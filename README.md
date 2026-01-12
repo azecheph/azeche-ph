@@ -126,3 +126,4 @@ azeche-ph/
 ---
 
 © 2026 Azeche P.H. - Sistema Administrativo Integral
+Actualizado: 12 enero 2026
