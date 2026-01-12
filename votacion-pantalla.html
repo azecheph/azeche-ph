@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados en Vivo - Azeche PH</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            min-height: 100vh;
+            padding: 40px;
+            color: white;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .logo-text {
+            font-size: 4em;
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+        .logo-blue { color: white; }
+        .logo-green { color: #FFD700; }
+        .edificio-nombre {
+            font-size: 2em;
+            opacity: 0.9;
+        }
+        .votacion-titulo {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 30px;
+            margin-bottom: 40px;
+        }
+        .votacion-titulo h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        .votacion-titulo p {
+            font-size: 1.5em;
+            opacity: 0.9;
+        }
+        .quorum-display {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 30px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .quorum-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+        .quorum-item {
+            text-align: center;
+        }
+        .quorum-number {
+            font-size: 4em;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+        .quorum-label {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .resultados-grid {
+            display: grid;
+            gap: 30px;
+        }
+        .resultado-card {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 30px;
+        }
+        .resultado-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .resultado-icon {
+            font-size: 4em;
+        }
+        .resultado-stats {
+            text-align: right;
+        }
+        .resultado-votos {
+            font-size: 4em;
+            font-weight: 900;
+        }
+        .resultado-porcentaje {
+            font-size: 2em;
+            opacity: 0.9;
+        }
+        .progress-bar {
+            height: 60px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 30px;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: 900;
+            color: #0056B8;
+        }
+        .no-votacion {
+            text-align: center;
+            padding: 100px;
+            font-size: 2em;
+            opacity: 0.7;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .live-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: #ff4444;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-text">
+                <span class="logo-blue">AZECHE</span><span class="logo-green">PH</span>
+            </div>
+            <div class="edificio-nombre" id="edificioNombre">
+                <span class="live-indicator"></span>
+                EN VIVO
+            </div>
+        </div>
+
+        <div class="quorum-display">
+            <div class="quorum-grid">
+                <div class="quorum-item">
+                    <div class="quorum-number" id="quorumPorcentaje">0%</div>
+                    <div class="quorum-label">QUÓRUM</div>
+                </div>
+                <div class="quorum-item">
+                    <div class="quorum-number" id="totalAsistentes">0</div>
+                    <div class="quorum-label">ASISTENTES</div>
+                </div>
+                <div class="quorum-item">
+                    <div class="quorum-number" id="totalVotos">0</div>
+                    <div class="quorum-label">VOTOS</div>
+                </div>
+                <div class="quorum-item">
+                    <div class="quorum-number" id="coeficienteTotal">0</div>
+                    <div class="quorum-label">COEFICIENTE</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="votacionContent">
+            <div class="no-votacion">
+                ⏳ Esperando votación activa...
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
+            authDomain: "azeche-ph.firebaseapp.com",
+            databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+            projectId: "azeche-ph",
+            storageBucket: "azeche-ph.firebasestorage.app",
+            messagingSenderId: "905337990521",
+            appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const edificio = urlParams.get('edificio') || 'nepal-2';
+
+        const nombresEdificios = {
+            'nepal-2': 'NEPAL 2',
+            'avalon': 'AVALON',
+            'convivienda-1': 'CONVIVIENDA 1',
+            'pinos-del-country': 'PINOS DEL COUNTRY'
+        };
+
+        document.getElementById('edificioNombre').innerHTML = `
+            <span class="live-indicator"></span>
+            ${nombresEdificios[edificio]} - EN VIVO
+        `;
+
+        // Escuchar asistentes
+        const asistentesRef = ref(db, `asambleas/${edificio}/asistentes`);
+        onValue(asistentesRef, (snapshot) => {
+            const asistentes = snapshot.val() || {};
+            const total = Object.keys(asistentes).length;
+            document.getElementById('totalAsistentes').textContent = total;
+            
+            const quorum = total > 0 ? Math.min(100, (total / 23) * 100) : 0;
+            document.getElementById('quorumPorcentaje').textContent = Math.round(quorum) + '%';
+            
+            let coefTotal = 0;
+            Object.values(asistentes).forEach(a => {
+                coefTotal += parseFloat(a.coeficiente || 0);
+            });
+            document.getElementById('coeficienteTotal').textContent = coefTotal.toFixed(2);
+        });
+
+        // Escuchar votación activa
+        const votacionRef = ref(db, `asambleas/${edificio}/votacion_activa`);
+        onValue(votacionRef, (snapshot) => {
+            const votacion = snapshot.val();
+            mostrarVotacion(votacion);
+        });
+
+        function mostrarVotacion(votacion) {
+            const container = document.getElementById('votacionContent');
+            
+            if (!votacion) {
+                container.innerHTML = `
+                    <div class="no-votacion">
+                        ⏳ Esperando votación activa...
+                    </div>
+                `;
+                document.getElementById('totalVotos').textContent = '0';
+                return;
+            }
+
+            const votos = votacion.votos || {};
+            let aFavor = 0, enContra = 0, abstencion = 0;
+
+            Object.values(votos).forEach(voto => {
+                if (voto.voto === 'si') aFavor++;
+                else if (voto.voto === 'no') enContra++;
+                else abstencion++;
+            });
+
+            const total = aFavor + enContra + abstencion;
+            document.getElementById('totalVotos').textContent = total;
+
+            const porcAFavor = total > 0 ? (aFavor / total * 100) : 0;
+            const porcContra = total > 0 ? (enContra / total * 100) : 0;
+            const porcAbstencion = total > 0 ? (abstencion / total * 100) : 0;
+
+            container.innerHTML = `
+                <div class="votacion-titulo">
+                    <h1>${votacion.titulo}</h1>
+                    <p>${votacion.descripcion || ''}</p>
+                </div>
+
+                <div class="resultados-grid">
+                    <div class="resultado-card" style="background: rgba(0, 184, 83, 0.3);">
+                        <div class="resultado-header">
+                            <div class="resultado-icon">✅</div>
+                            <div class="resultado-stats">
+                                <div class="resultado-votos">${aFavor}</div>
+                                <div class="resultado-porcentaje">${porcAFavor.toFixed(1)}%</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${porcAFavor}%">
+                                A FAVOR
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="resultado-card" style="background: rgba(220, 53, 69, 0.3);">
+                        <div class="resultado-header">
+                            <div class="resultado-icon">❌</div>
+                            <div class="resultado-stats">
+                                <div class="resultado-votos">${enContra}</div>
+                                <div class="resultado-porcentaje">${porcContra.toFixed(1)}%</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${porcContra}%; background: rgba(255,255,255,0.9);">
+                                EN CONTRA
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="resultado-card" style="background: rgba(108, 117, 125, 0.3);">
+                        <div class="resultado-header">
+                            <div class="resultado-icon">⚪</div>
+                            <div class="resultado-stats">
+                                <div class="resultado-votos">${abstencion}</div>
+                                <div class="resultado-porcentaje">${porcAbstencion.toFixed(1)}%</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${porcAbstencion}%; background: rgba(255,255,255,0.7);">
+                                ABSTENCIÓN
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Hacer pantalla completa al hacer doble click
+        document.body.addEventListener('dblclick', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
+    </script>
+</body>
+</html>

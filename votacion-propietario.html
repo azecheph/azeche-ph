@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votación - Azeche PH</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        .logo-text {
+            font-size: 2.5em;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+        .logo-blue { color: #0056B8; }
+        .logo-green { color: #00B853; }
+        .edificio-nombre {
+            color: #666;
+            font-size: 1.1em;
+        }
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+        }
+        .step h2 {
+            color: #0056B8;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #0056B8;
+        }
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        .votacion-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #0056B8;
+        }
+        .votacion-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .votacion-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        .opciones-voto {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .opcion-voto {
+            background: white;
+            border: 3px solid #ddd;
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        .opcion-voto:hover {
+            border-color: #0056B8;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .opcion-voto.selected {
+            border-color: #00B853;
+            background: linear-gradient(135deg, rgba(0, 184, 83, 0.1) 0%, white 100%);
+        }
+        .opcion-icon {
+            font-size: 2em;
+        }
+        .success-message {
+            text-align: center;
+            padding: 40px;
+        }
+        .success-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+        .success-message h2 {
+            color: #00B853;
+            margin-bottom: 15px;
+        }
+        .success-message p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        .resultados {
+            margin-top: 30px;
+        }
+        .resultado-bar {
+            margin-bottom: 20px;
+        }
+        .resultado-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        .progress-bar {
+            height: 40px;
+            background: #e9ecef;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #00B853 0%, #0056B8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            transition: width 0.5s ease;
+        }
+        .info-badge {
+            background: #fff3cd;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .info-badge p {
+            color: #856404;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-text">
+                <span class="logo-blue">AZECHE</span><span class="logo-green">PH</span>
+            </div>
+            <div class="edificio-nombre" id="edificioNombre">Cargando...</div>
+        </div>
+
+        <div class="content">
+            <!-- PASO 1: REGISTRO -->
+            <div class="step active" id="step-registro">
+                <h2>👋 Registro de Asistencia</h2>
+                
+                <div class="info-badge">
+                    <p>Ingresa tu información para registrar tu asistencia a la asamblea</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="nombrePropietario" placeholder="Tu nombre">
+                </div>
+
+                <div class="form-group">
+                    <label>Apartamento</label>
+                    <select id="apartamentoPropietario">
+                        <option value="">Selecciona tu apartamento</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Cédula / Documento</label>
+                    <input type="text" id="documentoPropietario" placeholder="123456789">
+                </div>
+
+                <button class="btn btn-primary" onclick="registrarAsistencia()">
+                    ✅ Registrar Asistencia
+                </button>
+            </div>
+
+            <!-- PASO 2: VOTACIÓN -->
+            <div class="step" id="step-votacion">
+                <h2>🗳️ Votación Activa</h2>
+
+                <div id="votacionInfo"></div>
+
+                <div class="opciones-voto" id="opcionesVoto">
+                    <div class="opcion-voto" onclick="seleccionarVoto('si')">
+                        <span class="opcion-icon">✅</span>
+                        <span>A Favor</span>
+                    </div>
+                    <div class="opcion-voto" onclick="seleccionarVoto('no')">
+                        <span class="opcion-icon">❌</span>
+                        <span>En Contra</span>
+                    </div>
+                    <div class="opcion-voto" onclick="seleccionarVoto('abstencion')">
+                        <span class="opcion-icon">⚪</span>
+                        <span>Abstención</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="btnVotar" disabled onclick="enviarVoto()">
+                    🗳️ Enviar Voto
+                </button>
+
+                <div class="resultados" id="resultadosLive" style="display: none;">
+                    <h3 style="color: #0056B8; margin-bottom: 15px;">📊 Resultados en Tiempo Real</h3>
+                    <div id="resultadosContent"></div>
+                </div>
+            </div>
+
+            <!-- PASO 3: CONFIRMACIÓN -->
+            <div class="step" id="step-confirmacion">
+                <div class="success-message">
+                    <div class="success-icon">🎉</div>
+                    <h2>¡Voto Registrado!</h2>
+                    <p>Tu voto ha sido registrado exitosamente</p>
+                    <div class="resultados" style="margin-top: 30px;">
+                        <h3 style="color: #0056B8; margin-bottom: 15px;">Resultados Actuales</h3>
+                        <div id="resultadosFinal"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, onValue, set, push, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
+            authDomain: "azeche-ph.firebaseapp.com",
+            databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+            projectId: "azeche-ph",
+            storageBucket: "azeche-ph.firebasestorage.app",
+            messagingSenderId: "905337990521",
+            appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Obtener edificio de URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const edificio = urlParams.get('edificio');
+        
+        if (!edificio) {
+            alert('⚠️ No se especificó edificio');
+        }
+
+        const nombresEdificios = {
+            'nepal-2': 'Nepal 2',
+            'avalon': 'Avalon',
+            'convivienda-1': 'Convivienda 1',
+            'pinos-del-country': 'Pinos del Country'
+        };
+
+        document.getElementById('edificioNombre').textContent = nombresEdificios[edificio] || edificio;
+
+        let votoSeleccionado = null;
+        let usuarioId = null;
+        let votacionActual = null;
+
+        // Cargar apartamentos del edificio
+        const residentesRef = ref(db, `residentes/${edificio}`);
+        get(residentesRef).then((snapshot) => {
+            const residentes = snapshot.val();
+            if (residentes) {
+                const select = document.getElementById('apartamentoPropietario');
+                Object.keys(residentes).forEach(apto => {
+                    const option = document.createElement('option');
+                    option.value = apto;
+                    option.textContent = `Apartamento ${apto}`;
+                    select.appendChild(option);
+                });
+            }
+        });
+
+        // Escuchar votación activa
+        const votacionRef = ref(db, `asambleas/${edificio}/votacion_activa`);
+        onValue(votacionRef, (snapshot) => {
+            votacionActual = snapshot.val();
+            if (votacionActual) {
+                mostrarVotacion();
+                actualizarResultados();
+            }
+        });
+
+        window.registrarAsistencia = async function() {
+            const nombre = document.getElementById('nombrePropietario').value;
+            const apartamento = document.getElementById('apartamentoPropietario').value;
+            const documento = document.getElementById('documentoPropietario').value;
+
+            if (!nombre || !apartamento || !documento) {
+                alert('⚠️ Completa todos los campos');
+                return;
+            }
+
+            // Generar ID único
+            usuarioId = `${apartamento}_${Date.now()}`;
+
+            // Registrar asistencia
+            await set(ref(db, `asambleas/${edificio}/asistentes/${usuarioId}`), {
+                nombre,
+                apartamento,
+                documento,
+                coeficiente: 0.0435, // Esto debería venir de la base de datos
+                horaRegistro: new Date().toISOString()
+            });
+
+            // Ir a votación
+            mostrarPaso('step-votacion');
+        };
+
+        function mostrarVotacion() {
+            if (!votacionActual) {
+                document.getElementById('votacionInfo').innerHTML = `
+                    <div class="info-badge">
+                        <p>⏳ Esperando votación...</p>
+                    </div>
+                `;
+                return;
+            }
+
+            document.getElementById('votacionInfo').innerHTML = `
+                <div class="votacion-card">
+                    <h3>${votacionActual.titulo}</h3>
+                    <p>${votacionActual.descripcion || ''}</p>
+                    <p style="font-size: 0.9em; color: #999; margin-top: 10px;">
+                        Tipo: ${votacionActual.tipo === 'coeficientes' ? 'Por Coeficientes' : 'Nominal'}
+                    </p>
+                </div>
+            `;
+        }
+
+        window.seleccionarVoto = function(voto) {
+            votoSeleccionado = voto;
+            
+            // Actualizar UI
+            document.querySelectorAll('.opcion-voto').forEach(el => el.classList.remove('selected'));
+            event.target.closest('.opcion-voto').classList.add('selected');
+            
+            document.getElementById('btnVotar').disabled = false;
+        };
+
+        window.enviarVoto = async function() {
+            if (!votoSeleccionado || !usuarioId) return;
+
+            await set(ref(db, `asambleas/${edificio}/votacion_activa/votos/${usuarioId}`), {
+                voto: votoSeleccionado,
+                apartamento: document.getElementById('apartamentoPropietario').value,
+                hora: new Date().toISOString()
+            });
+
+            mostrarPaso('step-confirmacion');
+            actualizarResultados();
+        };
+
+        function actualizarResultados() {
+            if (!votacionActual || !votacionActual.votos) return;
+
+            const votos = votacionActual.votos;
+            let aFavor = 0, enContra = 0, abstencion = 0;
+
+            Object.values(votos).forEach(voto => {
+                if (voto.voto === 'si') aFavor++;
+                else if (voto.voto === 'no') enContra++;
+                else abstencion++;
+            });
+
+            const total = aFavor + enContra + abstencion;
+            const porcAFavor = total > 0 ? (aFavor / total * 100) : 0;
+            const porcContra = total > 0 ? (enContra / total * 100) : 0;
+            const porcAbstencion = total > 0 ? (abstencion / total * 100) : 0;
+
+            const html = `
+                <div class="resultado-bar">
+                    <div class="resultado-label">
+                        <span>✅ A Favor</span>
+                        <span>${aFavor} (${porcAFavor.toFixed(1)}%)</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${porcAFavor}%">${porcAFavor.toFixed(1)}%</div>
+                    </div>
+                </div>
+                <div class="resultado-bar">
+                    <div class="resultado-label">
+                        <span>❌ En Contra</span>
+                        <span>${enContra} (${porcContra.toFixed(1)}%)</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${porcContra}%; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">${porcContra.toFixed(1)}%</div>
+                    </div>
+                </div>
+                <div class="resultado-bar">
+                    <div class="resultado-label">
+                        <span>⚪ Abstención</span>
+                        <span>${abstencion} (${porcAbstencion.toFixed(1)}%)</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${porcAbstencion}%; background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);">${porcAbstencion.toFixed(1)}%</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('resultadosFinal').innerHTML = html;
+            const resultadosLive = document.getElementById('resultadosContent');
+            if (resultadosLive) {
+                resultadosLive.innerHTML = html;
+            }
+        }
+
+        function mostrarPaso(pasoId) {
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            document.getElementById(pasoId).classList.add('active');
+        }
+    </script>
+</body>
+</html>
