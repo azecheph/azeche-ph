@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facturas Automáticas - Azeche P.H.</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .navbar h1 { color: #0056B8; font-size: 1.8em; }
+        
+        .nav-buttons { display: flex; gap: 15px; }
+        
+        .btn-nav {
+            background: #0056B8;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-nav:hover { background: #004494; }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px 40px; }
+        
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        
+        .page-header h1 { color: #0056B8; font-size: 2.2em; margin-bottom: 10px; }
+        
+        .upload-zone {
+            background: white;
+            padding: 60px 40px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            border: 3px dashed #0056B8;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: #00B853;
+            background: #f0f8ff;
+            transform: scale(1.02);
+        }
+        
+        .upload-icon { font-size: 4em; margin-bottom: 20px; }
+        
+        .facturas-lista {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .factura-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+        
+        .factura-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .factura-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .factura-estado {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .estado-procesando {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .estado-extraido {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .estado-aprobado {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .estado-rechazado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .factura-datos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .dato-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #0056B8;
+        }
+        
+        .dato-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .dato-valor {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .dato-valor.destacado {
+            font-size: 1.3em;
+            color: #0056B8;
+        }
+        
+        .factura-acciones {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-editar {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .btn-editar:hover { background: #ffb300; }
+        
+        .btn-aprobar {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-aprobar:hover { background: #218838; }
+        
+        .btn-rechazar {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-rechazar:hover { background: #c82333; }
+        
+        .btn-ver {
+            background: #0056B8;
+            color: white;
+        }
+        
+        .btn-ver:hover { background: #004494; }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0056B8;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .mensaje-exito {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid #28a745;
+        }
+        
+        .mensaje-error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>💼 Facturas Automáticas</h1>
+        <div class="nav-buttons">
+            <button class="btn-nav" onclick="location.href='Dashboard.html'">🏠 Inicio</button>
+            <button class="btn-nav" onclick="cerrarSesion()">🚪 Salir</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>🤖 Procesamiento Automático de Facturas</h1>
+            <p style="color: #666; margin-top: 10px;">
+                Sube facturas electrónicas (ZIP) y el sistema extraerá todos los datos automáticamente
+            </p>
+        </div>
+
+        <div id="mensajes"></div>
+
+        <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">📤</div>
+            <h2>Subir Factura Electrónica</h2>
+            <p style="margin-top: 10px; color: #666;">
+                Arrastra un archivo ZIP, PDF o XML aquí, o haz click para seleccionar
+            </p>
+            <p style="margin-top: 5px; color: #999; font-size: 0.9em;">
+                Formatos: .zip, .pdf, .xml • El sistema extraerá automáticamente todos los datos
+            </p>
+            <input type="file" id="fileInput" accept=".zip,.pdf,.xml" style="display: none;">
+        </div>
+        
+        <div id="listaFacturas" class="facturas-lista"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, onValue, update, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZ-rv2u8O4e5qB2bXsjHEikg5e3r4CPhI",
+            authDomain: "azeche-ph.firebaseapp.com",
+            databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+            projectId: "azeche-ph",
+            storageBucket: "azeche-ph.firebasestorage.app",
+            messagingSenderId: "990780503849",
+            appId: "1:990780503849:web:5d7b41c14ae60c6c36ae63"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
+        // Verificar sesión
+        if (!localStorage.getItem('azecheUser')) {
+            window.location.href = 'index.html';
+        }
+        
+        const userData = JSON.parse(localStorage.getItem('azecheUser'));
+        
+        // Referencias
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const listaFacturas = document.getElementById('listaFacturas');
+        const mensajes = document.getElementById('mensajes');
+        
+        // Drag & Drop
+        uploadZone.addEventListener('click', () => fileInput.click());
+        
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+        
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+        
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            
+            if (e.dataTransfer.files.length > 0) {
+                procesarArchivo(e.dataTransfer.files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                procesarArchivo(e.target.files[0]);
+            }
+        });
+        
+        async function procesarArchivo(file) {
+            const extension = file.name.toLowerCase();
+            if (!extension.endsWith('.zip') && !extension.endsWith('.pdf') && !extension.endsWith('.xml')) {
+                mostrarMensaje('Solo se aceptan archivos ZIP, PDF o XML de facturas electrónicas', 'error');
+                return;
+            }
+            
+            mostrarMensaje('📤 Subiendo factura y procesando...', 'info');
+            
+            // Registrar en Firebase como "procesando"
+            const facturaRef = ref(db, 'facturas_automaticas');
+            const nuevaFactura = {
+                nombreArchivo: file.name,
+                estado: 'procesando',
+                fechaSubida: new Date().toISOString(),
+                usuarioSubio: userData.email,
+                mensaje: extension.endsWith('.pdf') ? 'Procesando PDF...' : 'Extrayendo datos del XML...'
+            };
+            
+            const facturaKey = push(facturaRef, nuevaFactura).key;
+            
+            // Instrucciones para el usuario
+            let tipoArchivo = 'ZIP';
+            if (extension.endsWith('.pdf')) tipoArchivo = 'PDF';
+            if (extension.endsWith('.xml')) tipoArchivo = 'XML';
+            
+            mostrarMensaje(`⚠️ IMPORTANTE: Ejecuta PROCESAR_FACTURA.bat con este archivo ${tipoArchivo}`, 'info');
+            mostrarMensaje(`Archivo: ${file.name}`, 'info');
+            
+            setTimeout(() => {
+                mostrarMensaje(
+                    `<strong>PASOS:</strong><br>
+                    1. Guarda ${file.name} en tu carpeta de facturas<br>
+                    2. Ejecuta el archivo PROCESAR_FACTURA.bat correspondiente al edificio<br>
+                    3. Los datos aparecerán aquí automáticamente cuando el script termine`,
+                    'info'
+                );
+            }, 1000);
+        }
+        
+        function mostrarMensaje(texto, tipo) {
+            const clase = tipo === 'error' ? 'mensaje-error' : 'mensaje-exito';
+            mensajes.innerHTML = `<div class="${clase}">${texto}</div>`;
+            
+            setTimeout(() => {
+                mensajes.innerHTML = '';
+            }, 10000);
+        }
+        
+        // Escuchar facturas en Firebase
+        const facturasRef = ref(db, 'facturas_automaticas');
+        onValue(facturasRef, (snapshot) => {
+            const facturas = [];
+            snapshot.forEach((childSnapshot) => {
+                facturas.push({
+                    id: childSnapshot.key,
+                    ...childSnapshot.val()
+                });
+            });
+            
+            // Ordenar por fecha (más recientes primero)
+            facturas.sort((a, b) => new Date(b.fechaSubida) - new Date(a.fechaSubida));
+            
+            renderizarFacturas(facturas);
+        });
+        
+        function renderizarFacturas(facturas) {
+            if (facturas.length === 0) {
+                listaFacturas.innerHTML = `
+                    <div style="text-align: center; padding: 60px; color: #999;">
+                        <div style="font-size: 4em; margin-bottom: 20px;">📋</div>
+                        <h3>No hay facturas procesadas aún</h3>
+                        <p>Sube tu primera factura electrónica arriba</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            listaFacturas.innerHTML = facturas.map(factura => crearTarjetaFactura(factura)).join('');
+        }
+        
+        function crearTarjetaFactura(factura) {
+            const estadoClass = {
+                'procesando': 'estado-procesando',
+                'extraido': 'estado-extraido',
+                'aprobado': 'estado-aprobado',
+                'rechazado': 'estado-rechazado'
+            }[factura.estado] || 'estado-procesando';
+            
+            const estadoTexto = {
+                'procesando': '⏳ PROCESANDO',
+                'extraido': '🟢 DATOS EXTRAÍDOS',
+                'aprobado': '✅ APROBADA',
+                'rechazado': '❌ RECHAZADA'
+            }[factura.estado] || '⏳ PROCESANDO';
+            
+            let contenidoDatos = '';
+            
+            if (factura.estado === 'procesando') {
+                contenidoDatos = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>${factura.mensaje || 'Extrayendo datos del XML...'}</p>
+                    </div>
+                `;
+            } else if (factura.estado === 'extraido' || factura.estado === 'aprobado') {
+                contenidoDatos = `
+                    <div class="factura-datos">
+                        <div class="dato-item">
+                            <div class="dato-label">🏢 Edificio</div>
+                            <div class="dato-valor">${formatearEdificio(factura.edificio)}</div>
+                        </div>
+                        <div class="dato-item">
+                            <div class="dato-label">🏭 Proveedor</div>
+                            <div class="dato-valor">${factura.proveedor || 'N/A'}</div>
+                        </div>
+                        <div class="dato-item">
+                            <div class="dato-label">🆔 NIT</div>
+                            <div class="dato-valor">${factura.nitProveedor || 'N/A'}</div>
+                        </div>
+                        <div class="dato-item">
+                            <div class="dato-label">📄 Concepto</div>
+                            <div class="dato-valor">${factura.concepto || 'N/A'}</div>
+                        </div>
+                        <div class="dato-item">
+                            <div class="dato-label">💵 Valor Bruto</div>
+                            <div class="dato-valor">${formatearMoneda(factura.valorBruto)}</div>
+                        </div>
+                        <div class="dato-item">
+                            <div class="dato-label">📊 IVA</div>
+                            <div class="dato-valor">${formatearMoneda(factura.iva)}</div>
+                        </div>
+                        <div class="dato-item">
+                            <div class="dato-label">💸 Retención</div>
+                            <div class="dato-valor">${formatearMoneda(factura.retefuente)}</div>
+                        </div>
+                        <div class="dato-item" style="grid-column: span 2;">
+                            <div class="dato-label">💰 VALOR NETO A PAGAR</div>
+                            <div class="dato-valor destacado">${formatearMoneda(factura.valorNeto)}</div>
+                        </div>
+                        <div class="dato-item">
+                            <div class="dato-label">📅 Fecha Emisión</div>
+                            <div class="dato-valor">${formatearFecha(factura.fechaEmision)}</div>
+                        </div>
+                        <div class="dato-item">
+                            <div class="dato-label">📅 Fecha Vencimiento</div>
+                            <div class="dato-valor">${formatearFecha(factura.fechaVencimiento)}</div>
+                        </div>
+                        ${factura.driveLink ? `
+                        <div class="dato-item" style="grid-column: span 2;">
+                            <div class="dato-label">📎 Archivo en Drive</div>
+                            <a href="${factura.driveLink}" target="_blank" class="btn btn-ver" style="display: inline-block; margin-top: 5px; text-decoration: none;">
+                                Ver Factura Completa
+                            </a>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            
+            let acciones = '';
+            if (factura.estado === 'extraido') {
+                acciones = `
+                    <div class="factura-acciones">
+                        <button class="btn btn-rechazar" onclick="rechazarFactura('${factura.id}')">
+                            ❌ Rechazar
+                        </button>
+                        <button class="btn btn-aprobar" onclick="aprobarFactura('${factura.id}')">
+                            ✅ Aprobar y Crear Cuenta
+                        </button>
+                    </div>
+                `;
+            } else if (factura.estado === 'aprobado') {
+                acciones = `
+                    <div class="factura-acciones">
+                        <button class="btn btn-ver" onclick="location.href='cuentas-por-pagar.html'">
+                            🔍 Ver en Cuentas por Pagar
+                        </button>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="factura-card">
+                    <div class="factura-header">
+                        <div>
+                            <h3 style="color: #333; margin-bottom: 5px;">📄 ${factura.nombreArchivo || factura.archivoOriginal}</h3>
+                            <p style="color: #999; font-size: 0.9em;">
+                                ${factura.numeroFactura ? `Factura #${factura.numeroFactura} • ` : ''}
+                                ${new Date(factura.fechaSubida).toLocaleString('es-CO')}
+                            </p>
+                        </div>
+                        <div class="factura-estado ${estadoClass}">
+                            ${estadoTexto}
+                        </div>
+                    </div>
+                    ${contenidoDatos}
+                    ${acciones}
+                </div>
+            `;
+        }
+        
+        function formatearEdificio(edificio) {
+            const nombres = {
+                'nepal2': 'Nepal II',
+                'pinos_country': 'Pinos del Country',
+                'convivienda': 'Convivienda',
+                'avalon': 'Avalon'
+            };
+            return nombres[edificio] || edificio;
+        }
+        
+        function formatearMoneda(valor) {
+            if (!valor && valor !== 0) return 'N/A';
+            return new Intl.NumberFormat('es-CO', {
+                style: 'currency',
+                currency: 'COP',
+                minimumFractionDigits: 0
+            }).format(valor);
+        }
+        
+        function formatearFecha(fecha) {
+            if (!fecha) return 'N/A';
+            return new Date(fecha).toLocaleDateString('es-CO');
+        }
+        
+        window.aprobarFactura = async (id) => {
+            if (!confirm('¿Aprobar esta factura y crear cuenta automáticamente?')) return;
+            
+            const facturaRef = ref(db, `facturas_automaticas/${id}`);
+            await update(facturaRef, {
+                estado: 'aprobado',
+                fechaAprobacion: new Date().toISOString(),
+                usuarioAprobo: userData.email
+            });
+            
+            // Aquí iría la lógica para crear la cuenta en cuentas-por-pagar
+            mostrarMensaje('✅ Factura aprobada y cuenta creada exitosamente', 'success');
+        };
+        
+        window.rechazarFactura = async (id) => {
+            const motivo = prompt('¿Por qué rechazas esta factura?');
+            if (!motivo) return;
+            
+            const facturaRef = ref(db, `facturas_automaticas/${id}`);
+            await update(facturaRef, {
+                estado: 'rechazado',
+                fechaRechazo: new Date().toISOString(),
+                usuarioRechazo: userData.email,
+                motivoRechazo: motivo
+            });
+            
+            mostrarMensaje('❌ Factura rechazada', 'error');
+        };
+        
+        window.cerrarSesion = () => {
+            localStorage.removeItem('azecheUser');
+            window.location.href = 'index.html';
+        };
+    </script>
+</body>
+</html>

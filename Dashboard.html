@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)file:///C:/Users/C3MADRIZ/Downloads/Dashboard_2.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Azeche P.H.</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo-box {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .logo-text {
+            font-size: 2.2em;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+        
+        .logo-blue {
+            color: #0056B8;
+        }
+        
+        .logo-green {
+            color: #00B853;
+        }
+        
+        .logo-subtitle {
+            font-size: 0.35em;
+            font-weight: 400;
+            letter-spacing: 3px;
+            color: #666;
+            display: block;
+            margin-top: 2px;
+        }
+        
+        .welcome-text h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-text p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+        }
+        
+        .btn-logout:hover {
+            background: white;
+            color: #0056B8;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ALERTAS DE VENCIMIENTO */
+        .alertas-container {
+            margin-bottom: 30px;
+        }
+
+        .alerta {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-left: 5px solid;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .alerta-urgente {
+            border-color: #dc3545;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+        }
+
+        .alerta-advertencia {
+            border-color: #ffc107;
+            background: linear-gradient(135deg, #fffbf0 0%, #fff3cd 100%);
+        }
+
+        .alerta-info {
+            border-color: #17a2b8;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2f7 100%);
+        }
+
+        .alerta-icon {
+            font-size: 2.5em;
+            flex-shrink: 0;
+        }
+
+        .alerta-content {
+            flex: 1;
+        }
+
+        .alerta-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .alerta-urgente .alerta-title { color: #dc3545; }
+        .alerta-advertencia .alerta-title { color: #ff8800; }
+        .alerta-info .alerta-title { color: #17a2b8; }
+
+        .alerta-detail {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .alerta-close {
+            background: transparent;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+
+        .alerta-close:hover {
+            opacity: 1;
+        }
+
+        /* SECCIÓN SERVICIOS RECURRENTES */
+        .servicios-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .servicios-section h2 {
+            color: #0056B8;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8em;
+        }
+
+        .edificio-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: 2px solid #0056B8;
+            background: white;
+            color: #0056B8;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: #f0f4ff;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+        }
+
+        .servicios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .servicio-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+
+        .servicio-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .servicio-card.proximo {
+            border-color: #ffc107;
+            background: linear-gradient(135deg, #fffbf0 0%, #fff3cd 50%, #ffffff 100%);
+        }
+
+        .servicio-card.vencido {
+            border-color: #dc3545;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 50%, #ffffff 100%);
+        }
+
+        .servicio-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .servicio-icon {
+            font-size: 2em;
+        }
+
+        .servicio-tipo {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .servicio-proveedor {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 12px;
+        }
+
+        .servicio-fecha {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .fecha-label {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .fecha-valor {
+            font-weight: 700;
+            color: #0056B8;
+        }
+
+        .servicio-card.proximo .fecha-valor {
+            color: #ff8800;
+        }
+
+        .servicio-card.vencido .fecha-valor {
+            color: #dc3545;
+        }
+
+        .servicio-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .status-ok {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-proximo {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-vencido {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #0056B8;
+        }
+        
+        .stat-change {
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .positive { color: #28a745; }
+        .negative { color: #dc3545; }
+        .warning { color: #ffc107; }
+        
+        .quick-actions {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .quick-actions h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+            padding: 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 86, 184, 0.3);
+        }
+        
+        .action-btn span {
+            display: block;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER CON LOGO AZECHE -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-box">
+                    <div class="logo-text">
+                        <span class="logo-blue">AZECHE</span><span class="logo-green">PH</span>
+                        <span class="logo-subtitle">SOLUCIONES ADMINISTRATIVAS</span>
+                    </div>
+                </div>
+                <div class="welcome-text">
+                    <h1>👋 Bienvenida, <span id="userName">C3madriz</span></h1>
+                    <p>Panel de Control</p>
+                    <p>📅 <span id="fecha">domingo, 14 de diciembre de 2025</span></p>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">🚪 Salir</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- ALERTAS DE VENCIMIENTO (CUENTAS POR PAGAR Y SERVICIOS) -->
+        <div class="alertas-container" id="alertasContainer"></div>
+
+        <!-- ACCIONES RÁPIDAS -->
+        <div class="quick-actions">
+            <h2>⚡ Acciones Rápidas</h2>
+            <div class="actions-grid">
+                <button class="action-btn" onclick="location.href=&#39;edificios.html&#39;;">
+                    <span>🏢</span>
+                    Ver Edificios
+                </button>
+                <button class="action-btn" onclick="location.href=&#39;proveedores.html&#39;;">
+                    <span>🏪</span>
+                    Gestionar Proveedores
+                </button>
+                <button class="action-btn" onclick="location.href=&#39;cuentas-por-pagar.html&#39;;">
+                    <span>💸</span>
+                    Cuentas por Pagar
+                </button>
+                <button class="action-btn" onclick="location.href=&#39;Residentes_y_Propietarios_-_Azeche_P_H_.html&#39;;">
+                    <span>👥</span>
+                    Residentes y Propietarios
+                </button>
+                <button class="action-btn" onclick="location.href=&#39;limpiar-base-datos.html&#39;;">
+                    <span>🗑️</span>
+                    Limpiar Base de Datos
+                </button>
+            </div>
+        </div>
+
+        <!-- NUEVA SECCIÓN: SERVICIOS RECURRENTES -->
+        <div class="servicios-section">
+            <h2>💡 Servicios Públicos Recurrentes</h2>
+            
+            <div class="edificio-tabs">
+                <button class="tab-btn active" onclick="filtrarEdificio(&#39;todos&#39;)">Todos</button>
+                <button class="tab-btn" onclick="filtrarEdificio(&#39;Nepal 2&#39;)">Nepal 2</button>
+                <button class="tab-btn" onclick="filtrarEdificio(&#39;Avalon&#39;)">Avalon</button>
+                <button class="tab-btn" onclick="filtrarEdificio(&#39;Pinos del Contry&#39;)">Pinos del Contry</button>
+                <button class="tab-btn" onclick="filtrarEdificio(&#39;Convivienda I&#39;)">Convivienda I</button>
+            </div>
+
+            <div class="servicios-grid" id="serviciosGrid">
+                    <div class="servicio-card ">
+                        <div class="servicio-header">
+                            <div class="servicio-icon">💡</div>
+                            <div>
+                                <div class="servicio-tipo">Luz</div>
+                                <div style="font-size: 0.85em; color: #0056B8; font-weight: 600;">Nepal 2</div>
+                            </div>
+                        </div>
+                        <div class="servicio-proveedor">📍 Enel-Codensa</div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Fecha de Pago:</span>
+                            <span class="fecha-valor">26 de cada mes</span>
+                        </div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Suspensión:</span>
+                            <span class="fecha-valor">Día 28</span>
+                        </div>
+                        <div class="servicio-status status-ok">
+                            ✅ Faltan 12 días
+                        </div>
+                    </div>
+                
+                    <div class="servicio-card vencido">
+                        <div class="servicio-header">
+                            <div class="servicio-icon">💧</div>
+                            <div>
+                                <div class="servicio-tipo">Agua</div>
+                                <div style="font-size: 0.85em; color: #0056B8; font-weight: 600;">Nepal 2</div>
+                            </div>
+                        </div>
+                        <div class="servicio-proveedor">📍 Acueducto de Bogotá</div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Fecha de Pago:</span>
+                            <span class="fecha-valor">5 de cada mes</span>
+                        </div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Suspensión:</span>
+                            <span class="fecha-valor">Día 10</span>
+                        </div>
+                        <div class="servicio-status status-vencido">
+                            🚨 Vencido hace 9 día(s)
+                        </div>
+                    </div>
+                
+                    <div class="servicio-card vencido">
+                        <div class="servicio-header">
+                            <div class="servicio-icon">🌐</div>
+                            <div>
+                                <div class="servicio-tipo">Internet</div>
+                                <div style="font-size: 0.85em; color: #0056B8; font-weight: 600;">Nepal 2</div>
+                            </div>
+                        </div>
+                        <div class="servicio-proveedor">📍 ETB</div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Fecha de Pago:</span>
+                            <span class="fecha-valor">8 de cada mes</span>
+                        </div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Suspensión:</span>
+                            <span class="fecha-valor">Día 10</span>
+                        </div>
+                        <div class="servicio-status status-vencido">
+                            🚨 Vencido hace 6 día(s)
+                        </div>
+                    </div>
+                
+                    <div class="servicio-card ">
+                        <div class="servicio-header">
+                            <div class="servicio-icon">🌐</div>
+                            <div>
+                                <div class="servicio-tipo">Internet</div>
+                                <div style="font-size: 0.85em; color: #0056B8; font-weight: 600;">Nepal 2</div>
+                            </div>
+                        </div>
+                        <div class="servicio-proveedor">📍 WOM</div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Fecha de Pago:</span>
+                            <span class="fecha-valor">20 de cada mes</span>
+                        </div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Suspensión:</span>
+                            <span class="fecha-valor">Día 22</span>
+                        </div>
+                        <div class="servicio-status status-ok">
+                            ✅ Faltan 6 días
+                        </div>
+                    </div>
+                
+                    <div class="servicio-card ">
+                        <div class="servicio-header">
+                            <div class="servicio-icon">💡</div>
+                            <div>
+                                <div class="servicio-tipo">Luz</div>
+                                <div style="font-size: 0.85em; color: #0056B8; font-weight: 600;">Avalon</div>
+                            </div>
+                        </div>
+                        <div class="servicio-proveedor">📍 Enel-Codensa</div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Fecha de Pago:</span>
+                            <span class="fecha-valor">27 de cada mes</span>
+                        </div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Suspensión:</span>
+                            <span class="fecha-valor">Día 2</span>
+                        </div>
+                        <div class="servicio-status status-ok">
+                            ✅ Faltan 13 días
+                        </div>
+                    </div>
+                
+                    <div class="servicio-card vencido">
+                        <div class="servicio-header">
+                            <div class="servicio-icon">💧</div>
+                            <div>
+                                <div class="servicio-tipo">Agua</div>
+                                <div style="font-size: 0.85em; color: #0056B8; font-weight: 600;">Avalon</div>
+                            </div>
+                        </div>
+                        <div class="servicio-proveedor">📍 Acueducto de Bogotá</div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Fecha de Pago:</span>
+                            <span class="fecha-valor">7 de cada mes</span>
+                        </div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Suspensión:</span>
+                            <span class="fecha-valor">Día 10</span>
+                        </div>
+                        <div class="servicio-status status-vencido">
+                            🚨 Vencido hace 7 día(s)
+                        </div>
+                    </div>
+                
+                    <div class="servicio-card ">
+                        <div class="servicio-header">
+                            <div class="servicio-icon">🌐</div>
+                            <div>
+                                <div class="servicio-tipo">Internet</div>
+                                <div style="font-size: 0.85em; color: #0056B8; font-weight: 600;">Avalon</div>
+                            </div>
+                        </div>
+                        <div class="servicio-proveedor">📍 ETB</div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Fecha de Pago:</span>
+                            <span class="fecha-valor">23 de cada mes</span>
+                        </div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Suspensión:</span>
+                            <span class="fecha-valor">Día 25</span>
+                        </div>
+                        <div class="servicio-status status-ok">
+                            ✅ Faltan 9 días
+                        </div>
+                    </div>
+                
+                    <div class="servicio-card ">
+                        <div class="servicio-header">
+                            <div class="servicio-icon">💡</div>
+                            <div>
+                                <div class="servicio-tipo">Luz</div>
+                                <div style="font-size: 0.85em; color: #0056B8; font-weight: 600;">Pinos del Contry</div>
+                            </div>
+                        </div>
+                        <div class="servicio-proveedor">📍 Enel-Codensa</div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Fecha de Pago:</span>
+                            <span class="fecha-valor">27 de cada mes</span>
+                        </div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Suspensión:</span>
+                            <span class="fecha-valor">Día 19</span>
+                        </div>
+                        <div class="servicio-status status-ok">
+                            ✅ Faltan 13 días
+                        </div>
+                    </div>
+                
+                    <div class="servicio-card vencido">
+                        <div class="servicio-header">
+                            <div class="servicio-icon">💧</div>
+                            <div>
+                                <div class="servicio-tipo">Agua</div>
+                                <div style="font-size: 0.85em; color: #0056B8; font-weight: 600;">Pinos del Contry</div>
+                            </div>
+                        </div>
+                        <div class="servicio-proveedor">📍 Acueducto de Bogotá</div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Fecha de Pago:</span>
+                            <span class="fecha-valor">11 de cada mes</span>
+                        </div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Suspensión:</span>
+                            <span class="fecha-valor">Día 16</span>
+                        </div>
+                        <div class="servicio-status status-vencido">
+                            🚨 Vencido hace 3 día(s)
+                        </div>
+                    </div>
+                
+                    <div class="servicio-card ">
+                        <div class="servicio-header">
+                            <div class="servicio-icon">💡</div>
+                            <div>
+                                <div class="servicio-tipo">Luz</div>
+                                <div style="font-size: 0.85em; color: #0056B8; font-weight: 600;">Convivienda I</div>
+                            </div>
+                        </div>
+                        <div class="servicio-proveedor">📍 Enel-Codensa</div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Fecha de Pago:</span>
+                            <span class="fecha-valor">19 de cada mes</span>
+                        </div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Suspensión:</span>
+                            <span class="fecha-valor">Día 21</span>
+                        </div>
+                        <div class="servicio-status status-ok">
+                            ✅ Faltan 5 días
+                        </div>
+                    </div>
+                
+                    <div class="servicio-card proximo">
+                        <div class="servicio-header">
+                            <div class="servicio-icon">💧</div>
+                            <div>
+                                <div class="servicio-tipo">Agua</div>
+                                <div style="font-size: 0.85em; color: #0056B8; font-weight: 600;">Convivienda I</div>
+                            </div>
+                        </div>
+                        <div class="servicio-proveedor">📍 Acueducto de Bogotá</div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Fecha de Pago:</span>
+                            <span class="fecha-valor">16 de cada mes</span>
+                        </div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Suspensión:</span>
+                            <span class="fecha-valor">Día 19</span>
+                        </div>
+                        <div class="servicio-status status-proximo">
+                            ⚠️ Vence en 2 día(s)
+                        </div>
+                    </div>
+                
+                    <div class="servicio-card ">
+                        <div class="servicio-header">
+                            <div class="servicio-icon">🌐</div>
+                            <div>
+                                <div class="servicio-tipo">Internet</div>
+                                <div style="font-size: 0.85em; color: #0056B8; font-weight: 600;">Convivienda I</div>
+                            </div>
+                        </div>
+                        <div class="servicio-proveedor">📍 ETB</div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Fecha de Pago:</span>
+                            <span class="fecha-valor">24 de cada mes</span>
+                        </div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Suspensión:</span>
+                            <span class="fecha-valor">Día 26</span>
+                        </div>
+                        <div class="servicio-status status-ok">
+                            ✅ Faltan 10 días
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+        <!-- ESTADÍSTICAS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-label">Cuentas por Pagar</div>
+                <div class="stat-value" id="totalCuentas">$0</div>
+                <div class="stat-change positive" id="cambioMes">Todo limpio</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">⏰</div>
+                <div class="stat-label">Vencen Hoy</div>
+                <div class="stat-value" id="vencenHoy">0</div>
+                <div class="stat-change warning" id="textoVencen">Sin vencimientos</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-label">Facturas Vencidas</div>
+                <div class="stat-value" id="facturasVencidas">0</div>
+                <div class="stat-change negative" id="textoVencidas">Todo al día</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-label">Pagos del Mes</div>
+                <div class="stat-value" id="pagosMes">0</div>
+                <div class="stat-change positive" id="textoPagos">Sin pagos registrados</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
+            authDomain: "azeche-ph.firebaseapp.com",
+            databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+            projectId: "azeche-ph",
+            storageBucket: "azeche-ph.firebasestorage.app",
+            messagingSenderId: "905337990521",
+            appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // SERVICIOS RECURRENTES (Desde tu CSV de Notion)
+        const serviciosRecurrentes = [
+            { servicio: "Luz", edificio: "Nepal 2", proveedor: "Enel-Codensa", diaPago: 26, diaSuspension: 28 },
+            { servicio: "Agua", edificio: "Nepal 2", proveedor: "Acueducto de Bogotá", diaPago: 5, diaSuspension: 10 },
+            { servicio: "Internet", edificio: "Nepal 2", proveedor: "ETB", diaPago: 8, diaSuspension: 10 },
+            { servicio: "Internet", edificio: "Nepal 2", proveedor: "WOM", diaPago: 20, diaSuspension: 22 },
+            { servicio: "Luz", edificio: "Avalon", proveedor: "Enel-Codensa", diaPago: 27, diaSuspension: 2 },
+            { servicio: "Agua", edificio: "Avalon", proveedor: "Acueducto de Bogotá", diaPago: 7, diaSuspension: 10 },
+            { servicio: "Internet", edificio: "Avalon", proveedor: "ETB", diaPago: 23, diaSuspension: 25 },
+            { servicio: "Luz", edificio: "Pinos del Contry", proveedor: "Enel-Codensa", diaPago: 27, diaSuspension: 19 },
+            { servicio: "Agua", edificio: "Pinos del Contry", proveedor: "Acueducto de Bogotá", diaPago: 11, diaSuspension: 16 },
+            { servicio: "Luz", edificio: "Convivienda I", proveedor: "Enel-Codensa", diaPago: 19, diaSuspension: 21 },
+            { servicio: "Agua", edificio: "Convivienda I", proveedor: "Acueducto de Bogotá", diaPago: 16, diaSuspension: 19 },
+            { servicio: "Internet", edificio: "Convivienda I", proveedor: "ETB", diaPago: 24, diaSuspension: 26 }
+        ];
+
+        let edificioFiltro = 'todos';
+
+        // Fecha
+        document.getElementById('fecha').textContent = new Date().toLocaleDateString('es-ES', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Verificar sesión desde localStorage
+        const userInfo = localStorage.getItem('azecheUser');
+        if (userInfo) {
+            const user = JSON.parse(userInfo);
+            document.getElementById('userName').textContent = user.nombre;
+            cargarEstadisticas();
+            cargarServicios();
+        }
+
+        // Autenticación
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const nombre = user.displayName || user.email.split('@')[0];
+                document.getElementById('userName').textContent = nombre;
+                cargarEstadisticas();
+                cargarServicios();
+            } else if (!userInfo) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Logout
+        window.logout = () => {
+            localStorage.removeItem('azecheUser');
+            signOut(auth).then(() => {
+                window.location.href = 'index.html';
+            }).catch(() => {
+                window.location.href = 'index.html';
+            });
+        };
+
+        // FILTRAR EDIFICIOS
+        window.filtrarEdificio = (edificio) => {
+            edificioFiltro = edificio;
+            
+            // Actualizar tabs activos
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            cargarServicios();
+        };
+
+        // CARGAR SERVICIOS RECURRENTES
+        function cargarServicios() {
+            const grid = document.getElementById('serviciosGrid');
+            const hoy = new Date();
+            const diaActual = hoy.getDate();
+            const mesActual = hoy.getMonth();
+            const añoActual = hoy.getFullYear();
+            
+            const serviciosFiltrados = edificioFiltro === 'todos' 
+                ? serviciosRecurrentes 
+                : serviciosRecurrentes.filter(s => s.edificio === edificioFiltro);
+
+            const serviciosHTML = serviciosFiltrados.map(servicio => {
+                // Calcular fecha de pago para este mes
+                const fechaPago = new Date(añoActual, mesActual, servicio.diaPago);
+                const diffDias = Math.ceil((fechaPago - hoy) / (1000 * 60 * 60 * 24));
+                
+                // Determinar estado
+                let claseEstado = '';
+                let textoEstado = '';
+                let iconoEstado = '';
+                
+                if (diffDias < 0) {
+                    claseEstado = 'vencido';
+                    textoEstado = `Vencido hace ${Math.abs(diffDias)} día(s)`;
+                    iconoEstado = '🚨';
+                } else if (diffDias === 0) {
+                    claseEstado = 'vencido';
+                    textoEstado = '¡Vence HOY!';
+                    iconoEstado = '⏰';
+                } else if (diffDias <= 3) {
+                    claseEstado = 'proximo';
+                    textoEstado = `Vence en ${diffDias} día(s)`;
+                    iconoEstado = '⚠️';
+                } else {
+                    claseEstado = '';
+                    textoEstado = `Faltan ${diffDias} días`;
+                    iconoEstado = '✅';
+                }
+
+                // Icono según tipo de servicio
+                const iconoServicio = servicio.servicio === 'Luz' ? '💡' :
+                                     servicio.servicio === 'Agua' ? '💧' :
+                                     servicio.servicio === 'Gas' ? '🔥' :
+                                     servicio.servicio === 'Internet' ? '🌐' : '📋';
+
+                return `
+                    <div class="servicio-card ${claseEstado}">
+                        <div class="servicio-header">
+                            <div class="servicio-icon">${iconoServicio}</div>
+                            <div>
+                                <div class="servicio-tipo">${servicio.servicio}</div>
+                                <div style="font-size: 0.85em; color: #0056B8; font-weight: 600;">${servicio.edificio}</div>
+                            </div>
+                        </div>
+                        <div class="servicio-proveedor">📍 ${servicio.proveedor}</div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Fecha de Pago:</span>
+                            <span class="fecha-valor">${servicio.diaPago} de cada mes</span>
+                        </div>
+                        <div class="servicio-fecha">
+                            <span class="fecha-label">Suspensión:</span>
+                            <span class="fecha-valor">Día ${servicio.diaSuspension}</span>
+                        </div>
+                        <div class="servicio-status status-${claseEstado || 'ok'}">
+                            ${iconoEstado} ${textoEstado}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            grid.innerHTML = serviciosHTML || '<p style="text-align: center; color: #666; padding: 40px;">No hay servicios para este edificio</p>';
+        }
+
+        // SISTEMA DE ALERTAS COMBINADO (CUENTAS + SERVICIOS)
+        function mostrarAlertas(cuentas) {
+            const container = document.getElementById('alertasContainer');
+            container.innerHTML = '';
+
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+
+            const alertas = [];
+
+            // ALERTAS DE CUENTAS POR PAGAR
+            cuentas.forEach(cuenta => {
+                if (cuenta.estado !== 'Pendiente') return;
+
+                const fechaVenc = new Date(cuenta.fechaVencimiento);
+                fechaVenc.setHours(0, 0, 0, 0);
+
+                const diffTiempo = fechaVenc - hoy;
+                const diffDias = Math.ceil(diffTiempo / (1000 * 60 * 60 * 24));
+
+                if (diffDias < 0) {
+                    alertas.push({
+                        tipo: 'urgente',
+                        icon: '🚨',
+                        titulo: `¡VENCIDA! ${cuenta.proveedor}`,
+                        detalle: `Factura ${cuenta.facturaNo} - Vencida hace ${Math.abs(diffDias)} día(s) - $${parseFloat(cuenta.valorNeto).toLocaleString('es-CO')}`,
+                        prioridad: 1
+                    });
+                } else if (diffDias === 0) {
+                    alertas.push({
+                        tipo: 'urgente',
+                        icon: '⏰',
+                        titulo: `¡VENCE HOY! ${cuenta.proveedor}`,
+                        detalle: `Factura ${cuenta.facturaNo} - $${parseFloat(cuenta.valorNeto).toLocaleString('es-CO')} - Pagar antes de las 11:59 PM`,
+                        prioridad: 2
+                    });
+                } else if (diffDias <= 3) {
+                    alertas.push({
+                        tipo: 'advertencia',
+                        icon: '⚠️',
+                        titulo: `Vence en ${diffDias} día(s): ${cuenta.proveedor}`,
+                        detalle: `Factura ${cuenta.facturaNo} - Vence ${fechaVenc.toLocaleDateString('es-ES')} - $${parseFloat(cuenta.valorNeto).toLocaleString('es-CO')}`,
+                        prioridad: 3
+                    });
+                }
+            });
+
+            // ALERTAS DE SERVICIOS RECURRENTES
+            const diaActual = hoy.getDate();
+            const mesActual = hoy.getMonth();
+            const añoActual = hoy.getFullYear();
+
+            serviciosRecurrentes.forEach(servicio => {
+                const fechaPago = new Date(añoActual, mesActual, servicio.diaPago);
+                const diffTiempo = fechaPago - hoy;
+                const diffDias = Math.ceil(diffTiempo / (1000 * 60 * 60 * 24));
+
+                const iconoServicio = servicio.servicio === 'Luz' ? '💡' :
+                                     servicio.servicio === 'Agua' ? '💧' :
+                                     servicio.servicio === 'Internet' ? '🌐' : '📋';
+
+                if (diffDias < 0) {
+                    alertas.push({
+                        tipo: 'urgente',
+                        icon: iconoServicio,
+                        titulo: `¡${servicio.servicio.toUpperCase()} VENCIDO! ${servicio.edificio}`,
+                        detalle: `${servicio.proveedor} - Vencido hace ${Math.abs(diffDias)} día(s) - Suspensión el día ${servicio.diaSuspension}`,
+                        prioridad: 1
+                    });
+                } else if (diffDias === 0) {
+                    alertas.push({
+                        tipo: 'urgente',
+                        icon: iconoServicio,
+                        titulo: `¡${servicio.servicio.toUpperCase()} VENCE HOY! ${servicio.edificio}`,
+                        detalle: `${servicio.proveedor} - Pagar antes de las 11:59 PM - Suspensión el día ${servicio.diaSuspension}`,
+                        prioridad: 2
+                    });
+                } else if (diffDias <= 3) {
+                    alertas.push({
+                        tipo: 'advertencia',
+                        icon: iconoServicio,
+                        titulo: `${servicio.servicio} vence en ${diffDias} día(s) - ${servicio.edificio}`,
+                        detalle: `${servicio.proveedor} - Vence el ${servicio.diaPago} de ${obtenerNombreMes(mesActual)} - Suspensión día ${servicio.diaSuspension}`,
+                        prioridad: 3
+                    });
+                }
+            });
+
+            // Ordenar por prioridad
+            alertas.sort((a, b) => a.prioridad - b.prioridad);
+
+            // Mostrar alertas
+            alertas.forEach(alerta => {
+                const alertaDiv = document.createElement('div');
+                alertaDiv.className = `alerta alerta-${alerta.tipo}`;
+                alertaDiv.innerHTML = `
+                    <div class="alerta-icon">${alerta.icon}</div>
+                    <div class="alerta-content">
+                        <div class="alerta-title">${alerta.titulo}</div>
+                        <div class="alerta-detail">${alerta.detalle}</div>
+                    </div>
+                    <button class="alerta-close" onclick="this.parentElement.remove()">✕</button>
+                `;
+                container.appendChild(alertaDiv);
+            });
+        }
+
+        function obtenerNombreMes(mes) {
+            const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 
+                          'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+            return meses[mes];
+        }
+
+        // Cargar estadísticas
+        function cargarEstadisticas() {
+            const cuentasRef = ref(db, 'cuentas_por_pagar');
+            
+            onValue(cuentasRef, (snapshot) => {
+                let totalPendiente = 0;
+                let vencenHoy = 0;
+                let vencidas = 0;
+                let pagosMes = 0;
+                let totalCuentas = 0;
+                const todasCuentas = [];
+
+                const hoy = new Date().toISOString().split('T')[0];
+
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        const cuenta = child.val();
+                        totalCuentas++;
+                        todasCuentas.push(cuenta);
+
+                        if (cuenta.estado === 'Pendiente') {
+                            totalPendiente += parseFloat(cuenta.valorNeto) || 0;
+                            
+                            if (cuenta.fechaVencimiento === hoy) {
+                                vencenHoy++;
+                            }
+                            
+                            if (cuenta.fechaVencimiento < hoy) {
+                                vencidas++;
+                            }
+                        }
+
+                        if (cuenta.estado === 'Pagado') {
+                            const fechaPago = cuenta.fechaPago || '';
+                            const mesActual = new Date().getMonth();
+                            const mesPago = new Date(fechaPago).getMonth();
+                            if (mesActual === mesPago) {
+                                pagosMes++;
+                            }
+                        }
+                    });
+                }
+
+                // Mostrar alertas combinadas
+                mostrarAlertas(todasCuentas);
+
+                // Actualizar UI
+                document.getElementById('totalCuentas').textContent = 
+                    '$' + totalPendiente.toLocaleString('es-CO');
+                document.getElementById('cambioMes').textContent = 
+                    totalCuentas === 0 ? 'Todo limpio' : `${totalCuentas} cuenta(s)`;
+                
+                document.getElementById('vencenHoy').textContent = vencenHoy;
+                document.getElementById('textoVencen').textContent = 
+                    vencenHoy === 0 ? 'Sin vencimientos' : 'Requiere atención';
+                
+                document.getElementById('facturasVencidas').textContent = vencidas;
+                document.getElementById('textoVencidas').textContent = 
+                    vencidas === 0 ? 'Todo al día' : 'Acción inmediata';
+                
+                document.getElementById('pagosMes').textContent = pagosMes;
+                document.getElementById('textoPagos').textContent = 
+                    pagosMes === 0 ? 'Sin pagos registrados' : `+${pagosMes} este mes`;
+            });
+        }
+    </script>
+
+
+</body></html>
