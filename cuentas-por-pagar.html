@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuentas por Pagar - Azeche P.H.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 2em;
+            font-weight: 700;
+        }
+        
+        .edificio-selector {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .edificio-selector select {
+            padding: 12px 20px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #667eea;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .edificio-selector select:hover {
+            background: #f0f4ff;
+        }
+        
+        .btn-drive {
+            background: #4285f4;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-drive:hover {
+            background: #3367d6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
+        }
+        
+        .btn-logout {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-logout:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        .actions-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: #00B853;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #00a049;
+            transform: translateY(-3px);
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .btn-warning:hover {
+            background: #ffb300;
+            transform: translateY(-3px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-3px);
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+            overflow: hidden;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        
+        tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+        
+        tbody tr:hover {
+            background: #f8f9ff;
+        }
+        
+        td {
+            padding: 15px;
+            font-size: 14px;
+        }
+        
+        .estado {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            display: inline-block;
+        }
+        
+        .estado-pendiente {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .estado-pagada {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .estado-vencida {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .btn-table {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .btn-pagar {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-eliminar {
+            background: #dc3545;
+            color: white;
+            margin-left: 5px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .modal-header h2 {
+            color: #667eea;
+            font-size: 1.8em;
+        }
+        
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 2em;
+            cursor: pointer;
+            color: #999;
+            transition: all 0.3s;
+        }
+        
+        .btn-close:hover {
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        /* Preview Excel */
+        .preview-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+        }
+        
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .preview-table th {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            position: sticky;
+            top: 0;
+        }
+        
+        .preview-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .preview-summary {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .preview-summary strong {
+            color: #667eea;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>💰 Cuentas por Pagar</h1>
+            <div class="edificio-selector">
+                <select id="edificioSelect" onchange="cambiarEdificio()">
+                    <option value="">Selecciona edificio</option>
+                    <option value="nepal-2">Nepal 2</option>
+                    <option value="avalon">Avalon</option>
+                    <option value="convivienda-1">Convivienda 1</option>
+                    <option value="pinos-del-country">Pinos del Country</option>
+                </select>
+                <a href="#" id="btnDrive" class="btn-drive" target="_blank" style="display: none;">
+                    📁 Ver Facturas Drive
+                </a>
+            </div>
+            <button class="btn-logout" onclick="location.href='Dashboard.html'">
+                🏠 Dashboard
+            </button>
+        </div>
+
+        <!-- PANEL DE ACCIONES -->
+        <div class="actions-panel">
+            <button class="btn btn-primary" onclick="document.getElementById('fileExcel').click()">
+                📊 Cargar Excel de Facturas
+            </button>
+            <input type="file" id="fileExcel" accept=".xlsx,.xls,.csv" style="display: none;" onchange="procesarExcel(event)">
+            
+            <button class="btn btn-warning" onclick="abrirModalManual()">
+                ✏️ Agregar Cuenta Manual
+            </button>
+            <button class="btn btn-success" onclick="descargarExcel()">
+                📥 Descargar Excel
+            </button>
+        </div>
+
+        <!-- TABLA DE CUENTAS -->
+        <div class="table-container">
+            <div class="table-wrapper">
+                <table id="tablaCuentas">
+                    <thead>
+                        <tr>
+                            <th>Proveedor</th>
+                            <th>Tipo ID</th>
+                            <th>No. Identificación</th>
+                            <th>Concepto</th>
+                            <th>Factura No.</th>
+                            <th>Valor Bruto</th>
+                            <th>AIU</th>
+                            <th>IVA</th>
+                            <th>Retención</th>
+                            <th>Valor Neto</th>
+                            <th>F. Recepción</th>
+                            <th>F. Vencimiento</th>
+                            <th>F. Pago</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaCuerpo">
+                        <tr>
+                            <td colspan="15">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">📋</div>
+                                    <h3>No hay cuentas registradas para este edificio</h3>
+                                    <p>Carga un Excel o agrega una cuenta manualmente</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL AGREGAR MANUAL -->
+    <div class="modal" id="modalManual">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Agregar Cuenta Manual</h2>
+                <button class="btn-close" onclick="cerrarModal('modalManual')">&times;</button>
+            </div>
+            <form id="formManual">
+                <div class="form-group">
+                    <label>Proveedor *</label>
+                    <input type="text" id="proveedor" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo ID *</label>
+                        <select id="tipoId" required>
+                            <option value="NIT">NIT</option>
+                            <option value="CC">CC</option>
+                            <option value="CE">CE</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>No. Identificación *</label>
+                        <input type="text" id="numeroId" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Concepto *</label>
+                    <input type="text" id="concepto" required>
+                </div>
+                <div class="form-group">
+                    <label>Factura No.</label>
+                    <input type="text" id="facturaNo">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Valor Bruto *</label>
+                        <input type="number" id="valorBruto" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>AIU</label>
+                        <input type="number" id="aiu" step="0.01" value="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>IVA</label>
+                        <input type="number" id="iva" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Retención</label>
+                        <input type="number" id="retencion" step="0.01" value="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Valor Neto (calculado)</label>
+                    <input type="number" id="valorNeto" step="0.01" readonly>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>F. Recepción</label>
+                        <input type="date" id="fechaRecepcion">
+                    </div>
+                    <div class="form-group">
+                        <label>F. Vencimiento</label>
+                        <input type="date" id="fechaVencimiento">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="guardarCuentaManual()" style="width: 100%; margin-top: 20px;">
+                    💾 Guardar Cuenta
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PREVIEW EXCEL -->
+    <div class="modal" id="modalPreview">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2>📊 Preview - Facturas a Cargar</h2>
+                <button class="btn-close" onclick="cerrarModal('modalPreview')">&times;</button>
+            </div>
+            <div class="preview-summary">
+                Se van a cargar <strong id="totalFacturas">0</strong> facturas
+            </div>
+            <div class="preview-container" id="previewContainer"></div>
+            <button class="btn btn-primary" onclick="confirmarCargaExcel()" style="width: 100%; margin-top: 20px;">
+                ✅ Confirmar y Cargar Todas
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, push, set, onValue, update, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAS9c6-ың_xF-p7r2eL36yaKpuwTbCg-AE",
+            authDomain: "azeche-ph.firebaseapp.com",
+            databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+            projectId: "azeche-ph",
+            storageBucket: "azeche-ph.firebasestorage.app",
+            messagingSenderId: "357588904299",
+            appId: "1:357588904299:web:7f5e83f259569477d82b1f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
+        let edificioActual = '';
+        let facturasTemp = [];
+        
+        // Links de Google Drive
+        const driveLinks = {
+            'nepal-2': 'https://drive.google.com/drive/folders/11zgqRM4LhNRW5luW0B6pA06e42Xzu4Hc',
+            'avalon': 'https://drive.google.com/drive/folders/1x_vnC5l8Q50KxdQfsvIHx1wy8s8Gjrlk',
+            'convivienda-1': 'https://drive.google.com/drive/folders/1mEeVfXj74AoSkeCb2uSB00QIblwSdD1W',
+            'pinos-del-country': 'https://drive.google.com/drive/folders/1QYPuq6w1fHNSl5aq1fD2R7hDJjScJAtu'
+        };
+        
+        window.cambiarEdificio = function() {
+            edificioActual = document.getElementById('edificioSelect').value;
+            
+            // Mostrar/ocultar botón Drive
+            const btnDrive = document.getElementById('btnDrive');
+            if (edificioActual && driveLinks[edificioActual]) {
+                btnDrive.href = driveLinks[edificioActual];
+                btnDrive.style.display = 'inline-flex';
+            } else {
+                btnDrive.style.display = 'none';
+            }
+            
+            cargarCuentas();
+        };
+        
+        function cargarCuentas() {
+            if (!edificioActual) {
+                document.getElementById('tablaCuerpo').innerHTML = `
+                    <tr><td colspan="15">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🏢</div>
+                            <h3>Selecciona un edificio</h3>
+                        </div>
+                    </td></tr>
+                `;
+                return;
+            }
+            
+            const cuentasRef = ref(db, `cuentas_por_pagar/${edificioActual}`);
+            onValue(cuentasRef, (snapshot) => {
+                const tbody = document.getElementById('tablaCuerpo');
+                tbody.innerHTML = '';
+                
+                if (!snapshot.exists()) {
+                    tbody.innerHTML = `
+                        <tr><td colspan="15">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📋</div>
+                                <h3>No hay cuentas registradas para este edificio</h3>
+                                <p>Carga un Excel o agrega una cuenta manualmente</p>
+                            </div>
+                        </td></tr>
+                    `;
+                    return;
+                }
+                
+                snapshot.forEach((childSnapshot) => {
+                    const cuenta = childSnapshot.val();
+                    const id = childSnapshot.key;
+                    tbody.innerHTML += crearFilaCuenta(cuenta, id);
+                });
+            });
+        }
+        
+        function crearFilaCuenta(cuenta, id) {
+            const estadoClass = cuenta.estado === 'Pagada' ? 'estado-pagada' : 
+                               (new Date(cuenta.fechaVencimiento) < new Date() ? 'estado-vencida' : 'estado-pendiente');
+            
+            return `
+                <tr>
+                    <td>${cuenta.proveedor}</td>
+                    <td>${cuenta.tipoId}</td>
+                    <td>${cuenta.numeroId}</td>
+                    <td>${cuenta.concepto}</td>
+                    <td>${cuenta.facturaNo}</td>
+                    <td>$${Number(cuenta.valorBruto).toLocaleString('es-CO')}</td>
+                    <td>$${Number(cuenta.aiu || 0).toLocaleString('es-CO')}</td>
+                    <td>$${Number(cuenta.iva || 0).toLocaleString('es-CO')}</td>
+                    <td>$${Number(cuenta.retencion || 0).toLocaleString('es-CO')}</td>
+                    <td><strong>$${Number(cuenta.valorNeto).toLocaleString('es-CO')}</strong></td>
+                    <td>${cuenta.fechaRecepcion}</td>
+                    <td>${cuenta.fechaVencimiento}</td>
+                    <td>${cuenta.fechaPago || '-'}</td>
+                    <td><span class="estado ${estadoClass}">${cuenta.estado}</span></td>
+                    <td>
+                        ${cuenta.estado !== 'Pagada' ? 
+                            `<button class="btn-table btn-pagar" onclick="marcarPagada('${id}')">✅ Pagar</button>` : ''}
+                        <button class="btn-table btn-eliminar" onclick="eliminarCuenta('${id}')">🗑️</button>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        // PROCESAR EXCEL
+        window.procesarExcel = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!edificioActual) {
+                alert('❌ Selecciona un edificio primero');
+                event.target.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                    
+                    if (jsonData.length === 0) {
+                        alert('❌ El Excel está vacío');
+                        return;
+                    }
+                    
+                    // Convertir a formato del sistema
+                    facturasTemp = jsonData.map(row => ({
+                        proveedor: row['Proveedor'] || row['proveedor'] || '',
+                        tipoId: row['Tipo ID'] || row['tipoId'] || row['TipoID'] || 'NIT',
+                        numeroId: String(row['No. Identificación'] || row['numeroId'] || row['NIT'] || ''),
+                        concepto: row['Concepto'] || row['concepto'] || '',
+                        facturaNo: String(row['Factura No.'] || row['facturaNo'] || row['Factura'] || ''),
+                        valorBruto: Number(row['Valor Bruto'] || row['valorBruto'] || 0),
+                        aiu: Number(row['AIU'] || row['aiu'] || 0),
+                        iva: Number(row['IVA'] || row['iva'] || 0),
+                        retencion: Number(row['Retención'] || row['retencion'] || row['Retencion'] || 0),
+                        valorNeto: Number(row['Valor Neto'] || row['valorNeto'] || 0),
+                        fechaRecepcion: formatearFecha(row['F. Recepción'] || row['fechaRecepcion'] || row['Fecha Recepción']),
+                        fechaVencimiento: formatearFecha(row['F. Vencimiento'] || row['fechaVencimiento'] || row['Fecha Vencimiento']),
+                        fechaPago: row['F. Pago'] || row['fechaPago'] ? formatearFecha(row['F. Pago'] || row['fechaPago']) : null,
+                        estado: row['Estado'] || row['estado'] || 'Pendiente'
+                    }));
+                    
+                    // Calcular valor neto si no viene
+                    facturasTemp = facturasTemp.map(f => ({
+                        ...f,
+                        valorNeto: f.valorNeto || (f.valorBruto + f.aiu + f.iva - f.retencion)
+                    }));
+                    
+                    mostrarPreview();
+                    
+                } catch (error) {
+                    console.error(error);
+                    alert('❌ Error al leer el Excel: ' + error.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        };
+        
+        function formatearFecha(fecha) {
+            if (!fecha) return new Date().toISOString().split('T')[0];
+            if (typeof fecha === 'number') {
+                // Excel date
+                const date = new Date((fecha - 25569) * 86400 * 1000);
+                return date.toISOString().split('T')[0];
+            }
+            if (typeof fecha === 'string') {
+                const date = new Date(fecha);
+                if (!isNaN(date.getTime())) {
+                    return date.toISOString().split('T')[0];
+                }
+            }
+            return new Date().toISOString().split('T')[0];
+        }
+        
+        function mostrarPreview() {
+            document.getElementById('totalFacturas').textContent = facturasTemp.length;
+            
+            let html = '<table class="preview-table"><thead><tr>';
+            html += '<th>Proveedor</th><th>Concepto</th><th>Factura</th><th>Valor Neto</th><th>F. Venc.</th>';
+            html += '</tr></thead><tbody>';
+            
+            facturasTemp.forEach(f => {
+                html += `<tr>
+                    <td>${f.proveedor}</td>
+                    <td>${f.concepto}</td>
+                    <td>${f.facturaNo}</td>
+                    <td>$${f.valorNeto.toLocaleString('es-CO')}</td>
+                    <td>${f.fechaVencimiento}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('previewContainer').innerHTML = html;
+            document.getElementById('modalPreview').classList.add('active');
+        }
+        
+        window.confirmarCargaExcel = async function() {
+            if (!edificioActual) {
+                alert('❌ Selecciona un edificio');
+                return;
+            }
+            
+            try {
+                const cuentasRef = ref(db, `cuentas_por_pagar/${edificioActual}`);
+                
+                for (const factura of facturasTemp) {
+                    await push(cuentasRef, {
+                        ...factura,
+                        fechaCreacion: new Date().toISOString(),
+                        creadoPor: 'Carga Excel'
+                    });
+                }
+                
+                alert(`✅ ${facturasTemp.length} facturas cargadas exitosamente`);
+                cerrarModal('modalPreview');
+                facturasTemp = [];
+                document.getElementById('fileExcel').value = '';
+                
+            } catch (error) {
+                console.error(error);
+                alert('❌ Error al cargar facturas: ' + error.message);
+            }
+        };
+        
+        // MODAL MANUAL
+        window.abrirModalManual = function() {
+            if (!edificioActual) {
+                alert('❌ Selecciona un edificio primero');
+                return;
+            }
+            document.getElementById('modalManual').classList.add('active');
+            document.getElementById('fechaRecepcion').valueAsDate = new Date();
+        };
+        
+        ['valorBruto', 'aiu', 'iva', 'retencion'].forEach(id => {
+            document.getElementById(id).addEventListener('input', calcularValorNeto);
+        });
+        
+        function calcularValorNeto() {
+            const bruto = parseFloat(document.getElementById('valorBruto').value) || 0;
+            const aiu = parseFloat(document.getElementById('aiu').value) || 0;
+            const iva = parseFloat(document.getElementById('iva').value) || 0;
+            const ret = parseFloat(document.getElementById('retencion').value) || 0;
+            
+            const neto = bruto + aiu + iva - ret;
+            document.getElementById('valorNeto').value = neto.toFixed(2);
+        }
+        
+        window.guardarCuentaManual = async function() {
+            // Validar solo campos ESENCIALES
+            const proveedor = document.getElementById('proveedor').value.trim();
+            const numeroId = document.getElementById('numeroId').value.trim();
+            const concepto = document.getElementById('concepto').value.trim();
+            const valorBruto = document.getElementById('valorBruto').value;
+            
+            if (!proveedor || !numeroId || !concepto || !valorBruto) {
+                alert('❌ Completa los campos obligatorios:\n• Proveedor\n• No. Identificación\n• Concepto\n• Valor Bruto');
+                return;
+            }
+            
+            const nuevaCuenta = {
+                proveedor: proveedor,
+                tipoId: document.getElementById('tipoId').value,
+                numeroId: numeroId,
+                concepto: concepto,
+                facturaNo: document.getElementById('facturaNo').value || 'N/A',
+                valorBruto: parseFloat(valorBruto),
+                aiu: parseFloat(document.getElementById('aiu').value) || 0,
+                iva: parseFloat(document.getElementById('iva').value) || 0,
+                retencion: parseFloat(document.getElementById('retencion').value) || 0,
+                valorNeto: parseFloat(document.getElementById('valorNeto').value) || parseFloat(valorBruto),
+                fechaRecepcion: document.getElementById('fechaRecepcion').value || null,
+                fechaVencimiento: document.getElementById('fechaVencimiento').value || null,
+                fechaPago: null,
+                estado: 'Pendiente',
+                creadoPor: 'Manual',
+                fechaCreacion: new Date().toISOString()
+            };
+            
+            try {
+                const cuentasRef = ref(db, `cuentas_por_pagar/${edificioActual}`);
+                await push(cuentasRef, nuevaCuenta);
+                
+                alert('✅ Cuenta agregada exitosamente\n\nPuedes agregar los datos faltantes editándola después.');
+                cerrarModal('modalManual');
+                document.getElementById('formManual').reset();
+            } catch (error) {
+                alert('❌ Error al guardar: ' + error.message);
+                console.error('Error:', error);
+            }
+        };
+        
+        window.marcarPagada = async function(id) {
+            if (!confirm('¿Marcar como pagada?')) return;
+            
+            const cuentaRef = ref(db, `cuentas_por_pagar/${edificioActual}/${id}`);
+            await update(cuentaRef, {
+                estado: 'Pagada',
+                fechaPago: new Date().toISOString().split('T')[0]
+            });
+            
+            alert('✅ Cuenta marcada como pagada');
+        };
+        
+        window.eliminarCuenta = async function(id) {
+            if (!confirm('¿Eliminar esta cuenta? No se puede deshacer.')) return;
+            
+            const cuentaRef = ref(db, `cuentas_por_pagar/${edificioActual}/${id}`);
+            await remove(cuentaRef);
+            
+            alert('✅ Cuenta eliminada');
+        };
+        
+        window.descargarExcel = async function() {
+            if (!edificioActual) {
+                alert('❌ Selecciona un edificio primero');
+                return;
+            }
+            
+            try {
+                // Leer cuentas de Firebase
+                const cuentasRef = ref(db, `cuentas_por_pagar/${edificioActual}`);
+                const snapshot = await new Promise((resolve) => {
+                    onValue(cuentasRef, resolve, { onlyOnce: true });
+                });
+                
+                if (!snapshot.exists()) {
+                    alert('❌ No hay cuentas registradas para este edificio');
+                    return;
+                }
+                
+                // Convertir a array
+                const cuentas = [];
+                snapshot.forEach((childSnapshot) => {
+                    cuentas.push({
+                        id: childSnapshot.key,
+                        ...childSnapshot.val()
+                    });
+                });
+                
+                // Crear datos para Excel
+                const datosExcel = cuentas.map(c => ({
+                    'Proveedor': c.proveedor || '',
+                    'Tipo ID': c.tipoId || 'NIT',
+                    'No. Identificación': c.numeroId || '',
+                    'Concepto': c.concepto || '',
+                    'Factura No.': c.facturaNo || '',
+                    'Valor Bruto': c.valorBruto || 0,
+                    'AIU': c.aiu || 0,
+                    'IVA': c.iva || 0,
+                    'Retención': c.retencion || 0,
+                    'Valor Neto': c.valorNeto || 0,
+                    'F. Recepción': c.fechaRecepcion || '',
+                    'F. Vencimiento': c.fechaVencimiento || '',
+                    'F. Pago': c.fechaPago || '',
+                    'Estado': c.estado || 'Pendiente',
+                    'Creado Por': c.creadoPor || 'Manual'
+                }));
+                
+                // Crear workbook
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(datosExcel);
+                
+                // Ajustar anchos de columnas
+                ws['!cols'] = [
+                    { wch: 30 }, // Proveedor
+                    { wch: 10 }, // Tipo ID
+                    { wch: 15 }, // No. ID
+                    { wch: 35 }, // Concepto
+                    { wch: 15 }, // Factura
+                    { wch: 12 }, // Valor Bruto
+                    { wch: 10 }, // AIU
+                    { wch: 10 }, // IVA
+                    { wch: 10 }, // Retención
+                    { wch: 12 }, // Valor Neto
+                    { wch: 12 }, // F. Recepción
+                    { wch: 12 }, // F. Vencimiento
+                    { wch: 12 }, // F. Pago
+                    { wch: 10 }, // Estado
+                    { wch: 12 }  // Creado Por
+                ];
+                
+                XLSX.utils.book_append_sheet(wb, ws, 'Cuentas por Pagar');
+                
+                // Descargar
+                const nombreArchivo = `Cuentas_Por_Pagar_${edificioActual}_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, nombreArchivo);
+                
+                alert(`✅ Excel descargado exitosamente!\n\n📊 ${cuentas.length} cuentas exportadas\n📁 Archivo: ${nombreArchivo}`);
+                
+            } catch (error) {
+                console.error('Error descargando Excel:', error);
+                alert('❌ Error al descargar Excel: ' + error.message);
+            }
+        };
+        
+        window.cerrarModal = function(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        };
+    </script>
+</body>
+</html>
