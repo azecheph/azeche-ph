@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuentas por Pagar - Azeche P.H.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 2em;
+            font-weight: 700;
+        }
+        
+        .edificio-selector {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .edificio-selector select {
+            padding: 12px 20px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #667eea;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .edificio-selector select:hover {
+            background: #f0f4ff;
+        }
+        
+        .btn-drive {
+            background: #4285f4;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-drive:hover {
+            background: #3367d6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
+        }
+        
+        .btn-logout {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-logout:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        .actions-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: #00B853;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #00a049;
+            transform: translateY(-3px);
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .btn-warning:hover {
+            background: #ffb300;
+            transform: translateY(-3px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-3px);
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+            overflow: hidden;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        
+        tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+        
+        tbody tr:hover {
+            background: #f8f9ff;
+        }
+        
+        td {
+            padding: 15px;
+            font-size: 14px;
+        }
+        
+        .estado {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            display: inline-block;
+        }
+        
+        .estado-pendiente {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .estado-pagada {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .estado-vencida {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .btn-table {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .btn-pagar {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-eliminar {
+            background: #dc3545;
+            color: white;
+            margin-left: 5px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .modal-header h2 {
+            color: #667eea;
+            font-size: 1.8em;
+        }
+        
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 2em;
+            cursor: pointer;
+            color: #999;
+            transition: all 0.3s;
+        }
+        
+        .btn-close:hover {
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        /* Preview Excel */
+        .preview-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+        }
+        
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .preview-table th {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            position: sticky;
+            top: 0;
+        }
+        
+        .preview-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .preview-summary {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .preview-summary strong {
+            color: #667eea;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>💰 Cuentas por Pagar</h1>
+            <div class="edificio-selector">
+                <select id="edificioSelect" onchange="cambiarEdificio()">
+                    <option value="">Selecciona edificio</option>
+                    <option value="nepal-2">Nepal 2</option>
+                    <option value="avalon">Avalon</option>
+                    <option value="convivienda-1">Convivienda 1</option>
+                    <option value="pinos-del-country">Pinos del Country</option>
+                </select>
+                <a href="#" id="btnDrive" class="btn-drive" target="_blank" style="display: none;">
+                    📁 Ver Facturas Drive
+                </a>
+            </div>
+            <button class="btn-logout" onclick="location.href='Dashboard.html'">
+                🏠 Dashboard
+            </button>
+        </div>
+
+        <!-- PANEL DE ACCIONES -->
+        <div class="actions-panel">
+            <button class="btn btn-primary" onclick="document.getElementById('fileExcel').click()">
+                📊 Cargar Excel de Facturas
+            </button>
+            <input type="file" id="fileExcel" accept=".xlsx,.xls,.csv" style="display: none;" onchange="procesarExcel(event)">
+            
+            <button class="btn btn-warning" onclick="abrirModalManual()">
+                ✏️ Agregar Cuenta Manual
+            </button>
+            <button class="btn btn-success" onclick="descargarExcel()">
+                📥 Descargar Excel
+            </button>
+        </div>
+
+        <!-- FILTROS DE BÚSQUEDA -->
+        <div class="actions-panel" style="background: white; margin-bottom: 20px;">
+            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; width: 100%;">
+                <div style="flex: 1; min-width: 250px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #667eea;">🔍 Buscar por Proveedor:</label>
+                    <input type="text" id="filtroProveedor" placeholder="Escribe nombre del proveedor..." 
+                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;"
+                           oninput="aplicarFiltros()">
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #667eea;">📅 Filtrar por Mes:</label>
+                    <select id="filtroMes" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;" onchange="aplicarFiltros()">
+                        <option value="">Todos los meses</option>
+                        <option value="01">Enero</option>
+                        <option value="02">Febrero</option>
+                        <option value="03">Marzo</option>
+                        <option value="04">Abril</option>
+                        <option value="05">Mayo</option>
+                        <option value="06">Junio</option>
+                        <option value="07">Julio</option>
+                        <option value="08">Agosto</option>
+                        <option value="09">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                </div>
+                <button class="btn btn-secondary" onclick="limpiarFiltros()" style="align-self: flex-end;">
+                    🔄 Limpiar Filtros
+                </button>
+                <div style="align-self: flex-end; padding: 10px; background: #f0f4ff; border-radius: 8px; font-weight: 600;">
+                    📊 Mostrando: <span id="contadorFacturas">0</span> facturas
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLA DE CUENTAS -->
+        <div class="table-container">
+            <div class="table-wrapper">
+                <table id="tablaCuentas">
+                    <thead>
+                        <tr>
+                            <th>Proveedor</th>
+                            <th>Tipo de ID</th>
+                            <th>No. Identificación</th>
+                            <th>Banco</th>
+                            <th>Tipo de Cuenta</th>
+                            <th>Número de Cuenta</th>
+                            <th>Concepto</th>
+                            <th>Factura / CAE No.</th>
+                            <th>Valor Bruto</th>
+                            <th>AIU</th>
+                            <th>IVA</th>
+                            <th>Retención en IVA</th>
+                            <th>Valor Neto a Pagar</th>
+                            <th>Fecha de Recepción</th>
+                            <th>Fecha de Vencimiento</th>
+                            <th>Fecha de Pago</th>
+                            <th>Estado</th>
+                            <th>Método de Pago</th>
+                            <th>Categoría del Gasto</th>
+                            <th>Prioridad</th>
+                            <th>Observaciones</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaCuerpo">
+                        <tr>
+                            <td colspan="15">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">📋</div>
+                                    <h3>No hay cuentas registradas para este edificio</h3>
+                                    <p>Carga un Excel o agrega una cuenta manualmente</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL AGREGAR MANUAL -->
+    <div class="modal" id="modalManual">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Agregar Cuenta Manual</h2>
+                <button class="btn-close" onclick="cerrarModal('modalManual')">&times;</button>
+            </div>
+            <form id="formManual">
+                <div class="form-group">
+                    <label>Proveedor *</label>
+                    <input type="text" id="proveedor" required list="listaProveedores">
+                    <datalist id="listaProveedores">
+                        <!-- Se llena dinámicamente -->
+                    </datalist>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo de ID *</label>
+                        <select id="tipoId" required>
+                            <option value="NIT">NIT</option>
+                            <option value="CC">CC</option>
+                            <option value="CE">CE</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>No. Identificación *</label>
+                        <input type="text" id="numeroId" required>
+                    </div>
+                </div>
+                
+                <!-- DATOS BANCARIOS -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Banco</label>
+                        <input type="text" id="banco" placeholder="Ej: Bancolombia">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Cuenta</label>
+                        <select id="tipoCuenta">
+                            <option value="">Seleccionar...</option>
+                            <option value="Ahorros">Ahorros</option>
+                            <option value="Corriente">Corriente</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Número de Cuenta</label>
+                    <input type="text" id="numeroCuenta">
+                </div>
+                
+                <div class="form-group">
+                    <label>Concepto *</label>
+                    <input type="text" id="concepto" required>
+                </div>
+                <div class="form-group">
+                    <label>Factura / CAE No.</label>
+                    <input type="text" id="facturaNo">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Valor Bruto *</label>
+                        <input type="number" id="valorBruto" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>AIU</label>
+                        <input type="number" id="aiu" step="0.01" value="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>IVA</label>
+                        <input type="number" id="iva" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Retención en IVA</label>
+                        <input type="number" id="retencion" step="0.01" value="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Valor Neto a Pagar (calculado)</label>
+                    <input type="number" id="valorNeto" step="0.01" readonly>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Fecha de Recepción</label>
+                        <input type="date" id="fechaRecepcion">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de Vencimiento</label>
+                        <input type="date" id="fechaVencimiento">
+                    </div>
+                </div>
+                
+                <!-- NUEVOS CAMPOS -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Método de Pago</label>
+                        <select id="metodoPago">
+                            <option value="">Seleccionar...</option>
+                            <option value="Transferencia">Transferencia</option>
+                            <option value="Cheque">Cheque</option>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Consignación">Consignación</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Prioridad</label>
+                        <select id="prioridad">
+                            <option value="Media">Media</option>
+                            <option value="Alta">Alta</option>
+                            <option value="Baja">Baja</option>
+                            <option value="Urgente">Urgente</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Categoría del Gasto</label>
+                    <select id="categoriaGasto">
+                        <option value="">Seleccionar...</option>
+                        <option value="Servicios Públicos">Servicios Públicos</option>
+                        <option value="Mantenimiento">Mantenimiento</option>
+                        <option value="Vigilancia">Vigilancia</option>
+                        <option value="Aseo">Aseo</option>
+                        <option value="Administrativo">Administrativo</option>
+                        <option value="Impuestos">Impuestos</option>
+                        <option value="Seguros">Seguros</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Observaciones</label>
+                    <textarea id="observaciones" rows="3" placeholder="Notas adicionales..."></textarea>
+                </div>
+                
+                <button type="button" class="btn btn-primary" onclick="guardarCuentaManual()" style="width: 100%; margin-top: 20px;">
+                    💾 Guardar Cuenta
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR CUENTA -->
+    <div class="modal" id="modalEditar">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Editar Cuenta</h2>
+                <button class="btn-close" onclick="cerrarModal('modalEditar')">&times;</button>
+            </div>
+            <form id="formEditar">
+                <input type="hidden" id="editarId">
+                <div class="form-group">
+                    <label>Proveedor *</label>
+                    <input type="text" id="editarProveedor" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo de ID *</label>
+                        <select id="editarTipoId" required>
+                            <option value="NIT">NIT</option>
+                            <option value="CC">CC</option>
+                            <option value="CE">CE</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>No. Identificación *</label>
+                        <input type="text" id="editarNumeroId" required>
+                    </div>
+                </div>
+                
+                <!-- DATOS BANCARIOS -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Banco</label>
+                        <input type="text" id="editarBanco" placeholder="Ej: Bancolombia">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Cuenta</label>
+                        <select id="editarTipoCuenta">
+                            <option value="">Seleccionar...</option>
+                            <option value="Ahorros">Ahorros</option>
+                            <option value="Corriente">Corriente</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Número de Cuenta</label>
+                    <input type="text" id="editarNumeroCuenta">
+                </div>
+                
+                <div class="form-group">
+                    <label>Concepto *</label>
+                    <input type="text" id="editarConcepto" required>
+                </div>
+                <div class="form-group">
+                    <label>Factura / CAE No.</label>
+                    <input type="text" id="editarFacturaNo">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Valor Bruto *</label>
+                        <input type="number" id="editarValorBruto" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>AIU</label>
+                        <input type="number" id="editarAiu" step="0.01" value="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>IVA</label>
+                        <input type="number" id="editarIva" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Retención en IVA</label>
+                        <input type="number" id="editarRetencion" step="0.01" value="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Valor Neto a Pagar (calculado)</label>
+                    <input type="number" id="editarValorNeto" step="0.01" readonly>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Fecha de Recepción</label>
+                        <input type="date" id="editarFechaRecepcion">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de Vencimiento</label>
+                        <input type="date" id="editarFechaVencimiento">
+                    </div>
+                </div>
+                
+                <!-- NUEVOS CAMPOS -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Método de Pago</label>
+                        <select id="editarMetodoPago">
+                            <option value="">Seleccionar...</option>
+                            <option value="Transferencia">Transferencia</option>
+                            <option value="Cheque">Cheque</option>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Consignación">Consignación</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Prioridad</label>
+                        <select id="editarPrioridad">
+                            <option value="Media">Media</option>
+                            <option value="Alta">Alta</option>
+                            <option value="Baja">Baja</option>
+                            <option value="Urgente">Urgente</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Categoría del Gasto</label>
+                    <select id="editarCategoriaGasto">
+                        <option value="">Seleccionar...</option>
+                        <option value="Servicios Públicos">Servicios Públicos</option>
+                        <option value="Mantenimiento">Mantenimiento</option>
+                        <option value="Vigilancia">Vigilancia</option>
+                        <option value="Aseo">Aseo</option>
+                        <option value="Administrativo">Administrativo</option>
+                        <option value="Impuestos">Impuestos</option>
+                        <option value="Seguros">Seguros</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Observaciones</label>
+                    <textarea id="editarObservaciones" rows="3" placeholder="Notas adicionales..."></textarea>
+                </div>
+                
+                <button type="button" class="btn btn-primary" onclick="guardarEdicion()" style="width: 100%; margin-top: 20px;">
+                    💾 Guardar Cambios
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PREVIEW EXCEL -->
+    <div class="modal" id="modalPreview">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2>📊 Preview - Facturas a Cargar</h2>
+                <button class="btn-close" onclick="cerrarModal('modalPreview')">&times;</button>
+            </div>
+            <div class="preview-summary">
+                Se van a cargar <strong id="totalFacturas">0</strong> facturas
+            </div>
+            <div class="preview-container" id="previewContainer"></div>
+            <button class="btn btn-primary" onclick="confirmarCargaExcel()" style="width: 100%; margin-top: 20px;">
+                ✅ Confirmar y Cargar Todas
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, push, set, onValue, update, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAS9c6-ың_xF-p7r2eL36yaKpuwTbCg-AE",
+            authDomain: "azeche-ph.firebaseapp.com",
+            databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+            projectId: "azeche-ph",
+            storageBucket: "azeche-ph.firebasestorage.app",
+            messagingSenderId: "357588904299",
+            appId: "1:357588904299:web:7f5e83f259569477d82b1f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
+        let edificioActual = '';
+        let facturasTemp = [];
+        let proveedoresDB = {}; // Base de datos de proveedores en memoria
+        
+        // Cargar proveedores desde Firebase al iniciar
+        const proveedoresRef = ref(db, 'proveedores');
+        onValue(proveedoresRef, (snapshot) => {
+            proveedoresDB = {};
+            const datalist = document.getElementById('listaProveedores');
+            datalist.innerHTML = '';
+            
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const prov = childSnapshot.val();
+                    const nombre = prov.nombre || prov.razonSocial || '';
+                    
+                    if (nombre) {
+                        // Guardar en memoria
+                        proveedoresDB[nombre.toLowerCase()] = {
+                            nombre: nombre,
+                            tipoId: prov.tipoIdentificacion || prov.tipoId || 'NIT',
+                            numeroId: prov.noIdentificacion || prov.numeroId || prov.nit || '',
+                            banco: prov.banco || '',
+                            tipoCuenta: prov.tipoCuenta || '',
+                            numeroCuenta: prov.numeroCuenta || prov.cuentaBancaria || '',
+                            metodoPago: prov.metodoPago || ''
+                        };
+                        
+                        // Agregar al datalist
+                        const option = document.createElement('option');
+                        option.value = nombre;
+                        datalist.appendChild(option);
+                    }
+                });
+                console.log(`✅ ${Object.keys(proveedoresDB).length} proveedores cargados`);
+            }
+        });
+        
+        // Listener para autocompletar cuando cambie el proveedor
+        document.getElementById('proveedor').addEventListener('input', function() {
+            const nombreBuscado = this.value.trim().toLowerCase();
+            
+            if (!nombreBuscado) return;
+            
+            // Búsqueda exacta primero
+            let proveedor = proveedoresDB[nombreBuscado];
+            
+            // Si no encuentra, buscar por coincidencia parcial
+            if (!proveedor) {
+                for (const [key, prov] of Object.entries(proveedoresDB)) {
+                    if (key.includes(nombreBuscado) || nombreBuscado.includes(key)) {
+                        proveedor = prov;
+                        console.log(`🔍 Coincidencia parcial: "${nombreBuscado}" → "${prov.nombre}"`);
+                        break;
+                    }
+                }
+            }
+            
+            if (proveedor) {
+                // Auto-llenar todos los campos
+                document.getElementById('tipoId').value = proveedor.tipoId || 'NIT';
+                document.getElementById('numeroId').value = proveedor.numeroId || '';
+                document.getElementById('banco').value = proveedor.banco || '';
+                document.getElementById('tipoCuenta').value = proveedor.tipoCuenta || '';
+                document.getElementById('numeroCuenta').value = proveedor.numeroCuenta || '';
+                if (proveedor.metodoPago) {
+                    document.getElementById('metodoPago').value = proveedor.metodoPago;
+                }
+                
+                console.log('✅ Datos autocompletados:', {
+                    nombre: proveedor.nombre,
+                    banco: proveedor.banco || '(vacío)',
+                    tipoCuenta: proveedor.tipoCuenta || '(vacío)',
+                    numeroCuenta: proveedor.numeroCuenta || '(vacío)'
+                });
+            } else {
+                console.log(`⚠️ Proveedor "${nombreBuscado}" no encontrado en la base de datos`);
+            }
+        });
+        
+        // Links de Google Drive
+        const driveLinks = {
+            'nepal-2': 'https://drive.google.com/drive/folders/11zgqRM4LhNRW5luW0B6pA06e42Xzu4Hc',
+            'avalon': 'https://drive.google.com/drive/folders/1x_vnC5l8Q50KxdQfsvIHx1wy8s8Gjrlk',
+            'convivienda-1': 'https://drive.google.com/drive/folders/1mEeVfXj74AoSkeCb2uSB00QIblwSdD1W',
+            'pinos-del-country': 'https://drive.google.com/drive/folders/1QYPuq6w1fHNSl5aq1fD2R7hDJjScJAtu'
+        };
+        
+        window.cambiarEdificio = function() {
+            edificioActual = document.getElementById('edificioSelect').value;
+            
+            // Mostrar/ocultar botón Drive
+            const btnDrive = document.getElementById('btnDrive');
+            if (edificioActual && driveLinks[edificioActual]) {
+                btnDrive.href = driveLinks[edificioActual];
+                btnDrive.style.display = 'inline-flex';
+            } else {
+                btnDrive.style.display = 'none';
+            }
+            
+            cargarCuentas();
+        };
+        
+        function cargarCuentas() {
+            if (!edificioActual) {
+                document.getElementById('tablaCuerpo').innerHTML = `
+                    <tr><td colspan="22">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🏢</div>
+                            <h3>Selecciona un edificio</h3>
+                        </div>
+                    </td></tr>
+                `;
+                document.getElementById('contadorFacturas').textContent = '0';
+                return;
+            }
+            
+            const cuentasRef = ref(db, `cuentas_por_pagar/${edificioActual}`);
+            onValue(cuentasRef, (snapshot) => {
+                console.log('📊 Cargando cuentas de Firebase...');
+                const tbody = document.getElementById('tablaCuerpo');
+                tbody.innerHTML = '';
+                
+                if (!snapshot.exists()) {
+                    console.log('⚠️ No hay datos en Firebase');
+                    tbody.innerHTML = `
+                        <tr><td colspan="22">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📋</div>
+                                <h3>No hay cuentas registradas para este edificio</h3>
+                                <p>Carga un Excel o agrega una cuenta manualmente</p>
+                            </div>
+                        </td></tr>
+                    `;
+                    document.getElementById('contadorFacturas').textContent = '0';
+                    return;
+                }
+                
+                let contador = 0;
+                snapshot.forEach((childSnapshot) => {
+                    const cuenta = childSnapshot.val();
+                    const id = childSnapshot.key;
+                    console.log('✅ Cargando cuenta:', cuenta.proveedor);
+                    tbody.innerHTML += crearFilaCuenta(cuenta, id);
+                    contador++;
+                });
+                
+                console.log(`✅ Total cuentas cargadas: ${contador}`);
+                
+                // Actualizar contador
+                document.getElementById('contadorFacturas').textContent = contador;
+                
+                // MIGRACIÓN AUTOMÁTICA: Actualizar datos bancarios vacíos
+                migrarDatosBancarios(snapshot);
+                
+                // Aplicar filtros si hay alguno activo
+                if (document.getElementById('filtroProveedor').value || document.getElementById('filtroMes').value) {
+                    aplicarFiltros();
+                }
+            });
+        }
+        
+        // ═══════════════════════════════════════════════════════════════
+        // MIGRACIÓN AUTOMÁTICA DE DATOS BANCARIOS
+        // ═══════════════════════════════════════════════════════════════
+        async function migrarDatosBancarios(snapshot) {
+            let actualizados = 0;
+            let sinCambios = 0;
+            
+            console.log('🔄 Iniciando migración automática de datos bancarios...');
+            
+            for (const childSnapshot of snapshot.val() ? Object.entries(snapshot.val()) : []) {
+                const [id, cuenta] = childSnapshot;
+                
+                // Verificar si faltan datos bancarios
+                const faltaBanco = !cuenta.banco || cuenta.banco === '-';
+                const faltaTipoCuenta = !cuenta.tipoCuenta || cuenta.tipoCuenta === '-';
+                const faltaNumeroCuenta = !cuenta.numeroCuenta || cuenta.numeroCuenta === '-';
+                
+                if (faltaBanco || faltaTipoCuenta || faltaNumeroCuenta) {
+                    // Buscar proveedor en base de datos
+                    const nombreProveedor = (cuenta.proveedor || '').toLowerCase();
+                    const proveedor = proveedoresDB[nombreProveedor];
+                    
+                    if (proveedor) {
+                        // Preparar datos a actualizar
+                        const datosActualizar = {};
+                        
+                        if (faltaBanco && proveedor.banco) {
+                            datosActualizar.banco = proveedor.banco;
+                        }
+                        if (faltaTipoCuenta && proveedor.tipoCuenta) {
+                            datosActualizar.tipoCuenta = proveedor.tipoCuenta;
+                        }
+                        if (faltaNumeroCuenta && proveedor.numeroCuenta) {
+                            datosActualizar.numeroCuenta = proveedor.numeroCuenta;
+                        }
+                        
+                        // Si hay datos para actualizar
+                        if (Object.keys(datosActualizar).length > 0) {
+                            try {
+                                const cuentaRef = ref(db, `cuentas_por_pagar/${edificioActual}/${id}`);
+                                await update(cuentaRef, datosActualizar);
+                                actualizados++;
+                                console.log(`✅ Actualizado: ${cuenta.proveedor} (Factura: ${cuenta.facturaNo})`);
+                            } catch (error) {
+                                console.error(`❌ Error actualizando ${cuenta.proveedor}:`, error);
+                            }
+                        }
+                    } else {
+                        sinCambios++;
+                    }
+                } else {
+                    sinCambios++;
+                }
+            }
+            
+            if (actualizados > 0) {
+                console.log(`✅ Migración completada: ${actualizados} cuentas actualizadas, ${sinCambios} sin cambios`);
+            } else {
+                console.log(`ℹ️ No hay cuentas para actualizar (${sinCambios} ya tienen datos completos)`);
+            }
+        }
+        
+        function crearFilaCuenta(cuenta, id) {
+            const estadoClass = cuenta.estado === 'Pagada' ? 'estado-pagada' : 
+                               (new Date(cuenta.fechaVencimiento) < new Date() ? 'estado-vencida' : 'estado-pendiente');
+            
+            return `
+                <tr data-proveedor="${(cuenta.proveedor || '').toLowerCase()}" data-fecha="${cuenta.fechaVencimiento || ''}">
+                    <td>${cuenta.proveedor || ''}</td>
+                    <td>${cuenta.tipoId || ''}</td>
+                    <td>${cuenta.numeroId || ''}</td>
+                    <td>${cuenta.banco || '-'}</td>
+                    <td>${cuenta.tipoCuenta || '-'}</td>
+                    <td>${cuenta.numeroCuenta || '-'}</td>
+                    <td>${cuenta.concepto || ''}</td>
+                    <td>${cuenta.facturaNo || ''}</td>
+                    <td>$${Number(cuenta.valorBruto || 0).toLocaleString('es-CO')}</td>
+                    <td>$${Number(cuenta.aiu || 0).toLocaleString('es-CO')}</td>
+                    <td>$${Number(cuenta.iva || 0).toLocaleString('es-CO')}</td>
+                    <td>$${Number(cuenta.retencion || 0).toLocaleString('es-CO')}</td>
+                    <td><strong>$${Number(cuenta.valorNeto || 0).toLocaleString('es-CO')}</strong></td>
+                    <td>${cuenta.fechaRecepcion || '-'}</td>
+                    <td>${cuenta.fechaVencimiento || '-'}</td>
+                    <td>${cuenta.fechaPago || '-'}</td>
+                    <td><span class="estado ${estadoClass}">${cuenta.estado || 'Pendiente'}</span></td>
+                    <td>${cuenta.metodoPago || '-'}</td>
+                    <td>${cuenta.categoriaGasto || '-'}</td>
+                    <td>${cuenta.prioridad || 'Media'}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${cuenta.observaciones || ''}">${cuenta.observaciones || '-'}</td>
+                    <td style="white-space: nowrap;">
+                        <button class="btn-table" style="background: #4a90e2; color: white;" onclick="abrirEditar('${id}')">✏️</button>
+                        ${cuenta.estado !== 'Pagada' ? 
+                            `<button class="btn-table btn-pagar" onclick="marcarPagada('${id}')">✅</button>` : ''}
+                        <button class="btn-table btn-eliminar" onclick="eliminarCuenta('${id}')">🗑️</button>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        // PROCESAR EXCEL
+        window.procesarExcel = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!edificioActual) {
+                alert('❌ Selecciona un edificio primero');
+                event.target.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                    
+                    if (jsonData.length === 0) {
+                        alert('❌ El Excel está vacío');
+                        return;
+                    }
+                    
+                    // Convertir a formato del sistema
+                    facturasTemp = jsonData.map(row => ({
+                        proveedor: row['Proveedor'] || row['proveedor'] || '',
+                        tipoId: row['Tipo ID'] || row['tipoId'] || row['TipoID'] || 'NIT',
+                        numeroId: String(row['No. Identificación'] || row['numeroId'] || row['NIT'] || ''),
+                        concepto: row['Concepto'] || row['concepto'] || '',
+                        facturaNo: String(row['Factura No.'] || row['facturaNo'] || row['Factura'] || ''),
+                        valorBruto: Number(row['Valor Bruto'] || row['valorBruto'] || 0),
+                        aiu: Number(row['AIU'] || row['aiu'] || 0),
+                        iva: Number(row['IVA'] || row['iva'] || 0),
+                        retencion: Number(row['Retención'] || row['retencion'] || row['Retencion'] || 0),
+                        valorNeto: Number(row['Valor Neto'] || row['valorNeto'] || 0),
+                        fechaRecepcion: formatearFecha(row['F. Recepción'] || row['fechaRecepcion'] || row['Fecha Recepción']),
+                        fechaVencimiento: formatearFecha(row['F. Vencimiento'] || row['fechaVencimiento'] || row['Fecha Vencimiento']),
+                        fechaPago: row['F. Pago'] || row['fechaPago'] ? formatearFecha(row['F. Pago'] || row['fechaPago']) : null,
+                        estado: row['Estado'] || row['estado'] || 'Pendiente'
+                    }));
+                    
+                    // Calcular valor neto si no viene
+                    facturasTemp = facturasTemp.map(f => ({
+                        ...f,
+                        valorNeto: f.valorNeto || (f.valorBruto + f.aiu + f.iva - f.retencion)
+                    }));
+                    
+                    mostrarPreview();
+                    
+                } catch (error) {
+                    console.error(error);
+                    alert('❌ Error al leer el Excel: ' + error.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        };
+        
+        function formatearFecha(fecha) {
+            if (!fecha) return new Date().toISOString().split('T')[0];
+            if (typeof fecha === 'number') {
+                // Excel date
+                const date = new Date((fecha - 25569) * 86400 * 1000);
+                return date.toISOString().split('T')[0];
+            }
+            if (typeof fecha === 'string') {
+                const date = new Date(fecha);
+                if (!isNaN(date.getTime())) {
+                    return date.toISOString().split('T')[0];
+                }
+            }
+            return new Date().toISOString().split('T')[0];
+        }
+        
+        function mostrarPreview() {
+            document.getElementById('totalFacturas').textContent = facturasTemp.length;
+            
+            let html = '<table class="preview-table"><thead><tr>';
+            html += '<th>Proveedor</th><th>Concepto</th><th>Factura</th><th>Valor Neto</th><th>F. Venc.</th>';
+            html += '</tr></thead><tbody>';
+            
+            facturasTemp.forEach(f => {
+                html += `<tr>
+                    <td>${f.proveedor}</td>
+                    <td>${f.concepto}</td>
+                    <td>${f.facturaNo}</td>
+                    <td>$${f.valorNeto.toLocaleString('es-CO')}</td>
+                    <td>${f.fechaVencimiento}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('previewContainer').innerHTML = html;
+            document.getElementById('modalPreview').classList.add('active');
+        }
+        
+        window.confirmarCargaExcel = async function() {
+            if (!edificioActual) {
+                alert('❌ Selecciona un edificio');
+                return;
+            }
+            
+            try {
+                const cuentasRef = ref(db, `cuentas_por_pagar/${edificioActual}`);
+                
+                for (const factura of facturasTemp) {
+                    await push(cuentasRef, {
+                        ...factura,
+                        fechaCreacion: new Date().toISOString(),
+                        creadoPor: 'Carga Excel'
+                    });
+                }
+                
+                alert(`✅ ${facturasTemp.length} facturas cargadas exitosamente`);
+                cerrarModal('modalPreview');
+                facturasTemp = [];
+                document.getElementById('fileExcel').value = '';
+                
+            } catch (error) {
+                console.error(error);
+                alert('❌ Error al cargar facturas: ' + error.message);
+            }
+        };
+        
+        // MODAL MANUAL
+        window.abrirModalManual = function() {
+            if (!edificioActual) {
+                alert('❌ Selecciona un edificio primero');
+                return;
+            }
+            document.getElementById('modalManual').classList.add('active');
+            document.getElementById('fechaRecepcion').valueAsDate = new Date();
+        };
+        
+        ['valorBruto', 'aiu', 'iva', 'retencion'].forEach(id => {
+            document.getElementById(id).addEventListener('input', calcularValorNeto);
+        });
+        
+        function calcularValorNeto() {
+            const bruto = parseFloat(document.getElementById('valorBruto').value) || 0;
+            const aiu = parseFloat(document.getElementById('aiu').value) || 0;
+            const iva = parseFloat(document.getElementById('iva').value) || 0;
+            const ret = parseFloat(document.getElementById('retencion').value) || 0;
+            
+            const neto = bruto + aiu + iva - ret;
+            document.getElementById('valorNeto').value = neto.toFixed(2);
+        }
+        
+        window.guardarCuentaManual = async function() {
+            // Validar solo campos ESENCIALES
+            const proveedor = document.getElementById('proveedor').value.trim();
+            const numeroId = document.getElementById('numeroId').value.trim();
+            const concepto = document.getElementById('concepto').value.trim();
+            const valorBruto = document.getElementById('valorBruto').value;
+            
+            if (!proveedor || !numeroId || !concepto || !valorBruto) {
+                alert('❌ Completa los campos obligatorios:\n• Proveedor\n• No. Identificación\n• Concepto\n• Valor Bruto');
+                return;
+            }
+            
+            const nuevaCuenta = {
+                proveedor: proveedor,
+                tipoId: document.getElementById('tipoId').value,
+                numeroId: numeroId,
+                banco: document.getElementById('banco').value || '',
+                tipoCuenta: document.getElementById('tipoCuenta').value || '',
+                numeroCuenta: document.getElementById('numeroCuenta').value || '',
+                concepto: concepto,
+                facturaNo: document.getElementById('facturaNo').value || 'N/A',
+                valorBruto: parseFloat(valorBruto),
+                aiu: parseFloat(document.getElementById('aiu').value) || 0,
+                iva: parseFloat(document.getElementById('iva').value) || 0,
+                retencion: parseFloat(document.getElementById('retencion').value) || 0,
+                valorNeto: parseFloat(document.getElementById('valorNeto').value) || parseFloat(valorBruto),
+                fechaRecepcion: document.getElementById('fechaRecepcion').value || null,
+                fechaVencimiento: document.getElementById('fechaVencimiento').value || null,
+                fechaPago: null,
+                estado: 'Pendiente',
+                metodoPago: document.getElementById('metodoPago').value || '',
+                categoriaGasto: document.getElementById('categoriaGasto').value || '',
+                prioridad: document.getElementById('prioridad').value || 'Media',
+                observaciones: document.getElementById('observaciones').value || '',
+                creadoPor: 'Manual',
+                fechaCreacion: new Date().toISOString()
+            };
+            
+            try {
+                const cuentasRef = ref(db, `cuentas_por_pagar/${edificioActual}`);
+                await push(cuentasRef, nuevaCuenta);
+                
+                alert('✅ Cuenta agregada exitosamente\n\nPuedes agregar los datos faltantes editándola después.');
+                cerrarModal('modalManual');
+                document.getElementById('formManual').reset();
+            } catch (error) {
+                alert('❌ Error al guardar: ' + error.message);
+                console.error('Error:', error);
+            }
+        };
+        
+        window.marcarPagada = async function(id) {
+            if (!confirm('¿Marcar como pagada?')) return;
+            
+            const cuentaRef = ref(db, `cuentas_por_pagar/${edificioActual}/${id}`);
+            await update(cuentaRef, {
+                estado: 'Pagada',
+                fechaPago: new Date().toISOString().split('T')[0]
+            });
+            
+            alert('✅ Cuenta marcada como pagada');
+        };
+        
+        window.eliminarCuenta = async function(id) {
+            if (!confirm('¿Eliminar esta cuenta? No se puede deshacer.')) return;
+            
+            const cuentaRef = ref(db, `cuentas_por_pagar/${edificioActual}/${id}`);
+            await remove(cuentaRef);
+            
+            alert('✅ Cuenta eliminada');
+        };
+        
+        // ═══════════════════════════════════════════════════════════════
+        // FUNCIONES DE EDICIÓN
+        // ═══════════════════════════════════════════════════════════════
+        window.abrirEditar = async function(id) {
+            try {
+                // Leer cuenta de Firebase
+                const cuentaRef = ref(db, `cuentas_por_pagar/${edificioActual}/${id}`);
+                const snapshot = await new Promise((resolve) => {
+                    onValue(cuentaRef, resolve, { onlyOnce: true });
+                });
+                
+                if (!snapshot.exists()) {
+                    alert('❌ Cuenta no encontrada');
+                    return;
+                }
+                
+                const cuenta = snapshot.val();
+                
+                // Llenar formulario de edición
+                document.getElementById('editarId').value = id;
+                document.getElementById('editarProveedor').value = cuenta.proveedor || '';
+                document.getElementById('editarTipoId').value = cuenta.tipoId || 'NIT';
+                document.getElementById('editarNumeroId').value = cuenta.numeroId || '';
+                document.getElementById('editarBanco').value = cuenta.banco || '';
+                document.getElementById('editarTipoCuenta').value = cuenta.tipoCuenta || '';
+                document.getElementById('editarNumeroCuenta').value = cuenta.numeroCuenta || '';
+                document.getElementById('editarConcepto').value = cuenta.concepto || '';
+                document.getElementById('editarFacturaNo').value = cuenta.facturaNo || '';
+                document.getElementById('editarValorBruto').value = cuenta.valorBruto || 0;
+                document.getElementById('editarAiu').value = cuenta.aiu || 0;
+                document.getElementById('editarIva').value = cuenta.iva || 0;
+                document.getElementById('editarRetencion').value = cuenta.retencion || 0;
+                document.getElementById('editarValorNeto').value = cuenta.valorNeto || 0;
+                document.getElementById('editarFechaRecepcion').value = cuenta.fechaRecepcion || '';
+                document.getElementById('editarFechaVencimiento').value = cuenta.fechaVencimiento || '';
+                document.getElementById('editarMetodoPago').value = cuenta.metodoPago || '';
+                document.getElementById('editarPrioridad').value = cuenta.prioridad || 'Media';
+                document.getElementById('editarCategoriaGasto').value = cuenta.categoriaGasto || '';
+                document.getElementById('editarObservaciones').value = cuenta.observaciones || '';
+                
+                // Abrir modal
+                document.getElementById('modalEditar').classList.add('active');
+                
+            } catch (error) {
+                alert('❌ Error al cargar cuenta: ' + error.message);
+                console.error('Error:', error);
+            }
+        };
+        
+        // Calcular valor neto en edición
+        ['editarValorBruto', 'editarAiu', 'editarIva', 'editarRetencion'].forEach(id => {
+            document.getElementById(id).addEventListener('input', function() {
+                const bruto = parseFloat(document.getElementById('editarValorBruto').value) || 0;
+                const aiu = parseFloat(document.getElementById('editarAiu').value) || 0;
+                const iva = parseFloat(document.getElementById('editarIva').value) || 0;
+                const ret = parseFloat(document.getElementById('editarRetencion').value) || 0;
+                
+                const neto = bruto + aiu + iva - ret;
+                document.getElementById('editarValorNeto').value = neto.toFixed(2);
+            });
+        });
+        
+        window.guardarEdicion = async function() {
+            const id = document.getElementById('editarId').value;
+            
+            // Validar campos esenciales
+            const proveedor = document.getElementById('editarProveedor').value.trim();
+            const numeroId = document.getElementById('editarNumeroId').value.trim();
+            const concepto = document.getElementById('editarConcepto').value.trim();
+            const valorBruto = document.getElementById('editarValorBruto').value;
+            
+            if (!proveedor || !numeroId || !concepto || !valorBruto) {
+                alert('❌ Completa los campos obligatorios:\n• Proveedor\n• No. Identificación\n• Concepto\n• Valor Bruto');
+                return;
+            }
+            
+            try {
+                const datosActualizados = {
+                    proveedor: proveedor,
+                    tipoId: document.getElementById('editarTipoId').value,
+                    numeroId: numeroId,
+                    banco: document.getElementById('editarBanco').value || '',
+                    tipoCuenta: document.getElementById('editarTipoCuenta').value || '',
+                    numeroCuenta: document.getElementById('editarNumeroCuenta').value || '',
+                    concepto: concepto,
+                    facturaNo: document.getElementById('editarFacturaNo').value || '',
+                    valorBruto: parseFloat(valorBruto),
+                    aiu: parseFloat(document.getElementById('editarAiu').value) || 0,
+                    iva: parseFloat(document.getElementById('editarIva').value) || 0,
+                    retencion: parseFloat(document.getElementById('editarRetencion').value) || 0,
+                    valorNeto: parseFloat(document.getElementById('editarValorNeto').value) || parseFloat(valorBruto),
+                    fechaRecepcion: document.getElementById('editarFechaRecepcion').value || null,
+                    fechaVencimiento: document.getElementById('editarFechaVencimiento').value || null,
+                    metodoPago: document.getElementById('editarMetodoPago').value || '',
+                    categoriaGasto: document.getElementById('editarCategoriaGasto').value || '',
+                    prioridad: document.getElementById('editarPrioridad').value || 'Media',
+                    observaciones: document.getElementById('editarObservaciones').value || ''
+                };
+                
+                const cuentaRef = ref(db, `cuentas_por_pagar/${edificioActual}/${id}`);
+                await update(cuentaRef, datosActualizados);
+                
+                alert('✅ Cuenta actualizada exitosamente');
+                cerrarModal('modalEditar');
+                
+            } catch (error) {
+                alert('❌ Error al guardar: ' + error.message);
+                console.error('Error:', error);
+            }
+        };
+        
+        window.descargarExcel = async function() {
+            if (!edificioActual) {
+                alert('❌ Selecciona un edificio primero');
+                return;
+            }
+            
+            try {
+                // Leer cuentas de Firebase
+                const cuentasRef = ref(db, `cuentas_por_pagar/${edificioActual}`);
+                const snapshot = await new Promise((resolve) => {
+                    onValue(cuentasRef, resolve, { onlyOnce: true });
+                });
+                
+                if (!snapshot.exists()) {
+                    alert('❌ No hay cuentas registradas para este edificio');
+                    return;
+                }
+                
+                // Convertir a array
+                const cuentas = [];
+                snapshot.forEach((childSnapshot) => {
+                    cuentas.push({
+                        id: childSnapshot.key,
+                        ...childSnapshot.val()
+                    });
+                });
+                
+                // Crear datos para Excel
+                const datosExcel = cuentas.map(c => ({
+                    'Proveedor': c.proveedor || '',
+                    'Tipo de ID': c.tipoId || 'NIT',
+                    'No. Identificación': c.numeroId || '',
+                    'Banco': c.banco || '',
+                    'Tipo de Cuenta': c.tipoCuenta || '',
+                    'Número de Cuenta': c.numeroCuenta || '',
+                    'Concepto': c.concepto || '',
+                    'Factura / CAE No.': c.facturaNo || '',
+                    'Valor Bruto': c.valorBruto || 0,
+                    'AIU': c.aiu || 0,
+                    'IVA': c.iva || 0,
+                    'Retención en IVA': c.retencion || 0,
+                    'Valor Neto a Pagar': c.valorNeto || 0,
+                    'Fecha de Recepción': c.fechaRecepcion || '',
+                    'Fecha de Vencimiento': c.fechaVencimiento || '',
+                    'Fecha de Pago': c.fechaPago || '',
+                    'Estado': c.estado || 'Pendiente',
+                    'Método de Pago': c.metodoPago || '',
+                    'Categoría del Gasto': c.categoriaGasto || '',
+                    'Prioridad': c.prioridad || 'Media',
+                    'Observaciones': c.observaciones || ''
+                }));
+                
+                // Crear workbook
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(datosExcel);
+                
+                // Ajustar anchos de columnas
+                ws['!cols'] = [
+                    { wch: 30 }, // Proveedor
+                    { wch: 12 }, // Tipo de ID
+                    { wch: 18 }, // No. ID
+                    { wch: 20 }, // Banco
+                    { wch: 15 }, // Tipo de Cuenta
+                    { wch: 20 }, // Número de Cuenta
+                    { wch: 35 }, // Concepto
+                    { wch: 18 }, // Factura / CAE
+                    { wch: 14 }, // Valor Bruto
+                    { wch: 12 }, // AIU
+                    { wch: 12 }, // IVA
+                    { wch: 16 }, // Retención en IVA
+                    { wch: 18 }, // Valor Neto a Pagar
+                    { wch: 18 }, // Fecha Recepción
+                    { wch: 20 }, // Fecha Vencimiento
+                    { wch: 15 }, // Fecha Pago
+                    { wch: 12 }, // Estado
+                    { wch: 18 }, // Método de Pago
+                    { wch: 25 }, // Categoría del Gasto
+                    { wch: 12 }, // Prioridad
+                    { wch: 40 }  // Observaciones
+                ];
+                
+                XLSX.utils.book_append_sheet(wb, ws, 'Cuentas por Pagar');
+                
+                // Descargar
+                const nombreArchivo = `Cuentas_Por_Pagar_${edificioActual}_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, nombreArchivo);
+                
+                alert(`✅ Excel descargado exitosamente!\n\n📊 ${cuentas.length} cuentas exportadas\n📁 Archivo: ${nombreArchivo}`);
+                
+            } catch (error) {
+                console.error('Error descargando Excel:', error);
+                alert('❌ Error al descargar Excel: ' + error.message);
+            }
+        };
+        
+        window.cerrarModal = function(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        };
+        
+        // ═══════════════════════════════════════════════════════════════
+        // FUNCIONES DE FILTROS
+        // ═══════════════════════════════════════════════════════════════
+        window.aplicarFiltros = function() {
+            const filtroProveedor = document.getElementById('filtroProveedor').value.toLowerCase();
+            const filtroMes = document.getElementById('filtroMes').value;
+            
+            const filas = document.querySelectorAll('#tablaCuerpo tr');
+            let contador = 0;
+            
+            filas.forEach(fila => {
+                // Obtener datos de la fila
+                const proveedor = fila.getAttribute('data-proveedor') || '';
+                const fecha = fila.getAttribute('data-fecha') || '';
+                const mesFecha = fecha ? fecha.substring(5, 7) : ''; // Extrae mes de YYYY-MM-DD
+                
+                // Aplicar filtros
+                const coincideProveedor = !filtroProveedor || proveedor.includes(filtroProveedor);
+                const coincideMes = !filtroMes || mesFecha === filtroMes;
+                
+                if (coincideProveedor && coincideMes) {
+                    fila.style.display = '';
+                    contador++;
+                } else {
+                    fila.style.display = 'none';
+                }
+            });
+            
+            // Actualizar contador
+            document.getElementById('contadorFacturas').textContent = contador;
+        };
+        
+        window.limpiarFiltros = function() {
+            document.getElementById('filtroProveedor').value = '';
+            document.getElementById('filtroMes').value = '';
+            aplicarFiltros();
+        };
+    </script>
+</body>
+</html>
