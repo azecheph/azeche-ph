@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<!-- saved from url=(0058)file:///C:/Users/C3MADRIZ/Downloads/index-LOGIN-FINAL.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azeche P.H. - Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .logo-box {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo-text {
+            font-size: 3em;
+            font-weight: 900;
+            letter-spacing: -2px;
+        }
+        
+        .logo-blue { color: #0056B8; }
+        .logo-green { color: #00B853; }
+        
+        .logo-subtitle {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+            letter-spacing: 2px;
+        }
+        
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .quick-access {
+            margin-bottom: 30px;
+        }
+        
+        .quick-access h3 {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        
+        .user-buttons {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .user-btn {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+            padding: 20px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .user-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 86, 184, 0.3);
+        }
+        
+        .user-btn .icon {
+            font-size: 1.5em;
+        }
+        
+        .user-btn.admin {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        }
+        
+        .divider {
+            text-align: center;
+            color: #999;
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: #ddd;
+        }
+        
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #0056B8;
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 86, 184, 0.3);
+        }
+        
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #999;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- LOGO -->
+        <div class="logo-box">
+            <div class="logo-text">
+                <span class="logo-blue">AZECHE</span><span class="logo-green">PH</span>
+            </div>
+            <div class="logo-subtitle">SOLUCIONES ADMINISTRATIVAS</div>
+        </div>
+        
+        <h2>Bienvenida</h2>
+        
+        <!-- ACCESO RÁPIDO -->
+        <div class="quick-access">
+            <h3>🚀 Acceso Rápido</h3>
+            <div class="user-buttons">
+                <button class="user-btn admin" onclick="loginRapido('admin')" style="background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);">
+                    <span class="icon">👔</span>
+                    <span>Azeche Adm.</span>
+                </button>
+                <button class="user-btn" onclick="loginRapido('c3madriz')" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);">
+                    <span class="icon">👩‍💼</span>
+                    <span>C3madriz</span>
+                </button>
+                <button class="user-btn" onclick="loginRapido('contadora')" style="background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);">
+                    <span class="icon">📊</span>
+                    <span>Contadora</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- DIVIDER -->
+        <div class="divider">o</div>
+        
+        <!-- FORMULARIO MANUAL -->
+        <form id="loginForm">
+            <div class="error-message" id="errorMessage"></div>
+            
+            <div class="form-group">
+                <label>📧 Email</label>
+                <input type="email" id="email" placeholder="usuario@ejemplo.com" required="">
+            </div>
+            
+            <div class="form-group">
+                <label>🔒 Contraseña</label>
+                <input type="password" id="password" placeholder="••••••••" required="">
+            </div>
+            
+            <button type="submit" class="btn-login">Iniciar Sesión</button>
+        </form>
+        
+        <div class="footer">
+            © 2025 Azeche P.H. - Sistema Administrativo
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
+            authDomain: "azeche-ph.firebaseapp.com",
+            databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+            projectId: "azeche-ph",
+            storageBucket: "azeche-ph.firebasestorage.app",
+            messagingSenderId: "905337990521",
+            appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // USUARIOS FINALES
+        const usuarios = {
+            admin: {
+                email: 'azeche.adm@azecheph.com',
+                password: 'AzecheAdm2025!',
+                nombre: 'Azeche Adm.',
+                rol: 'administrador',
+                permisos: ['ver', 'editar', 'crear', 'eliminar', 'configurar']
+            },
+            c3madriz: {
+                email: 'c3madriz@azecheph.com',
+                password: 'C3madriz2025!',
+                nombre: 'Carla Castellano (Creadora)',
+                rol: 'creadora',
+                permisos: ['todo', 'administrar', 'configurar', 'eliminar', 'usuarios', 'reportes', 'backup', 'superadmin']
+            },
+            contadora: {
+                email: 'contadora@azecheph.com',
+                password: 'Conta2026!',
+                nombre: 'Contadora',
+                rol: 'contadora',
+                permisos: ['ver', 'editar', 'crear', 'descargar', 'reportes']
+            }
+        };
+
+        // LOGIN RÁPIDO CON CONTRASEÑA
+        window.loginRapido = function(tipo) {
+            const usuario = usuarios[tipo];
+            
+            // Pedir contraseña usando prompt
+            const passwordIngresada = prompt(`🔐 Ingresa la contraseña para ${usuario.nombre}:`);
+            
+            if (!passwordIngresada) {
+                return; // Usuario canceló
+            }
+            
+            if (passwordIngresada !== usuario.password) {
+                mostrarError('❌ Contraseña incorrecta');
+                return;
+            }
+            
+            // Contraseña correcta, proceder con login
+            login(usuario.email, usuario.password, usuario.nombre, usuario.rol);
+        };
+
+        // LOGIN MANUAL
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            login(email, password);
+        });
+
+        // FUNCIÓN DE LOGIN
+        function login(email, password, nombre = null, rol = null) {
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    
+                    // Guardar info del usuario en localStorage
+                    const userInfo = {
+                        uid: user.uid,
+                        email: user.email,
+                        nombre: nombre || user.displayName || user.email.split('@')[0],
+                        rol: rol || 'usuario',
+                        loginTime: new Date().toISOString()
+                    };
+                    
+                    localStorage.setItem('azecheUser', JSON.stringify(userInfo));
+                    
+                    // Registrar login en Firebase
+                    set(ref(db, `logs_acceso/${user.uid}/${Date.now()}`), {
+                        email: user.email,
+                        nombre: userInfo.nombre,
+                        rol: userInfo.rol,
+                        fecha: new Date().toISOString(),
+                        accion: 'login'
+                    });
+                    
+                    // Redirigir al Dashboard
+                    window.location.href = 'Dashboard.html';
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    mostrarError('Usuario o contraseña incorrectos');
+                });
+        }
+
+        function mostrarError(mensaje) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = mensaje;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+
+
+</body></html>
