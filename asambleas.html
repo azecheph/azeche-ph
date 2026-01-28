@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asambleas - Azeche P.H.</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 2em;
+        }
+        
+        .btn-back {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .btn-back:hover {
+            background: #5568d3;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .edificios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .edificio-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .edificio-card h3 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .badge {
+            font-size: 0.5em;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .badge.proxima {
+            background: #00B853;
+            color: white;
+        }
+        
+        .badge.agendar {
+            background: #ffa500;
+            color: white;
+        }
+        
+        .fecha-asamblea {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .fecha-asamblea .icon {
+            font-size: 2em;
+        }
+        
+        .fecha-asamblea h4 {
+            color: #667eea;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .fecha-asamblea p {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .estado-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        
+        .documentos-section {
+            margin: 15px 0;
+        }
+        
+        .documentos-section h4 {
+            color: #333;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .doc-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .doc-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+        
+        .btn-download {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+        }
+        
+        .btn-download:hover {
+            background: #5568d3;
+        }
+        
+        .btn-action {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+            font-size: 0.95em;
+        }
+        
+        .btn-editar {
+            background: #ffa500;
+            color: white;
+        }
+        
+        .btn-editar:hover {
+            background: #ff8c00;
+        }
+        
+        .btn-votacion {
+            background: #00B853;
+            color: white;
+        }
+        
+        .btn-votacion:hover {
+            background: #009643;
+        }
+        
+        .btn-actas {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-actas:hover {
+            background: #5568d3;
+        }
+        
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .modal-header h2 {
+            color: #667eea;
+        }
+        
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 2em;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+        
+        .btn-cancel {
+            background: #999;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .btn-save {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        /* SECCIÓN TAREAS */
+        .tareas-section {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 40px;
+        }
+        
+        .tareas-section h2 {
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .nueva-tarea-form {
+            background: #f8f9ff;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .nueva-tarea-form h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .btn-crear {
+            width: 100%;
+            background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        .btn-crear:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(14, 165, 233, 0.4);
+        }
+        
+        .tarea-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .tarea-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+        
+        .tarea-title {
+            flex: 1;
+        }
+        
+        .tarea-title h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .tarea-meta {
+            color: #667eea;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .tarea-desc {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .prioridad-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .tarea-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            align-items: center;
+        }
+        
+        .tarea-origen {
+            color: #999;
+            font-size: 0.85em;
+        }
+        
+        .btn-completar {
+            margin-left: auto;
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .btn-eliminar {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Gestión de Asambleas y Consejos</h1>
+            <a href="Dashboard.html" class="btn-back">🏠 Dashboard</a>
+        </div>
+        
+        <div class="edificios-grid">
+            <!-- NEPAL 2 -->
+            <div class="edificio-card">
+                <h3>
+                    🏢 Nepal 2
+                    <span class="badge proxima">PRÓXIMA</span>
+                </h3>
+                
+                <div class="fecha-asamblea">
+                    <span class="icon">📅</span>
+                    <div>
+                        <h4>Fecha programada</h4>
+                        <p id="fecha-nepal2">14 de Febrero, 2026</p>
+                    </div>
+                </div>
+                
+                <div class="estado-badge">
+                    <span>⏳</span>
+                    <span id="estado-nepal2">Pendiente de fecha</span>
+                </div>
+                
+                <div class="documentos-section">
+                    <h4>📄 Documentos Preparatorios</h4>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📋</span>
+                            <span>Convocatoria (Plantilla)</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('nepal2', 'convocatoria')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📝</span>
+                            <span>Acta (Plantilla)</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('nepal2', 'acta')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📊</span>
+                            <span>Informe de Gestión 2025</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('nepal2', 'informe')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📧</span>
+                            <span>Citación Formal</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('nepal2', 'citacion')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                </div>
+                
+                <button class="btn-action btn-editar" onclick="abrirModal('nepal-2')">
+                    ✏️ Editar Fecha y Estado
+                </button>
+                <button class="btn-action btn-votacion" onclick="abrirVotacion('nepal2')">
+                    🗳️ Sistema de Votación
+                </button>
+                <button class="btn-action btn-actas" onclick="abrirGeneradorActas()">
+                    📝 Generador de Actas
+                </button>
+            </div>
+            
+            <!-- AVALON -->
+            <div class="edificio-card">
+                <h3>
+                    🏰 Avalon
+                    <span class="badge proxima">PRÓXIMA</span>
+                </h3>
+                
+                <div class="fecha-asamblea">
+                    <span class="icon">📅</span>
+                    <div>
+                        <h4>Fecha programada</h4>
+                        <p id="fecha-avalon">28 de Febrero, 2026</p>
+                    </div>
+                </div>
+                
+                <div class="estado-badge">
+                    <span>⏳</span>
+                    <span id="estado-avalon">Pendiente de fecha</span>
+                </div>
+                
+                <div class="documentos-section">
+                    <h4>📄 Documentos Preparatorios</h4>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📋</span>
+                            <span>Convocatoria (Plantilla)</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('avalon', 'convocatoria')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📝</span>
+                            <span>Acta (Plantilla)</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('avalon', 'acta')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📊</span>
+                            <span>Informe de Gestión 2025</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('avalon', 'informe')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📧</span>
+                            <span>Citación Formal</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('avalon', 'citacion')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                </div>
+                
+                <button class="btn-action btn-editar" onclick="abrirModal('avalon')">
+                    ✏️ Editar Fecha y Estado
+                </button>
+                <button class="btn-action btn-votacion" onclick="abrirVotacion('avalon')">
+                    🗳️ Sistema de Votación
+                </button>
+                <button class="btn-action btn-actas" onclick="abrirGeneradorActas()">
+                    📝 Generador de Actas
+                </button>
+            </div>
+            
+            <!-- CONVIVIENDA -->
+            <div class="edificio-card">
+                <h3>
+                    🏘️ Convivienda I
+                    <span class="badge agendar">POR AGENDAR</span>
+                </h3>
+                
+                <div class="fecha-asamblea">
+                    <span class="icon">📅</span>
+                    <div>
+                        <h4>Fecha programada</h4>
+                        <p id="fecha-convivienda">Por definir</p>
+                    </div>
+                </div>
+                
+                <div class="estado-badge">
+                    <span>⏳</span>
+                    <span id="estado-convivienda">Pendiente de fecha</span>
+                </div>
+                
+                <div class="documentos-section">
+                    <h4>📄 Documentos Preparatorios</h4>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📋</span>
+                            <span>Convocatoria (Plantilla)</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('convivienda', 'convocatoria')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📝</span>
+                            <span>Acta (Plantilla)</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('convivienda', 'acta')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📊</span>
+                            <span>Informe de Gestión 2025</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('convivienda', 'informe')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📧</span>
+                            <span>Citación Formal</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('convivienda', 'citacion')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                </div>
+                
+                <button class="btn-action btn-editar" onclick="abrirModal('convivienda-1')">
+                    ✏️ Editar Fecha y Estado
+                </button>
+                <button class="btn-action btn-votacion" onclick="abrirVotacion('convivienda')">
+                    🗳️ Sistema de Votación
+                </button>
+                <button class="btn-action btn-actas" onclick="abrirGeneradorActas()">
+                    📝 Generador de Actas
+                </button>
+            </div>
+            
+            <!-- PINOS DEL COUNTRY -->
+            <div class="edificio-card">
+                <h3>
+                    🌲 Pinos del Country
+                    <span class="badge agendar">POR AGENDAR</span>
+                </h3>
+                
+                <div class="fecha-asamblea">
+                    <span class="icon">📅</span>
+                    <div>
+                        <h4>Fecha programada</h4>
+                        <p id="fecha-pinos">Por definir</p>
+                    </div>
+                </div>
+                
+                <div class="estado-badge">
+                    <span>⏳</span>
+                    <span id="estado-pinos">Pendiente de fecha</span>
+                </div>
+                
+                <div class="documentos-section">
+                    <h4>📄 Documentos Preparatorios</h4>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📋</span>
+                            <span>Convocatoria (Plantilla)</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('pinos', 'convocatoria')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📝</span>
+                            <span>Acta (Plantilla)</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('pinos', 'acta')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📊</span>
+                            <span>Informe de Gestión 2025</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('pinos', 'informe')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📧</span>
+                            <span>Citación Formal</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('pinos', 'citacion')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                </div>
+                
+                <button class="btn-action btn-editar" onclick="abrirModal('pinos-del-country')">
+                    ✏️ Editar Fecha y Estado
+                </button>
+                <button class="btn-action btn-votacion" onclick="abrirVotacion('pinos')">
+                    🗳️ Sistema de Votación
+                </button>
+                <button class="btn-action btn-actas" onclick="abrirGeneradorActas()">
+                    📝 Generador de Actas
+                </button>
+            </div>
+        </div>
+        
+        <!-- SECCIÓN DE TAREAS -->
+        <div class="tareas-section">
+            <h2>📋 Consejos Mensuales y Tareas</h2>
+            
+            <div class="nueva-tarea-form">
+                <h3>➕ Agregar Nueva Tarea</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Título de la Tarea *</label>
+                        <input type="text" id="tituloTarea" placeholder="Ej: Revisión de instalaciones eléctricas">
+                    </div>
+                    <div class="form-group">
+                        <label>Edificio *</label>
+                        <select id="edificioTarea">
+                            <option value="">Seleccionar...</option>
+                            <option value="nepal-2">Nepal 2</option>
+                            <option value="avalon">Avalon</option>
+                            <option value="convivienda-1">Convivienda I</option>
+                            <option value="pinos-del-country">Pinos del Country</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Origen *</label>
+                        <select id="origenTarea">
+                            <option value="">Seleccionar...</option>
+                            <option value="Consejo">Consejo</option>
+                            <option value="Asamblea">Asamblea</option>
+                            <option value="Administración">Administración</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Prioridad *</label>
+                        <select id="prioridadTarea">
+                            <option value="Media">Media</option>
+                            <option value="Alta">Alta</option>
+                            <option value="Baja">Baja</option>
+                            <option value="Urgente">Urgente</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha Límite</label>
+                        <input type="date" id="fechaTarea">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="descripcionTarea" rows="3" placeholder="Detalles de la tarea..."></textarea>
+                </div>
+                
+                <button class="btn-crear" onclick="crearTarea()">
+                    ✅ Crear Tarea
+                </button>
+            </div>
+            
+            <div>
+                <h3 style="color: #333; margin-bottom: 20px;">📋 Tareas Activas</h3>
+                <div id="listaTareas">
+                    <p style="text-align: center; color: #999; padding: 40px;">Cargando tareas...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL EDITAR -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitulo">✏️ Editar Asamblea</h2>
+                <button class="btn-close" onclick="cerrarModal()">×</button>
+            </div>
+            
+            <form id="form" onsubmit="guardar(event)">
+                <div class="form-group">
+                    <label>Edificio</label>
+                    <input type="text" id="inputEdificio" readonly style="background: #f5f5f5;">
+                </div>
+                
+                <div class="form-group">
+                    <label>Fecha de Asamblea *</label>
+                    <input type="date" id="inputFecha" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Estado *</label>
+                    <select id="inputEstado" required>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="programada">Programada</option>
+                        <option value="realizada">Realizada</option>
+                        <option value="cancelada">Cancelada</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+                    <button type="submit" class="btn-save">💾 Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { getDatabase, ref, onValue, get, update, push, set } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBw0UU5yVfx4YQfW23ONSKp1DJlcJFM2TE",
+            authDomain: "azeche-ph.firebaseapp.com",
+            databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+            projectId: "azeche-ph",
+            storageBucket: "azeche-ph.firebasestorage.app",
+            messagingSenderId: "905337990521",
+            appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // Verificar autenticación
+        onAuthStateChanged(auth, (user) => {
+            if (false) { // Autenticación desactivada para pruebas
+                window.location.href = 'index.html';
+            } else {
+                cargarAsambleas();
+                cargarTareas();
+            }
+        });
+
+        const nombres = {
+            'nepal-2': 'Nepal 2',
+            'avalon': 'Avalon',
+            'convivienda-1': 'Convivienda I',
+            'pinos-del-country': 'Pinos del Country'
+        };
+
+        const idMap = {
+            'nepal-2': 'nepal2',
+            'avalon': 'avalon',
+            'convivienda-1': 'convivienda',
+            'pinos-del-country': 'pinos'
+        };
+
+        let edificioActual = '';
+
+        // Cargar asambleas
+        function cargarAsambleas() {
+            const asambleasRef = ref(db, 'asambleas');
+            onValue(asambleasRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    
+                    Object.keys(nombres).forEach(edificio => {
+                        const asamblea = data[edificio];
+                        const id = idMap[edificio];
+                        const fechaElement = document.getElementById(`fecha-${id}`);
+                        const estadoElement = document.getElementById(`estado-${id}`);
+                        
+                        if (asamblea && asamblea.fecha) {
+                            const fecha = new Date(asamblea.fecha);
+                            fechaElement.textContent = fecha.toLocaleDateString('es-ES', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            });
+                        }
+                        
+                        if (asamblea && asamblea.estado) {
+                            const estados = {
+                                'pendiente': '⏳ Pendiente',
+                                'programada': '📅 Programada',
+                                'realizada': '✅ Realizada',
+                                'cancelada': '❌ Cancelada'
+                            };
+                            estadoElement.textContent = estados[asamblea.estado] || asamblea.estado;
+                        }
+                    });
+                }
+            });
+        }
+
+        // Cargar tareas
+        function cargarTareas() {
+            const tareasRef = ref(db, 'tareas');
+            onValue(tareasRef, (snapshot) => {
+                const container = document.getElementById('listaTareas');
+                
+                if (!snapshot.exists()) {
+                    container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No hay tareas activas</p>';
+                    return;
+                }
+                
+                const tareas = [];
+                snapshot.forEach((child) => {
+                    tareas.push({ id: child.key, ...child.val() });
+                });
+                
+                const pendientes = tareas.filter(t => t.estado === 'pendiente');
+                
+                if (pendientes.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No hay tareas pendientes</p>';
+                    return;
+                }
+                
+                const prioridadColor = {
+                    'Urgente': '#dc3545',
+                    'Alta': '#fd7e14',
+                    'Media': '#ffc107',
+                    'Baja': '#20c997'
+                };
+                
+                container.innerHTML = pendientes.map(tarea => `
+                    <div class="tarea-card" style="border-left: 5px solid ${prioridadColor[tarea.prioridad] || '#999'}">
+                        <div class="tarea-header">
+                            <div class="tarea-title">
+                                <h4>${tarea.titulo}</h4>
+                                <p class="tarea-meta">🏢 ${nombres[tarea.edificio] || tarea.edificio}</p>
+                                <p class="tarea-desc">${tarea.descripcion || ''}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <span class="prioridad-badge" style="background: ${prioridadColor[tarea.prioridad] || '#999'}">${tarea.prioridad}</span>
+                                ${tarea.fechaLimite ? `<p style="color: #999; font-size: 0.85em; margin-top: 8px;">📅 ${new Date(tarea.fechaLimite).toLocaleDateString('es-ES')}</p>` : ''}
+                            </div>
+                        </div>
+                        <div class="tarea-footer">
+                            <span class="tarea-origen">Origen: ${tarea.origen}</span>
+                            <button class="btn-completar" onclick="completarTarea('${tarea.id}')">✅ Completar</button>
+                            <button class="btn-eliminar" onclick="eliminarTarea('${tarea.id}')">🗑️ Eliminar</button>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        // Crear tarea
+        window.crearTarea = async function() {
+            const titulo = document.getElementById('tituloTarea').value;
+            const edificio = document.getElementById('edificioTarea').value;
+            const origen = document.getElementById('origenTarea').value;
+            const prioridad = document.getElementById('prioridadTarea').value;
+            const fechaLimite = document.getElementById('fechaTarea').value;
+            const descripcion = document.getElementById('descripcionTarea').value;
+            
+            if (!titulo || !edificio || !origen) {
+                alert('⚠️ Por favor completa los campos obligatorios');
+                return;
+            }
+            
+            try {
+                const tareasRef = ref(db, 'tareas');
+                const nuevaTareaRef = push(tareasRef);
+                
+                await set(nuevaTareaRef, {
+                    titulo,
+                    edificio,
+                    origen,
+                    prioridad,
+                    fechaLimite,
+                    descripcion,
+                    estado: 'pendiente',
+                    fechaCreacion: new Date().toISOString()
+                });
+                
+                alert('✅ Tarea creada correctamente');
+                
+                // Limpiar
+                document.getElementById('tituloTarea').value = '';
+                document.getElementById('edificioTarea').value = '';
+                document.getElementById('origenTarea').value = '';
+                document.getElementById('prioridadTarea').value = 'Media';
+                document.getElementById('fechaTarea').value = '';
+                document.getElementById('descripcionTarea').value = '';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al crear la tarea');
+            }
+        };
+
+        // Completar tarea
+        window.completarTarea = async function(tareaId) {
+            if (!confirm('¿Marcar esta tarea como completada?')) return;
+            
+            try {
+                const tareaRef = ref(db, `tareas/${tareaId}`);
+                await update(tareaRef, {
+                    estado: 'completada',
+                    fechaCompletado: new Date().toISOString()
+                });
+                alert('✅ Tarea completada');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error');
+            }
+        };
+
+        // Eliminar tarea
+        window.eliminarTarea = async function(tareaId) {
+            if (!confirm('¿Eliminar esta tarea permanentemente?')) return;
+            
+            try {
+                const tareaRef = ref(db, `tareas/${tareaId}`);
+                await set(tareaRef, null);
+                alert('✅ Tarea eliminada');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error');
+            }
+        };
+
+        // Abrir modal
+        window.abrirModal = async function(edificioId) {
+            edificioActual = edificioId;
+            
+            document.getElementById('modalTitulo').textContent = `✏️ Editar Asamblea - ${nombres[edificioId]}`;
+            document.getElementById('inputEdificio').value = nombres[edificioId];
+            
+            const asambleaRef = ref(db, `asambleas/${edificioId}`);
+            const snapshot = await get(asambleaRef);
+            
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                document.getElementById('inputFecha').value = data.fecha || '';
+                document.getElementById('inputEstado').value = data.estado || 'pendiente';
+            } else {
+                document.getElementById('inputFecha').value = '';
+                document.getElementById('inputEstado').value = 'pendiente';
+            }
+            
+            document.getElementById('modal').classList.add('active');
+        };
+
+        window.cerrarModal = function() {
+            document.getElementById('modal').classList.remove('active');
+        };
+
+        window.guardar = async function(e) {
+            e.preventDefault();
+            
+            const fecha = document.getElementById('inputFecha').value;
+            const estado = document.getElementById('inputEstado').value;
+            
+            try {
+                const asambleaRef = ref(db, `asambleas/${edificioActual}`);
+                await update(asambleaRef, {
+                    fecha,
+                    estado,
+                    edificio: nombres[edificioActual],
+                    ultimaActualizacion: new Date().toISOString()
+                });
+                
+                alert('✅ Asamblea actualizada');
+                cerrarModal();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al guardar');
+            }
+        };
+
+        // Descargar documentos
+        window.descargarDoc = function(edificio, tipo) {
+            alert(`📥 Descargando: ${tipo} de ${edificio}\n\nNota: Sube los PDFs a GitHub Pages para descarga real.`);
+        };
+
+        // Abrir sistema de votación
+        window.abrirVotacion = function(edificio) {
+            const edificiosMap = {
+                'nepal2': 'nepal-2',
+                'avalon': 'avalon',
+                'convivienda': 'convivienda-1',
+                'pinos': 'pinos-del-country'
+            };
+            window.location.href = `votacion-admin.html?edificio=${edificiosMap[edificio]}`;
+        };
+
+        // Abrir generador de actas
+        window.abrirGeneradorActas = function() {
+            window.open('generador-actas-v2.html', '_blank');
+        };
+    </script>
+</body>
+</html>
