@@ -976,6 +976,8 @@
             }
         });
         
+
+        
         // CARGAR CONTADORES DINÁMICOS
         function cargarContadores() {
             // Contar próximas asambleas
@@ -998,6 +1000,8 @@
                     const tareas = snapshot.val();
                     const pendientes = Object.values(tareas).filter(t => t.estado === 'pendiente');
                     document.querySelector('#dashboard-section .stat-card:nth-child(5) .value').textContent = pendientes.length;
+                }
+            });
             
             // Contar facturas pendientes y calcular saldo por pagar
             const cuentasRef = ref(db, 'cuentas_por_pagar');
@@ -1019,10 +1023,7 @@
                 document.getElementById('saldoPorPagar').textContent = 
                     '$' + saldoTotal.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0});
             });
-                }
-            });
         }
-
         // Cerrar sesión
         window.cerrarSesion = function() {
             signOut(auth).then(() => {
