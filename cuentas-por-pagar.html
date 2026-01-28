@@ -488,6 +488,47 @@
             font-weight: 700;
         }
 
+
+        /* ESTILOS PARA ALERTAS DE DEUDAS */
+        .alerta-card {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+            border-left: 5px solid #dc3545;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.15);
+        }
+        
+        .alerta-card h3 {
+            color: #dc3545;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .alerta-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .alerta-item:last-child {
+            border-bottom: none;
+        }
+        
+        .alerta-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .alerta-valor {
+            font-weight: 700;
+            color: #dc3545;
+        }
+        
+        .alerta-valor.grande {
+            font-size: 1.3em;
+        }
     </style>
 </head>
 <body>
@@ -510,6 +551,18 @@
             <button class="btn-logout" onclick="location.href='Dashboard.html'">
                 🏠 Dashboard
             </button>
+        </div>
+
+        <!-- PANEL DE ALERTAS DE DEUDAS POR EDIFICIO -->
+        <div id="panelAlertas" style="display: none; margin-bottom: 30px;">
+            <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <h2 style="color: #dc3545; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <span>⚠️</span> Alertas de Deudas por Edificio
+                </h2>
+                <div id="alertasDeudas" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
         </div>
 
         <!-- PANEL DE ACCIONES -->
@@ -582,6 +635,8 @@
                             <th>IVA</th>
                             <th>Retención</th>
                             <th>Valor Neto a Pagar</th>
+                            <th>Adelanto</th>
+                            <th>Resto a Pagar</th>
                             <th>Fecha de Recepción</th>
                             <th>Fecha de Vencimiento</th>
                             <th>Fecha de Pago</th>
@@ -690,6 +745,22 @@
                 <div class="form-group">
                     <label>Valor Neto a Pagar (calculado)</label>
                     <input type="number" id="valorNeto" step="0.01" readonly>
+                
+                <!-- CAMPOS DE ADELANTO -->
+                <div class="form-row" style="border-top: 2px solid #667eea; padding-top: 20px; margin-top: 20px;">
+                    <div class="form-group">
+                        <label>💰 Adelanto</label>
+                        <input type="number" id="adelanto" step="0.01" value="0" oninput="calcularRestoAPagar()">
+                    </div>
+                    <div class="form-group">
+                        <label>📅 Fecha del Adelanto</label>
+                        <input type="date" id="fechaAdelanto">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label style="color: #00B853; font-weight: 700;">✅ Resto a Pagar</label>
+                    <input type="number" id="restoAPagar" step="0.01" readonly style="background: #e8f5e9; font-size: 1.2em; font-weight: 700; color: #00B853;">
+                </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -1029,6 +1100,8 @@
             }
             
             cargarCuentas();
+            cargarAlertasDeudas();
+            verificarYPasarFacturas();
         };
         
         function cargarCuentas() {
@@ -1171,6 +1244,8 @@
                     <td>$${Number(cuenta.iva || 0).toLocaleString('es-CO')}</td>
                     <td>$${Number(cuenta.retencion || 0).toLocaleString('es-CO')}</td>
                     <td><strong>$${Number(cuenta.valorNeto || 0).toLocaleString('es-CO')}</strong></td>
+                    <td style="color: #ff9800;">$${Number(cuenta.adelanto || 0).toLocaleString('es-CO')}</td>
+                    <td style="font-weight: 700; color: #00B853;"><strong>$${Number(cuenta.restoAPagar || cuenta.valorNeto || 0).toLocaleString('es-CO')}</strong></td>
                     <td>${cuenta.fechaRecepcion || '-'}</td>
                     <td>${cuenta.fechaVencimiento || '-'}</td>
                     <td>${cuenta.fechaPago || '-'}</td>
@@ -1338,7 +1413,218 @@
         }
         
         window.guardarCuentaManual = async function() {
-            // Validar solo campos ESENCIALES
+        // ========== FUNCIONES PARA ADELANTOS Y CÁLCULOS ==========
+        
+        // Calcular Resto a Pagar
+        window.calcularRestoAPagar = function() {
+            const valorNeto = parseFloat(document.getElementById('valorNeto').value) || 0;
+            const adelanto = parseFloat(document.getElementById('adelanto').value) || 0;
+            const resto = valorNeto - adelanto;
+            document.getElementById('restoAPagar').value = resto.toFixed(2);
+        };
+
+        // ========== FUNCIONES PARA REGISTRO MENSUAL ==========
+        
+        // Obtener mes actual en formato YYYY-MM
+        function obtenerMesActual() {
+            const fecha = new Date();
+            const año = fecha.getFullYear();
+            const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+            return `${año}-${mes}`;
+        }
+
+        // Guardar factura en registro mensual
+        async function guardarEnRegistroMensual(facturaId, cuenta, edificio) {
+            const mes = obtenerMesActual();
+            const año = mes.split('-')[0];
+            const registroRef = ref(db, `facturas_mensuales/${año}/${mes}/${edificio}/${facturaId}`);
+            
+            await set(registroRef, {
+                facturaId: facturaId,
+                proveedor: cuenta.proveedor,
+                valorNeto: cuenta.valorNeto,
+                adelanto: cuenta.adelanto || 0,
+                restoAPagar: cuenta.restoAPagar || cuenta.valorNeto,
+                estado: cuenta.estado,
+                fechaRegistro: new Date().toISOString(),
+                mes: mes
+            });
+        }
+
+        // Actualizar resumen mensual por edificio
+        async function actualizarResumenMensual(edificio) {
+            const mes = obtenerMesActual();
+            const año = mes.split('-')[0];
+            const facturasRef = ref(db, `facturas_mensuales/${año}/${mes}/${edificio}`);
+            
+            const snapshot = await get(facturasRef);
+            
+            let total = 0;
+            let pagadas = 0;
+            let pendientes = 0;
+            
+            if (snapshot.exists()) {
+                snapshot.forEach((child) => {
+                    if (child.key !== 'resumen') {
+                        const factura = child.val();
+                        total++;
+                        if (factura.estado === 'pagada' || factura.estado === 'Pagada') {
+                            pagadas++;
+                        } else {
+                            pendientes++;
+                        }
+                    }
+                });
+            }
+            
+            const resumenRef = ref(db, `facturas_mensuales/${año}/${mes}/${edificio}/resumen`);
+            await set(resumenRef, {
+                total: total,
+                pagadas: pagadas,
+                pendientes: pendientes,
+                ultimaActualizacion: new Date().toISOString()
+            });
+        }
+
+        // Pasar facturas impagadas al mes siguiente
+        async function verificarYPasarFacturas() {
+            const mesActual = obtenerMesActual();
+            const [año, mes] = mesActual.split('-').map(Number);
+            
+            // Calcular mes siguiente
+            let mesSiguiente, añoSiguiente;
+            if (mes === 12) {
+                mesSiguiente = 1;
+                añoSiguiente = año + 1;
+            } else {
+                mesSiguiente = mes + 1;
+                añoSiguiente = año;
+            }
+            const mesSiguienteStr = `${añoSiguiente}-${String(mesSiguiente).padStart(2, '0')}`;
+            
+            const edificios = ['nepal-2', 'avalon', 'convivienda-1', 'pinos-del-country'];
+            
+            for (const edificio of edificios) {
+                const cuentasRef = ref(db, `cuentas_por_pagar/${edificio}`);
+                const snapshot = await get(cuentasRef);
+                
+                if (snapshot.exists()) {
+                    snapshot.forEach(async (child) => {
+                        const cuenta = child.val();
+                        
+                        // Si la factura es del mes pasado y no está pagada
+                        if ((cuenta.estado !== 'pagada' && cuenta.estado !== 'Pagada') && cuenta.mes && cuenta.mes < mesActual) {
+                            const observacionNueva = (cuenta.observaciones || '') + ` | ⚠️ Faltante del mes ${cuenta.mes}`;
+                            
+                            await update(ref(db, `cuentas_por_pagar/${edificio}/${child.key}`), {
+                                mes: mesActual,
+                                faltanteDelMes: cuenta.mes,
+                                observaciones: observacionNueva
+                            });
+                        }
+                    });
+                }
+            }
+        }
+
+        // ========== FUNCIONES PARA ALERTAS DE DEUDAS ==========
+        
+        // Cargar alertas de deudas por edificio
+        async function cargarAlertasDeudas() {
+            const alertasContainer = document.getElementById('alertasDeudas');
+            const panelAlertas = document.getElementById('panelAlertas');
+            
+            if (!alertasContainer || !panelAlertas) return;
+            
+            alertasContainer.innerHTML = '';
+            
+            const edificios = [
+                { id: 'nepal-2', nombre: 'Nepal 2' },
+                { id: 'avalon', nombre: 'Avalon' },
+                { id: 'convivienda-1', nombre: 'Convivienda I' },
+                { id: 'pinos-del-country', nombre: 'Pinos del Country' }
+            ];
+            
+            let hayAlertas = false;
+            
+            for (const edificio of edificios) {
+                const cuentasRef = ref(db, `cuentas_por_pagar/${edificio.id}`);
+                const snapshot = await get(cuentasRef);
+                
+                if (snapshot.exists()) {
+                    let totalDeuda = 0;
+                    let facturasPendientes = 0;
+                    let facturasVencidas = 0;
+                    let proximasVencer = 0;
+                    const hoy = new Date();
+                    const en7dias = new Date(hoy.getTime() + 7 * 24 * 60 * 60 * 1000);
+                    
+                    snapshot.forEach((child) => {
+                        const cuenta = child.val();
+                        if (cuenta.estado !== 'pagada' && cuenta.estado !== 'Pagada') {
+                            const resto = parseFloat(cuenta.restoAPagar || cuenta.valorNeto || 0);
+                            totalDeuda += resto;
+                            facturasPendientes++;
+                            
+                            if (cuenta.fechaVencimiento) {
+                                const fechaVenc = new Date(cuenta.fechaVencimiento + 'T00:00:00');
+                                if (fechaVenc < hoy) {
+                                    facturasVencidas++;
+                                } else if (fechaVenc <= en7dias) {
+                                    proximasVencer++;
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Solo mostrar si hay deudas
+                    if (facturasPendientes > 0) {
+                        hayAlertas = true;
+                        alertasContainer.innerHTML += `
+                            <div class="alerta-card">
+                                <h3>🏢 ${edificio.nombre}</h3>
+                                <div class="alerta-item">
+                                    <span class="alerta-label">Total Deuda:</span>
+                                    <span class="alerta-valor grande">$${totalDeuda.toLocaleString('es-CO', {minimumFractionDigits: 0})}</span>
+                                </div>
+                                <div class="alerta-item">
+                                    <span class="alerta-label">Facturas Pendientes:</span>
+                                    <span class="alerta-valor">${facturasPendientes}</span>
+                                </div>
+                                ${facturasVencidas > 0 ? `
+                                <div class="alerta-item" style="background: #ffebee; padding: 8px; border-radius: 6px; margin: 5px 0;">
+                                    <span class="alerta-label">⚠️ Vencidas:</span>
+                                    <span class="alerta-valor">${facturasVencidas}</span>
+                                </div>
+                                ` : ''}
+                                ${proximasVencer > 0 ? `
+                                <div class="alerta-item" style="background: #fff3e0; padding: 8px; border-radius: 6px; margin: 5px 0;">
+                                    <span class="alerta-label">⏰ Próximas a vencer (7 días):</span>
+                                    <span class="alerta-valor" style="color: #ff9800;">${proximasVencer}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }
+                    
+                    // Guardar deudas en Firebase
+                    await set(ref(db, `deudas_edificios/${edificio.id}`), {
+                        totalDeuda: totalDeuda,
+                        facturasPendientes: facturasPendientes,
+                        facturasVencidas: facturasVencidas,
+                        proximasVencer: proximasVencer,
+                        ultimaActualizacion: new Date().toISOString()
+                    });
+                }
+            }
+            
+            // Mostrar u ocultar panel
+            panelAlertas.style.display = hayAlertas ? 'block' : 'none';
+        }
+
+        // ========== MODIFICAR FUNCIÓN GUARDAR ==========
+        
+        window.guardarCuentaManual = async function() {
             const proveedor = document.getElementById('proveedor').value.trim();
             const numeroId = document.getElementById('numeroId').value.trim();
             const concepto = document.getElementById('concepto').value.trim();
@@ -1348,6 +1634,10 @@
                 alert('❌ Completa los campos obligatorios:\n• Proveedor\n• No. Identificación\n• Concepto\n• Valor Bruto');
                 return;
             }
+            
+            const valorNeto = parseFloat(document.getElementById('valorNeto').value) || parseFloat(valorBruto);
+            const adelanto = parseFloat(document.getElementById('adelanto').value) || 0;
+            const restoAPagar = valorNeto - adelanto;
             
             const nuevaCuenta = {
                 proveedor: proveedor,
@@ -1362,7 +1652,10 @@
                 aiu: parseFloat(document.getElementById('aiu').value) || 0,
                 iva: parseFloat(document.getElementById('iva').value) || 0,
                 retencion: parseFloat(document.getElementById('retencion').value) || 0,
-                valorNeto: parseFloat(document.getElementById('valorNeto').value) || parseFloat(valorBruto),
+                valorNeto: valorNeto,
+                adelanto: adelanto,
+                fechaAdelanto: document.getElementById('fechaAdelanto').value || null,
+                restoAPagar: restoAPagar,
                 fechaRecepcion: document.getElementById('fechaRecepcion').value || null,
                 fechaVencimiento: document.getElementById('fechaVencimiento').value || null,
                 fechaPago: null,
@@ -1371,23 +1664,21 @@
                 categoriaGasto: document.getElementById('categoriaGasto').value || '',
                 prioridad: document.getElementById('prioridad').value || 'Media',
                 observaciones: document.getElementById('observaciones').value || '',
+                mes: obtenerMesActual(),
+                edificio: edificioActual,
                 creadoPor: 'Manual',
                 fechaCreacion: new Date().toISOString()
             };
             
             try {
                 const cuentasRef = ref(db, `cuentas_por_pagar/${edificioActual}`);
-                await push(cuentasRef, nuevaCuenta);
+                const nuevaRef = await push(cuentasRef, nuevaCuenta);
                 
-                alert('✅ Cuenta agregada exitosamente\n\nPuedes agregar los datos faltantes editándola después.');
-                cerrarModal('modalManual');
-                document.getElementById('formManual').reset();
-            } catch (error) {
-                alert('❌ Error al guardar: ' + error.message);
-                console.error('Error:', error);
-            }
-        };
-        
+                // Guardar en registro mensual
+                await guardarEnRegistroMensual(nuevaRef.key, nuevaCuenta, edificioActual);
+                await actualizarResumenMensual(edificioActual);
+                
+                // Recargar alertas
         window.marcarPagada = async function(id) {
             if (!confirm('¿Marcar como pagada?')) return;
             
