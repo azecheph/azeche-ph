@@ -1092,10 +1092,38 @@
         };
 
         // Descargar documentos
-        window.descargarDoc = function(edificio, tipo) {
-            alert(`📥 Descargando: ${tipo} de ${edificio}\n\nNota: Sube los PDFs a GitHub Pages para descarga real.`);
-        };
 
+        window.descargarDoc = function(edificio, tipo) {
+            const documentosMap = {
+                'nepal2': {
+                    'convocatoria': 'CONVOCATORIA_Nepal2_2026.docx',
+                    'acta': 'ACTA_ASAMBLEA_Nepal2_2026.docx',
+                    'informe': 'INFORME_GESTION_Nepal2_2025.docx',
+                    'citacion': 'CITACION_FORMAL_Nepal2_2026.docx'
+                },
+                'avalon': {
+                    'convocatoria': 'CONVOCATORIA_Avalon_2026.docx',
+                    'acta': 'ACTA_ASAMBLEA_Avalon_2026.docx',
+                    'informe': 'INFORME_GESTION_Avalon_2025.docx',
+                    'citacion': 'CITACION_FORMAL_Avalon_2026.docx'
+                },
+                'convivienda': {
+                    'convocatoria': 'CONVOCATORIA_Convivienda1_2026.docx',
+                    'acta': 'ACTA_ASAMBLEA_Convivienda1_2026.docx',
+                    'informe': 'INFORME_GESTION_Convivienda1_2025.docx',
+                    'citacion': 'CITACION_FORMAL_Convivienda1_2026.docx'
+                },
+                'pinos': {
+                    'convocatoria': 'CONVOCATORIA_PinosDelCountry_2026.docx',
+                    'acta': 'ACTA_ASAMBLEA_PinosDelCountry_2026.docx',
+                    'informe': 'INFORME_GESTION_PinosDelCountry_2025.docx',
+                    'citacion': 'CITACION_FORMAL_PinosDelCountry_2026.docx'
+                }
+            };
+            
+            const nombreArchivo = documentosMap[edificio][tipo];
+            window.open(`./documentos/${nombreArchivo}`, '_blank');
+        };
         // Abrir sistema de votación
         window.abrirVotacion = function(edificio) {
             const edificiosMap = {
