@@ -596,7 +596,7 @@
                             <th>Valor Neto a Pagar</th>
                             <th>💰 Anticipo</th>
                             <th>📅 Fecha Anticipo</th>
-                            <th style="background: #e8f5e9; color: #00B853;">✅ Resto a Pagar</th>
+                            <th style="background: #e8f5e9; color: #00B853;">✅ Saldo a Pagar</th>
                             <th>Fecha de Recepción</th>
                             <th>Fecha de Vencimiento</th>
                             <th>Fecha de Pago</th>
@@ -1219,7 +1219,7 @@
                     <td><strong>$${Number(cuenta.valorNeto || 0).toLocaleString('es-CO')}</strong></td>
                     <td style="color: #ff9800;">${cuenta.anticipo ? '$' + Number(cuenta.anticipo).toLocaleString('es-CO') : '-'}</td>
                     <td>${cuenta.fechaAnticipo || '-'}</td>
-                    <td style="background: #e8f5e9; font-weight: 700; color: #00B853;"><strong>$${Number(cuenta.restoAPagar || cuenta.valorNeto || 0).toLocaleString('es-CO')}</strong></td>
+                    <td style="background: #e8f5e9; font-weight: 700; color: #00B853;"><strong>$${Number((cuenta.valorNeto || 0) - (cuenta.anticipo || 0)).toLocaleString('es-CO')}</strong></td>
                     <td>${cuenta.fechaRecepcion || '-'}</td>
                     <td>${cuenta.fechaVencimiento || '-'}</td>
                     <td>${cuenta.fechaPago || '-'}</td>
