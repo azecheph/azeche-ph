@@ -251,7 +251,7 @@
                     
                     <div class="info-group">
                         <div class="info-label">📧 Email</div>
-                        <div class="info-value"><a href="mailto:nepal2edificio@gmail.com">nepal2edificio@gmail.com</a></div>
+                        <div class="info-value"><a href="/cdn-cgi/l/email-protection#721c1702131e4017161b141b111b1d32151f131b1e5c111d1f"><span class="__cf_email__" data-cfemail="27494257464b1542434e414e444e4867404a464e4b0944484a">[email&#160;protected]</span></a></div>
                     </div>
                     
                     <div class="info-group">
@@ -286,7 +286,7 @@
                     
                     <div class="info-group">
                         <div class="info-label">📧 Email</div>
-                        <div class="info-value"><a href="mailto:pinosdelcountry@gmail.com">pinosdelcountry@gmail.com</a></div>
+                        <div class="info-value"><a href="/cdn-cgi/l/email-protection#52223b3c3d2136373e313d273c26202b12353f333b3e7c313d3f"><span class="__cf_email__" data-cfemail="07776e69687463626b6468726973757e47606a666e6b2964686a">[email&#160;protected]</span></a></div>
                     </div>
                     
                     <div class="info-group">
@@ -321,7 +321,7 @@
                     
                     <div class="info-group">
                         <div class="info-label">📧 Email</div>
-                        <div class="info-value"><a href="mailto:convivienda1@gmail.com">convivienda1@gmail.com</a></div>
+                        <div class="info-value"><a href="/cdn-cgi/l/email-protection#b1d2dedfc7d8c7d8d4dfd5d080f1d6dcd0d8dd9fd2dedc"><span class="__cf_email__" data-cfemail="294a46475f405f404c474d4818694e44484045074a4644">[email&#160;protected]</span></a></div>
                     </div>
                     
                     <div class="info-group">
@@ -356,7 +356,7 @@
                     
                     <div class="info-group">
                         <div class="info-label">📧 Email</div>
-                        <div class="info-value"><a href="mailto:phavalon2015@gmail.com">phavalon2015@gmail.com</a></div>
+                        <div class="info-value"><a href="mailto:edificioavalonadm@gmail.com">edificioavalonadm@gmail.com</a></div>
                     </div>
                     
                     <div class="info-group">
@@ -382,7 +382,7 @@
         </div>
     </div>
     
-    <script type="module">
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
@@ -438,25 +438,4 @@
         function cargarEstadisticas() {
             // Proveedores
             const proveedoresRef = ref(db, 'proveedores');
-            onValue(proveedoresRef, (snapshot) => {
-                const count = snapshot.exists() ? snapshot.size : 0;
-                document.getElementById('totalProveedores').textContent = count;
-            });
-
-            // Cuentas por pagar
-            const cuentasRef = ref(db, 'cuentas_por_pagar');
-            onValue(cuentasRef, (snapshot) => {
-                let count = 0;
-                
-                if (snapshot.exists()) {
-                    snapshot.forEach(() => {
-                        count++;
-                    });
-                }
-                
-                document.getElementById('totalCuentas').textContent = count;
-            });
-        }
-    </script>
-</body>
-</html>
+            onValue(proveedoresRef, (s
