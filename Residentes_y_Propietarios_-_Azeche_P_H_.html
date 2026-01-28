@@ -595,6 +595,20 @@
         function renderizar() {
             const edificio = edificioActual;
             const busqueda = document.getElementById('searchInput').value.toLowerCase();
+        // FUNCIÓN PARA ORDENAR POR NÚMERO DE APARTAMENTO
+        function ordenarPorApartamento(entries) {
+            return entries.sort((a, b) => {
+                const aptoA = a[1].apto || '999999';
+                const aptoB = b[1].apto || '999999';
+                
+                // Extraer número del apartamento
+                const numA = parseInt(aptoA.replace(/\D/g, '')) || 999999;
+                const numB = parseInt(aptoB.replace(/\D/g, '')) || 999999;
+                
+                return numA - numB;
+            });
+        }
+
 
             // Propietarios
             const propList = document.getElementById('listaPropietarios');
@@ -602,7 +616,7 @@
             let countProp = 0;
 
             if (edificio && dataPropietarios[edificio]) {
-                Object.entries(dataPropietarios[edificio]).forEach(([key, prop]) => {
+                ordenarPorApartamento(Object.entries(dataPropietarios[edificio])).forEach(([key, prop]) => {
                     const estado = prop.estado || 'activo';
                     
                     if ((filtroEstado === 'todos' || estado === filtroEstado) &&
@@ -630,7 +644,7 @@
             let countRes = 0;
 
             if (edificio && dataResidentes[edificio]) {
-                Object.entries(dataResidentes[edificio]).forEach(([key, res]) => {
+                ordenarPorApartamento(Object.entries(dataResidentes[edificio])).forEach(([key, res]) => {
                     const estado = res.estado || 'activo';
                     
                     if ((filtroEstado === 'todos' || estado === filtroEstado) &&
