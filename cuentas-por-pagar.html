@@ -594,8 +594,8 @@
                             <th>IVA</th>
                             <th>Retención</th>
                             <th>Valor Neto a Pagar</th>
-                            <th>💰 Adelanto</th>
-                            <th>📅 Fecha Adelanto</th>
+                            <th>💰 Anticipo</th>
+                            <th>📅 Fecha Anticipo</th>
                             <th style="background: #e8f5e9; color: #00B853;">✅ Resto a Pagar</th>
                             <th>Fecha de Recepción</th>
                             <th>Fecha de Vencimiento</th>
@@ -708,12 +708,12 @@
 
                 <div class="form-row" style="border-top: 2px solid #667eea; padding-top: 15px; margin-top: 15px;">
                     <div class="form-group">
-                        <label>💰 Adelanto</label>
-                        <input type="number" id="adelanto" step="0.01" value="0">
+                        <label>💰 Anticipo</label>
+                        <input type="number" id="anticipo" step="0.01" value="0" oninput="calcularRestoAPagar()">
                     </div>
                     <div class="form-group">
-                        <label>📅 Fecha Adelanto</label>
-                        <input type="date" id="fechaAdelanto">
+                        <label>📅 Fecha Anticipo</label>
+                        <input type="date" id="fechaAnticipo">
                     </div>
                 </div>
                 <div class="form-group">
@@ -866,12 +866,12 @@
                 <!-- ADELANTO EN EDICIÓN -->
                 <div class="form-row" style="border-top: 2px solid #667eea; padding-top: 15px; margin-top: 15px;">
                     <div class="form-group">
-                        <label>💰 Adelanto</label>
-                        <input type="number" id="editarAdelanto" step="0.01" value="0" oninput="calcularRestoEditar()">
+                        <label>💰 Anticipo</label>
+                        <input type="number" id="editarAnticipo" step="0.01" value="0" oninput="calcularRestoEditar()">
                     </div>
                     <div class="form-group">
-                        <label>📅 Fecha Adelanto</label>
-                        <input type="date" id="editarFechaAdelanto">
+                        <label>📅 Fecha Anticipo</label>
+                        <input type="date" id="editarFechaAnticipo">
                     </div>
                 </div>
                 <div class="form-group">
@@ -1217,8 +1217,8 @@
                     <td>$${Number(cuenta.iva || 0).toLocaleString('es-CO')}</td>
                     <td>$${Number(cuenta.retencion || 0).toLocaleString('es-CO')}</td>
                     <td><strong>$${Number(cuenta.valorNeto || 0).toLocaleString('es-CO')}</strong></td>
-                    <td style="color: #ff9800;">${cuenta.adelanto ? '$' + Number(cuenta.adelanto).toLocaleString('es-CO') : '-'}</td>
-                    <td>${cuenta.fechaAdelanto || '-'}</td>
+                    <td style="color: #ff9800;">${cuenta.anticipo ? '$' + Number(cuenta.anticipo).toLocaleString('es-CO') : '-'}</td>
+                    <td>${cuenta.fechaAnticipo || '-'}</td>
                     <td style="background: #e8f5e9; font-weight: 700; color: #00B853;"><strong>$${Number(cuenta.restoAPagar || cuenta.valorNeto || 0).toLocaleString('es-CO')}</strong></td>
                     <td>${cuenta.fechaRecepcion || '-'}</td>
                     <td>${cuenta.fechaVencimiento || '-'}</td>
@@ -1389,16 +1389,16 @@
         // Calcular Resto a Pagar en formulario agregar
         function calcularRestoAPagar() {
             const valorNeto = parseFloat(document.getElementById('valorNeto').value) || 0;
-            const adelanto = parseFloat(document.getElementById('adelanto').value) || 0;
-            const resto = valorNeto - adelanto;
+            const anticipo = parseFloat(document.getElementById('anticipo').value) || 0;
+            const resto = valorNeto - anticipo;
             document.getElementById('restoAPagar').value = resto.toFixed(2);
         }
         
         // Calcular Resto a Pagar en formulario editar
         function calcularRestoEditar() {
             const valorNeto = parseFloat(document.getElementById('editarValorNeto').value) || 0;
-            const adelanto = parseFloat(document.getElementById('editarAdelanto').value) || 0;
-            const resto = valorNeto - adelanto;
+            const anticipo = parseFloat(document.getElementById('editarAnticipo').value) || 0;
+            const resto = valorNeto - anticipo;
             document.getElementById('editarRestoAPagar').value = resto.toFixed(2);
         }
         
@@ -1439,8 +1439,8 @@
                 iva: parseFloat(document.getElementById('iva').value) || 0,
                 retencion: parseFloat(document.getElementById('retencion').value) || 0,
                 valorNeto: parseFloat(document.getElementById('valorNeto').value) || parseFloat(valorBruto),
-                adelanto: parseFloat(document.getElementById('adelanto').value) || 0,
-                fechaAdelanto: document.getElementById('fechaAdelanto').value || null,
+                anticipo: parseFloat(document.getElementById('anticipo').value) || 0,
+                fechaAnticipo: document.getElementById('fechaAnticipo').value || null,
                 restoAPagar: parseFloat(document.getElementById('restoAPagar').value) || parseFloat(document.getElementById('valorNeto').value),
                 fechaRecepcion: document.getElementById('fechaRecepcion').value || null,
                 fechaVencimiento: document.getElementById('fechaVencimiento').value || null,
@@ -1527,8 +1527,8 @@
                 document.getElementById('editarPrioridad').value = cuenta.prioridad || 'Media';
                 document.getElementById('editarCategoriaGasto').value = cuenta.categoriaGasto || '';
                 document.getElementById('editarObservaciones').value = cuenta.observaciones || '';
-                document.getElementById('editarAdelanto').value = cuenta.adelanto || 0;
-                document.getElementById('editarFechaAdelanto').value = cuenta.fechaAdelanto || '';
+                document.getElementById('editarAnticipo').value = cuenta.anticipo || 0;
+                document.getElementById('editarFechaAnticipo').value = cuenta.fechaAnticipo || '';
                 document.getElementById('editarRestoAPagar').value = cuenta.restoAPagar || cuenta.valorNeto || 0;
                 
                 // Abrir modal
@@ -1582,8 +1582,8 @@
                     iva: parseFloat(document.getElementById('editarIva').value) || 0,
                     retencion: parseFloat(document.getElementById('editarRetencion').value) || 0,
                     valorNeto: parseFloat(document.getElementById('editarValorNeto').value) || parseFloat(valorBruto),
-                    adelanto: parseFloat(document.getElementById('editarAdelanto').value) || 0,
-                    fechaAdelanto: document.getElementById('editarFechaAdelanto').value || null,
+                    anticipo: parseFloat(document.getElementById('editarAnticipo').value) || 0,
+                    fechaAnticipo: document.getElementById('editarFechaAnticipo').value || null,
                     restoAPagar: parseFloat(document.getElementById('editarRestoAPagar').value) || parseFloat(document.getElementById('editarValorNeto').value),
                     fechaRecepcion: document.getElementById('editarFechaRecepcion').value || null,
                     fechaVencimiento: document.getElementById('editarFechaVencimiento').value || null,
