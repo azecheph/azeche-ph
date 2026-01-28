@@ -251,7 +251,7 @@
                     
                     <div class="info-group">
                         <div class="info-label">📧 Email</div>
-                        <div class="info-value"><a href="mailto:nepal2edificio@gmail.com">nepal2edificio@gmail.com</a></div>
+                        <div class="info-value"><a href="/cdn-cgi/l/email-protection#335d5643525f0156575a555a505a5c73545e525a5f1d505c5e"><span class="__cf_email__" data-cfemail="4a242f3a2b26782f2e232c232923250a2d272b232664292527">[email&#160;protected]</span></a></div>
                     </div>
                     
                     <div class="info-group">
@@ -286,7 +286,7 @@
                     
                     <div class="info-group">
                         <div class="info-label">📧 Email</div>
-                        <div class="info-value"><a href="mailto:pinosdelcountry@gmail.com">pinosdelcountry@gmail.com</a></div>
+                        <div class="info-value"><a href="/cdn-cgi/l/email-protection#fe8e9790918d9a9b929d918b908a8c87be99939f9792d09d9193"><span class="__cf_email__" data-cfemail="d7a7beb9b8a4b3b2bbb4b8a2b9a3a5ae97b0bab6bebbf9b4b8ba">[email&#160;protected]</span></a></div>
                     </div>
                     
                     <div class="info-group">
@@ -309,19 +309,19 @@
                     </div>
                 </div>
                 
-                <!-- Convivienda I -->
+                <!-- Convivienda -->
                 <div class="edificio-card">
                     <div class="edificio-header">
                         <div class="edificio-icon">🏘️</div>
                         <div class="edificio-title">
-                            <h2>Convivienda I</h2>
+                            <h2>Convivienda</h2>
                             <p>EDIFICIO</p>
                         </div>
                     </div>
                     
                     <div class="info-group">
                         <div class="info-label">📧 Email</div>
-                        <div class="info-value"><a href="mailto:convivienda1@gmail.com">convivienda1@gmail.com</a></div>
+                        <div class="info-value"><a href="/cdn-cgi/l/email-protection#ff9c9091899689969a919b9ecebf98929e9693d19c9092"><span class="__cf_email__" data-cfemail="45262a2b332c332c202b212474052228242c296b262a28">[email&#160;protected]</span></a></div>
                     </div>
                     
                     <div class="info-group">
@@ -356,7 +356,7 @@
                     
                     <div class="info-group">
                         <div class="info-label">📧 Email</div>
-                        <div class="info-value"><a href="mailto:edificioavalonadm@gmail.com">edificioavalonadm@gmail.com</a></div>
+                        <div class="info-value"><a href="/cdn-cgi/l/email-protection#92f7f6fbf4fbf1fbfdf3e4f3fefdfcf3f6ffd2f5fff3fbfebcf1fdff"><span class="__cf_email__" data-cfemail="2247464b444b414b4d4354434e4d4c43464f62454f434b4e0c414d4f">[email&#160;protected]</span></a></div>
                     </div>
                     
                     <div class="info-group">
@@ -382,7 +382,7 @@
         </div>
     </div>
     
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
@@ -413,29 +413,26 @@
             });
         };
 
-        // Toggle password visibility - FUNCIÓN CORREGIDA
-        window.togglePassword = (id, password) => {
-            const element = document.getElementById(`pwd-${id}`);
-            if (element) {
-                if (element.textContent === '••••••••••') {
-                    element.textContent = password;
-                } else {
-                    element.textContent = '••••••••••';
-                }
-            }
-        };
+    </script>
 
-        // Copy to clipboard
-        window.copyToClipboard = (text) => {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('✅ Copiado al portapapeles');
-            }).catch(() => {
+    <script>
+        // FUNCIONES GLOBALES - FUERA DEL MÓDULO DE FIREBASE
+        function togglePassword(id, password) {
+            const element = document.getElementById('pwd-' + id);
+            if (element.textContent === '••••••••••') {
+                element.textContent = password;
+            } else {
+                element.textContent = '••••••••••';
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('✅ Contraseña copiada al portapapeles');
+            }).catch(function(err) {
                 alert('❌ Error al copiar');
             });
-        };
-
-        // Cargar estadísticas
-        function cargarEstadisticas() {
-            // Proveedores
-            const proveedoresRef = ref(db, 'proveedores');
-            onValue(proveedoresRef, (s
+        }
+    </script>
+</body>
+</html>
