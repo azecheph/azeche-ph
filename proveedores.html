@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proveedores - Azeche P.H.</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -306,6 +307,9 @@
                             <th>Proveedor</th>
                             <th>Tipo ID</th>
                             <th>No. Identificación</th>
+                            <th>Teléfono</th>
+                            <th>Correo</th>
+                            <th>Dirección</th>
                             <th>Banco</th>
                             <th>Tipo Cuenta</th>
                             <th>No. Cuenta</th>
@@ -314,7 +318,7 @@
                     </thead>
                     <tbody id="tbodyProveedores">
                         <tr>
-                            <td colspan="7" style="text-align: center; padding: 50px; color: #999;">
+                            <td colspan="10" style="text-align: center; padding: 50px; color: #999;">
                                 Cargando proveedores...
                             </td>
                         </tr>
@@ -420,7 +424,7 @@
                 tbody.innerHTML = '';
                 
                 if (!snapshot.exists()) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 50px; color: #999;">No hay proveedores registrados</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 50px; color: #999;">No hay proveedores registrados</td></tr>';
                     return;
                 }
                 
@@ -432,12 +436,16 @@
                         <td><strong>${proveedor.nombre}</strong></td>
                         <td>${proveedor.tipoIdentificacion || '-'}</td>
                         <td>${proveedor.noIdentificacion || '-'}</td>
+                        <td>${proveedor.telefono || '-'}</td>
+                        <td>${proveedor.correo || '-'}</td>
+                        <td>${proveedor.direccion || '-'}</td>
                         <td>${proveedor.banco || '-'}</td>
                         <td>${proveedor.tipoCuenta || '-'}</td>
                         <td>${proveedor.numeroCuenta || '-'}</td>
-                        <td>
+                        <td style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            <button class="btn-small" style="background: #9C27B0; color: white;" onclick="generarContrato('${child.key}')">📄 Contrato</button>
                             <button class="btn-small btn-editar" onclick="editarProveedor('${child.key}')">✏️ Editar</button>
-                            <button class="btn-small btn-eliminar" onclick="eliminarProveedor('${child.key}', '${proveedor.nombre}')">🗑️ Eliminar</button>
+                            <button class="btn-small btn-eliminar" onclick="eliminarProveedor('${child.key}', '${proveedor.nombre}')">🗑️</button>
                         </td>
                     `;
                 });
@@ -478,6 +486,226 @@
                     alert('❌ Error al eliminar: ' + error.message);
                 }
             }
+        };
+
+        // Generar contrato del proveedor
+        window.generarContrato = (id) => {
+            const proveedorRef = ref(db, 'proveedores/' + id);
+            
+            onValue(proveedorRef, (snapshot) => {
+                const proveedor = snapshot.val();
+                
+                if (!proveedor) {
+                    alert('❌ No se encontró el proveedor');
+                    return;
+                }
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                let yPos = 20;
+                const pageWidth = doc.internal.pageSize.width;
+                const marginLeft = 20;
+                const marginRight = 20;
+                const maxWidth = pageWidth - marginLeft - marginRight;
+
+                // Encabezado
+                doc.setFillColor(0, 86, 184);
+                doc.rect(0, 0, pageWidth, 40, 'F');
+                
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(18);
+                doc.setFont(undefined, 'bold');
+                doc.text('CONTRATO DE PRESTACIÓN DE SERVICIOS', pageWidth / 2, 15, { align: 'center' });
+                
+                doc.setFontSize(11);
+                doc.setFont(undefined, 'normal');
+                doc.text('Azeche P.H. - Soluciones Administrativas', pageWidth / 2, 25, { align: 'center' });
+                doc.text(`Fecha: ${new Date().toLocaleDateString('es-CO')}`, pageWidth / 2, 33, { align: 'center' });
+
+                yPos = 55;
+
+                // Título del contrato
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('ENTRE:', marginLeft, yPos);
+                
+                yPos += 10;
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+
+                // Información del contratante (Azeche)
+                const textoContratante = [
+                    'AZECHE P.H., actuando a través de su representante legal CARLA CASTELLANO MADRIZ, ',
+                    'identificada con C.E. 679955, quien en adelante se denominará EL CONTRATANTE, por una parte; y por la otra,'
+                ];
+                
+                textoContratante.forEach(line => {
+                    const lines = doc.splitTextToSize(line, maxWidth);
+                    lines.forEach(l => {
+                        doc.text(l, marginLeft, yPos);
+                        yPos += 5;
+                    });
+                });
+
+                yPos += 5;
+
+                // Información del proveedor
+                doc.setFont(undefined, 'bold');
+                doc.text(`${proveedor.nombre.toUpperCase()},`, marginLeft, yPos);
+                yPos += 6;
+                doc.setFont(undefined, 'normal');
+                
+                const infoProveedor = [
+                    `Identificado(a) con ${proveedor.tipoIdentificacion} No. ${proveedor.noIdentificacion}`,
+                    proveedor.direccion ? `con dirección en ${proveedor.direccion}` : '',
+                    proveedor.telefono ? `teléfono ${proveedor.telefono}` : '',
+                    proveedor.correo ? `y correo electrónico ${proveedor.correo}` : ''
+                ].filter(Boolean).join(', ');
+
+                const infoLines = doc.splitTextToSize(infoProveedor + ', quien en adelante se denominará EL PROVEEDOR.', maxWidth);
+                infoLines.forEach(line => {
+                    doc.text(line, marginLeft, yPos);
+                    yPos += 5;
+                });
+
+                yPos += 10;
+
+                // Cláusulas del contrato
+                doc.setFont(undefined, 'bold');
+                doc.text('CLÁUSULA PRIMERA - OBJETO DEL CONTRATO:', marginLeft, yPos);
+                yPos += 7;
+                doc.setFont(undefined, 'normal');
+                
+                const clausula1 = 'EL PROVEEDOR se compromete a prestar los servicios de [DESCRIPCIÓN DEL SERVICIO] para los conjuntos residenciales administrados por EL CONTRATANTE, de acuerdo con las especificaciones técnicas y condiciones establecidas en este contrato.';
+                const c1Lines = doc.splitTextToSize(clausula1, maxWidth);
+                c1Lines.forEach(line => {
+                    doc.text(line, marginLeft, yPos);
+                    yPos += 5;
+                });
+
+                yPos += 8;
+
+                doc.setFont(undefined, 'bold');
+                doc.text('CLÁUSULA SEGUNDA - VALOR Y FORMA DE PAGO:', marginLeft, yPos);
+                yPos += 7;
+                doc.setFont(undefined, 'normal');
+                
+                const clausula2 = 'El valor del presente contrato será de [VALOR EN PESOS] pesos colombianos, pagaderos mediante transferencia a la cuenta bancaria registrada a continuación:';
+                const c2Lines = doc.splitTextToSize(clausula2, maxWidth);
+                c2Lines.forEach(line => {
+                    doc.text(line, marginLeft, yPos);
+                    yPos += 5;
+                });
+
+                yPos += 3;
+                doc.text(`• Banco: ${proveedor.banco || 'No especificado'}`, marginLeft + 5, yPos);
+                yPos += 5;
+                doc.text(`• Tipo de cuenta: ${proveedor.tipoCuenta || 'No especificado'}`, marginLeft + 5, yPos);
+                yPos += 5;
+                doc.text(`• Número de cuenta: ${proveedor.numeroCuenta || 'No especificado'}`, marginLeft + 5, yPos);
+                yPos += 5;
+                doc.text(`• Titular: ${proveedor.nombre}`, marginLeft + 5, yPos);
+
+                yPos += 10;
+
+                doc.setFont(undefined, 'bold');
+                doc.text('CLÁUSULA TERCERA - PLAZO DE EJECUCIÓN:', marginLeft, yPos);
+                yPos += 7;
+                doc.setFont(undefined, 'normal');
+                
+                const clausula3 = 'El plazo de ejecución del presente contrato será de [PLAZO], contados a partir de la fecha de firma del mismo, prorrogable de común acuerdo entre las partes.';
+                const c3Lines = doc.splitTextToSize(clausula3, maxWidth);
+                c3Lines.forEach(line => {
+                    doc.text(line, marginLeft, yPos);
+                    yPos += 5;
+                });
+
+                yPos += 8;
+
+                doc.setFont(undefined, 'bold');
+                doc.text('CLÁUSULA CUARTA - OBLIGACIONES DEL PROVEEDOR:', marginLeft, yPos);
+                yPos += 7;
+                doc.setFont(undefined, 'normal');
+                
+                const obligaciones = [
+                    '1. Prestar los servicios contratados con calidad y oportunidad.',
+                    '2. Cumplir con todas las normas de seguridad y salud en el trabajo.',
+                    '3. Contar con los seguros y pólizas requeridas por la ley.',
+                    '4. Responder por daños causados durante la ejecución del contrato.',
+                    '5. Mantener confidencialidad sobre la información de los conjuntos.'
+                ];
+
+                obligaciones.forEach(obl => {
+                    doc.text(obl, marginLeft, yPos);
+                    yPos += 6;
+                });
+
+                // Nueva página para firmas
+                doc.addPage();
+                yPos = 30;
+
+                doc.setFont(undefined, 'bold');
+                doc.text('CLÁUSULA QUINTA - CAUSALES DE TERMINACIÓN:', marginLeft, yPos);
+                yPos += 7;
+                doc.setFont(undefined, 'normal');
+                
+                const terminacion = 'El presente contrato podrá terminarse por mutuo acuerdo, incumplimiento de las obligaciones, o por cualquier otra causa legal. En caso de terminación anticipada, se deberá notificar con 30 días de anticipación.';
+                const termLines = doc.splitTextToSize(terminacion, maxWidth);
+                termLines.forEach(line => {
+                    doc.text(line, marginLeft, yPos);
+                    yPos += 5;
+                });
+
+                yPos += 15;
+
+                // Firmas
+                doc.setFont(undefined, 'bold');
+                doc.text('FIRMAS:', pageWidth / 2, yPos, { align: 'center' });
+                yPos += 20;
+
+                // Firma EL CONTRATANTE
+                doc.text('EL CONTRATANTE', marginLeft + 30, yPos);
+                yPos += 15;
+                doc.line(marginLeft, yPos, marginLeft + 70, yPos);
+                yPos += 5;
+                doc.setFont(undefined, 'normal');
+                doc.text('Carla Castellano Madriz', marginLeft, yPos);
+                yPos += 5;
+                doc.text('C.E. 679955', marginLeft, yPos);
+                yPos += 5;
+                doc.text('Representante Legal Azeche P.H.', marginLeft, yPos);
+
+                // Firma EL PROVEEDOR
+                yPos = yPos - 25;
+                doc.setFont(undefined, 'bold');
+                doc.text('EL PROVEEDOR', pageWidth - marginRight - 40, yPos);
+                yPos += 15;
+                doc.line(pageWidth - marginRight - 70, yPos, pageWidth - marginRight, yPos);
+                yPos += 5;
+                doc.setFont(undefined, 'normal');
+                doc.text(proveedor.nombre, pageWidth - marginRight - 70, yPos);
+                yPos += 5;
+                doc.text(`${proveedor.tipoIdentificacion} ${proveedor.noIdentificacion}`, pageWidth - marginRight - 70, yPos);
+
+                // Footer
+                const totalPages = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8);
+                    doc.setTextColor(150, 150, 150);
+                    doc.text('Compliance Pro - Carla Castellano Madriz C.E. 679955', marginLeft, 285);
+                    doc.text(`Página ${i} de ${totalPages}`, pageWidth - marginRight, 285, { align: 'right' });
+                }
+
+                // Descargar
+                const filename = `Contrato-${proveedor.nombre.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
+                doc.save(filename);
+                
+                alert('✅ Contrato generado y descargado exitosamente');
+                
+            }, { onlyOnce: true });
         };
     </script>
 </body>
