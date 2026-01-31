@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contratos - Azeche P.H.</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn-nav {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            margin-left: 10px;
+        }
+        
+        .btn-nav:hover {
+            background: white;
+            color: #0056B8;
+            transform: translateY(-2px);
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,86,184,0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .form-container {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .form-container.active {
+            display: block;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #0056B8;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+        }
+        
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        tbody tr {
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s;
+        }
+        
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        td {
+            padding: 15px;
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-ver {
+            background: #00B853;
+            color: white;
+        }
+        
+        .btn-editar {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .btn-eliminar {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-small:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .file-preview {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .file-preview.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📄 Contratos por Edificio</h1>
+            <div>
+                <button class="btn-nav" onclick="location.href='Dashboard.html'">🏠 Dashboard</button>
+                <button class="btn-nav" onclick="location.href='proveedores.html'">🤝 Proveedores</button>
+                <button class="btn-nav" onclick="logout()">🚪 Salir</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="toggleFormulario()">➕ Nuevo Contrato</button>
+            </div>
+
+            <!-- FORMULARIO -->
+            <div id="formContainer" class="form-container">
+                <h2 style="margin-bottom: 20px; color: #0056B8;">📝 Registrar Contrato</h2>
+                <form id="formContrato" onsubmit="guardarContrato(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Edificio *</label>
+                            <select id="edificio" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Nepal 2">Nepal 2</option>
+                                <option value="Avalon">Avalon</option>
+                                <option value="Convivienda 1">Convivienda 1</option>
+                                <option value="Pinos del Country">Pinos del Country</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Proveedor *</label>
+                            <select id="proveedor" required>
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Tipo de Servicio *</label>
+                            <input type="text" id="tipoServicio" placeholder="Ej: Vigilancia, Aseo, Mantenimiento" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Fecha de Inicio</label>
+                            <input type="date" id="fechaInicio">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Fecha de Vencimiento</label>
+                            <input type="date" id="fechaVencimiento">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Valor del Contrato</label>
+                            <input type="text" id="valorContrato" placeholder="Ej: $2,500,000">
+                        </div>
+                        
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Archivo del Contrato (PDF, Word, Imagen) *</label>
+                            <input type="file" id="contratoFile" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required onchange="previewFile()">
+                            <div id="filePreview" class="file-preview"></div>
+                        </div>
+                        
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Observaciones</label>
+                            <textarea id="observaciones" rows="3" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em; font-family: inherit;" placeholder="Notas adicionales sobre el contrato"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary">💾 Guardar Contrato</button>
+                        <button type="button" class="btn btn-secondary" onclick="toggleFormulario()">❌ Cancelar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- TABLA DE CONTRATOS -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Edificio</th>
+                            <th>Proveedor</th>
+                            <th>Tipo de Servicio</th>
+                            <th>Fecha Inicio</th>
+                            <th>Fecha Vencimiento</th>
+                            <th>Valor</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyContratos">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 50px; color: #999;">
+                                Cargando contratos...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, push, onValue, remove, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
+            authDomain: "azeche-ph.firebaseapp.com",
+            databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+            projectId: "azeche-ph",
+            storageBucket: "azeche-ph.firebasestorage.app",
+            messagingSenderId: "905337990521",
+            appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+        const storage = getStorage(app);
+
+        let currentUser = null;
+        let editandoId = null;
+        let contratoFile = null;
+
+        // Verificar autenticación
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                cargarProveedores();
+                cargarContratos();
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Logout
+        window.logout = () => {
+            signOut(auth);
+        };
+
+        // Cargar proveedores en el select
+        function cargarProveedores() {
+            const proveedoresRef = ref(db, 'proveedores');
+            
+            onValue(proveedoresRef, (snapshot) => {
+                const select = document.getElementById('proveedor');
+                select.innerHTML = '<option value="">Seleccionar...</option>';
+                
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        const proveedor = child.val();
+                        const option = document.createElement('option');
+                        option.value = child.key;
+                        option.textContent = proveedor.nombre;
+                        option.dataset.nombre = proveedor.nombre;
+                        select.appendChild(option);
+                    });
+                }
+            });
+        }
+
+        // Toggle formulario
+        window.toggleFormulario = () => {
+            const form = document.getElementById('formContainer');
+            const formElement = document.getElementById('formContrato');
+            
+            if (form.classList.contains('active')) {
+                form.classList.remove('active');
+                formElement.reset();
+                editandoId = null;
+                contratoFile = null;
+                document.getElementById('filePreview').classList.remove('active');
+            } else {
+                form.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+
+        // Preview de archivo
+        window.previewFile = () => {
+            const fileInput = document.getElementById('contratoFile');
+            contratoFile = fileInput.files[0];
+            const preview = document.getElementById('filePreview');
+            
+            if (contratoFile) {
+                preview.classList.add('active');
+                preview.innerHTML = `
+                    <strong>✓ Archivo seleccionado:</strong><br>
+                    ${contratoFile.name} (${(contratoFile.size / 1024).toFixed(0)} KB)
+                `;
+            }
+        };
+
+        // Guardar contrato
+        window.guardarContrato = async (e) => {
+            e.preventDefault();
+            
+            if (!contratoFile) {
+                alert('❌ Debes seleccionar un archivo de contrato');
+                return;
+            }
+
+            try {
+                // Subir archivo a Firebase Storage
+                const fileName = `contratos/${Date.now()}-${contratoFile.name}`;
+                const fileRef = storageRef(storage, fileName);
+                
+                await uploadBytes(fileRef, contratoFile);
+                const contratoURL = await getDownloadURL(fileRef);
+                
+                // Obtener nombre del proveedor
+                const selectProveedor = document.getElementById('proveedor');
+                const proveedorNombre = selectProveedor.options[selectProveedor.selectedIndex].dataset.nombre;
+                
+                const contrato = {
+                    edificio: document.getElementById('edificio').value,
+                    proveedorId: document.getElementById('proveedor').value,
+                    proveedorNombre: proveedorNombre,
+                    tipoServicio: document.getElementById('tipoServicio').value,
+                    fechaInicio: document.getElementById('fechaInicio').value,
+                    fechaVencimiento: document.getElementById('fechaVencimiento').value,
+                    valorContrato: document.getElementById('valorContrato').value,
+                    contratoURL: contratoURL,
+                    contratoNombre: contratoFile.name,
+                    observaciones: document.getElementById('observaciones').value,
+                    creadoPor: currentUser.email,
+                    fechaRegistro: new Date().toISOString()
+                };
+
+                if (editandoId) {
+                    await update(ref(db, 'contratos/' + editandoId), contrato);
+                    alert('✅ Contrato actualizado exitosamente');
+                } else {
+                    await push(ref(db, 'contratos'), contrato);
+                    alert('✅ Contrato guardado exitosamente');
+                }
+                
+                toggleFormulario();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al guardar: ' + error.message);
+            }
+        };
+
+        // Cargar contratos
+        function cargarContratos() {
+            const contratosRef = ref(db, 'contratos');
+            
+            onValue(contratosRef, (snapshot) => {
+                const tbody = document.getElementById('tbodyContratos');
+                tbody.innerHTML = '';
+                
+                if (!snapshot.exists()) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 50px; color: #999;">No hay contratos registrados</td></tr>';
+                    return;
+                }
+                
+                snapshot.forEach((child) => {
+                    const contrato = child.val();
+                    const row = tbody.insertRow();
+                    
+                    // Verificar si está próximo a vencer (30 días)
+                    let estadoHTML = '';
+                    if (contrato.fechaVencimiento) {
+                        const hoy = new Date();
+                        const vencimiento = new Date(contrato.fechaVencimiento);
+                        const diasRestantes = Math.ceil((vencimiento - hoy) / (1000 * 60 * 60 * 24));
+                        
+                        if (diasRestantes < 0) {
+                            estadoHTML = '<br><small style="color: #dc3545; font-weight: 600;">⚠️ VENCIDO</small>';
+                        } else if (diasRestantes <= 30) {
+                            estadoHTML = `<br><small style="color: #ffc107; font-weight: 600;">⏰ Vence en ${diasRestantes} días</small>`;
+                        }
+                    }
+                    
+                    row.innerHTML = `
+                        <td><strong>${contrato.edificio}</strong>${estadoHTML}</td>
+                        <td>${contrato.proveedorNombre || '-'}</td>
+                        <td>${contrato.tipoServicio || '-'}</td>
+                        <td>${contrato.fechaInicio ? new Date(contrato.fechaInicio).toLocaleDateString('es-CO') : '-'}</td>
+                        <td>${contrato.fechaVencimiento ? new Date(contrato.fechaVencimiento).toLocaleDateString('es-CO') : '-'}</td>
+                        <td>${contrato.valorContrato || '-'}</td>
+                        <td style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            <button class="btn-small btn-ver" onclick="verContrato('${contrato.contratoURL}')">📄 Ver</button>
+                            <button class="btn-small btn-eliminar" onclick="eliminarContrato('${child.key}', '${contrato.edificio}', '${contrato.proveedorNombre}')">🗑️</button>
+                        </td>
+                    `;
+                });
+            });
+        }
+
+        // Ver contrato
+        window.verContrato = (url) => {
+            window.open(url, '_blank');
+        };
+
+        // Eliminar contrato
+        window.eliminarContrato = async (id, edificio, proveedor) => {
+            if (confirm(`¿Seguro que deseas eliminar el contrato de ${proveedor} para ${edificio}?`)) {
+                try {
+                    await remove(ref(db, 'contratos/' + id));
+                    alert('✅ Contrato eliminado');
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('❌ Error al eliminar: ' + error.message);
+                }
+            }
+        };
+    </script>
+</body>
+</html>
