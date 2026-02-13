@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Asamblea - Azeche P.H.</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 { 
+            color: #667eea; 
+            margin-bottom: 10px; 
+            text-align: center;
+            font-size: 2em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+        .form-group { margin-bottom: 20px; }
+        label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            color: #333; 
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: opacity 0.3s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .success {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+        }
+        .success h2 {
+            margin-bottom: 15px;
+            font-size: 2em;
+        }
+        .success p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        .error {
+            background: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Registro de Asistencia</h1>
+        <p class="subtitle">Completa tus datos para registrarte en la asamblea</p>
+        
+        <div class="error" id="error"></div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 15px; color: #667eea;">Verificando...</p>
+        </div>
+        
+        <div class="success" id="success">
+            <h2>✅</h2>
+            <h2>Registro Exitoso</h2>
+            <p>Ya estás registrado en la lista de asistencia.<br>Ahora puedes participar en las votaciones.</p>
+        </div>
+        
+        <form id="formRegistro" onsubmit="registrarAsistencia(event)">
+            <div class="form-group">
+                <label>🏠 Número de Apartamento</label>
+                <input type="text" id="apartamento" required placeholder="Ej: 101, 202, 305" autocomplete="off">
+            </div>
+            
+            <div class="form-group">
+                <label>👤 Nombre Completo</label>
+                <input type="text" id="nombre" required placeholder="Nombre del propietario" autocomplete="off">
+            </div>
+            
+            <div class="form-group">
+                <label>🆔 Número de Cédula</label>
+                <input type="text" id="cedula" required placeholder="Sin puntos ni espacios" autocomplete="off">
+            </div>
+            
+            <button type="submit" class="btn" id="btnSubmit">✅ Registrar Asistencia</button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAFWn-qxIC0o6A0f5BBzdJe0NM2UgGP-88",
+            authDomain: "azeche-ph.firebaseapp.com",
+            databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+            projectId: "azeche-ph",
+            storageBucket: "azeche-ph.firebasestorage.app",
+            messagingSenderId: "650847232355",
+            appId: "1:650847232355:web:8a84be8775e96ce03a0e15"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Obtener edificio de URL
+        const params = new URLSearchParams(window.location.search);
+        const edificio = params.get('edificio');
+
+        if (!edificio) {
+            mostrarError('❌ Edificio no especificado en la URL');
+            document.getElementById('formRegistro').style.display = 'none';
+        }
+
+        window.registrarAsistencia = async function(event) {
+            event.preventDefault();
+            
+            const apartamento = document.getElementById('apartamento').value.trim().toUpperCase();
+            const nombre = document.getElementById('nombre').value.trim();
+            const cedula = document.getElementById('cedula').value.trim();
+            
+            // Deshabilitar botón y mostrar loading
+            document.getElementById('btnSubmit').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+            
+            try {
+                // 1. Verificar que el apartamento existe y la cédula coincide
+                const propietarioRef = ref(db, `propietarios/${edificio}`);
+                const snapshot = await get(propietarioRef);
+                
+                let encontrado = false;
+                let propietarioKey = null;
+                let propietarioData = null;
+                
+                if (snapshot.exists()) {
+                    const propietarios = snapshot.val();
+                    
+                    Object.entries(propietarios).forEach(([key, prop]) => {
+                        // Normalizar para comparación
+                        const aptoNorm = (prop.apto || '').toString().trim().toUpperCase();
+                        const cedulaNorm = (prop.cedula || '').toString().trim();
+                        
+                        if (aptoNorm === apartamento && cedulaNorm === cedula) {
+                            // Verificar que sea propietario
+                            if (prop.tipo === 'Propietario' || prop.tipo === 'propietario' || !prop.tipo) {
+                                encontrado = true;
+                                propietarioKey = key;
+                                propietarioData = prop;
+                            }
+                        }
+                    });
+                }
+                
+                if (!encontrado) {
+                    mostrarError('❌ Apartamento o cédula incorrectos.<br>Solo propietarios pueden registrarse.');
+                    document.getElementById('btnSubmit').disabled = false;
+                    document.getElementById('loading').style.display = 'none';
+                    return;
+                }
+                
+                // 2. Verificar si ya está registrado
+                const asistenteRef = ref(db, `asambleas/${edificio}/asistentes/${propietarioKey}`);
+                const asistenciaSnapshot = await get(asistenteRef);
+                
+                if (asistenciaSnapshot.exists()) {
+                    mostrarError('⚠️ Ya estás registrado en la lista de asistencia');
+                    document.getElementById('btnSubmit').disabled = false;
+                    document.getElementById('loading').style.display = 'none';
+                    return;
+                }
+                
+                // 3. Registrar asistencia
+                await set(asistenteRef, {
+                    apartamento: apartamento,
+                    nombre: nombre,
+                    cedula: cedula,
+                    coeficiente: propietarioData.coeficiente || 0,
+                    horaRegistro: new Date().toISOString(),
+                    registrado: true
+                });
+                
+                // 4. Mostrar éxito
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('formRegistro').style.display = 'none';
+                document.getElementById('success').style.display = 'block';
+                
+                console.log('✅ Registro exitoso:', apartamento);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarError('❌ Error al registrar: ' + error.message);
+                document.getElementById('btnSubmit').disabled = false;
+                document.getElementById('loading').style.display = 'none';
+            }
+        };
+
+        function mostrarError(mensaje) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.innerHTML = mensaje;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 6000);
+        }
+    </script>
+</body>
+</html>
