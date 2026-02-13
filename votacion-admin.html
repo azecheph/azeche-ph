@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panel Admin - Votación Azeche PH</title>
+<title>Panel Admin - Votacion Azeche PH</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0056B8 0%, #00B853 100%); min-height: 100vh; padding: 20px; }
@@ -21,10 +21,12 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .quorum-display { background: linear-gradient(135deg, #0056B8 0%, #00B853 100%); color: white; padding: 30px; border-radius: 15px; text-align: center; margin: 20px 0; }
 .quorum-number { font-size: 4em; font-weight: 900; margin: 10px 0; }
 .quorum-label { font-size: 1.2em; opacity: 0.9; }
-.qr-section { text-align: center; padding: 20px; background: #f8f9fa; border-radius: 15px; margin: 20px 0; }
-.qr-code { width: 250px; height: 250px; background: white; margin: 20px auto; border-radius: 15px; display: flex; align-items: center; justify-content: center; border: 5px solid #0056B8; overflow: hidden; min-height: 250px; }
-.qr-code img { width: 100%; height: 100%; object-fit: contain; }
-.qr-placeholder { color: #999; padding: 20px; text-align: center; }
+.qr-section { text-align: center; padding: 20px; background: #f0f7ff; border-radius: 15px; margin: 20px 0; border: 2px dashed #0056B8; }
+.qr-section h4 { color: #0056B8; margin-bottom: 12px; font-size: 1.1em; }
+.qr-section input { width: 100%; padding: 10px; border: 2px solid #0056B8; border-radius: 8px; font-size: 0.85em; margin-bottom: 10px; background: white; color: #333; }
+.qr-section button { background: #0056B8; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.95em; }
+.qr-section button:hover { background: #004494; }
+.qr-section p { color: #666; font-size: 0.85em; margin-top: 8px; }
 .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
 .stat-box { background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center; border: 2px solid #e9ecef; }
 .stat-number { font-size: 2.5em; font-weight: 900; color: #0056B8; }
@@ -48,7 +50,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .resultado-nombre { color: #333; }
 .resultado-valor { color: #0056B8; }
 .progress-bar { height: 40px; background: #e9ecef; border-radius: 20px; overflow: hidden; }
-.progress-fill { height: 100%; background: linear-gradient(135deg, #00B853 0%, #0056B8 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; transition: width 0.5s ease; }
+.progress-fill { height: 100%; background: linear-gradient(135deg, #00B853 0%, #0056B8 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; transition: width 0.5s ease; min-width: 0; }
 .btn-cerrar { background: #dc3545; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 600; margin-top: 20px; }
 .btn-danger { background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9em; }
 .btn-warning { background: #ff9800; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9em; }
@@ -56,196 +58,178 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .admin-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
 .error-message { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #f5c6cb; }
 .success-message { background: #d4edda; color: #155724; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #c3e6cb; }
-.loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.enlace-votacion-section { background: #e8f5e9; padding: 20px; border-radius: 15px; margin: 20px 0; border: 2px dashed #00B853; text-align: center; }
+.enlace-votacion-section h4 { color: #00B853; margin-bottom: 12px; }
+.enlace-votacion-section input { width: 100%; padding: 10px; border: 2px solid #00B853; border-radius: 8px; font-size: 0.85em; margin-bottom: 10px; background: white; }
+.enlace-votacion-section button { background: #00B853; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.enlace-votacion-section button:hover { background: #009643; }
+.enlace-votacion-section p { color: #666; font-size: 0.85em; margin-top: 8px; }
+
+/* Opciones custom */
+.opciones-container { margin: 15px 0; }
+.opcion-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+.opcion-row input { flex: 1; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 0.95em; }
+.opcion-row .btn-remove-opcion { background: #dc3545; color: white; border: none; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 1.2em; display: flex; align-items: center; justify-content: center; }
+.btn-add-opcion { background: #0056B8; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-top: 5px; }
+.opciones-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.opciones-count { color: #666; font-size: 0.85em; }
+.tipo-badge { display: inline-block; background: #0056B8; color: white; padding: 4px 12px; border-radius: 15px; font-size: 0.8em; margin-left: 10px; }
+
 @media (max-width: 968px) { .main-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 <div class="container">
-<div class="header">
-<div class="logo-text">
-<span class="logo-blue">AZECHE</span><span class="logo-green">PH</span>
-</div>
-<div class="edificio-info">
-<h2 id="edificioNombre">Selecciona edificio</h2>
-<p id="fechaAsamblea">Sistema de Votación</p>
-</div>
-<select id="selectEdificio" style="padding: 12px; border-radius: 10px; border: 2px solid #0056B8; font-size: 1em;">
-<option value="">Selecciona edificio</option>
-<option value="nepal-2">Nepal 2</option>
-<option value="avalon">Avalon</option>
-<option value="convivienda-1">Convivienda 1</option>
-<option value="pinos-del-country">Pinos del Country</option>
-            <option value="prueba-asamblea">🧪 PRUEBA - Asamblea</option>
-</select>
-<a href="Dashboard.html" class="btn-back">← Dashboard</a>
-</div>
-<div id="errorContainer"></div>
-<div class="main-grid">
-<div>
-<div class="panel">
-<h3>
-<span>📋 Quórum</span>
-<button class="btn-danger" onclick="limpiarAsistentes()" title="Borrar todos los asistentes"> 🗑️ Limpiar </button>
-<button onclick="copiarEnlaceQuorum()" 
-        style="background: linear-gradient(135deg, #00B853 0%, #00875F 100%); 
-               color: white; 
-               border: none; 
-               padding: 12px 24px; 
-               border-radius: 10px; 
-               font-size: 16px; 
-               font-weight: 600; 
-               cursor: pointer; 
-               box-shadow: 0 4px 6px rgba(0,184,83,0.3);
-               transition: all 0.3s;
-               display: inline-flex;
-               align-items: center;
-               gap: 8px;"
-        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0,184,83,0.4)'"
-        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0,184,83,0.3)'"
-        title="Copiar enlace para que propietarios se registren">
-    🔗 Enlace Auto-Registro
-</button>
-</h3>
-<div class="qr-section" style="background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 100%);">
-    <p style="font-weight: 600; margin-bottom: 15px; color: #333; font-size: 1.1em;">📱 Enlace de Auto-Registro</p>
-    <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <input type="text" id="enlaceRegistroQuorum" readonly 
-               style="width: 100%; padding: 12px; border: 2px solid #00B853; border-radius: 8px; font-family: monospace; font-size: 14px; text-align: center; background: #f8f9fa;"
-               value="Selecciona un edificio primero">
-        <button onclick="copiarEnlaceQuorum()" 
-                style="width: 100%; margin-top: 10px; padding: 12px; background: linear-gradient(135deg, #00B853 0%, #00875F 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px; transition: all 0.3s;"
-                onmouseover="this.style.transform='translateY(-2px)'"
-                onmouseout="this.style.transform='translateY(0)'">
-            📋 Copiar Enlace
-        </button>
+  <div class="header">
+    <div>
+      <div class="logo-text"><span class="logo-blue">AZECHE</span> <span class="logo-green">PH</span></div>
     </div>
-    <p style="font-size: 0.85em; color: #666; margin-top: 12px;">
-        Comparte este enlace con los propietarios por Google Chat o WhatsApp
-    </p>
-</div>
-<div class="quorum-display">
-<div class="quorum-label">QUÓRUM ACTUAL</div>
-<div class="quorum-number" id="quorumActual">0%</div>
-<div class="quorum-label">
-<span id="totalAsistentes">0</span> propietarios
-</div>
-</div>
-<div class="stats-grid">
-<div class="stat-box">
-<div class="stat-number" id="totalCoeficiente">0</div>
-<div class="stat-label">Coeficiente</div>
-</div>
-<div class="stat-box">
-<div class="stat-number" id="totalApartamentos">0</div>
-<div class="stat-label">Apartamentos</div>
-</div>
-<div class="stat-box">
-<div class="stat-number" id="totalVotos">0</div>
-<div class="stat-label">Votos</div>
-</div>
-</div>
-<h4 style="color: #333; margin: 20px 0 10px 0;">Asistentes</h4>
-<div class="asistentes-list" id="listaAsistentes">
-<p style="text-align: center; color: #999; padding: 20px;">
-<span class="loading-spinner"></span> Cargando...
-</p>
-</div>
-</div>
-</div>
-<div>
-<!-- ENLACE DE VOTACIÓN -->
-<div class="panel" style="margin-top:30px">
-<h3><span style="color:#2196F3">🗳️ Enlace de Votación</span></h3>
-<div style="background:linear-gradient(135deg,#2196F3 0%,#1976D2 100%);padding:20px;border-radius:12px">
-<p style="font-weight:700;color:white;text-align:center;font-size:1.1em;margin-bottom:15px">🔗 ENLACE PARA VOTAR</p>
-<div style="background:white;padding:20px;border-radius:8px">
-<input type="text" id="enlaceVotacionPrincipal" readonly style="width:100%;padding:15px;border:3px solid #2196F3;border-radius:8px;font-family:monospace;font-size:14px;background:#E3F2FD;margin-bottom:10px;font-weight:600;text-align:center" value="Crea una votación primero">
-<button onclick="copiarEnlaceVotacionPrincipal()" style="width:100%;padding:15px;background:linear-gradient(135deg,#2196F3 0%,#1976D2 100%);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:18px">📋 COPIAR ENLACE DE VOTACIÓN</button>
-</div>
-<p style="font-size:0.9em;color:white;margin-top:15px;text-align:center;font-weight:600">⚠️ Comparte DURANTE la votación</p>
-</div>
-</div>
-<div class="panel">
-<h3>
-<span>🗳️ Votación Activa</span>
-</h3>
-<div id="votacionActiva">
-<div class="no-votacion">
-<p>📭 No hay votación activa</p>
-<p style="font-size: 0.9em; margin-top: 10px;">Crea una nueva votación abajo</p>
-</div>
-</div>
-</div>
-<div class="panel" style="margin-top: 30px;">
-<h3>➕ Crear Nueva Votación</h3>
-<div class="form-group">
-<label>Título</label>
-<input type="text" id="tituloVotacion" placeholder="Ej: Aprobación de presupuesto 2026">
-</div>
-<div class="form-group">
-<label>Descripción</label>
-<textarea id="descripcionVotacion" placeholder="Detalles de la votación..."></textarea>
-</div>
-<div class="form-group">
-<label>Tipo de Votación</label>
-<select id="tipoVotacion">
-<option value="coeficientes">Por Coeficientes (Ponderado)</option>
-<option value="nominal">Nominal Simple (1 voto = 1 apartamento)</option>
-<option value="multiple">Múltiple Opción</option>
-</select>
-</div>
-<button class="btn-crear" onclick="crearVotacion()"> 🗳️ Crear Votación </button>
-</div>
-</div>
-</div>
-</div>
-<script>
-// FUNCIONES GLOBALES (accesibles desde onclick)
+    <div class="edificio-info">
+      <h2 id="edificioNombre">Selecciona edificio</h2>
+      <p>Sistema de Votacion</p>
+    </div>
+    <div>
+      <select id="selectEdificio" style="padding:12px;border-radius:10px;border:2px solid #ddd;font-size:1em;">
+        <option value="">Selecciona edificio</option>
+        <option value="nepal-2">Nepal 2</option>
+        <option value="avalon">Avalon</option>
+        <option value="convivienda-1">Convivienda 1</option>
+        <option value="pinos-del-country">Pinos del Country</option>
+        <option value="prueba-asamblea">PRUEBA - Asamblea</option>
+      </select>
+    </div>
+    <a href="Dashboard.html" class="btn-back">Dashboard</a>
+  </div>
 
-    const input = document.getElementById('enlaceVotacionPrincipal');
-    if (!input || input.value === 'Crea una votación primero' || input.value === '') {
-        alert('❌ Debes crear una votación primero');
-        return;
-    }
-    input.select();
-    input.setSelectionRange(0, 99999);
-    try {
-        const success = document.execCommand('copy');
-        if (success) {
-            alert('✅ Enlace de votación copiado:\n\n' + input.value);
-        } else {
-            alert('❌ Copia manualmente:\n\n' + input.value);
-        }
-    } catch(err) {
-        alert('❌ Copia manualmente:\n\n' + input.value);
-    }
-}
-</script>
+  <div class="main-grid">
+    <!-- LEFT COLUMN: Quorum -->
+    <div>
+      <div class="panel">
+        <h3>
+          Quorum
+          <button class="btn-danger" onclick="limpiarAsistentes()">Limpiar</button>
+        </h3>
+
+        <!-- ENLACE DE REGISTRO - VISIBLE -->
+        <div class="qr-section" id="seccionEnlaceRegistro">
+          <h4>Enlace de Auto-Registro</h4>
+          <input type="text" id="enlaceRegistroQuorum" value="Selecciona un edificio primero" readonly>
+          <button onclick="copiarEnlaceRegistro()">Copiar Enlace</button>
+          <p>Comparte este enlace con los propietarios por Google Chat o WhatsApp</p>
+        </div>
+
+        <div class="quorum-display">
+          <div class="quorum-label">QUORUM ACTUAL</div>
+          <div class="quorum-number" id="quorumActual">0%</div>
+          <div><span id="totalAsistentes">0</span> propietarios</div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-number" id="totalCoeficiente">0</div>
+            <div class="stat-label">Coeficiente</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="totalApartamentos">0</div>
+            <div class="stat-label">Apartamentos</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="totalVotos">0</div>
+            <div class="stat-label">Votos</div>
+          </div>
+        </div>
+        <h4>Asistentes</h4>
+        <div class="asistentes-list" id="listaAsistentes">
+          <p style="text-align:center;color:#999;padding:20px;">Cargando...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Votacion -->
+    <div>
+      <!-- Enlace de votacion -->
+      <div class="enlace-votacion-section" id="seccionEnlaceVotacion">
+        <h4>Enlace para Votar</h4>
+        <input type="text" id="enlaceVotacionPrincipal" value="Crea una votacion primero" readonly>
+        <button onclick="copiarEnlaceVotacion()">COPIAR ENLACE DE VOTACION</button>
+        <p>Comparte DURANTE la votacion</p>
+      </div>
+
+      <!-- Votacion activa -->
+      <div class="panel">
+        <h3>Votacion Activa</h3>
+        <div id="votacionActiva">
+          <div class="no-votacion">
+            <p style="font-size:2em;">Sin votacion</p>
+            <p>Crea una nueva votacion abajo</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Crear nueva votacion -->
+      <div class="panel" style="margin-top:30px;">
+        <h3>Crear Nueva Votacion</h3>
+        <div class="form-group">
+          <label>Titulo</label>
+          <input type="text" id="tituloVotacion" placeholder="Ej: Aprobacion presupuesto 2026">
+        </div>
+        <div class="form-group">
+          <label>Descripcion</label>
+          <textarea id="descripcionVotacion" placeholder="Descripcion de la votacion..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Tipo de Votacion</label>
+          <select id="tipoVotacion">
+            <option value="coeficientes">Por Coeficientes (Ponderado)</option>
+            <option value="nominal">Nominal Simple (1 voto = 1 apartamento)</option>
+          </select>
+        </div>
+
+        <!-- OPCIONES CUSTOM (2-5) -->
+        <div class="form-group">
+          <div class="opciones-label">
+            <label style="margin-bottom:0;">Opciones de Votacion</label>
+            <span class="opciones-count" id="opcionesCount">2 de 5</span>
+          </div>
+          <div class="opciones-container" id="opcionesContainer">
+            <div class="opcion-row" data-index="0">
+              <span style="font-weight:600;color:#0056B8;min-width:20px;">1.</span>
+              <input type="text" value="Si, a favor" placeholder="Opcion 1">
+            </div>
+            <div class="opcion-row" data-index="1">
+              <span style="font-weight:600;color:#0056B8;min-width:20px;">2.</span>
+              <input type="text" value="No, en contra" placeholder="Opcion 2">
+            </div>
+          </div>
+          <button class="btn-add-opcion" id="btnAddOpcion" onclick="agregarOpcion()">+ Agregar opcion</button>
+        </div>
+
+        <button class="btn-crear" onclick="crearVotacion()">Crear Votacion</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, onValue, set, push, update, remove, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
 const firebaseConfig = {
-apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
-authDomain: "azeche-ph.firebaseapp.com",
-databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
-projectId: "azeche-ph",
-storageBucket: "azeche-ph.firebasestorage.app",
-messagingSenderId: "905337990521",
-appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
+  apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
+  authDomain: "azeche-ph.firebaseapp.com",
+  databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+  projectId: "azeche-ph",
+  storageBucket: "azeche-ph.firebasestorage.app",
+  messagingSenderId: "905337990521",
+  appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
 };
 
-// Inicializar Firebase con manejo de errores
 let app, db;
 try {
-app = initializeApp(firebaseConfig);
-db = getDatabase(app);
+  app = initializeApp(firebaseConfig);
+  db = getDatabase(app);
 } catch (error) {
-console.error('Error inicializando Firebase:', error);
-mostrarError('Error de conexión con la base de datos. Por favor recarga la página.');
+  console.error('Error inicializando Firebase:', error);
 }
 
 let edificioActual = '';
@@ -253,395 +237,491 @@ let asistentesData = {};
 let votacionActual = null;
 let datosEdificio = null;
 
-// Cambio de edificio
-document.getElementById('selectEdificio').addEventListener('change', async (e) => {
-edificioActual = e.target.value;
-if (edificioActual) {
-cargarDatos();
-generarQR();
-} else {
-limpiarVista();
-}
-});
+// ========== OPCIONES CUSTOM ==========
+let opcionesCount = 2;
+const MAX_OPCIONES = 5;
+const MIN_OPCIONES = 2;
 
-async function cargarDatos() {
-if (!db || !edificioActual) return;
+window.agregarOpcion = function() {
+  if (opcionesCount >= MAX_OPCIONES) return;
+  opcionesCount++;
+  const container = document.getElementById('opcionesContainer');
+  const row = document.createElement('div');
+  row.className = 'opcion-row';
+  row.dataset.index = opcionesCount - 1;
+  row.innerHTML = `
+    <span style="font-weight:600;color:#0056B8;min-width:20px;">${opcionesCount}.</span>
+    <input type="text" value="" placeholder="Opcion ${opcionesCount}">
+    <button class="btn-remove-opcion" onclick="eliminarOpcion(this)" title="Eliminar">&times;</button>
+  `;
+  container.appendChild(row);
+  actualizarOpcionesUI();
+};
 
-// Cargar datos del edificio (total apartamentos y coeficientes)
-try {
-const edificioRef = ref(db, `edificios/${edificioActual}`);
-const edificioSnapshot = await get(edificioRef);
-if (edificioSnapshot.exists()) {
-datosEdificio = edificioSnapshot.val();
-        // document.getElementById('totalApartamentos').textContent = datosEdificio.totalApartamentos || 0;
-document.getElementById('edificioNombre').textContent = datosEdificio.nombre || edificioActual;
-} else {
-document.getElementById('totalApartamentos').textContent = '?';
-mostrarAdvertencia('No hay configuración para este edificio');
-}
-} catch (error) {
-console.error('Error cargando datos del edificio:', error);
-mostrarError('Error cargando datos del edificio');
-}
+window.eliminarOpcion = function(btn) {
+  if (opcionesCount <= MIN_OPCIONES) return;
+  btn.closest('.opcion-row').remove();
+  opcionesCount--;
+  // Re-numerar
+  const rows = document.querySelectorAll('#opcionesContainer .opcion-row');
+  rows.forEach((row, i) => {
+    row.dataset.index = i;
+    row.querySelector('span').textContent = (i + 1) + '.';
+  });
+  actualizarOpcionesUI();
+};
 
-// Cargar residentes del edificio
-try {
-const residentesRef = ref(db, `propietarios/${edificioActual}`);
-onValue(residentesRef, (snapshot) => {
-const data = snapshot.val();
-if (data) {
-mostrarResidentes(data);
-} else {
-document.getElementById('totalApartamentos').textContent = '0';
-mostrarAdvertencia('No hay residentes registrados');
-}
-}, (error) => {
-console.error('Error en residentes:', error);
-mostrarError('Error cargando residentes');
-});
-} catch (error) {
-console.error('Error configurando listener residentes:', error);
+function actualizarOpcionesUI() {
+  document.getElementById('opcionesCount').textContent = opcionesCount + ' de ' + MAX_OPCIONES;
+  document.getElementById('btnAddOpcion').style.display = opcionesCount >= MAX_OPCIONES ? 'none' : 'inline-block';
 }
 
-// Cargar asistentes
-try {
-const asistentesRef = ref(db, `asambleas/${edificioActual}/asistentes`);
-onValue(asistentesRef, (snapshot) => {
-asistentesData = snapshot.val() || {};
-actualizarQuorum();
-mostrarAsistentes();
-}, (error) => {
-console.error('Error en asistentes:', error);
-mostrarError('Error cargando asistentes');
-});
-} catch (error) {
-console.error('Error configurando listener asistentes:', error);
-}
-
-// Cargar votación activa
-try {
-const votacionRef = ref(db, `asambleas/${edificioActual}/votacion_activa`);
-onValue(votacionRef, (snapshot) => {
-votacionActual = snapshot.val();
-mostrarVotacionActiva();
-}, (error) => {
-console.error('Error en votación:', error);
-mostrarError('Error cargando votación');
-});
-} catch (error) {
-console.error('Error configurando listener votación:', error);
-}
-}
-
-function mostrarResidentes(residentes) {
-    // FILTRAR SOLO PROPIETARIOS (no arrendatarios)
-    let totalPropietarios = 0;
-    
-    if (residentes) {
-        Object.values(residentes).forEach(persona => {
-            // Solo contar si es propietario
-            if (persona.tipo === "Propietario" || persona.tipo === "propietario" || !persona.tipo) {
-                totalPropietarios++;
-            }
-        });
+function obtenerOpciones() {
+  const opciones = {};
+  const rows = document.querySelectorAll('#opcionesContainer .opcion-row');
+  rows.forEach((row, i) => {
+    const input = row.querySelector('input');
+    const label = input.value.trim();
+    if (label) {
+      opciones['opcion_' + (i + 1)] = { label: label, orden: i + 1 };
     }
-    
-    document.getElementById("totalApartamentos").textContent = totalPropietarios;
-    console.log("✅ Total propietarios: " + totalPropietarios);
+  });
+  return opciones;
 }
 
-function actualizarQuorum() {
-const total = Object.keys(asistentesData).length;
-document.getElementById('totalAsistentes').textContent = total;
-
-// Calcular quórum dinámicamente
-let totalCoef = 0;
-let coefRequerido = 0;
-
-if (datosEdificio && datosEdificio.coeficienteQuorum) {
-coefRequerido = datosEdificio.coeficienteQuorum;
-} else {
-coefRequerido = 0.5; // Default 50%
-}
-
-Object.values(asistentesData).forEach(a => {
-totalCoef += parseFloat(a.coeficiente || 0);
+// ========== CAMBIO DE EDIFICIO ==========
+document.getElementById('selectEdificio').addEventListener('change', async (e) => {
+  edificioActual = e.target.value;
+  if (edificioActual) {
+    cargarDatos();
+    actualizarEnlaceRegistro();
+  } else {
+    limpiarVista();
+  }
 });
 
-document.getElementById('totalCoeficiente').textContent = totalCoef.toFixed(4);
+function actualizarEnlaceRegistro() {
+  const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+  const urlRegistro = baseUrl + 'registro-asamblea.html?edificio=' + edificioActual;
+  const inputEnlace = document.getElementById('enlaceRegistroQuorum');
+  if (inputEnlace) {
+    inputEnlace.value = urlRegistro;
+  }
+}
 
-// Calcular porcentaje de quórum
-const quorumPorcentaje = (totalCoef / 1.0) * 100;
-document.getElementById('quorumActual').textContent = Math.round(quorumPorcentaje) + '%';
+function actualizarEnlaceVotacion() {
+  const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+  const input = document.getElementById('enlaceVotacionPrincipal');
+  if (votacionActual && edificioActual) {
+    const urlVotacion = baseUrl + 'votacion-propietario.html?edificio=' + edificioActual;
+    input.value = urlVotacion;
+  } else {
+    input.value = 'Crea una votacion primero';
+  }
+}
+
+// ========== COPIAR ENLACES ==========
+window.copiarEnlaceRegistro = function() {
+  const input = document.getElementById('enlaceRegistroQuorum');
+  if (!input || !input.value || input.value === 'Selecciona un edificio primero') {
+    alert('Selecciona un edificio primero');
+    return;
+  }
+  copiarAlPortapapeles(input.value, 'Enlace de registro copiado');
+};
+
+window.copiarEnlaceVotacion = function() {
+  const input = document.getElementById('enlaceVotacionPrincipal');
+  if (!input || input.value === 'Crea una votacion primero') {
+    alert('Debes crear una votacion primero');
+    return;
+  }
+  copiarAlPortapapeles(input.value, 'Enlace de votacion copiado');
+};
+
+function copiarAlPortapapeles(texto, mensaje) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(texto).then(() => {
+      alert(mensaje + ':\n\n' + texto);
+    }).catch(() => {
+      copiarFallback(texto, mensaje);
+    });
+  } else {
+    copiarFallback(texto, mensaje);
+  }
+}
+
+function copiarFallback(texto, mensaje) {
+  const ta = document.createElement('textarea');
+  ta.value = texto;
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    alert(mensaje + ':\n\n' + texto);
+  } catch(e) {
+    alert('Copia manualmente:\n\n' + texto);
+  }
+  document.body.removeChild(ta);
+}
+
+// ========== CARGAR DATOS ==========
+async function cargarDatos() {
+  if (!db || !edificioActual) return;
+
+  try {
+    const edificioRef = ref(db, 'edificios/' + edificioActual);
+    const edificioSnapshot = await get(edificioRef);
+    if (edificioSnapshot.exists()) {
+      datosEdificio = edificioSnapshot.val();
+      document.getElementById('edificioNombre').textContent = datosEdificio.nombre || edificioActual;
+    }
+  } catch (error) {
+    console.error('Error cargando edificio:', error);
+  }
+
+  // Cargar propietarios
+  try {
+    const residentesRef = ref(db, 'propietarios/' + edificioActual);
+    onValue(residentesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        let totalPropietarios = 0;
+        Object.values(data).forEach(persona => {
+          if (persona.tipo === "Propietario" || persona.tipo === "propietario" || !persona.tipo) {
+            totalPropietarios++;
+          }
+        });
+        document.getElementById('totalApartamentos').textContent = totalPropietarios;
+      } else {
+        document.getElementById('totalApartamentos').textContent = '0';
+      }
+    });
+  } catch (error) {
+    console.error('Error en propietarios:', error);
+  }
+
+  // Cargar asistentes
+  try {
+    const asistentesRef = ref(db, 'asambleas/' + edificioActual + '/asistentes');
+    onValue(asistentesRef, (snapshot) => {
+      asistentesData = snapshot.val() || {};
+      actualizarQuorum();
+      mostrarAsistentes();
+    });
+  } catch (error) {
+    console.error('Error en asistentes:', error);
+  }
+
+  // Cargar votacion activa
+  try {
+    const votacionRef = ref(db, 'asambleas/' + edificioActual + '/votacion_activa');
+    onValue(votacionRef, (snapshot) => {
+      votacionActual = snapshot.val();
+      mostrarVotacionActiva();
+      actualizarEnlaceVotacion();
+    });
+  } catch (error) {
+    console.error('Error en votacion:', error);
+  }
+}
+
+// ========== QUORUM ==========
+function actualizarQuorum() {
+  const total = Object.keys(asistentesData).length;
+  document.getElementById('totalAsistentes').textContent = total;
+
+  let totalCoef = 0;
+  Object.values(asistentesData).forEach(a => {
+    totalCoef += parseFloat(a.coeficiente || 0);
+  });
+
+  document.getElementById('totalCoeficiente').textContent = totalCoef.toFixed(4);
+  const quorumPorcentaje = (totalCoef / 1.0) * 100;
+  document.getElementById('quorumActual').textContent = Math.round(quorumPorcentaje) + '%';
 }
 
 function mostrarAsistentes() {
-const lista = document.getElementById('listaAsistentes');
-if (Object.keys(asistentesData).length === 0) {
-lista.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">Esperando registros...</p>';
-return;
-}
-lista.innerHTML = '';
-Object.entries(asistentesData).forEach(([id, asistente]) => {
-const div = document.createElement('div');
-div.className = 'asistente-item';
-div.innerHTML = `
-<div>
-<div class="asistente-nombre">${asistente.nombre || 'Sin nombre'}</div>
-<div class="asistente-apto">Apto ${asistente.apartamento}</div>
-</div>
-<div style="display: flex; align-items: center; gap: 10px;">
-<div class="asistente-coef">${parseFloat(asistente.coeficiente || 0).toFixed(4)}</div>
-<button class="btn-delete-asistente" onclick="eliminarAsistente('${id}')">🗑️</button>
-</div>
-`;
-lista.appendChild(div);
-});
+  const lista = document.getElementById('listaAsistentes');
+  if (Object.keys(asistentesData).length === 0) {
+    lista.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">Esperando registros...</p>';
+    return;
+  }
+  lista.innerHTML = '';
+  Object.entries(asistentesData).forEach(([id, asistente]) => {
+    const div = document.createElement('div');
+    div.className = 'asistente-item';
+    div.innerHTML = `
+      <div>
+        <div class="asistente-nombre">${asistente.nombre || 'Sin nombre'}</div>
+        <div class="asistente-apto">Apto ${asistente.apartamento}</div>
+      </div>
+      <div>
+        <span class="asistente-coef">${parseFloat(asistente.coeficiente || 0).toFixed(4)}</span>
+        <button class="btn-delete-asistente" onclick="eliminarAsistente('${id}')">X</button>
+      </div>
+    `;
+    lista.appendChild(div);
+  });
 }
 
-function generarQR() {
-    const baseUrl = window.location.origin + window.location.pathname.replace('votacion-admin.html', '').replace('votacion-admin-corregido.html', '').replace('votacion-admin-LIMPIO.html', '');
-    
-    // Actualizar enlace en sección Quórum
-    const urlRegistro = baseUrl + 'registro-asamblea.html?edificio=' + edificioActual;
-    const inputEnlace = document.getElementById('enlaceRegistroQuorum');
-    
-    if (inputEnlace) {
-        inputEnlace.value = urlRegistro;
-        console.log('✅ Enlace actualizado:', urlRegistro);
-    } else {
-        console.error('❌ No se encontró el campo enlaceRegistroQuorum');
-    }
-}
-const bu=window.location.origin+window.location.pathname.substring(0,window.location.pathname.lastIndexOf("/")+1);const uv=bu+"asambleas.html?edificio="+edificioActual+"&votacion="+votacionId;const ip=document.getElementById("enlaceVotacionPrincipal");if(ip){ip.value=uv}
-    const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+// ========== MOSTRAR VOTACION ACTIVA CON OPCIONES DINAMICAS ==========
 function mostrarVotacionActiva() {
-const container = document.getElementById('votacionActiva');
-if (!votacionActual) {
-container.innerHTML = `
-<div class="no-votacion">
-<p>📭 No hay votación activa</p>
-<p style="font-size: 0.9em; margin-top: 10px;">Crea una nueva votación abajo</p>
-</div>
-`;
-document.getElementById('totalVotos').textContent = '0';
-return;
+  const container = document.getElementById('votacionActiva');
+  if (!votacionActual) {
+    container.innerHTML = `
+      <div class="no-votacion">
+        <p style="font-size:2em;">Sin votacion</p>
+        <p>Crea una nueva votacion abajo</p>
+      </div>
+    `;
+    document.getElementById('totalVotos').textContent = '0';
+    return;
+  }
+
+  const votos = votacionActual.votos || {};
+  const totalVotos = Object.keys(votos).length;
+  document.getElementById('totalVotos').textContent = totalVotos;
+
+  const tipoActual = votacionActual.tipo || 'coeficientes';
+  const opciones = votacionActual.opciones || null;
+
+  let html = `
+    <div class="votacion-activa">
+      <h4>${votacionActual.titulo} <span class="tipo-badge">${tipoActual === 'nominal' ? 'Nominal' : 'Coeficientes'}</span></h4>
+      <p style="color:#666;margin-bottom:20px;">${votacionActual.descripcion || ''}</p>
+  `;
+
+  if (opciones && Object.keys(opciones).length > 0) {
+    // --- OPCIONES CUSTOM ---
+    const conteos = {};
+    Object.keys(opciones).forEach(key => { conteos[key] = 0; });
+
+    Object.values(votos).forEach(voto => {
+      const opcionKey = voto.opcion || voto.voto || '';
+      // Mapear legacy si/no/abstencion a opcion_1/opcion_2/opcion_3
+      if (conteos.hasOwnProperty(opcionKey)) {
+        if (tipoActual === 'nominal') {
+          conteos[opcionKey] += 1;
+        } else {
+          conteos[opcionKey] += parseFloat(voto.coeficiente || 0);
+        }
+      } else {
+        // Legacy: intentar mapear "si" -> opcion_1, "no" -> opcion_2, "abstencion" -> opcion_3
+        const legacyMap = { 'si': 'opcion_1', 'no': 'opcion_2', 'abstencion': 'opcion_3' };
+        const mapped = legacyMap[opcionKey];
+        if (mapped && conteos.hasOwnProperty(mapped)) {
+          if (tipoActual === 'nominal') {
+            conteos[mapped] += 1;
+          } else {
+            conteos[mapped] += parseFloat(voto.coeficiente || 0);
+          }
+        }
+      }
+    });
+
+    let totalParticipacion = 0;
+    Object.values(conteos).forEach(v => { totalParticipacion += v; });
+
+    const colores = ['#00B853', '#dc3545', '#ff9800', '#0056B8', '#9c27b0'];
+    let i = 0;
+    Object.entries(opciones).sort((a, b) => (a[1].orden || 0) - (b[1].orden || 0)).forEach(([key, opt]) => {
+      const valor = conteos[key] || 0;
+      const porcentaje = totalParticipacion > 0 ? (valor / totalParticipacion * 100) : 0;
+      const color = colores[i % colores.length];
+      const unidad = tipoActual === 'nominal' ? 'voto(s)' : 'coef.';
+      const valorDisplay = tipoActual === 'nominal' ? valor : valor.toFixed(4);
+      html += `
+        <div class="resultado-bar">
+          <div class="resultado-label">
+            <span class="resultado-nombre">${opt.label}</span>
+            <span class="resultado-valor">${valorDisplay} ${unidad} (${porcentaje.toFixed(1)}%)</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${Math.max(porcentaje, 0)}%;background:${color};">${porcentaje.toFixed(1)}%</div>
+          </div>
+        </div>
+      `;
+      i++;
+    });
+  } else {
+    // --- LEGACY: si/no/abstencion ---
+    let aFavor = 0, enContra = 0, abstencion = 0;
+
+    if (tipoActual === 'nominal') {
+      Object.values(votos).forEach(voto => {
+        if (voto.voto === 'si') aFavor++;
+        else if (voto.voto === 'no') enContra++;
+        else abstencion++;
+      });
+    } else {
+      Object.values(votos).forEach(voto => {
+        const coef = parseFloat(voto.coeficiente || 0);
+        if (voto.voto === 'si') aFavor += coef;
+        else if (voto.voto === 'no') enContra += coef;
+        else abstencion += coef;
+      });
+    }
+
+    const totalP = aFavor + enContra + abstencion;
+    const pA = totalP > 0 ? (aFavor / totalP * 100) : 0;
+    const pC = totalP > 0 ? (enContra / totalP * 100) : 0;
+    const pAb = totalP > 0 ? (abstencion / totalP * 100) : 0;
+    const u = tipoActual === 'nominal' ? '' : ' coef.';
+
+    html += `
+      <div class="resultado-bar">
+        <div class="resultado-label">
+          <span class="resultado-nombre">A Favor</span>
+          <span class="resultado-valor">${tipoActual === 'nominal' ? aFavor : aFavor.toFixed(4)}${u} (${pA.toFixed(1)}%)</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pA}%;background:#00B853;">${pA.toFixed(1)}%</div></div>
+      </div>
+      <div class="resultado-bar">
+        <div class="resultado-label">
+          <span class="resultado-nombre">En Contra</span>
+          <span class="resultado-valor">${tipoActual === 'nominal' ? enContra : enContra.toFixed(4)}${u} (${pC.toFixed(1)}%)</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pC}%;background:#dc3545;">${pC.toFixed(1)}%</div></div>
+      </div>
+      <div class="resultado-bar">
+        <div class="resultado-label">
+          <span class="resultado-nombre">Abstencion</span>
+          <span class="resultado-valor">${tipoActual === 'nominal' ? abstencion : abstencion.toFixed(4)}${u} (${pAb.toFixed(1)}%)</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pAb}%;background:#ff9800;">${pAb.toFixed(1)}%</div></div>
+      </div>
+    `;
+  }
+
+  html += `
+    <p style="margin-top:15px;color:#666;font-size:0.9em;">Total votos: ${totalVotos}</p>
+    <div class="admin-controls">
+      <button class="btn-cerrar" onclick="cerrarVotacion()">Cerrar Votacion</button>
+      <button class="btn-danger" onclick="borrarVotacion()">Borrar Votacion</button>
+      <button class="btn-warning" onclick="reiniciarVotos()">Reiniciar Votos</button>
+    </div>
+  </div>
+  `;
+
+  container.innerHTML = html;
 }
 
-const votos = votacionActual.votos || {};
-const totalVotos = Object.keys(votos).length;
-document.getElementById('totalVotos').textContent = totalVotos;
-
-// Calcular resultados según tipo de votación
-let aFavor = 0, enContra = 0, abstencion = 0;
-
-if (tipoVotacion === 'nominal') {
-  // Votación nominal: cada apto = 1 voto
-  Object.values(votos).forEach(voto => {
-    if (voto.voto === 'si') aFavor++;
-    else if (voto.voto === 'no') enContra++;
-    else abstencion++;
-  });
-} else {
-  // Votación por coeficiente: ponderar por coeficiente
-  Object.values(votos).forEach(voto => {
-    const coef = parseFloat(voto.coeficiente || 0);
-    if (voto.voto === 'si') aFavor += coef;
-    else if (voto.voto === 'no') enContra += coef;
-    else abstencion += coef;
-  });
-}
-
-const totalParticipantes = aFavor + enContra + abstencion;
-const porcAFavor = totalParticipantes > 0 ? (aFavor / totalParticipantes * 100) : 0;
-const porcContra = totalParticipantes > 0 ? (enContra / totalParticipantes * 100) : 0;
-const porcAbstencion = totalParticipantes > 0 ? (abstencion / totalParticipantes * 100) : 0;
-
-container.innerHTML = `
-<div class="votacion-activa">
-<h4>${votacionActual.titulo}</h4>
-<p style="color: #666; margin-bottom: 20px;">${votacionActual.descripcion || ''}</p>
-<div class="resultado-bar">
-<div class="resultado-label">
-<span class="resultado-nombre">✅ A Favor</span>
-<span class="resultado-valor">${aFavor} votos (${porcAFavor.toFixed(1)}%)</span>
-</div>
-<div class="progress-bar">
-<div class="progress-fill" style="width: ${porcAFavor}%">${porcAFavor.toFixed(1)}%</div>
-</div>
-</div>
-<div class="resultado-bar">
-<div class="resultado-label">
-<span class="resultado-nombre">❌ En Contra</span>
-<span class="resultado-valor">${enContra} votos (${porcContra.toFixed(1)}%)</span>
-</div>
-<div class="progress-bar">
-<div class="progress-fill" style="width: ${porcContra}%; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">${porcContra.toFixed(1)}%</div>
-</div>
-</div>
-<div class="resultado-bar">
-<div class="resultado-label">
-<span class="resultado-nombre">⚪ Abstención</span>
-<span class="resultado-valor">${abstencion} votos (${porcAbstencion.toFixed(1)}%)</span>
-</div>
-<div class="progress-bar">
-<div class="progress-fill" style="width: ${porcAbstencion}%; background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);">${porcAbstencion.toFixed(1)}%</div>
-</div>
-</div>
-<div class="admin-controls">
-<button class="btn-cerrar" onclick="cerrarVotacion()">🔒 Cerrar Votación</button>
-<button class="btn-danger" onclick="borrarVotacion()">🗑️ Borrar Votación</button>
-<button class="btn-warning" onclick="reiniciarVotos()">🔄 Reiniciar Votos</button>
-</div>
-</div>
-`;
-}
-
+// ========== CREAR VOTACION CON OPCIONES CUSTOM ==========
 window.crearVotacion = async function() {
-if (!edificioActual) {
-alert('⚠️ Selecciona un edificio primero');
-return;
-}
-const titulo = document.getElementById('tituloVotacion').value;
-const descripcion = document.getElementById('descripcionVotacion').value;
-const tipo = document.getElementById('tipoVotacion').value;
+  if (!edificioActual) {
+    alert('Selecciona un edificio primero');
+    return;
+  }
+  const titulo = document.getElementById('tituloVotacion').value.trim();
+  const descripcion = document.getElementById('descripcionVotacion').value.trim();
+  const tipo = document.getElementById('tipoVotacion').value;
 
-if (!titulo) {
-alert('⚠️ Ingresa un título para la votación');
-return;
-}
+  if (!titulo) {
+    alert('Ingresa un titulo para la votacion');
+    return;
+  }
 
-const votacion = {
-titulo,
-descripcion,
-tipo,
-fechaCreacion: new Date().toISOString(),
-estado: 'activa',
-votos: {}
+  const opciones = obtenerOpciones();
+  if (Object.keys(opciones).length < 2) {
+    alert('Debes definir al menos 2 opciones de votacion');
+    return;
+  }
+
+  const votacion = {
+    titulo: titulo,
+    descripcion: descripcion,
+    tipo: tipo,
+    opciones: opciones,
+    fechaCreacion: new Date().toISOString(),
+    estado: 'activa',
+    votos: {}
+  };
+
+  try {
+    await set(ref(db, 'asambleas/' + edificioActual + '/votacion_activa'), votacion);
+    document.getElementById('tituloVotacion').value = '';
+    document.getElementById('descripcionVotacion').value = '';
+    alert('Votacion creada exitosamente');
+  } catch (error) {
+    console.error('Error creando votacion:', error);
+    alert('Error al crear votacion: ' + error.message);
+  }
 };
 
-try {
-await set(ref(db, `asambleas/${edificioActual}/votacion_activa`), votacion);
-document.getElementById('tituloVotacion').value = '';
-document.getElementById('descripcionVotacion').value = '';
-alert('✅ Votación creada exitosamente');
-} catch (error) {
-console.error('Error creando votación:', error);
-alert('❌ Error al crear votación: ' + error.message);
-}
-};
-
+// ========== ACCIONES ADMIN ==========
 window.cerrarVotacion = async function() {
-if (!confirm('¿Cerrar la votación actual? Se guardará en el historial.')) return;
+  if (!votacionActual || !edificioActual) return;
+  if (!confirm('Cerrar esta votacion? Se guardara en el historial.')) return;
 
-try {
-const historialRef = push(ref(db, `asambleas/${edificioActual}/historial_votaciones`));
-await set(historialRef, {
-...votacionActual,
-fechaCierre: new Date().toISOString(),
-estado: 'cerrada'
-});
-await set(ref(db, `asambleas/${edificioActual}/votacion_activa`), null);
-alert('✅ Votación cerrada y guardada en historial');
-} catch (error) {
-console.error('Error cerrando votación:', error);
-alert('❌ Error al cerrar votación: ' + error.message);
-}
+  try {
+    const historialRef = ref(db, 'asambleas/' + edificioActual + '/historial_votaciones');
+    const newRef = push(historialRef);
+    await set(newRef, {
+      ...votacionActual,
+      fechaCierre: new Date().toISOString(),
+      estado: 'cerrada'
+    });
+    await remove(ref(db, 'asambleas/' + edificioActual + '/votacion_activa'));
+    alert('Votacion cerrada y guardada en historial');
+  } catch (error) {
+    console.error('Error cerrando votacion:', error);
+    alert('Error: ' + error.message);
+  }
 };
 
 window.borrarVotacion = async function() {
-if (!confirm('⚠️ ¿BORRAR la votación actual? Esta acción NO se puede deshacer.')) return;
-if (!confirm('¿Estás segura? Los votos se perderán para siempre.')) return;
-
-try {
-await set(ref(db, `asambleas/${edificioActual}/votacion_activa`), null);
-alert('🗑️ Votación eliminada');
-} catch (error) {
-console.error('Error borrando votación:', error);
-alert('❌ Error al borrar votación: ' + error.message);
-}
+  if (!confirm('BORRAR esta votacion? Esta accion no se puede deshacer.')) return;
+  try {
+    await remove(ref(db, 'asambleas/' + edificioActual + '/votacion_activa'));
+    alert('Votacion borrada');
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
 };
 
 window.reiniciarVotos = async function() {
-if (!confirm('¿Reiniciar los votos? Mantendrá el título y descripción pero borrará todos los votos.')) return;
-
-try {
-const votacionLimpia = {
-...votacionActual,
-votos: {}
-};
-await set(ref(db, `asambleas/${edificioActual}/votacion_activa`), votacionLimpia);
-alert('🔄 Votos reiniciados');
-} catch (error) {
-console.error('Error reiniciando votos:', error);
-alert('❌ Error al reiniciar votos: ' + error.message);
-}
+  if (!confirm('Reiniciar todos los votos de esta votacion?')) return;
+  try {
+    await remove(ref(db, 'asambleas/' + edificioActual + '/votacion_activa/votos'));
+    alert('Votos reiniciados');
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
 };
 
-window.eliminarAsistente = async function(asistenteId) {
-if (!confirm('¿Eliminar este asistente?')) return;
-
-try {
-await remove(ref(db, `asambleas/${edificioActual}/asistentes/${asistenteId}`));
-alert('✅ Asistente eliminado');
-} catch (error) {
-console.error('Error eliminando asistente:', error);
-alert('❌ Error al eliminar asistente: ' + error.message);
-}
+window.eliminarAsistente = async function(id) {
+  if (!confirm('Eliminar este asistente?')) return;
+  try {
+    await remove(ref(db, 'asambleas/' + edificioActual + '/asistentes/' + id));
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
 };
 
 window.limpiarAsistentes = async function() {
-if (!confirm('⚠️ ¿BORRAR TODOS los asistentes? Esta acción NO se puede deshacer.')) return;
-if (!confirm('¿Estás segura? Se perderá todo el registro de asistencia.')) return;
-
-try {
-await set(ref(db, `asambleas/${edificioActual}/asistentes`), null);
-alert('🗑️ Todos los asistentes eliminados');
-} catch (error) {
-console.error('Error limpiando asistentes:', error);
-alert('❌ Error al limpiar asistentes: ' + error.message);
-}
+  if (!edificioActual) return;
+  if (!confirm('ELIMINAR todos los asistentes? Esto reinicia el quorum.')) return;
+  try {
+    await remove(ref(db, 'asambleas/' + edificioActual + '/asistentes'));
+    alert('Asistentes eliminados');
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
 };
 
-function mostrarError(mensaje) {
-const container = document.getElementById('errorContainer');
-container.innerHTML = `<div class="error-message">${mensaje}</div>`;
-}
-
-function mostrarAdvertencia(mensaje) {
-const container = document.getElementById('errorContainer');
-container.innerHTML = `<div class="error-message" style="background: #fff3cd; color: #856404; border-color: #ffeeba;">⚠️ ${mensaje}</div>`;
-setTimeout(() => {
-container.innerHTML = '';
-}, 5000);
-}
-
 function limpiarVista() {
-document.getElementById('totalApartamentos').textContent = '0';
-document.getElementById('totalCoeficiente').textContent = '0';
-document.getElementById('totalAsistentes').textContent = '0';
-document.getElementById('quorumActual').textContent = '0%';
-document.getElementById('totalVotos').textContent = '0';
-document.getElementById('qrCodeContainer').innerHTML = '<div class="qr-placeholder">Selecciona edificio</div>';
-document.getElementById('urlRegistro').href = '#';
-document.getElementById('urlRegistro').textContent = '-';
-document.getElementById('listaAsistentes').innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">Esperando registros...</p>';
-document.getElementById('votacionActiva').innerHTML = `
-<div class="no-votacion">
-<p>📭 No hay votación activa</p>
-<p style="font-size: 0.9em; margin-top: 10px;">Crea una nueva votación abajo</p>
-</div>
-`;
+  document.getElementById('edificioNombre').textContent = 'Selecciona edificio';
+  document.getElementById('quorumActual').textContent = '0%';
+  document.getElementById('totalAsistentes').textContent = '0';
+  document.getElementById('totalCoeficiente').textContent = '0';
+  document.getElementById('totalApartamentos').textContent = '0';
+  document.getElementById('totalVotos').textContent = '0';
+  document.getElementById('listaAsistentes').innerHTML = '';
+  document.getElementById('votacionActiva').innerHTML = '<div class="no-votacion"><p>Selecciona un edificio</p></div>';
+  document.getElementById('enlaceRegistroQuorum').value = 'Selecciona un edificio primero';
+  document.getElementById('enlaceVotacionPrincipal').value = 'Crea una votacion primero';
 }
-
-// ========== FUNCIÓN QR AUTO-REGISTRO ==========
-// ========== FUNCIÓN ENLACE AUTO-REGISTRO ==========
-// Copiar enlace al portapapeles
-// Copiar enlace desde sección Quórum
 </script>
-
-
 </body>
-
-
 </html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Votación - Azeche PH</title>
+<title>Votacion - Azeche PH</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0056B8 0%, #00B853 100%); min-height: 100vh; padding: 20px; }
@@ -28,11 +28,13 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .votacion-card { background: #f8f9fa; padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid #0056B8; }
 .votacion-card h3 { color: #333; margin-bottom: 10px; }
 .votacion-card p { color: #666; line-height: 1.6; }
+.tipo-info { display: inline-block; background: #0056B8; color: white; padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-top: 8px; }
 .opciones-voto { display: grid; gap: 15px; margin: 20px 0; }
 .opcion-voto { background: white; border: 3px solid #ddd; padding: 20px; border-radius: 15px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 15px; font-size: 1.1em; font-weight: 600; }
 .opcion-voto:hover { border-color: #0056B8; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 .opcion-voto.selected { border-color: #00B853; background: linear-gradient(135deg, rgba(0, 184, 83, 0.1) 0%, white 100%); }
-.opcion-icon { font-size: 2em; }
+.opcion-numero { width: 40px; height: 40px; border-radius: 50%; background: #e9ecef; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #0056B8; flex-shrink: 0; }
+.opcion-voto.selected .opcion-numero { background: #00B853; color: white; }
 .success-message { text-align: center; padding: 40px; }
 .success-icon { font-size: 5em; margin-bottom: 20px; }
 .success-message h2 { color: #00B853; margin-bottom: 15px; }
@@ -41,368 +43,461 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .resultado-bar { margin-bottom: 20px; }
 .resultado-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; color: #333; }
 .progress-bar { height: 40px; background: #e9ecef; border-radius: 20px; overflow: hidden; }
-.progress-fill { height: 100%; background: linear-gradient(135deg, #00B853 0%, #0056B8 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; transition: width 0.5s ease; }
+.progress-fill { height: 100%; background: linear-gradient(135deg, #00B853 0%, #0056B8 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; transition: width 0.5s ease; min-width: 0; }
 .info-badge { background: #fff3cd; border-left: 4px solid #ff9800; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
 .info-badge p { color: #856404; margin: 0; }
 .error-message { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #f5c6cb; }
-.loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #0056B8; border-radius: 50%; border-top-color: transparent; animation: spin 1s ease-in-out infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.waiting-msg { text-align: center; padding: 30px; color: #666; }
+.waiting-msg p { font-size: 1.2em; margin-bottom: 10px; }
 </style>
 </head>
 <body>
 <div class="container">
-<div class="header">
-<div class="logo-text">
-<span class="logo-blue">AZECHE</span><span class="logo-green">PH</span>
+  <div class="header">
+    <div class="logo-text"><span class="logo-blue">AZECHE</span> <span class="logo-green">PH</span></div>
+    <div class="edificio-nombre" id="edificioNombre">Cargando...</div>
+  </div>
+
+  <div class="content">
+    <div id="errorMsg"></div>
+
+    <!-- STEP 1: Registro -->
+    <div class="step active" id="step-registro">
+      <h2>Registro de Asistencia</h2>
+      <div class="info-badge">
+        <p>Ingresa tu informacion para registrar tu asistencia a la asamblea</p>
+      </div>
+      <div class="form-group">
+        <label>Nombre Completo</label>
+        <input type="text" id="nombrePropietario" placeholder="Tu nombre completo">
+      </div>
+      <div class="form-group">
+        <label>Apartamento</label>
+        <select id="apartamentoPropietario">
+          <option value="">Selecciona tu apartamento</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Cedula / Documento</label>
+        <input type="text" id="documentoPropietario" placeholder="Numero de documento">
+      </div>
+      <button class="btn btn-primary" onclick="registrarAsistencia()">Registrar Asistencia</button>
+    </div>
+
+    <!-- STEP 2: Votacion -->
+    <div class="step" id="step-votacion">
+      <h2>Votacion Activa</h2>
+      <div id="votacionInfo">
+        <div class="waiting-msg">
+          <p>Esperando votacion...</p>
+          <p style="font-size:0.9em;">El administrador aun no ha abierto una votacion</p>
+        </div>
+      </div>
+      <div id="opcionesVotoContainer" class="opciones-voto" style="display:none;"></div>
+      <button class="btn btn-primary" id="btnVotar" onclick="enviarVoto()" disabled style="display:none;">Enviar Voto</button>
+
+      <div id="resultadosLive" style="display:none;margin-top:20px;">
+        <h3 style="color:#0056B8;margin-bottom:15px;">Resultados en Tiempo Real</h3>
+        <div id="resultadosContent"></div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Confirmacion -->
+    <div class="step" id="step-confirmacion">
+      <div class="success-message">
+        <div class="success-icon">&#10003;</div>
+        <h2>Voto Registrado</h2>
+        <p>Tu voto ha sido registrado exitosamente</p>
+        <h3 style="color:#0056B8;margin-top:30px;">Resultados Actuales</h3>
+        <div id="resultadosFinal" class="resultados"></div>
+      </div>
+    </div>
+  </div>
 </div>
-<div class="edificio-nombre" id="edificioNombre">Cargando...</div>
-</div>
-<div id="errorContainer"></div>
-<div class="content">
-<div id="errorMsg"></div>
-<!-- PASO 1: REGISTRO -->
-<div class="step active" id="step-registro">
-<h2>👋 Registro de Asistencia</h2>
-<div class="info-badge">
-<p>Ingresa tu información para registrar tu asistencia a la asamblea</p>
-</div>
-<div class="form-group">
-<label>Nombre Completo</label>
-<input type="text" id="nombrePropietario" placeholder="Tu nombre">
-</div>
-<div class="form-group">
-<label>Apartamento</label>
-<select id="apartamentoPropietario">
-<option value="">Selecciona tu apartamento</option>
-</select>
-</div>
-<div class="form-group">
-<label>Cédula / Documento</label>
-<input type="text" id="documentoPropietario" placeholder="123456789">
-</div>
-<button class="btn btn-primary" onclick="registrarAsistencia()"> ✅ Registrar Asistencia </button>
-</div>
-<!-- PASO 2: VOTACIÓN -->
-<div class="step" id="step-votacion">
-<h2>🗳️ Votación Activa</h2>
-<div id="votacionInfo"></div>
-<div class="opciones-voto" id="opcionesVoto">
-<div class="opcion-voto" onclick="seleccionarVoto('si')">
-<span class="opcion-icon">✅</span>
-<span>A Favor</span>
-</div>
-<div class="opcion-voto" onclick="seleccionarVoto('no')">
-<span class="opcion-icon">❌</span>
-<span>En Contra</span>
-</div>
-<div class="opcion-voto" onclick="seleccionarVoto('abstencion')">
-<span class="opcion-icon">⚪</span>
-<span>Abstención</span>
-</div>
-</div>
-<button class="btn btn-primary" id="btnVotar" disabled onclick="enviarVoto()"> 🗳️ Enviar Voto </button>
-<div class="resultados" id="resultadosLive" style="display: none;">
-<h3 style="color: #0056B8; margin-bottom: 15px;">📊 Resultados en Tiempo Real</h3>
-<div id="resultadosContent"></div>
-</div>
-</div>
-<!-- PASO 3: CONFIRMACIÓN -->
-<div class="step" id="step-confirmacion">
-<div class="success-message">
-<div class="success-icon">🎉</div>
-<h2>¡Voto Registrado!</h2>
-<p>Tu voto ha sido registrado exitosamente</p>
-<div class="resultados" style="margin-top: 30px;">
-<h3 style="color: #0056B8; margin-bottom: 15px;">Resultados Actuales</h3>
-<div id="resultadosFinal"></div>
-</div>
-</div>
-</div>
-</div>
-</div>
+
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getDatabase, ref, onValue, set, push, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getDatabase, ref, onValue, set, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
 const firebaseConfig = {
-apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
-authDomain: "azeche-ph.firebaseapp.com",
-databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
-projectId: "azeche-ph",
-storageBucket: "azeche-ph.firebasestorage.app",
-messagingSenderId: "905337990521",
-appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
+  apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
+  authDomain: "azeche-ph.firebaseapp.com",
+  databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+  projectId: "azeche-ph",
+  storageBucket: "azeche-ph.firebasestorage.app",
+  messagingSenderId: "905337990521",
+  appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
 };
 
 let db;
 try {
-const app = initializeApp(firebaseConfig);
-db = getDatabase(app);
+  const app = initializeApp(firebaseConfig);
+  db = getDatabase(app);
 } catch (error) {
-console.error('Error inicializando Firebase:', error);
-mostrarError('Error de conexión. Por favor recarga la página.');
+  console.error('Error inicializando Firebase:', error);
+  mostrarError('Error de conexion. Por favor recarga la pagina.');
 }
 
 const urlParams = new URLSearchParams(window.location.search);
 const edificio = urlParams.get('edificio');
 
 if (!edificio) {
-mostrarError('⚠️ No se especificó edificio. Por favor usa el enlace correcto.');
-document.getElementById('step-registro').style.display = 'none';
+  mostrarError('No se especifico edificio. Usa el enlace que te compartio el administrador.');
+  document.getElementById('step-registro').style.display = 'none';
 }
 
 const nombresEdificios = {
-'nepal-2': 'Nepal 2',
-'avalon': 'Avalon',
-'convivienda-1': 'Convivienda 1',
-'pinos-del-country': 'Pinos del Country'
+  'nepal-2': 'Nepal 2',
+  'avalon': 'Avalon',
+  'convivienda-1': 'Convivienda 1',
+  'pinos-del-country': 'Pinos del Country',
+  'prueba-asamblea': 'PRUEBA - Asamblea'
 };
 
 document.getElementById('edificioNombre').textContent = nombresEdificios[edificio] || edificio;
 
-let votoSeleccionado = null;
+let votoSeleccionado = null; // key de la opcion seleccionada
 let usuarioId = null;
 let votacionActual = null;
 let coeficienteUsuario = null;
 
-// Cargar apartamentos del edificio
+// ========== CARGAR APARTAMENTOS ==========
 async function cargarResidentes() {
-if (!db) return;
+  if (!db || !edificio) return;
+  try {
+    // Intentar primero en propietarios/{edificio}
+    let residentesRef = ref(db, 'propietarios/' + edificio);
+    let snapshot = await get(residentesRef);
+    let residentes = snapshot.val();
 
-try {
-const residentesRef = ref(db, `residentes/${edificio}`);
-const snapshot = await get(residentesRef);
-const residentes = snapshot.val();
+    if (residentes) {
+      const select = document.getElementById('apartamentoPropietario');
+      const aptos = [];
+      Object.entries(residentes).forEach(([key, prop]) => {
+        if (prop.tipo === 'Propietario' || prop.tipo === 'propietario' || !prop.tipo) {
+          aptos.push({ key, apto: prop.apto, nombre: prop.nombre || 'Propietario', coeficiente: prop.coeficiente || 0 });
+        }
+      });
+      aptos.sort((a, b) => (parseInt(a.apto) || 0) - (parseInt(b.apto) || 0));
+      aptos.forEach(apt => {
+        const option = document.createElement('option');
+        option.value = apt.key;
+        option.textContent = 'Apto ' + apt.apto + ' - ' + apt.nombre;
+        option.dataset.apto = apt.apto;
+        option.dataset.nombre = apt.nombre;
+        option.dataset.coeficiente = apt.coeficiente;
+        select.appendChild(option);
+      });
+      return;
+    }
 
-if (residentes) {
-const select = document.getElementById('apartamentoPropietario');
-Object.keys(residentes).forEach(apto => {
-const option = document.createElement('option');
-option.value = apto;
-option.textContent = `Apartamento ${apto}`;
-select.appendChild(option);
-});
-} else {
-mostrarAdvertencia('No hay apartamentos registrados para este edificio');
-}
-} catch (error) {
-console.error('Error cargando residentes:', error);
-mostrarError('Error cargando apartamentos');
-}
+    // Fallback: residentes/{edificio}
+    residentesRef = ref(db, 'residentes/' + edificio);
+    snapshot = await get(residentesRef);
+    residentes = snapshot.val();
+
+    if (residentes) {
+      const select = document.getElementById('apartamentoPropietario');
+      Object.keys(residentes).sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0)).forEach(apto => {
+        const option = document.createElement('option');
+        option.value = apto;
+        option.textContent = 'Apartamento ' + apto;
+        option.dataset.apto = apto;
+        option.dataset.nombre = '';
+        option.dataset.coeficiente = residentes[apto].coeficiente || 0;
+        select.appendChild(option);
+      });
+    } else {
+      mostrarError('No hay apartamentos registrados para este edificio');
+    }
+  } catch (error) {
+    console.error('Error cargando residentes:', error);
+    mostrarError('Error cargando apartamentos');
+  }
 }
 
-// Obtener coeficiente del apartamento
-async function obtenerCoeficiente(apartamento) {
-if (!db || !edificio || !apartamento) return 0.0435;
-
-try {
-const residenteRef = ref(db, `residentes/${edificio}/${apartamento}`);
-const snapshot = await get(residenteRef);
-
-if (snapshot.exists()) {
-const datos = snapshot.val();
-return datos.coeficiente || 0.0435;
+// ========== ESCUCHAR VOTACION ACTIVA ==========
+if (db && edificio) {
+  const votacionRef = ref(db, 'asambleas/' + edificio + '/votacion_activa');
+  onValue(votacionRef, (snapshot) => {
+    votacionActual = snapshot.val();
+    if (votacionActual) {
+      mostrarVotacion();
+      actualizarResultados();
+    } else {
+      document.getElementById('votacionInfo').innerHTML = `
+        <div class="waiting-msg">
+          <p>Esperando votacion...</p>
+          <p style="font-size:0.9em;">El administrador aun no ha abierto una votacion</p>
+        </div>
+      `;
+      document.getElementById('opcionesVotoContainer').style.display = 'none';
+      document.getElementById('btnVotar').style.display = 'none';
+    }
+  });
 }
-} catch (error) {
-console.error('Error obteniendo coeficiente:', error);
-}
-return 0.0435;
-}
 
-// Escuchar votación activa
-const votacionRef = ref(db, `asambleas/${edificio}/votacion_activa`);
-onValue(votacionRef, (snapshot) => {
-votacionActual = snapshot.val();
-if (votacionActual) {
-mostrarVotacion();
-actualizarResultados();
-} else {
-document.getElementById('votacionInfo').innerHTML = `
-<div class="info-badge">
-<p>⏳ Esperando votación...</p>
-</div>
-`;
-}
-}, (error) => {
-console.error('Error en votación:', error);
-mostrarError('Error cargando votación');
-});
-
-// Iniciar carga
 cargarResidentes();
 
+// ========== REGISTRO ==========
 window.registrarAsistencia = async function() {
-const nombre = document.getElementById('nombrePropietario').value;
-const apartamento = document.getElementById('apartamentoPropietario').value;
-const documento = document.getElementById('documentoPropietario').value;
+  const nombre = document.getElementById('nombrePropietario').value.trim();
+  const selectApto = document.getElementById('apartamentoPropietario');
+  const propietarioKey = selectApto.value;
+  const documento = document.getElementById('documentoPropietario').value.trim();
 
-if (!nombre || !apartamento || !documento) {
-mostrarError('⚠️ Completa todos los campos');
-return;
-}
+  if (!nombre || !propietarioKey || !documento) {
+    mostrarError('Completa todos los campos');
+    return;
+  }
 
-// Verificar que no haya votado ya
-try {
-const asistentesRef = ref(db, `asambleas/${edificio}/asistentes`);
-const snapshot = await get(asistentesRef);
-const asistentes = snapshot.val() || {};
+  const selectedOption = selectApto.options[selectApto.selectedIndex];
+  const apartamento = selectedOption.dataset.apto || propietarioKey;
+  coeficienteUsuario = parseFloat(selectedOption.dataset.coeficiente) || 0;
 
-const yaRegistro = Object.values(asistentes).some(a =>
-a.nombre.toLowerCase() === nombre.toLowerCase() ||
-a.documento === documento
-);
+  try {
+    // Verificar si ya esta registrado
+    const asistentesRef = ref(db, 'asambleas/' + edificio + '/asistentes');
+    const snapshot = await get(asistentesRef);
+    const asistentes = snapshot.val() || {};
 
-if (yaRegistro) {
-mostrarError('⚠️ Ya existe un registro con ese nombre o documento');
-return;
-}
-} catch (error) {
-console.error('Error verificando registro:', error);
-}
+    const yaRegistro = Object.values(asistentes).some(a =>
+      (a.nombre && a.nombre.toLowerCase() === nombre.toLowerCase()) ||
+      (a.documento && a.documento === documento) ||
+      (a.apartamento && a.apartamento === apartamento)
+    );
 
-// Obtener coeficiente del apartamento
-coeficienteUsuario = await obtenerCoeficiente(apartamento);
+    if (yaRegistro) {
+      // Si ya esta registrado, permitir pasar a votacion
+      usuarioId = propietarioKey + '_' + Date.now();
+      mostrarPaso('step-votacion');
+      return;
+    }
 
-// Generar ID único
-usuarioId = `${apartamento}_${Date.now()}`;
+    usuarioId = propietarioKey + '_' + Date.now();
 
-try {
-await set(ref(db, `asambleas/${edificio}/asistentes/${usuarioId}`), {
-nombre,
-apartamento,
-documento,
-coeficiente: coeficienteUsuario,
-horaRegistro: new Date().toISOString()
-});
+    await set(ref(db, 'asambleas/' + edificio + '/asistentes/' + usuarioId), {
+      nombre: nombre,
+      apartamento: apartamento,
+      documento: documento,
+      coeficiente: coeficienteUsuario,
+      horaRegistro: new Date().toISOString()
+    });
 
-mostrarPaso('step-votacion');
-} catch (error) {
-console.error('Error registrando asistencia:', error);
-mostrarError('Error al registrar. Por favor intenta de nuevo.');
-}
+    mostrarPaso('step-votacion');
+  } catch (error) {
+    console.error('Error registrando:', error);
+    mostrarError('Error al registrar: ' + error.message);
+  }
 };
 
+// ========== MOSTRAR VOTACION CON OPCIONES DINAMICAS ==========
 function mostrarVotacion() {
-if (!votacionActual) {
-document.getElementotacionInfo').innerHTML = `
-<div class="info-badge">
-<p>⏳ Esperando votación...</p>
-</div>
-ById('v`;
-return;
+  if (!votacionActual) return;
+
+  const tipoTexto = votacionActual.tipo === 'nominal' ? 'Nominal' : 'Por Coeficientes';
+
+  document.getElementById('votacionInfo').innerHTML = `
+    <div class="votacion-card">
+      <h3>${votacionActual.titulo}</h3>
+      <p>${votacionActual.descripcion || ''}</p>
+      <span class="tipo-info">${tipoTexto}</span>
+    </div>
+  `;
+
+  const opcionesContainer = document.getElementById('opcionesVotoContainer');
+  opcionesContainer.innerHTML = '';
+  opcionesContainer.style.display = 'grid';
+  document.getElementById('btnVotar').style.display = 'block';
+
+  const opciones = votacionActual.opciones;
+
+  if (opciones && Object.keys(opciones).length > 0) {
+    // Opciones custom desde Firebase
+    Object.entries(opciones)
+      .sort((a, b) => (a[1].orden || 0) - (b[1].orden || 0))
+      .forEach(([key, opt], index) => {
+        const div = document.createElement('div');
+        div.className = 'opcion-voto';
+        div.dataset.key = key;
+        div.innerHTML = `
+          <div class="opcion-numero">${index + 1}</div>
+          <span>${opt.label}</span>
+        `;
+        div.addEventListener('click', function() {
+          votoSeleccionado = key;
+          document.querySelectorAll('.opcion-voto').forEach(el => el.classList.remove('selected'));
+          this.classList.add('selected');
+          document.getElementById('btnVotar').disabled = false;
+        });
+        opcionesContainer.appendChild(div);
+      });
+  } else {
+    // Fallback legacy: si/no/abstencion
+    const legacyOpciones = [
+      { key: 'si', label: 'Si, a favor' },
+      { key: 'no', label: 'No, en contra' },
+      { key: 'abstencion', label: 'Abstencion' }
+    ];
+    legacyOpciones.forEach((opt, index) => {
+      const div = document.createElement('div');
+      div.className = 'opcion-voto';
+      div.dataset.key = opt.key;
+      div.innerHTML = `
+        <div class="opcion-numero">${index + 1}</div>
+        <span>${opt.label}</span>
+      `;
+      div.addEventListener('click', function() {
+        votoSeleccionado = opt.key;
+        document.querySelectorAll('.opcion-voto').forEach(el => el.classList.remove('selected'));
+        this.classList.add('selected');
+        document.getElementById('btnVotar').disabled = false;
+      });
+      opcionesContainer.appendChild(div);
+    });
+  }
+
+  // Reset seleccion
+  votoSeleccionado = null;
+  document.getElementById('btnVotar').disabled = true;
 }
 
-document.getElementById('votacionInfo').innerHTML = `
-<div class="votacion-card">
-<h3>${votacionActual.titulo}</h3>
-<p>${votacionActual.descripcion || ''}</p>
-<p style="font-size: 0.9em; color: #999; margin-top: 10px;">
-Tipo: ${votacionActual.tipo === 'coeficientes' ? 'Por Coeficientes' : 'Nominal'}
-</p>
-</div>
-`;
-}
-
-window.seleccionarVoto = function(voto) {
-votoSeleccionado = voto;
-document.querySelectorAll('.opcion-voto').forEach(el => el.classList.remove('selected'));
-event.target.closest('.opcion-voto').classList.add('selected');
-document.getElementById('btnVotar').disabled = false;
-};
-
+// ========== ENVIAR VOTO ==========
 window.enviarVoto = async function() {
-if (!votoSeleccionado || !usuarioId) {
-mostrarError('⚠️ Selecciona una opción de voto');
-return;
-}
+  if (!votoSeleccionado || !usuarioId) {
+    mostrarError('Selecciona una opcion de voto');
+    return;
+  }
 
-try {
-await set(ref(db, `asambleas/${edificio}/votacion_activa/votos/${usuarioId}`), {
-voto: votoSeleccionado,
-apartamento: document.getElementById('apartamentoPropietario').value,
-coeficiente: coeficienteUsuario,
-hora: new Date().toISOString()
-});
+  const apartamento = document.getElementById('apartamentoPropietario').value;
 
-mostrarPaso('step-confirmacion');
-actualizarResultados();
-} catch (error) {
-console.error('Error enviando voto:', error);
-mostrarError('Error al enviar voto. Por favor intenta de nuevo.');
-}
+  try {
+    // Verificar si ya voto
+    const votoRef = ref(db, 'asambleas/' + edificio + '/votacion_activa/votos/' + usuarioId);
+    const existeSnap = await get(votoRef);
+    if (existeSnap.exists()) {
+      mostrarError('Ya registraste tu voto para esta votacion');
+      return;
+    }
+
+    const datoVoto = {
+      opcion: votoSeleccionado,
+      voto: votoSeleccionado, // compatibilidad legacy
+      apartamento: apartamento,
+      coeficiente: coeficienteUsuario || 0,
+      hora: new Date().toISOString()
+    };
+
+    await set(votoRef, datoVoto);
+
+    mostrarPaso('step-confirmacion');
+    actualizarResultados();
+  } catch (error) {
+    console.error('Error enviando voto:', error);
+    mostrarError('Error al enviar voto. Intenta de nuevo.');
+  }
 };
 
+// ========== ACTUALIZAR RESULTADOS ==========
 function actualizarResultados() {
-if (!votacionActual || !votacionActual.votos) return;
+  if (!votacionActual || !votacionActual.votos) return;
 
-const votos = votacionActual.votos;
-let aFavor = 0, enContra = 0, abstencion = 0;
+  const votos = votacionActual.votos;
+  const tipoActual = votacionActual.tipo || 'coeficientes';
+  const opciones = votacionActual.opciones;
+  let html = '';
 
-Object.values(votos).forEach(voto => {
-if (voto.voto === 'si') aFavor++;
-else if (voto.voto === 'no') enContra++;
-else abstencion++;
-});
+  const colores = ['#00B853', '#dc3545', '#ff9800', '#0056B8', '#9c27b0'];
 
-const total = aFavor + enContra + abstencion;
-const porcAFavor = total > 0 ? (aFavor / total * 100) : 0;
-const porcContra = total > 0 ? (enContra / total * 100) : 0;
-const porcAbstencion = total > 0 ? (abstencion / total * 100) : 0;
+  if (opciones && Object.keys(opciones).length > 0) {
+    // Resultados con opciones custom
+    const conteos = {};
+    Object.keys(opciones).forEach(key => { conteos[key] = 0; });
 
-const html = `
-<div class="resultado-bar">
-<div class="resultado-label">
-<span>✅ A Favor</span>
-<span>${aFavor} (${porcAFavor.toFixed(1)}%)</span>
-</div>
-<div class="progress-bar">
-<div class="progress-fill" style="width: ${porcAFavor}%">${porcAFavor.toFixed(1)}%</div>
-</div>
-</div>
-<div class="resultado-bar">
-<div class="resultado-label">
-<span>❌ En Contra</span>
-<span>${enContra} (${porcContra.toFixed(1)}%)</span>
-</div>
-<div class="progress-bar">
-<div class="progress-fill" style="width: ${porcContra}%; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">${porcContra.toFixed(1)}%</div>
-</div>
-</div>
-<div class="resultado-bar">
-<div class="resultado-label">
-<span>⚪ Abstención</span>
-<span>${abstencion} (${porcAbstencion.toFixed(1)}%)</span>
-</div>
-<div class="progress-bar">
-<div class="progress-fill" style="width: ${porcAbstencion}%; background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);">${porcAbstencion.toFixed(1)}%</div>
-</div>
-</div>
-`;
+    Object.values(votos).forEach(voto => {
+      const opcionKey = voto.opcion || voto.voto || '';
+      if (conteos.hasOwnProperty(opcionKey)) {
+        conteos[opcionKey] += tipoActual === 'nominal' ? 1 : parseFloat(voto.coeficiente || 0);
+      } else {
+        // Mapear legacy
+        const legacyMap = { 'si': 'opcion_1', 'no': 'opcion_2', 'abstencion': 'opcion_3' };
+        const mapped = legacyMap[opcionKey];
+        if (mapped && conteos.hasOwnProperty(mapped)) {
+          conteos[mapped] += tipoActual === 'nominal' ? 1 : parseFloat(voto.coeficiente || 0);
+        }
+      }
+    });
 
-document.getElementById('resultadosFinal').innerHTML = html;
-const resultadosLive = document.getElementById('resultadosContent');
-if (resultadosLive) {
-resultadosLive.innerHTML = html;
-document.getElementById('resultadosLive').style.display = 'block';
+    let total = 0;
+    Object.values(conteos).forEach(v => { total += v; });
+
+    let i = 0;
+    Object.entries(opciones).sort((a, b) => (a[1].orden || 0) - (b[1].orden || 0)).forEach(([key, opt]) => {
+      const valor = conteos[key] || 0;
+      const porc = total > 0 ? (valor / total * 100) : 0;
+      const color = colores[i % colores.length];
+      html += `
+        <div class="resultado-bar">
+          <div class="resultado-label">
+            <span>${opt.label}</span>
+            <span>${tipoActual === 'nominal' ? valor : valor.toFixed(4)} (${porc.toFixed(1)}%)</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${Math.max(porc, 0)}%;background:${color};">${porc.toFixed(1)}%</div>
+          </div>
+        </div>
+      `;
+      i++;
+    });
+  } else {
+    // Legacy si/no/abstencion
+    let aFavor = 0, enContra = 0, abstencion = 0;
+    Object.values(votos).forEach(voto => {
+      const val = tipoActual === 'nominal' ? 1 : parseFloat(voto.coeficiente || 0);
+      if (voto.voto === 'si') aFavor += val;
+      else if (voto.voto === 'no') enContra += val;
+      else abstencion += val;
+    });
+
+    const total = aFavor + enContra + abstencion;
+    const pA = total > 0 ? (aFavor / total * 100) : 0;
+    const pC = total > 0 ? (enContra / total * 100) : 0;
+    const pAb = total > 0 ? (abstencion / total * 100) : 0;
+
+    html = `
+      <div class="resultado-bar">
+        <div class="resultado-label"><span>A Favor</span><span>${aFavor} (${pA.toFixed(1)}%)</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pA}%;background:#00B853;">${pA.toFixed(1)}%</div></div>
+      </div>
+      <div class="resultado-bar">
+        <div class="resultado-label"><span>En Contra</span><span>${enContra} (${pC.toFixed(1)}%)</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pC}%;background:#dc3545;">${pC.toFixed(1)}%</div></div>
+      </div>
+      <div class="resultado-bar">
+        <div class="resultado-label"><span>Abstencion</span><span>${abstencion} (${pAb.toFixed(1)}%)</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pAb}%;background:#ff9800;">${pAb.toFixed(1)}%</div></div>
+      </div>
+    `;
+  }
+
+  document.getElementById('resultadosFinal').innerHTML = html;
+  const live = document.getElementById('resultadosContent');
+  if (live) {
+    live.innerHTML = html;
+    document.getElementById('resultadosLive').style.display = 'block';
+  }
 }
-}
 
+// ========== UTILIDADES ==========
 function mostrarPaso(pasoId) {
-document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-document.getElementById(pasoId).classList.add('active');
+  document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+  document.getElementById(pasoId).classList.add('active');
 }
 
 function mostrarError(mensaje) {
-const container = document.getElementById('errorMsg');
-container.innerHTML = `<div class="error-message">${mensaje}</div>`;
-setTimeout(() => {
-container.innerHTML = '';
-}, 8000);
-}
-
-function mostrarAdvertencia(mensaje) {
-const container = document.getElementById('errorMsg');
-container.innerHTML = `<div class="info-badge"><p>⚠️ ${mensaje}</p></div>`;
+  const container = document.getElementById('errorMsg');
+  container.innerHTML = '<div class="error-message">' + mensaje + '</div>';
+  setTimeout(() => { container.innerHTML = ''; }, 8000);
 }
 </script>
 </body>
