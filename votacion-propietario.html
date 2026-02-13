@@ -32,7 +32,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .opcion-voto { background: white; border: 3px solid #ddd; padding: 20px; border-radius: 15px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 15px; font-size: 1.1em; font-weight: 600; }
 .opcion-voto:hover { border-color: #6B2FA0; transform: translateY(-3px); }
 .opcion-voto.selected { border-color: #9C27B0; background: rgba(156, 39, 176, 0.1); }
-.opcion-numero { width: 40px; height: 40px; border-radius: 50%; background: #e9ecef; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #6B2FA0; }
+.opcion-numero { width: 40px; height: 40px; border-radius: 50%; background: #e9ecef; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #6B2FA0; flex-shrink: 0; }
 .opcion-voto.selected .opcion-numero { background: #9C27B0; color: white; }
 .success-message { text-align: center; padding: 40px; }
 .success-icon { font-size: 5em; margin-bottom: 20px; }
@@ -54,8 +54,6 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
     <div class="edificio-nombre" id="edificioNombre">CARGANDO...</div>
   </div>
   <div class="content">
-    <div id="errorMsg"></div>
-    
     <!-- STEP 1: Registro -->
     <div class="step active" id="step-registro">
       <h2>Emitir Voto</h2>
@@ -66,7 +64,6 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
       </div>
       <button class="btn" onclick="registrar()">Registrar Asistencia</button>
     </div>
-    
     <!-- STEP 2: Votacion -->
     <div class="step" id="step-votacion">
       <h2>Votacion</h2>
@@ -78,7 +75,6 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
         <div id="resultadosContent"></div>
       </div>
     </div>
-    
     <!-- STEP 3: Confirmacion -->
     <div class="step" id="step-confirmacion">
       <div class="success-message">
@@ -91,12 +87,10 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
     </div>
   </div>
 </div>
-
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, onValue, set, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-// USA LA MISMA CONFIG QUE EL SISTEMA DE ASISTENCIA
 const firebaseConfig = {
   apiKey: "AIzaSyAFWn-qxIC0o6A0f5BBzdJe0NM2UgGP-88",
   authDomain: "azeche-ph.firebaseapp.com",
@@ -127,10 +121,9 @@ let usuarioId = null;
 let votacion = null;
 let coeficiente = 0;
 
-// Cargar propietarios IGUAL que asistencia
 async function cargarPropietarios() {
   try {
-    const snap = await get(ref(db, `propietarios/${edificio}`));
+    const snap = await get(ref(db, 'propietarios/' + edificio));
     const data = snap.val();
     if (data) {
       const select = document.getElementById('apartamento');
@@ -139,7 +132,7 @@ async function cargarPropietarios() {
         .forEach(([key, prop]) => {
           const opt = document.createElement('option');
           opt.value = key;
-          opt.textContent = `Apto ${prop.apto} - ${prop.nombre || 'Propietario'}`;
+          opt.textContent = 'Apto ' + prop.apto + ' - ' + (prop.nombre || 'Propietario');
           opt.dataset.apto = prop.apto;
           opt.dataset.coeficiente = prop.coeficiente || 0;
           select.appendChild(opt);
@@ -150,8 +143,7 @@ async function cargarPropietarios() {
   }
 }
 
-// Escuchar votacion activa EN TIEMPO REAL
-onValue(ref(db, `asambleas/${edificio}/votacion_activa`), (snap) => {
+onValue(ref(db, 'asambleas/' + edificio + '/votacion_activa'), (snap) => {
   votacion = snap.val();
   console.log('VOTACION:', votacion);
   if (votacion) {
@@ -176,9 +168,9 @@ window.registrar = async function() {
   
   try {
     usuarioId = key;
-    await set(ref(db, `asambleas/${edificio}/asistentes/${key}`), {
+    await set(ref(db, 'asambleas/' + edificio + '/asistentes/' + key), {
       apartamento: opt.dataset.apto,
-      nombre: opt.textContent.replace('Apto ', ''),
+      nombre: opt.textContent,
       coeficiente: coeficiente,
       horaRegistro: new Date().toISOString()
     });
@@ -194,19 +186,13 @@ function mostrarVotacion() {
   if (!votacion) return;
   
   const tipo = votacion.tipo === 'nominal' ? 'Nominal' : 'Por Coeficientes';
-  document.getElementById('votacionInfo').innerHTML = `
-    <div class="votacion-card">
-      <h3>${votacion.titulo || 'Votacion'}</h3>
-      <p>${votacion.descripcion || ''}</p>
-      <span class="tipo-info">${tipo}</span>
-    </div>`;
+  document.getElementById('votacionInfo').innerHTML = '<div class="votacion-card"><h3>' + votacion.titulo + '</h3><p>' + (votacion.descripcion || '') + '</p><span class="tipo-info">' + tipo + '</span></div>';
   
   const container = document.getElementById('opcionesContainer');
   container.innerHTML = '';
   container.style.display = 'grid';
   document.getElementById('btnVotar').style.display = 'block';
   
-  // Las opciones deben estar en votacion.opciones
   const opciones = votacion.opciones;
   if (opciones) {
     Object.entries(opciones)
@@ -214,7 +200,7 @@ function mostrarVotacion() {
       .forEach(([k, opt], i) => {
         const div = document.createElement('div');
         div.className = 'opcion-voto';
-        div.innerHTML = `<div class="opcion-numero">${i+1}</div><span>${opt.label}</span>`;
+        div.innerHTML = '<div class="opcion-numero">' + (i+1) + '</div><span>' + opt.label + '</span>';
         div.onclick = function() {
           votoSeleccionado = k;
           document.querySelectorAll('.opcion-voto').forEach(el => el.classList.remove('selected'));
@@ -233,10 +219,10 @@ window.votar = async function() {
   if (!votoSeleccionado || !usuarioId) { alert('Selecciona una opcion'); return; }
   
   try {
-    const existe = await get(ref(db, `asambleas/${edificio}/votacion_activa/votos/${usuarioId}`));
+    const existe = await get(ref(db, 'asambleas/' + edificio + '/votacion_activa/votos/' + usuarioId));
     if (existe.exists()) { alert('Ya registraste tu voto'); return; }
     
-    await set(ref(db, `asambleas/${edificio}/votacion_activa/votos/${usuarioId}`), {
+    await set(ref(db, 'asambleas/' + edificio + '/votacion_activa/votos/' + usuarioId), {
       opcion: votoSeleccionado,
       coeficiente: coeficiente || 0,
       hora: new Date().toISOString()
@@ -277,10 +263,7 @@ function actualizarResultados() {
       .forEach(([k, opt], i) => {
         const val = conteos[k] || 0;
         const pct = total > 0 ? (val / total * 100) : 0;
-        html += `<div class="resultado-bar">
-          <div class="resultado-label"><span>${opt.label}</span><span>${tipo === 'nominal' ? val : val.toFixed(4)} (${pct.toFixed(1)}%)</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${colores[i % colores.length]};">${pct.toFixed(1)}%</div></div>
-        </div>`;
+        html += '<div class="resultado-bar"><div class="resultado-label"><span>' + opt.label + '</span><span>' + (tipo === 'nominal' ? val : val.toFixed(4)) + ' (' + pct.toFixed(1) + '%)</span></div><div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%;background:' + colores[i % colores.length] + ';">' + pct.toFixed(1) + '%</div></div></div>';
       });
   }
   
