@@ -522,37 +522,54 @@ container.innerHTML = `
 window.crearVotacion = async function() {
     console.log("🔍 DEBUG: Función crearVotacion llamada");
     console.log("🔍 DEBUG: Edificio actual:", edificioActual);
-if (!edificioActual) {
-alert('⚠️ Selecciona un edificio primero');
-return;
-}
-const titulo = document.getElementById('tituloVotacion').value;
-const descripcion = document.getElementById('descripcionVotacion').value;
-const tipo = document.getElementById('tipoVotacion').value;
-
-if (!titulo) {
-alert('⚠️ Ingresa un título para la votación');
-return;
-}
-
-const votacion = {
-titulo,
-descripcion,
-tipo,
-fechaCreacion: new Date().toISOString(),
-estado: 'activa',
-votos: {}
-};
-
-try {
-await set(ref(db, `asambleas/${edificioActual}/votacion_activa`), votacion);
-document.getElementById('tituloVotacion').value = '';
-document.getElementById('descripcionVotacion').value = '';
-alert('✅ Votación creada exitosamente');
-} catch (error) {
-console.error('Error creando votación:', error);
-alert('❌ Error al crear votación: ' + error.message);
-}
+    
+    if (!edificioActual) {
+        console.error("❌ No hay edificio seleccionado");
+        alert('⚠️ Selecciona un edificio primero');
+        return;
+    }
+    
+    const titulo = document.getElementById('tituloVotacion').value;
+    const descripcion = document.getElementById('descripcionVotacion').value;
+    const tipo = document.getElementById('tipoVotacion').value;
+    
+    console.log("🔍 DEBUG: Datos del formulario:", { titulo, descripcion, tipo });
+    
+    if (!titulo || titulo.trim() === '') {
+        console.error("❌ Título vacío");
+        alert('⚠️ Ingresa un título para la votación');
+        return;
+    }
+    
+    const votacionId = 'v-' + Date.now();
+    const votacion = {
+        id: votacionId,
+        titulo: titulo.trim(),
+        descripcion: descripcion.trim(),
+        tipo: tipo,
+        fechaCreacion: new Date().toISOString(),
+        estado: 'activa',
+        votos: {}
+    };
+    
+    console.log("🔍 DEBUG: Votación a crear:", votacion);
+    console.log("🔍 DEBUG: Ruta Firebase:", `asambleas/${edificioActual}/votacion_activa`);
+    
+    try {
+        console.log("🔍 DEBUG: Intentando escribir en Firebase...");
+        await set(ref(db, `asambleas/${edificioActual}/votacion_activa`), votacion);
+        console.log("✅ DEBUG: Votación escrita exitosamente");
+        
+        // Limpiar formulario
+        document.getElementById('tituloVotacion').value = '';
+        document.getElementById('descripcionVotacion').value = '';
+        
+        alert('✅ Votación creada exitosamente\n\nID: ' + votacionId);
+    } catch (error) {
+        console.error('❌ Error creando votación:', error);
+        console.error('❌ Detalles del error:', error.message, error.stack);
+        alert('❌ Error al crear votación:\n\n' + error.message);
+    }
 };
 
 window.cerrarVotacion = async function() {
