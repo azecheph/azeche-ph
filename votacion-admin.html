@@ -363,9 +363,24 @@ totalCoef += parseFloat(a.coeficiente || 0);
 
 document.getElementById('totalCoeficiente').textContent = totalCoef.toFixed(4);
 
-// Calcular porcentaje de quórum
-const quorumPorcentaje = coefRequerido > 0 ? Math.min(100, (totalCoef / coefRequerido) * 100) : 0;
-document.getElementById('quorumActual').textContent = Math.round(quorumPorcentaje) + '%';
+
+// Calcular porcentaje de quórum CORRECTAMENTE
+// El quórum es: (coeficiente asistentes / coeficiente total edificio) * 100
+let totalCoeficienteEdificio = 1.0; // Por defecto 1.0 (100%)
+
+// Intentar obtener el coeficiente total del edificio
+if (datosEdificio && datosEdificio.totalCoeficiente) {
+    totalCoeficienteEdificio = parseFloat(datosEdificio.totalCoeficiente);
+}
+
+const quorumPorcentaje = totalCoeficienteEdificio > 0 ? (totalCoef / totalCoeficienteEdificio) * 100 : 0;
+document.getElementById('quorumActual').textContent = quorumPorcentaje.toFixed(1) + '%';
+
+console.log('📊 Quórum calculado:', {
+    totalCoefAsistentes: totalCoef.toFixed(4),
+    totalCoefEdificio: totalCoeficienteEdificio.toFixed(4),
+    porcentaje: quorumPorcentaje.toFixed(1) + '%'
+});
 }
 
 function mostrarAsistentes() {
@@ -505,6 +520,8 @@ container.innerHTML = `
     }, 100);
 
 window.crearVotacion = async function() {
+    console.log("🔍 DEBUG: Función crearVotacion llamada");
+    console.log("🔍 DEBUG: Edificio actual:", edificioActual);
 if (!edificioActual) {
 alert('⚠️ Selecciona un edificio primero');
 return;
