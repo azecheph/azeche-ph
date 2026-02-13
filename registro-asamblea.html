@@ -40,28 +40,30 @@
             display: block; 
             font-weight: 600; 
             margin-bottom: 8px; 
-            color: #333; 
+            color: #333;
+            font-size: 1.1em;
         }
-        input {
+        select {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 18px;
             transition: border-color 0.3s;
+            background: white;
         }
-        input:focus {
+        select:focus {
             outline: none;
             border-color: #667eea;
         }
         .btn {
             width: 100%;
-            padding: 15px;
+            padding: 18px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             border-radius: 10px;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
             cursor: pointer;
             margin-top: 20px;
@@ -115,39 +117,47 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .info-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+        .info-box p {
+            color: #1976D2;
+            margin: 0;
+            font-size: 0.95em;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>📝 Registro de Asistencia</h1>
-        <p class="subtitle">Completa tus datos para registrarte en la asamblea</p>
+        <p class="subtitle">Selecciona tu apartamento para registrarte</p>
         
         <div class="error" id="error"></div>
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p style="margin-top: 15px; color: #667eea;">Verificando...</p>
+            <p style="margin-top: 15px; color: #667eea;">Registrando...</p>
         </div>
         
         <div class="success" id="success">
             <h2>✅</h2>
-            <h2>Registro Exitoso</h2>
-            <p>Ya estás registrado en la lista de asistencia.<br>Ahora puedes participar en las votaciones.</p>
+            <h2>¡Registrado!</h2>
+            <p>Tu asistencia ha sido registrada exitosamente.<br>Ya puedes participar en las votaciones.</p>
+        </div>
+        
+        <div class="info-box" id="infoEdificio">
+            <p>📍 Cargando apartamentos...</p>
         </div>
         
         <form id="formRegistro" onsubmit="registrarAsistencia(event)">
             <div class="form-group">
-                <label>🏠 Número de Apartamento</label>
-                <input type="text" id="apartamento" required placeholder="Ej: 101, 202, 305" autocomplete="off">
-            </div>
-            
-            <div class="form-group">
-                <label>👤 Nombre Completo</label>
-                <input type="text" id="nombre" required placeholder="Nombre del propietario" autocomplete="off">
-            </div>
-            
-            <div class="form-group">
-                <label>🆔 Número de Cédula</label>
-                <input type="text" id="cedula" required placeholder="Sin puntos ni espacios" autocomplete="off">
+                <label>🏠 Selecciona tu Apartamento</label>
+                <select id="apartamento" required>
+                    <option value="">-- Selecciona --</option>
+                </select>
             </div>
             
             <button type="submit" class="btn" id="btnSubmit">✅ Registrar Asistencia</button>
@@ -174,20 +184,85 @@
         // Obtener edificio de URL
         const params = new URLSearchParams(window.location.search);
         const edificio = params.get('edificio');
-        console.log("🔍 DEBUG - Edificio recibido:", edificio);
-        console.log("🔍 DEBUG - URL completa:", window.location.href);
 
         if (!edificio) {
-            mostrarError('❌ Edificio no especificado. URL: ' + window.location.href);
+            mostrarError('❌ Edificio no especificado en la URL');
             document.getElementById('formRegistro').style.display = 'none';
+        } else {
+            cargarApartamentos();
+        }
+
+        // Cargar apartamentos del edificio
+        async function cargarApartamentos() {
+            try {
+                const propietariosRef = ref(db, `propietarios/${edificio}`);
+                const snapshot = await get(propietariosRef);
+                
+                if (!snapshot.exists()) {
+                    mostrarError('❌ No hay propietarios registrados para este edificio');
+                    return;
+                }
+                
+                const propietarios = snapshot.val();
+                const select = document.getElementById('apartamento');
+                const apartamentos = [];
+                
+                // Recolectar apartamentos de propietarios
+                Object.entries(propietarios).forEach(([key, prop]) => {
+                    if (prop.tipo === 'Propietario' || prop.tipo === 'propietario' || !prop.tipo) {
+                        apartamentos.push({
+                            key: key,
+                            apto: prop.apto,
+                            nombre: prop.nombre || 'Propietario',
+                            coeficiente: prop.coeficiente || 0
+                        });
+                    }
+                });
+                
+                // Ordenar por número de apartamento
+                apartamentos.sort((a, b) => {
+                    const numA = parseInt(a.apto) || 0;
+                    const numB = parseInt(b.apto) || 0;
+                    return numA - numB;
+                });
+                
+                // Agregar opciones al select
+                apartamentos.forEach(apt => {
+                    const option = document.createElement('option');
+                    option.value = apt.key;
+                    option.textContent = `Apto ${apt.apto} - ${apt.nombre}`;
+                    option.dataset.apto = apt.apto;
+                    option.dataset.nombre = apt.nombre;
+                    option.dataset.coeficiente = apt.coeficiente;
+                    select.appendChild(option);
+                });
+                
+                document.getElementById('infoEdificio').innerHTML = 
+                    `<p>📍 ${edificio.toUpperCase()} - ${apartamentos.length} apartamentos disponibles</p>`;
+                
+                console.log(`✅ ${apartamentos.length} apartamentos cargados`);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarError('❌ Error al cargar apartamentos: ' + error.message);
+            }
         }
 
         window.registrarAsistencia = async function(event) {
             event.preventDefault();
             
-            const apartamento = document.getElementById('apartamento').value.trim().toUpperCase();
-            const nombre = document.getElementById('nombre').value.trim();
-            const cedula = document.getElementById('cedula').value.trim();
+            const selectApto = document.getElementById('apartamento');
+            const propietarioKey = selectApto.value;
+            
+            if (!propietarioKey) {
+                mostrarError('❌ Debes seleccionar un apartamento');
+                return;
+            }
+            
+            const selectedOption = selectApto.options[selectApto.selectedIndex];
+            const apartamento = selectedOption.dataset.apto;
+            const nombre = selectedOption.dataset.nombre;
+            const coeficiente = parseFloat(selectedOption.dataset.coeficiente) || 0;
             
             // Deshabilitar botón y mostrar loading
             document.getElementById('btnSubmit').disabled = true;
@@ -195,64 +270,30 @@
             document.getElementById('error').style.display = 'none';
             
             try {
-                // 1. Verificar que el apartamento existe y la cédula coincide
-                const propietarioRef = ref(db, `propietarios/${edificio}`);
-                const snapshot = await get(propietarioRef);
-                
-                let encontrado = false;
-                let propietarioKey = null;
-                let propietarioData = null;
-                
-                if (snapshot.exists()) {
-                    const propietarios = snapshot.val();
-                    
-                    Object.entries(propietarios).forEach(([key, prop]) => {
-                        // Normalizar para comparación
-                        const aptoNorm = (prop.apto || '').toString().trim().toUpperCase();
-                        const cedulaNorm = (prop.cedula || '').toString().trim();
-                        
-                        if (aptoNorm === apartamento && cedulaNorm === cedula) {
-                            // Verificar que sea propietario
-                            if (prop.tipo === 'Propietario' || prop.tipo === 'propietario' || !prop.tipo) {
-                                encontrado = true;
-                                propietarioKey = key;
-                                propietarioData = prop;
-                            }
-                        }
-                    });
-                }
-                
-                if (!encontrado) {
-                    mostrarError('❌ Apartamento o cédula incorrectos.<br>Solo propietarios pueden registrarse.');
-                    document.getElementById('btnSubmit').disabled = false;
-                    document.getElementById('loading').style.display = 'none';
-                    return;
-                }
-                
-                // 2. Verificar si ya está registrado
+                // Verificar si ya está registrado
                 const asistenteRef = ref(db, `asambleas/${edificio}/asistentes/${propietarioKey}`);
                 const asistenciaSnapshot = await get(asistenteRef);
                 
                 if (asistenciaSnapshot.exists()) {
-                    mostrarError('⚠️ Ya estás registrado en la lista de asistencia');
+                    mostrarError('⚠️ Este apartamento ya está registrado en la asamblea');
                     document.getElementById('btnSubmit').disabled = false;
                     document.getElementById('loading').style.display = 'none';
                     return;
                 }
                 
-                // 3. Registrar asistencia
+                // Registrar asistencia
                 await set(asistenteRef, {
                     apartamento: apartamento,
                     nombre: nombre,
-                    cedula: cedula,
-                    coeficiente: propietarioData.coeficiente || 0,
+                    coeficiente: coeficiente,
                     horaRegistro: new Date().toISOString(),
                     registrado: true
                 });
                 
-                // 4. Mostrar éxito
+                // Mostrar éxito
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('formRegistro').style.display = 'none';
+                document.getElementById('infoEdificio').style.display = 'none';
                 document.getElementById('success').style.display = 'block';
                 
                 console.log('✅ Registro exitoso:', apartamento);
