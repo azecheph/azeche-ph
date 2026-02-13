@@ -214,7 +214,7 @@ const edificioRef = ref(db, `edificios/${edificioActual}`);
 const edificioSnapshot = await get(edificioRef);
 if (edificioSnapshot.exists()) {
 datosEdificio = edificioSnapshot.val();
-document.getElementById('totalApartamentos').textContent = datosEdificio.totalApartamentos || 0;
+        // document.getElementById('totalApartamentos').textContent = datosEdificio.totalApartamentos || 0;
 document.getElementById('edificioNombre').textContent = datosEdificio.nombre || edificioActual;
 } else {
 document.getElementById('totalApartamentos').textContent = '?';
@@ -569,7 +569,6 @@ document.getElementById('votacionActiva').innerHTML = `
 </div>
 `;
 }
-</script>
 
 // ========== FUNCIÓN QR AUTO-REGISTRO ==========
 function generarQRRegistro() {
@@ -596,6 +595,8 @@ function generarQRRegistro() {
     // Mostrar modal
     document.getElementById('modalQRRegistro').classList.add('active');
 }
+</script>
+
 </body>
 
 <!-- Modal QR Auto-Registro -->
