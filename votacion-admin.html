@@ -108,21 +108,23 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
     🔗 Enlace Auto-Registro
 </button>
 </h3>
-<div class="qr-section" style="background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 100%);">
-    <p style="font-weight: 600; margin-bottom: 15px; color: #333; font-size: 1.1em;">📱 Enlace de Auto-Registro</p>
-    <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+<div class="qr-section" style="background: linear-gradient(135deg, #00B853 0%, #00875F 100%); padding: 20px; margin-bottom: 30px;">
+    <p style="font-weight: 700; margin-bottom: 15px; color: white; font-size: 1.2em; text-align: center;">
+        📱 ENLACE DE AUTO-REGISTRO
+    </p>
+    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
         <input type="text" id="enlaceRegistroQuorum" readonly 
-               style="width: 100%; padding: 12px; border: 2px solid #00B853; border-radius: 8px; font-family: monospace; font-size: 14px; text-align: center; background: #f8f9fa;"
+               style="width: 100%; padding: 15px; border: 3px solid #00B853; border-radius: 8px; font-family: monospace; font-size: 14px; text-align: center; background: #f8f9fa; font-weight: 600;"
                value="Selecciona un edificio primero">
         <button onclick="copiarEnlaceQuorum()" 
-                style="width: 100%; margin-top: 10px; padding: 12px; background: linear-gradient(135deg, #00B853 0%, #00875F 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px; transition: all 0.3s;"
-                onmouseover="this.style.transform='translateY(-2px)'"
-                onmouseout="this.style.transform='translateY(0)'">
-            📋 Copiar Enlace
+                style="width: 100%; margin-top: 15px; padding: 15px; background: linear-gradient(135deg, #00B853 0%, #00875F 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 18px; box-shadow: 0 4px 8px rgba(0,184,83,0.3); transition: all 0.3s;"
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0,184,83,0.4)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 8px rgba(0,184,83,0.3)'">
+            📋 COPIAR ENLACE DE REGISTRO
         </button>
     </div>
-    <p style="font-size: 0.85em; color: #666; margin-top: 12px;">
-        Comparte este enlace con los propietarios por Google Chat o WhatsApp
+    <p style="font-size: 0.9em; color: white; margin-top: 15px; text-align: center; font-weight: 600;">
+        ⚠️ Comparte este enlace ANTES de la asamblea para que se registren
     </p>
 </div>
 <div class="quorum-display">
@@ -155,6 +157,32 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 </div>
 </div>
 <div>
+
+<!-- CAJA SEPARADA PARA ENLACE DE VOTACIÓN -->
+<div class="panel" style="margin-top: 30px;">
+<h3>
+<span style="color: #2196F3;">🗳️ Enlace de Votación</span>
+</h3>
+<div style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(33,150,243,0.3);">
+    <p style="font-weight: 700; margin-bottom: 15px; color: white; text-align: center; font-size: 1.1em;">
+        🔗 ENLACE PARA QUE VOTEN
+    </p>
+    <div style="background: white; padding: 20px; border-radius: 8px;">
+        <input type="text" id="enlaceVotacionPrincipal" readonly 
+               style="width: 100%; padding: 15px; border: 3px solid #2196F3; border-radius: 8px; font-family: monospace; font-size: 14px; background: #E3F2FD; margin-bottom: 10px; font-weight: 600; text-align: center;"
+               value="Crea una votación primero">
+        <button onclick="copiarEnlaceVotacionPrincipal()" 
+                style="width: 100%; padding: 15px; background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 18px; box-shadow: 0 4px 8px rgba(33,150,243,0.3); transition: all 0.3s;"
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(33,150,243,0.4)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 8px rgba(33,150,243,0.3)'">
+            📋 COPIAR ENLACE DE VOTACIÓN
+        </button>
+    </div>
+    <p style="font-size: 0.9em; color: white; margin-top: 15px; text-align: center; font-weight: 600;">
+        ⚠️ Comparte este enlace DURANTE la votación para que los propietarios voten
+    </p>
+</div>
+</div>
 <div class="panel">
 <h3>
 <span>🗳️ Votación Activa</span>
@@ -461,6 +489,21 @@ container.innerHTML = `
 `;
 }
 
+    // Actualizar enlace de votación
+    const baseUrl = window.location.origin + window.location.pathname.replace('votacion-admin.html', '').replace('votacion-admin-SIMPLE.html', '');
+    const urlVotacion = baseUrl + 'asambleas.html?edificio=' + edificioActual + '&votacion=' + votacionId;
+    setTimeout(() => {
+        const inputVotacion = document.getElementById('enlaceVotacion');
+        if (inputVotacion) {
+            inputVotacion.value = urlVotacion;
+        }
+        // También actualizar el campo principal
+        const inputPrincipal = document.getElementById('enlaceVotacionPrincipal');
+        if (inputPrincipal) {
+            inputPrincipal.value = urlVotacion;
+        }
+    }, 100);
+
 window.crearVotacion = async function() {
 if (!edificioActual) {
 alert('⚠️ Selecciona un edificio primero');
@@ -605,18 +648,77 @@ document.getElementById('votacionActiva').innerHTML = `
 function copiarEnlaceQuorum() {
     const input = document.getElementById('enlaceRegistroQuorum');
     
-    if (input.value === 'Selecciona un edificio primero') {
+    if (!input) {
+        alert('❌ Error: No se encontró el campo del enlace');
+        return;
+    }
+    
+    if (input.value === 'Selecciona un edificio primero' || input.value === '') {
         alert('❌ Selecciona un edificio primero');
         return;
     }
     
-    input.select();
-    input.setSelectionRange(0, 99999);
+    // Intentar copiar con método moderno
+
+// Copiar enlace de votación
+function copiarEnlaceVotacion() {
+    const input = document.getElementById('enlaceVotacion');
+    
+    if (!input) {
+        alert('❌ Error: No se encontró el enlace');
+        return;
+    }
     
     navigator.clipboard.writeText(input.value).then(() => {
-        alert('✅ Enlace copiado al portapapeles\n\nAhora puedes pegarlo en Google Chat, WhatsApp, etc.');
-    }).catch(() => {
-        alert('❌ Error al copiar. Copia manualmente el enlace.');
+        alert('✅ Enlace de votación copiado:\n\n' + input.value + '\n\nCompártelo para que voten');
+    }).catch((err) => {
+        input.select();
+        try {
+            document.execCommand('copy');
+            alert('✅ Enlace copiado');
+        } catch(e) {
+            alert('❌ Copia manualmente:\n\n' + input.value);
+        }
+    });
+
+// Copiar enlace de votación desde caja principal
+function copiarEnlaceVotacionPrincipal() {
+    const input = document.getElementById('enlaceVotacionPrincipal');
+    
+    if (!input) {
+        alert('❌ Error: No se encontró el enlace');
+        return;
+    }
+    
+    if (input.value === 'Crea una votación primero' || input.value === '') {
+        alert('❌ Debes crear una votación primero');
+        return;
+    }
+    
+    navigator.clipboard.writeText(input.value).then(() => {
+        alert('✅ Enlace de votación copiado:\n\n' + input.value + '\n\n📱 Compártelo para que voten');
+    }).catch((err) => {
+        input.select();
+        try {
+            document.execCommand('copy');
+            alert('✅ Enlace copiado');
+        } catch(e) {
+            alert('❌ Copia manualmente:\n\n' + input.value);
+        }
+    });
+}
+}
+    navigator.clipboard.writeText(input.value).then(() => {
+        alert('✅ Enlace copiado:\n\n' + input.value + '\n\nPégalo en Google Chat o WhatsApp');
+    }).catch((err) => {
+        // Método alternativo para navegadores viejos
+        input.select();
+        try {
+            document.execCommand('copy');
+            alert('✅ Enlace copiado:\n\n' + input.value);
+        } catch(e) {
+            alert('❌ No se pudo copiar automáticamente. Copia manualmente:\n\n' + input.value);
+        }
     });
 }
 </script>
