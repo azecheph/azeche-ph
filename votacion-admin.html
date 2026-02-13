@@ -88,18 +88,42 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 <h3>
 <span>📋 Quórum</span>
 <button class="btn-danger" onclick="limpiarAsistentes()" title="Borrar todos los asistentes"> 🗑️ Limpiar </button>
-<button class="btn btn-primary" onclick="generarQRRegistro()" title="Generar QR para que propietarios se registren"> 
-    📱 QR Auto-Registro 
+<button onclick="mostrarEnlaceRegistro()" 
+        style="background: linear-gradient(135deg, #00B853 0%, #00875F 100%); 
+               color: white; 
+               border: none; 
+               padding: 12px 24px; 
+               border-radius: 10px; 
+               font-size: 16px; 
+               font-weight: 600; 
+               cursor: pointer; 
+               box-shadow: 0 4px 6px rgba(0,184,83,0.3);
+               transition: all 0.3s;
+               display: inline-flex;
+               align-items: center;
+               gap: 8px;"
+        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0,184,83,0.4)'"
+        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0,184,83,0.3)'"
+        title="Generar enlace para que propietarios se registren">
+    🔗 Enlace Auto-Registro
 </button>
 </h3>
-<div class="qr-section">
-<p style="font-weight: 600; margin-bottom: 10px;">Escanea para registrarte</p>
-<div class="qr-code" id="qrCodeContainer">
-<div class="qr-placeholder">Selecciona edificio</div>
-</div>
-<p style="font-size: 0.9em; color: #666; margin-top: 10px;">
-URL: <a href="#" id="urlRegistro" target="_blank">-</a>
-</p>
+<div class="qr-section" style="background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 100%);">
+    <p style="font-weight: 600; margin-bottom: 15px; color: #333; font-size: 1.1em;">📱 Enlace de Auto-Registro</p>
+    <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <input type="text" id="enlaceRegistroQuorum" readonly 
+               style="width: 100%; padding: 12px; border: 2px solid #00B853; border-radius: 8px; font-family: monospace; font-size: 14px; text-align: center; background: #f8f9fa;"
+               value="Selecciona un edificio primero">
+        <button onclick="copiarEnlaceQuorum()" 
+                style="width: 100%; margin-top: 10px; padding: 12px; background: linear-gradient(135deg, #00B853 0%, #00875F 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px; transition: all 0.3s;"
+                onmouseover="this.style.transform='translateY(-2px)'"
+                onmouseout="this.style.transform='translateY(0)'">
+            📋 Copiar Enlace
+        </button>
+    </div>
+    <p style="font-size: 0.85em; color: #666; margin-top: 12px;">
+        Comparte este enlace con los propietarios por Google Chat o WhatsApp
+    </p>
 </div>
 <div class="quorum-display">
 <div class="quorum-label">QUÓRUM ACTUAL</div>
@@ -349,6 +373,10 @@ const qrContainer = document.getElementById('qrCodeContainer');
 qrContainer.innerHTML = `<img src="${qrUrl}" alt="QR Code para ${datosEdificio?.nombre || edificioActual}">`;
 document.getElementById('urlRegistro').href = votacionUrl;
 document.getElementById('urlRegistro').textContent = 'Abrir enlace';
+    
+    // Actualizar enlace en sección Quórum
+    const urlRegistro = baseUrl + 'registro-asamblea.html?edificio=' + edificioActual;
+    document.getElementById('enlaceRegistroQuorum').value = urlRegistro;
 }
 
 function mostrarVotacionActiva() {
@@ -571,7 +599,8 @@ document.getElementById('votacionActiva').innerHTML = `
 }
 
 // ========== FUNCIÓN QR AUTO-REGISTRO ==========
-function generarQRRegistro() {
+// ========== FUNCIÓN ENLACE AUTO-REGISTRO ==========
+function mostrarEnlaceRegistro() {
     if (!edificioActual) {
         alert('❌ Selecciona un edificio primero');
         return;
@@ -580,36 +609,78 @@ function generarQRRegistro() {
     // URL para auto-registro
     const urlRegistro = window.location.origin + '/registro-asamblea.html?edificio=' + edificioActual;
     
-    // Limpiar QR anterior
-    document.getElementById('qrcodeRegistro').innerHTML = '';
+    // Mostrar enlace en el input
+    document.getElementById('enlaceRegistro').value = urlRegistro;
     
-    // Generar nuevo QR
-    new QRCode(document.getElementById('qrcodeRegistro'), {
-        text: urlRegistro,
-        width: 300,
-        height: 300
-    });
-    
-    console.log('✅ QR generado para:', urlRegistro);
+    console.log('✅ Enlace generado:', urlRegistro);
     
     // Mostrar modal
     document.getElementById('modalQRRegistro').classList.add('active');
+}
+
+// Copiar enlace al portapapeles
+function copiarEnlaceRegistro() {
+    const input = document.getElementById('enlaceRegistro');
+    input.select();
+    input.setSelectionRange(0, 99999); // Para móviles
+    
+    navigator.clipboard.writeText(input.value).then(() => {
+        alert('✅ Enlace copiado al portapapeles\n\nAhora puedes pegarlo en Google Chat, WhatsApp, etc.');
+    }).catch(() => {
+        alert('❌ Error al copiar. Copia manualmente el enlace.');
+    });
+}
+
+// Copiar enlace desde sección Quórum
+function copiarEnlaceQuorum() {
+    const input = document.getElementById('enlaceRegistroQuorum');
+    
+    if (input.value === 'Selecciona un edificio primero') {
+        alert('❌ Selecciona un edificio primero');
+        return;
+    }
+    
+    input.select();
+    input.setSelectionRange(0, 99999);
+    
+    navigator.clipboard.writeText(input.value).then(() => {
+        alert('✅ Enlace copiado al portapapeles\n\nAhora puedes pegarlo en Google Chat, WhatsApp, etc.');
+    }).catch(() => {
+        alert('❌ Error al copiar. Copia manualmente el enlace.');
+    });
 }
 </script>
 
 </body>
 
-<!-- Modal QR Auto-Registro -->
+
+<!-- Modal Enlace Auto-Registro -->
 <div class="modal" id="modalQRRegistro">
-    <div class="modal-content" style="max-width: 500px; text-align: center;">
-        <h2>📱 QR de Auto-Registro</h2>
-        <p style="margin: 20px 0; color: #666;">Los propietarios escanean este QR al entrar a la asamblea</p>
-        <div id="qrcodeRegistro" style="display: flex; justify-content: center; margin: 20px 0;"></div>
-        <p style="font-size: 0.9em; color: #666; background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 20px;">
-            ⚠️ Al escanear deben ingresar:<br>
-            <strong>Apartamento + Nombre + Cédula</strong>
-        </p>
-        <button class="btn btn-secondary" onclick="cerrarModal('modalQRRegistro')" style="margin-top: 20px;">Cerrar</button>
+    <div class="modal-content" style="max-width: 600px;">
+        <h2 style="text-align: center;">🔗 Enlace de Auto-Registro</h2>
+        <p style="text-align: center; margin: 20px 0; color: #666;">Comparte este enlace con los propietarios para que se registren</p>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #333;">📱 Enlace de Registro:</label>
+            <input type="text" id="enlaceRegistro" readonly 
+                   style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace; font-size: 14px; background: white;"
+                   value="">
+            <button onclick="copiarEnlaceRegistro()" 
+                    style="width: 100%; margin-top: 10px; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;">
+                📋 Copiar Enlace
+            </button>
+        </div>
+        
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="font-size: 0.9em; color: #856404; margin: 0; text-align: center;">
+                ⚠️ Los propietarios deben ingresar:<br>
+                <strong>Apartamento + Nombre + Cédula</strong>
+            </p>
+        </div>
+        
+        <div style="text-align: center;">
+            <button class="btn btn-secondary" onclick="cerrarModal('modalQRRegistro')" style="padding: 12px 30px;">Cerrar</button>
+        </div>
     </div>
 </div>
 </html>
