@@ -174,9 +174,11 @@
         // Obtener edificio de URL
         const params = new URLSearchParams(window.location.search);
         const edificio = params.get('edificio');
+        console.log("🔍 DEBUG - Edificio recibido:", edificio);
+        console.log("🔍 DEBUG - URL completa:", window.location.href);
 
         if (!edificio) {
-            mostrarError('❌ Edificio no especificado en la URL');
+            mostrarError('❌ Edificio no especificado. URL: ' + window.location.href);
             document.getElementById('formRegistro').style.display = 'none';
         }
 
