@@ -1,276 +1,563 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Votacion - Azeche P.H.</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #6B2FA0 0%, #9C27B0 100%); min-height: 100vh; padding: 20px; }
-.container { max-width: 600px; margin: 0 auto; }
-.header { background: white; padding: 30px; border-radius: 20px 20px 0 0; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
-.logo-text { font-size: 2.5em; font-weight: 900; }
-.logo-blue { color: #0056B8; }
-.logo-purple { color: #6B2FA0; }
-.edificio-nombre { color: #666; font-size: 1.1em; margin-top: 10px; }
-.content { background: white; padding: 30px; border-radius: 0 0 20px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-.step { display: none; }
-.step.active { display: block; }
-.step h2 { color: #6B2FA0; margin-bottom: 20px; }
-.form-group { margin-bottom: 20px; }
-.form-group label { display: block; color: #333; font-weight: 600; margin-bottom: 8px; }
-.form-group select { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 1em; }
-.form-group select:focus { outline: none; border-color: #6B2FA0; }
-.btn { width: 100%; padding: 18px; border: none; border-radius: 10px; font-size: 1.1em; font-weight: 600; cursor: pointer; margin-top: 10px; background: linear-gradient(135deg, #6B2FA0 0%, #9C27B0 100%); color: white; }
-.btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-.btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
-.votacion-card { background: #f8f9fa; padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid #6B2FA0; }
-.votacion-card h3 { color: #333; margin-bottom: 10px; }
-.votacion-card p { color: #666; line-height: 1.6; }
-.tipo-info { display: inline-block; background: #6B2FA0; color: white; padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-top: 8px; }
-.opciones-voto { display: grid; gap: 15px; margin: 20px 0; }
-.opcion-voto { background: white; border: 3px solid #ddd; padding: 20px; border-radius: 15px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 15px; font-size: 1.1em; font-weight: 600; }
-.opcion-voto:hover { border-color: #6B2FA0; transform: translateY(-3px); }
-.opcion-voto.selected { border-color: #9C27B0; background: rgba(156, 39, 176, 0.1); }
-.opcion-numero { width: 40px; height: 40px; border-radius: 50%; background: #e9ecef; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #6B2FA0; flex-shrink: 0; }
-.opcion-voto.selected .opcion-numero { background: #9C27B0; color: white; }
-.success-message { text-align: center; padding: 40px; }
-.success-icon { font-size: 5em; margin-bottom: 20px; }
-.success-message h2 { color: #9C27B0; margin-bottom: 15px; }
-.resultados { margin-top: 30px; }
-.resultado-bar { margin-bottom: 20px; }
-.resultado-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; color: #333; }
-.progress-bar { height: 40px; background: #e9ecef; border-radius: 20px; overflow: hidden; }
-.progress-fill { height: 100%; background: linear-gradient(135deg, #9C27B0 0%, #6B2FA0 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; transition: width 0.5s ease; }
-.info-badge { background: #e1bee7; border-left: 4px solid #6B2FA0; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-.info-badge p { color: #4a148c; margin: 0; }
-.waiting-msg { text-align: center; padding: 30px; color: #666; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votación - Azeche P.H.</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .voting-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-closed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .voting-title {
+            font-size: 1.8rem;
+            color: #333;
+            margin: 15px 0;
+        }
+        .options-list {
+            margin-top: 25px;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .option:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+        .option.voted {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        .option.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .option-info {
+            flex: 1;
+            z-index: 1;
+        }
+        .option-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .vote-count {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-left: 20px;
+            z-index: 1;
+        }
+        .no-voting {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        .no-voting-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        .last-update {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #28a745;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        .live-dot {
+            width: 10px;
+            height: 10px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .voter-id-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .voter-id-section input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+        .voter-id-section input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <div class="logo-text"><span class="logo-blue">AZECHE</span> <span class="logo-purple">PH</span></div>
-    <div class="edificio-nombre" id="edificioNombre">CARGANDO...</div>
-  </div>
-  <div class="content">
-    <!-- STEP 1: Registro -->
-    <div class="step active" id="step-registro">
-      <h2>Emitir Voto</h2>
-      <div class="info-badge"><p>Selecciona tu apartamento para registrar tu asistencia</p></div>
-      <div class="form-group">
-        <label>Apartamento</label>
-        <select id="apartamento"><option value="">-- Selecciona --</option></select>
-      </div>
-      <button class="btn" onclick="registrar()">Registrar Asistencia</button>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Azeche P.H.</h1>
+            <p>Sistema de Votación de Propietarios</p>
+        </div>
+
+        <div id="message-container"></div>
+
+        <div id="voting-container">
+            <div class="voting-card">
+                <div class="no-voting">
+                    <div class="no-voting-icon">⏳</div>
+                    <h2>Cargando...</h2>
+                    <p>Conectando con el servidor</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="last-update" id="last-update"></div>
     </div>
-    <!-- STEP 2: Votacion -->
-    <div class="step" id="step-votacion">
-      <h2>Votacion</h2>
-      <div id="votacionInfo"></div>
-      <div id="opcionesContainer" class="opciones-voto" style="display:none;"></div>
-      <button class="btn" id="btnVotar" onclick="votar()" disabled style="display:none;">Enviar Voto</button>
-      <div id="resultadosLive" style="display:none;margin-top:20px;">
-        <h3 style="color:#6B2FA0;margin-bottom:15px;">Resultados en Tiempo Real</h3>
-        <div id="resultadosContent"></div>
-      </div>
-    </div>
-    <!-- STEP 3: Confirmacion -->
-    <div class="step" id="step-confirmacion">
-      <div class="success-message">
-        <div class="success-icon">&#10003;</div>
-        <h2>Voto Registrado</h2>
-        <p>Tu voto ha sido registrado exitosamente</p>
-        <h3 style="color:#6B2FA0;margin-top:30px;">Resultados Actuales</h3>
-        <div id="resultadosFinal" class="resultados"></div>
-      </div>
-    </div>
-  </div>
-</div>
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getDatabase, ref, onValue, set, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAFWn-qxIC0o6A0f5BBzdJe0NM2UgGP-88",
-  authDomain: "azeche-ph.firebaseapp.com",
-  databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
-  projectId: "azeche-ph",
-  storageBucket: "azeche-ph.firebasestorage.app",
-  messagingSenderId: "650847232355",
-  appId: "1:650847232355:web:8a84be8775e96ce03a0e15"
-};
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, update, get, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-const params = new URLSearchParams(window.location.search);
-const edificio = params.get('edificio') || 'nepal-2';
-
-const nombresEdificios = {
-  'nepal-2': 'NEPAL 2',
-  'avalon': 'AVALON',
-  'convivienda-1': 'CONVIVIENDA 1',
-  'pinos-del-country': 'PINOS DEL COUNTRY'
-};
-
-document.getElementById('edificioNombre').textContent = nombresEdificios[edificio] || edificio.toUpperCase();
-
-let votoSeleccionado = null;
-let usuarioId = null;
-let votacion = null;
-let coeficiente = 0;
-
-async function cargarPropietarios() {
-  try {
-    const snap = await get(ref(db, 'propietarios/' + edificio));
-    const data = snap.val();
-    if (data) {
-      const select = document.getElementById('apartamento');
-      Object.entries(data)
-        .sort((a, b) => (parseInt(a[1].apto) || 0) - (parseInt(b[1].apto) || 0))
-        .forEach(([key, prop]) => {
-          const opt = document.createElement('option');
-          opt.value = key;
-          opt.textContent = 'Apto ' + prop.apto + ' - ' + (prop.nombre || 'Propietario');
-          opt.dataset.apto = prop.apto;
-          opt.dataset.coeficiente = prop.coeficiente || 0;
-          select.appendChild(opt);
-        });
-    }
-  } catch (e) {
-    console.error('Error:', e);
-  }
-}
-
-onValue(ref(db, 'asambleas/' + edificio + '/votacion_activa'), (snap) => {
-  votacion = snap.val();
-  console.log('VOTACION:', votacion);
-  if (votacion) {
-    mostrarVotacion();
-    actualizarResultados();
-  } else {
-    document.getElementById('votacionInfo').innerHTML = '<div class="waiting-msg"><p>Esperando votacion...</p><p>El administrador aun no ha abierto una votacion</p></div>';
-    document.getElementById('opcionesContainer').style.display = 'none';
-    document.getElementById('btnVotar').style.display = 'none';
-  }
-});
-
-cargarPropietarios();
-
-window.registrar = async function() {
-  const select = document.getElementById('apartamento');
-  const key = select.value;
-  if (!key) { alert('Selecciona tu apartamento'); return; }
-  
-  const opt = select.options[select.selectedIndex];
-  coeficiente = parseFloat(opt.dataset.coeficiente) || 0;
-  
-  try {
-    usuarioId = key;
-    await set(ref(db, 'asambleas/' + edificio + '/asistentes/' + key), {
-      apartamento: opt.dataset.apto,
-      nombre: opt.textContent,
-      coeficiente: coeficiente,
-      horaRegistro: new Date().toISOString()
-    });
-    document.getElementById('step-registro').classList.remove('active');
-    document.getElementById('step-votacion').classList.add('active');
-  } catch (e) {
-    console.error('Error:', e);
-    alert('Error: ' + e.message);
-  }
-};
-
-function mostrarVotacion() {
-  if (!votacion) return;
-  
-  const tipo = votacion.tipo === 'nominal' ? 'Nominal' : 'Por Coeficientes';
-  document.getElementById('votacionInfo').innerHTML = '<div class="votacion-card"><h3>' + votacion.titulo + '</h3><p>' + (votacion.descripcion || '') + '</p><span class="tipo-info">' + tipo + '</span></div>';
-  
-  const container = document.getElementById('opcionesContainer');
-  container.innerHTML = '';
-  container.style.display = 'grid';
-  document.getElementById('btnVotar').style.display = 'block';
-  
-  const opciones = votacion.opciones;
-  if (opciones) {
-    Object.entries(opciones)
-      .sort((a, b) => (a[1].orden || 0) - (b[1].orden || 0))
-      .forEach(([k, opt], i) => {
-        const div = document.createElement('div');
-        div.className = 'opcion-voto';
-        div.innerHTML = '<div class="opcion-numero">' + (i+1) + '</div><span>' + opt.label + '</span>';
-        div.onclick = function() {
-          votoSeleccionado = k;
-          document.querySelectorAll('.opcion-voto').forEach(el => el.classList.remove('selected'));
-          this.classList.add('selected');
-          document.getElementById('btnVotar').disabled = false;
+        // ============================================
+        // CONFIGURACIÓN FIREBASE - REEMPLAZA CON TUS DATOS
+        // ============================================
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_PROYECTO.firebaseapp.com",
+            databaseURL: "https://TU_PROYECTO-default-rtdb.firebaseio.com",
+            projectId: "TU_PROYECTO",
+            storageBucket: "TU_PROYECTO.appspot.com",
+            messagingSenderId: "TU_SENDER_ID",
+            appId: "TU_APP_ID"
         };
-        container.appendChild(div);
-      });
-  }
-  
-  votoSeleccionado = null;
-  document.getElementById('btnVotar').disabled = true;
-}
 
-window.votar = async function() {
-  if (!votoSeleccionado || !usuarioId) { alert('Selecciona una opcion'); return; }
-  
-  try {
-    const existe = await get(ref(db, 'asambleas/' + edificio + '/votacion_activa/votos/' + usuarioId));
-    if (existe.exists()) { alert('Ya registraste tu voto'); return; }
-    
-    await set(ref(db, 'asambleas/' + edificio + '/votacion_activa/votos/' + usuarioId), {
-      opcion: votoSeleccionado,
-      coeficiente: coeficiente || 0,
-      hora: new Date().toISOString()
-    });
-    
-    document.getElementById('step-votacion').classList.remove('active');
-    document.getElementById('step-confirmacion').classList.add('active');
-    actualizarResultados();
-  } catch (e) {
-    console.error('Error:', e);
-    alert('Error al enviar voto');
-  }
-};
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-function actualizarResultados() {
-  if (!votacion || !votacion.votos) return;
-  
-  const votos = votacion.votos;
-  const tipo = votacion.tipo || 'coeficientes';
-  const opciones = votacion.opciones;
-  const colores = ['#9C27B0', '#dc3545', '#ff9800'];
-  let html = '';
-  
-  if (opciones) {
-    const conteos = {};
-    Object.keys(opciones).forEach(k => conteos[k] = 0);
-    
-    Object.values(votos).forEach(v => {
-      const val = tipo === 'nominal' ? 1 : parseFloat(v.coeficiente || 0);
-      if (conteos.hasOwnProperty(v.opcion)) conteos[v.opcion] += val;
-    });
-    
-    let total = 0;
-    Object.values(conteos).forEach(v => total += v);
-    
-    Object.entries(opciones)
-      .sort((a, b) => (a[1].orden || 0) - (b[1].orden || 0))
-      .forEach(([k, opt], i) => {
-        const val = conteos[k] || 0;
-        const pct = total > 0 ? (val / total * 100) : 0;
-        html += '<div class="resultado-bar"><div class="resultado-label"><span>' + opt.label + '</span><span>' + (tipo === 'nominal' ? val : val.toFixed(4)) + ' (' + pct.toFixed(1) + '%)</span></div><div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%;background:' + colores[i % colores.length] + ';">' + pct.toFixed(1) + '%</div></div></div>';
-      });
-  }
-  
-  document.getElementById('resultadosFinal').innerHTML = html;
-  document.getElementById('resultadosContent').innerHTML = html;
-  document.getElementById('resultadosLive').style.display = 'block';
-}
-</script>
+        // ============================================
+        // CONFIGURACIÓN DE LA VOTACIÓN
+        // ============================================
+        const VOTING_CONFIG = {
+            // ID único de la votación activa (cámbialo para cada votación)
+            votingId: "votacion_2024_presupuesto",
+            
+            // Nombre del edificio/PH
+            buildingName: "Azeche P.H.",
+            
+            // Verificar ID de propietario antes de votar
+            requireVoterId: true,
+            
+            // Lista de IDs de propietarios válidos (opcional, para validación)
+            // Si está vacío, acepta cualquier ID
+            validVoterIds: []
+        };
+
+        // ============================================
+        // ESTADO DE LA APLICACIÓN
+        // ============================================
+        let currentVoting = null;
+        let hasVoted = false;
+        let voterId = localStorage.getItem('voterId') || '';
+        let votedOption = localStorage.getItem(`voted_${VOTING_CONFIG.votingId}`) || null;
+        let unsubscribe = null;
+
+        // ============================================
+        // FUNCIONES DE UI
+        // ============================================
+
+        function showMessage(text, type = 'success') {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `<div class="message ${type}">${text}</div>`;
+            setTimeout(() => container.innerHTML = '', 5000);
+        }
+
+        function updateLastUpdate() {
+            document.getElementById('last-update').textContent = 
+                `Última actualización: ${new Date().toLocaleTimeString()}`;
+        }
+
+        // ============================================
+        // RENDERIZADO
+        // ============================================
+
+        function renderNoVoting() {
+            document.getElementById('voting-container').innerHTML = `
+                <div class="voting-card">
+                    <div class="no-voting">
+                        <div class="no-voting-icon">😴</div>
+                        <h2>No hay votaciones activas</h2>
+                        <p>En este momento no hay ninguna votación en curso.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderVoting(voting) {
+            const isActive = voting.status === 'active';
+            const totalVotes = voting.totalVotes || 0;
+            const maxVotes = Math.max(...voting.options.map(o => o.votes || 0));
+            
+            // Calcular porcentajes de participación
+            const totalOwners = voting.totalOwners || 100; // Ajusta según tu PH
+            const participationRate = ((totalVotes / totalOwners) * 100).toFixed(1);
+
+            const optionsHtml = voting.options.map((option, index) => {
+                const percentage = totalVotes > 0 
+                    ? ((option.votes || 0) / totalVotes * 100).toFixed(1) 
+                    : 0;
+                const barWidth = maxVotes > 0 
+                    ? ((option.votes || 0) / maxVotes * 100) 
+                    : 0;
+                
+                const isVoted = votedOption === index.toString();
+                const canVote = isActive && !votedOption && (!VOTING_CONFIG.requireVoterId || voterId);
+
+                return `
+                    <div class="option ${isVoted ? 'voted' : ''} ${!canVote ? 'disabled' : ''}" 
+                         onclick="${canVote ? `submitVote(${index})` : ''}">
+                        <div class="option-info">
+                            <div class="option-name">${option.name}</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${barWidth}%"></div>
+                            </div>
+                            <small>${percentage}% (${option.votes || 0} votos)</small>
+                        </div>
+                        <div class="vote-count">${option.votes || 0}</div>
+                        ${isVoted ? '<span style="margin-left: 10px; color: #28a745;">✓</span>' : ''}
+                    </div>
+                `;
+            }).join('');
+
+            // Sección de ID de votante si es requerido
+            const voterSection = VOTING_CONFIG.requireVoterId && !voterId ? `
+                <div class="voter-id-section">
+                    <label><strong>Identificación de Propietario</strong></label>
+                    <input type="text" id="voter-id-input" placeholder="Ingresa tu número de apartamento o ID" 
+                           value="${voterId}">
+                    <button class="btn btn-primary" onclick="setVoterId()" style="margin-top: 10px; width: 100%;">
+                        Confirmar Identidad
+                    </button>
+                </div>
+            ` : VOTING_CONFIG.requireVoterId && voterId ? `
+                <div class="voter-id-section" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><strong>Propietario:</strong> ${voterId}</span>
+                    <button class="btn" onclick="changeVoterId()" style="background: #6c757d; color: white; padding: 8px 16px;">
+                        Cambiar
+                    </button>
+                </div>
+            ` : '';
+
+            document.getElementById('voting-container').innerHTML = `
+                <div class="voting-card">
+                    <span class="status-badge ${isActive ? 'status-active' : 'status-closed'}">
+                        ${isActive ? '🟢 En curso' : '🔴 Cerrada'}
+                    </span>
+                    <h2 class="voting-title">${voting.title}</h2>
+                    <p style="color: #666; margin-bottom: 15px;">${voting.description || ''}</p>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-number">${totalVotes}</div>
+                            <div class="stat-label">Votos emitidos</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number">${participationRate}%</div>
+                            <div class="stat-label">Participación</div>
+                        </div>
+                    </div>
+
+                    ${isActive ? `
+                        <div class="live-indicator">
+                            <span class="live-dot"></span>
+                            <span>En tiempo real • ${new Date().toLocaleTimeString()}</span>
+                        </div>
+                    ` : ''}
+
+                    ${voterSection}
+
+                    ${votedOption ? `
+                        <div class="message success" style="margin-bottom: 20px;">
+                            ✅ Ya emitiste tu voto en esta votación
+                        </div>
+                    ` : isActive ? `
+                        <p style="margin: 15px 0; color: #666; text-align: center;">
+                            ${VOTING_CONFIG.requireVoterId && !voterId 
+                                ? 'Confirma tu identidad para votar' 
+                                : 'Haz clic en una opción para votar'}
+                        </p>
+                    ` : ''}
+                    
+                    <div class="options-list">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+
+            updateLastUpdate();
+        }
+
+        // ============================================
+        // FUNCIONES DE VOTACIÓN
+        // ============================================
+
+        window.setVoterId = function() {
+            const input = document.getElementById('voter-id-input');
+            const id = input.value.trim().toUpperCase();
+            
+            if (!id) {
+                showMessage('Por favor ingresa tu identificación', 'error');
+                return;
+            }
+
+            // Validar contra lista si existe
+            if (VOTING_CONFIG.validVoterIds.length > 0 && 
+                !VOTING_CONFIG.validVoterIds.includes(id)) {
+                showMessage('Identificación no válida', 'error');
+                return;
+            }
+
+            voterId = id;
+            localStorage.setItem('voterId', voterId);
+            showMessage('Identidad confirmada. Ahora puedes votar.');
+            renderVoting(currentVoting);
+        };
+
+        window.changeVoterId = function() {
+            voterId = '';
+            votedOption = null;
+            localStorage.removeItem('voterId');
+            localStorage.removeItem(`voted_${VOTING_CONFIG.votingId}`);
+            showMessage('Sesión cerrada. Ingresa tu identificación nuevamente.');
+            renderVoting(currentVoting);
+        };
+
+        window.submitVote = async function(optionIndex) {
+            if (!currentVoting || currentVoting.status !== 'active') {
+                showMessage('La votación no está activa', 'error');
+                return;
+            }
+
+            if (votedOption) {
+                showMessage('Ya has votado en esta votación', 'error');
+                return;
+            }
+
+            if (VOTING_CONFIG.requireVoterId && !voterId) {
+                showMessage('Debes confirmar tu identidad primero', 'error');
+                return;
+            }
+
+            try {
+                const votingRef = ref(db, `votaciones/${VOTING_CONFIG.votingId}`);
+                const snapshot = await get(votingRef);
+                const voting = snapshot.val();
+
+                if (!voting) {
+                    showMessage('Error al acceder a la votación', 'error');
+                    return;
+                }
+
+                // Verificar si ya votó (doble check)
+                if (voting.voters && voting.voters[voterId]) {
+                    showMessage('Ya registraste un voto anteriormente', 'error');
+                    votedOption = voting.voters[voterId];
+                    localStorage.setItem(`voted_${VOTING_CONFIG.votingId}`, votedOption);
+                    renderVoting(currentVoting);
+                    return;
+                }
+
+                // Actualizar voto
+                const updates = {};
+                const currentVotes = voting.options[optionIndex].votes || 0;
+                
+                updates[`options/${optionIndex}/votes`] = currentVotes + 1;
+                updates[`totalVotes`] = (voting.totalVotes || 0) + 1;
+                updates[`voters/${voterId}`] = optionIndex;
+                updates[`lastVoteAt`] = new Date().toISOString();
+
+                await update(votingRef, updates);
+
+                votedOption = optionIndex.toString();
+                localStorage.setItem(`voted_${VOTING_CONFIG.votingId}`, votedOption);
+                
+                showMessage('¡Voto registrado exitosamente! ✅');
+                
+            } catch (error) {
+                console.error('Error al votar:', error);
+                showMessage('Error al registrar el voto. Intenta de nuevo.', 'error');
+            }
+        };
+
+        // ============================================
+        // ESCUCHAR CAMBIOS EN TIEMPO REAL
+        // ============================================
+
+        function listenToVoting() {
+            const votingRef = ref(db, `votaciones/${VOTING_CONFIG.votingId}`);
+            
+            unsubscribe = onValue(votingRef, (snapshot) => {
+                const voting = snapshot.val();
+                
+                if (!voting) {
+                    renderNoVoting();
+                    return;
+                }
+
+                currentVoting = voting;
+                renderVoting(voting);
+            }, (error) => {
+                console.error('Error de Firebase:', error);
+                showMessage('Error de conexión. Verifica tu configuración.', 'error');
+            });
+        }
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            listenToVoting();
+        });
+
+        // Limpiar al cerrar
+        window.addEventListener('beforeunload', () => {
+            if (unsubscribe) unsubscribe();
+        });
+    </script>
 </body>
 </html>
