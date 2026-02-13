@@ -6,46 +6,46 @@
 <title>Votacion - Azeche PH</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0056B8 0%, #00B853 100%); min-height: 100vh; padding: 20px; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #6B2FA0 0%, #9C27B0 100%); min-height: 100vh; padding: 20px; }
 .container { max-width: 600px; margin: 0 auto; }
 .header { background: white; padding: 30px; border-radius: 20px 20px 0 0; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
 .logo-text { font-size: 2.5em; font-weight: 900; margin-bottom: 10px; }
 .logo-blue { color: #0056B8; }
-.logo-green { color: #00B853; }
+.logo-purple { color: #6B2FA0; }
 .edificio-nombre { color: #666; font-size: 1.1em; }
 .content { background: white; padding: 30px; border-radius: 0 0 20px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
 .step { display: none; }
 .step.active { display: block; }
-.step h2 { color: #0056B8; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+.step h2 { color: #6B2FA0; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
 .form-group { margin-bottom: 20px; }
 .form-group label { display: block; color: #333; font-weight: 600; margin-bottom: 8px; }
 .form-group input, .form-group select { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 1em; }
-.form-group input:focus, .form-group select:focus { outline: none; border-color: #0056B8; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: #6B2FA0; }
 .btn { width: 100%; padding: 18px; border: none; border-radius: 10px; font-size: 1.1em; font-weight: 600; cursor: pointer; transition: all 0.3s; margin-top: 10px; }
-.btn-primary { background: linear-gradient(135deg, #0056B8 0%, #00B853 100%); color: white; }
+.btn-primary { background: linear-gradient(135deg, #6B2FA0 0%, #9C27B0 100%); color: white; }
 .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
 .btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
-.votacion-card { background: #f8f9fa; padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid #0056B8; }
+.votacion-card { background: #f8f9fa; padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid #6B2FA0; }
 .votacion-card h3 { color: #333; margin-bottom: 10px; }
 .votacion-card p { color: #666; line-height: 1.6; }
-.tipo-info { display: inline-block; background: #0056B8; color: white; padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-top: 8px; }
+.tipo-info { display: inline-block; background: #6B2FA0; color: white; padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-top: 8px; }
 .opciones-voto { display: grid; gap: 15px; margin: 20px 0; }
 .opcion-voto { background: white; border: 3px solid #ddd; padding: 20px; border-radius: 15px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 15px; font-size: 1.1em; font-weight: 600; }
-.opcion-voto:hover { border-color: #0056B8; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-.opcion-voto.selected { border-color: #00B853; background: linear-gradient(135deg, rgba(0, 184, 83, 0.1) 0%, white 100%); }
-.opcion-numero { width: 40px; height: 40px; border-radius: 50%; background: #e9ecef; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #0056B8; flex-shrink: 0; }
-.opcion-voto.selected .opcion-numero { background: #00B853; color: white; }
+.opcion-voto:hover { border-color: #6B2FA0; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+.opcion-voto.selected { border-color: #9C27B0; background: linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, white 100%); }
+.opcion-numero { width: 40px; height: 40px; border-radius: 50%; background: #e9ecef; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #6B2FA0; flex-shrink: 0; }
+.opcion-voto.selected .opcion-numero { background: #9C27B0; color: white; }
 .success-message { text-align: center; padding: 40px; }
 .success-icon { font-size: 5em; margin-bottom: 20px; }
-.success-message h2 { color: #00B853; margin-bottom: 15px; }
+.success-message h2 { color: #9C27B0; margin-bottom: 15px; }
 .success-message p { color: #666; font-size: 1.1em; }
 .resultados { margin-top: 30px; }
 .resultado-bar { margin-bottom: 20px; }
 .resultado-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; color: #333; }
 .progress-bar { height: 40px; background: #e9ecef; border-radius: 20px; overflow: hidden; }
-.progress-fill { height: 100%; background: linear-gradient(135deg, #00B853 0%, #0056B8 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; transition: width 0.5s ease; min-width: 0; }
-.info-badge { background: #fff3cd; border-left: 4px solid #ff9800; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-.info-badge p { color: #856404; margin: 0; }
+.progress-fill { height: 100%; background: linear-gradient(135deg, #9C27B0 0%, #6B2FA0 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; transition: width 0.5s ease; min-width: 0; }
+.info-badge { background: #e1bee7; border-left: 4px solid #6B2FA0; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+.info-badge p { color: #4a148c; margin: 0; }
 .error-message { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #f5c6cb; }
 .waiting-msg { text-align: center; padding: 30px; color: #666; }
 .waiting-msg p { font-size: 1.2em; margin-bottom: 10px; }
@@ -54,22 +54,18 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 <body>
 <div class="container">
   <div class="header">
-    <div class="logo-text"><span class="logo-blue">AZECHE</span> <span class="logo-green">PH</span></div>
+    <div class="logo-text"><span class="logo-blue">AZECHE</span> <span class="logo-purple">PH</span></div>
     <div class="edificio-nombre" id="edificioNombre">Cargando...</div>
   </div>
 
   <div class="content">
     <div id="errorMsg"></div>
 
-    <!-- STEP 1: Registro -->
+    <!-- STEP 1: Registro simplificado -->
     <div class="step active" id="step-registro">
-      <h2>Registro de Asistencia</h2>
+      <h2>Emitir Voto</h2>
       <div class="info-badge">
-        <p>Ingresa tu informacion para registrar tu asistencia a la asamblea</p>
-      </div>
-      <div class="form-group">
-        <label>Nombre Completo</label>
-        <input type="text" id="nombrePropietario" placeholder="Tu nombre completo">
+        <p>Selecciona tu apartamento para registrar tu asistencia</p>
       </div>
       <div class="form-group">
         <label>Apartamento</label>
@@ -77,16 +73,12 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
           <option value="">Selecciona tu apartamento</option>
         </select>
       </div>
-      <div class="form-group">
-        <label>Cedula / Documento</label>
-        <input type="text" id="documentoPropietario" placeholder="Numero de documento">
-      </div>
       <button class="btn btn-primary" onclick="registrarAsistencia()">Registrar Asistencia</button>
     </div>
 
     <!-- STEP 2: Votacion -->
     <div class="step" id="step-votacion">
-      <h2>Votacion Activa</h2>
+      <h2>Votacion</h2>
       <div id="votacionInfo">
         <div class="waiting-msg">
           <p>Esperando votacion...</p>
@@ -97,7 +89,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
       <button class="btn btn-primary" id="btnVotar" onclick="enviarVoto()" disabled style="display:none;">Enviar Voto</button>
 
       <div id="resultadosLive" style="display:none;margin-top:20px;">
-        <h3 style="color:#0056B8;margin-bottom:15px;">Resultados en Tiempo Real</h3>
+        <h3 style="color:#6B2FA0;margin-bottom:15px;">Resultados en Tiempo Real</h3>
         <div id="resultadosContent"></div>
       </div>
     </div>
@@ -108,7 +100,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
         <div class="success-icon">&#10003;</div>
         <h2>Voto Registrado</h2>
         <p>Tu voto ha sido registrado exitosamente</p>
-        <h3 style="color:#0056B8;margin-top:30px;">Resultados Actuales</h3>
+        <h3 style="color:#6B2FA0;margin-top:30px;">Resultados Actuales</h3>
         <div id="resultadosFinal" class="resultados"></div>
       </div>
     </div>
@@ -156,7 +148,7 @@ const nombresEdificios = {
 
 document.getElementById('edificioNombre').textContent = nombresEdificios[edificio] || edificio;
 
-let votoSeleccionado = null; // key de la opcion seleccionada
+let votoSeleccionado = null;
 let usuarioId = null;
 let votacionActual = null;
 let coeficienteUsuario = null;
@@ -165,37 +157,33 @@ let coeficienteUsuario = null;
 async function cargarResidentes() {
   if (!db || !edificio) return;
   try {
-    // Intentar primero en propietarios/{edificio}
     let residentesRef = ref(db, 'propietarios/' + edificio);
     let snapshot = await get(residentesRef);
     let residentes = snapshot.val();
-
+    
     if (residentes) {
       const select = document.getElementById('apartamentoPropietario');
       const aptos = [];
       Object.entries(residentes).forEach(([key, prop]) => {
         if (prop.tipo === 'Propietario' || prop.tipo === 'propietario' || !prop.tipo) {
-          aptos.push({ key, apto: prop.apto, nombre: prop.nombre || 'Propietario', coeficiente: prop.coeficiente || 0 });
+          aptos.push({ key, apto: prop.apto, coeficiente: prop.coeficiente || 0 });
         }
       });
       aptos.sort((a, b) => (parseInt(a.apto) || 0) - (parseInt(b.apto) || 0));
       aptos.forEach(apt => {
         const option = document.createElement('option');
         option.value = apt.key;
-        option.textContent = 'Apto ' + apt.apto + ' - ' + apt.nombre;
+        option.textContent = 'Apartamento ' + apt.apto;
         option.dataset.apto = apt.apto;
-        option.dataset.nombre = apt.nombre;
         option.dataset.coeficiente = apt.coeficiente;
         select.appendChild(option);
       });
       return;
     }
-
-    // Fallback: residentes/{edificio}
+    
     residentesRef = ref(db, 'residentes/' + edificio);
     snapshot = await get(residentesRef);
     residentes = snapshot.val();
-
     if (residentes) {
       const select = document.getElementById('apartamentoPropietario');
       Object.keys(residentes).sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0)).forEach(apto => {
@@ -203,20 +191,19 @@ async function cargarResidentes() {
         option.value = apto;
         option.textContent = 'Apartamento ' + apto;
         option.dataset.apto = apto;
-        option.dataset.nombre = '';
         option.dataset.coeficiente = residentes[apto].coeficiente || 0;
         select.appendChild(option);
       });
     } else {
-      mostrarError('No hay apartamentos registrados para este edificio');
+      mostrarError('No hay apartamentos registrados');
     }
   } catch (error) {
-    console.error('Error cargando residentes:', error);
+    console.error('Error:', error);
     mostrarError('Error cargando apartamentos');
   }
 }
 
-// ========== ESCUCHAR VOTACION ACTIVA ==========
+// ========== ESCUCHAR VOTACION ==========
 if (db && edificio) {
   const votacionRef = ref(db, 'asambleas/' + edificio + '/votacion_activa');
   onValue(votacionRef, (snapshot) => {
@@ -229,8 +216,7 @@ if (db && edificio) {
         <div class="waiting-msg">
           <p>Esperando votacion...</p>
           <p style="font-size:0.9em;">El administrador aun no ha abierto una votacion</p>
-        </div>
-      `;
+        </div>`;
       document.getElementById('opcionesVotoContainer').style.display = 'none';
       document.getElementById('btnVotar').style.display = 'none';
     }
@@ -241,114 +227,60 @@ cargarResidentes();
 
 // ========== REGISTRO ==========
 window.registrarAsistencia = async function() {
-  const nombre = document.getElementById('nombrePropietario').value.trim();
   const selectApto = document.getElementById('apartamentoPropietario');
   const propietarioKey = selectApto.value;
-  const documento = document.getElementById('documentoPropietario').value.trim();
-
-  if (!nombre || !propietarioKey || !documento) {
-    mostrarError('Completa todos los campos');
+  
+  if (!propietarioKey) {
+    mostrarError('Selecciona tu apartamento');
     return;
   }
-
+  
   const selectedOption = selectApto.options[selectApto.selectedIndex];
   const apartamento = selectedOption.dataset.apto || propietarioKey;
   coeficienteUsuario = parseFloat(selectedOption.dataset.coeficiente) || 0;
-
+  
   try {
-    // Verificar si ya esta registrado
-    const asistentesRef = ref(db, 'asambleas/' + edificio + '/asistentes');
-    const snapshot = await get(asistentesRef);
-    const asistentes = snapshot.val() || {};
-
-    const yaRegistro = Object.values(asistentes).some(a =>
-      (a.nombre && a.nombre.toLowerCase() === nombre.toLowerCase()) ||
-      (a.documento && a.documento === documento) ||
-      (a.apartamento && a.apartamento === apartamento)
-    );
-
-    if (yaRegistro) {
-      // Si ya esta registrado, permitir pasar a votacion
-      usuarioId = propietarioKey + '_' + Date.now();
-      mostrarPaso('step-votacion');
-      return;
-    }
-
     usuarioId = propietarioKey + '_' + Date.now();
-
     await set(ref(db, 'asambleas/' + edificio + '/asistentes/' + usuarioId), {
-      nombre: nombre,
       apartamento: apartamento,
-      documento: documento,
       coeficiente: coeficienteUsuario,
       horaRegistro: new Date().toISOString()
     });
-
     mostrarPaso('step-votacion');
   } catch (error) {
-    console.error('Error registrando:', error);
+    console.error('Error:', error);
     mostrarError('Error al registrar: ' + error.message);
   }
 };
 
-// ========== MOSTRAR VOTACION CON OPCIONES DINAMICAS ==========
+// ========== MOSTRAR VOTACION ==========
 function mostrarVotacion() {
   if (!votacionActual) return;
-
+  
   const tipoTexto = votacionActual.tipo === 'nominal' ? 'Nominal' : 'Por Coeficientes';
-
   document.getElementById('votacionInfo').innerHTML = `
     <div class="votacion-card">
       <h3>${votacionActual.titulo}</h3>
       <p>${votacionActual.descripcion || ''}</p>
       <span class="tipo-info">${tipoTexto}</span>
-    </div>
-  `;
-
+    </div>`;
+  
   const opcionesContainer = document.getElementById('opcionesVotoContainer');
   opcionesContainer.innerHTML = '';
   opcionesContainer.style.display = 'grid';
   document.getElementById('btnVotar').style.display = 'block';
-
+  
   const opciones = votacionActual.opciones;
-
   if (opciones && Object.keys(opciones).length > 0) {
-    // Opciones custom desde Firebase
-    Object.entries(opciones)
-      .sort((a, b) => (a[1].orden || 0) - (b[1].orden || 0))
-      .forEach(([key, opt], index) => {
-        const div = document.createElement('div');
-        div.className = 'opcion-voto';
-        div.dataset.key = key;
-        div.innerHTML = `
-          <div class="opcion-numero">${index + 1}</div>
-          <span>${opt.label}</span>
-        `;
-        div.addEventListener('click', function() {
-          votoSeleccionado = key;
-          document.querySelectorAll('.opcion-voto').forEach(el => el.classList.remove('selected'));
-          this.classList.add('selected');
-          document.getElementById('btnVotar').disabled = false;
-        });
-        opcionesContainer.appendChild(div);
-      });
-  } else {
-    // Fallback legacy: si/no/abstencion
-    const legacyOpciones = [
-      { key: 'si', label: 'Si, a favor' },
-      { key: 'no', label: 'No, en contra' },
-      { key: 'abstencion', label: 'Abstencion' }
-    ];
-    legacyOpciones.forEach((opt, index) => {
+    Object.entries(opciones).sort((a, b) => (a[1].orden || 0) - (b[1].orden || 0)).forEach(([key, opt], index) => {
       const div = document.createElement('div');
       div.className = 'opcion-voto';
-      div.dataset.key = opt.key;
+      div.dataset.key = key;
       div.innerHTML = `
         <div class="opcion-numero">${index + 1}</div>
-        <span>${opt.label}</span>
-      `;
+        <span>${opt.label}</span>`;
       div.addEventListener('click', function() {
-        votoSeleccionado = opt.key;
+        votoSeleccionado = key;
         document.querySelectorAll('.opcion-voto').forEach(el => el.classList.remove('selected'));
         this.classList.add('selected');
         document.getElementById('btnVotar').disabled = false;
@@ -356,8 +288,7 @@ function mostrarVotacion() {
       opcionesContainer.appendChild(div);
     });
   }
-
-  // Reset seleccion
+  
   votoSeleccionado = null;
   document.getElementById('btnVotar').disabled = true;
 }
@@ -368,127 +299,72 @@ window.enviarVoto = async function() {
     mostrarError('Selecciona una opcion de voto');
     return;
   }
-
-  const apartamento = document.getElementById('apartamentoPropietario').value;
-
+  
   try {
-    // Verificar si ya voto
     const votoRef = ref(db, 'asambleas/' + edificio + '/votacion_activa/votos/' + usuarioId);
     const existeSnap = await get(votoRef);
     if (existeSnap.exists()) {
-      mostrarError('Ya registraste tu voto para esta votacion');
+      mostrarError('Ya registraste tu voto');
       return;
     }
-
-    const datoVoto = {
+    
+    await set(votoRef, {
       opcion: votoSeleccionado,
-      voto: votoSeleccionado, // compatibilidad legacy
-      apartamento: apartamento,
+      voto: votoSeleccionado,
       coeficiente: coeficienteUsuario || 0,
       hora: new Date().toISOString()
-    };
-
-    await set(votoRef, datoVoto);
-
+    });
+    
     mostrarPaso('step-confirmacion');
     actualizarResultados();
   } catch (error) {
-    console.error('Error enviando voto:', error);
-    mostrarError('Error al enviar voto. Intenta de nuevo.');
+    console.error('Error:', error);
+    mostrarError('Error al enviar voto');
   }
 };
 
-// ========== ACTUALIZAR RESULTADOS ==========
+// ========== RESULTADOS ==========
 function actualizarResultados() {
   if (!votacionActual || !votacionActual.votos) return;
-
+  
   const votos = votacionActual.votos;
   const tipoActual = votacionActual.tipo || 'coeficientes';
   const opciones = votacionActual.opciones;
+  const colores = ['#9C27B0', '#dc3545', '#ff9800', '#0056B8', '#9c27b0'];
+  
   let html = '';
-
-  const colores = ['#00B853', '#dc3545', '#ff9800', '#0056B8', '#9c27b0'];
-
+  
   if (opciones && Object.keys(opciones).length > 0) {
-    // Resultados con opciones custom
     const conteos = {};
-    Object.keys(opciones).forEach(key => { conteos[key] = 0; });
-
-    Object.values(votos).forEach(voto => {
-      const opcionKey = voto.opcion || voto.voto || '';
-      if (conteos.hasOwnProperty(opcionKey)) {
-        conteos[opcionKey] += tipoActual === 'nominal' ? 1 : parseFloat(voto.coeficiente || 0);
-      } else {
-        // Mapear legacy
-        const legacyMap = { 'si': 'opcion_1', 'no': 'opcion_2', 'abstencion': 'opcion_3' };
-        const mapped = legacyMap[opcionKey];
-        if (mapped && conteos.hasOwnProperty(mapped)) {
-          conteos[mapped] += tipoActual === 'nominal' ? 1 : parseFloat(voto.coeficiente || 0);
-        }
-      }
-    });
-
-    let total = 0;
-    Object.values(conteos).forEach(v => { total += v; });
-
-    let i = 0;
-    Object.entries(opciones).sort((a, b) => (a[1].orden || 0) - (b[1].orden || 0)).forEach(([key, opt]) => {
-      const valor = conteos[key] || 0;
-      const porc = total > 0 ? (valor / total * 100) : 0;
-      const color = colores[i % colores.length];
-      html += `
-        <div class="resultado-bar">
-          <div class="resultado-label">
-            <span>${opt.label}</span>
-            <span>${tipoActual === 'nominal' ? valor : valor.toFixed(4)} (${porc.toFixed(1)}%)</span>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width:${Math.max(porc, 0)}%;background:${color};">${porc.toFixed(1)}%</div>
-          </div>
-        </div>
-      `;
-      i++;
-    });
-  } else {
-    // Legacy si/no/abstencion
-    let aFavor = 0, enContra = 0, abstencion = 0;
+    Object.keys(opciones).forEach(key => conteos[key] = 0);
+    
     Object.values(votos).forEach(voto => {
       const val = tipoActual === 'nominal' ? 1 : parseFloat(voto.coeficiente || 0);
-      if (voto.voto === 'si') aFavor += val;
-      else if (voto.voto === 'no') enContra += val;
-      else abstencion += val;
+      const opcionKey = voto.opcion || voto.voto || '';
+      if (conteos.hasOwnProperty(opcionKey)) {
+        conteos[opcionKey] += val;
+      }
     });
-
-    const total = aFavor + enContra + abstencion;
-    const pA = total > 0 ? (aFavor / total * 100) : 0;
-    const pC = total > 0 ? (enContra / total * 100) : 0;
-    const pAb = total > 0 ? (abstencion / total * 100) : 0;
-
-    html = `
-      <div class="resultado-bar">
-        <div class="resultado-label"><span>A Favor</span><span>${aFavor} (${pA.toFixed(1)}%)</span></div>
-        <div class="progress-bar"><div class="progress-fill" style="width:${pA}%;background:#00B853;">${pA.toFixed(1)}%</div></div>
-      </div>
-      <div class="resultado-bar">
-        <div class="resultado-label"><span>En Contra</span><span>${enContra} (${pC.toFixed(1)}%)</span></div>
-        <div class="progress-bar"><div class="progress-fill" style="width:${pC}%;background:#dc3545;">${pC.toFixed(1)}%</div></div>
-      </div>
-      <div class="resultado-bar">
-        <div class="resultado-label"><span>Abstencion</span><span>${abstencion} (${pAb.toFixed(1)}%)</span></div>
-        <div class="progress-bar"><div class="progress-fill" style="width:${pAb}%;background:#ff9800;">${pAb.toFixed(1)}%</div></div>
-      </div>
-    `;
+    
+    let total = 0;
+    Object.values(conteos).forEach(v => total += v);
+    
+    Object.entries(opciones).sort((a, b) => (a[1].orden || 0) - (b[1].orden || 0)).forEach(([key, opt], i) => {
+      const valor = conteos[key] || 0;
+      const porc = total > 0 ? (valor / total * 100) : 0;
+      html += `
+        <div class="resultado-bar">
+          <div class="resultado-label"><span>${opt.label}</span><span>${tipoActual === 'nominal' ? valor : valor.toFixed(4)} (${porc.toFixed(1)}%)</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${Math.max(porc, 0)}%;background:${colores[i % colores.length]};">${porc.toFixed(1)}%</div></div>
+        </div>`;
+    });
   }
-
+  
   document.getElementById('resultadosFinal').innerHTML = html;
-  const live = document.getElementById('resultadosContent');
-  if (live) {
-    live.innerHTML = html;
-    document.getElementById('resultadosLive').style.display = 'block';
-  }
+  document.getElementById('resultadosContent').innerHTML = html;
+  document.getElementById('resultadosLive').style.display = 'block';
 }
 
-// ========== UTILIDADES ==========
 function mostrarPaso(pasoId) {
   document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
   document.getElementById(pasoId).classList.add('active');
