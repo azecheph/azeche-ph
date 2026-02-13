@@ -201,6 +201,29 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 </div>
 </div>
 </div>
+<script>
+// FUNCIONES GLOBALES (accesibles desde onclick)
+
+    const input = document.getElementById('enlaceVotacionPrincipal');
+    if (!input || input.value === 'Crea una votación primero' || input.value === '') {
+        alert('❌ Debes crear una votación primero');
+        return;
+    }
+    input.select();
+    input.setSelectionRange(0, 99999);
+    try {
+        const success = document.execCommand('copy');
+        if (success) {
+            alert('✅ Enlace de votación copiado:\n\n' + input.value);
+        } else {
+            alert('❌ Copia manualmente:\n\n' + input.value);
+        }
+    } catch(err) {
+        alert('❌ Copia manualmente:\n\n' + input.value);
+    }
+}
+</script>
+
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, onValue, set, push, update, remove, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
@@ -615,26 +638,8 @@ document.getElementById('votacionActiva').innerHTML = `
 // ========== FUNCIÓN ENLACE AUTO-REGISTRO ==========
 // Copiar enlace al portapapeles
 // Copiar enlace desde sección Quórum
-function copiarEnlaceQuorum() {
-    const input = document.getElementById('enlaceRegistroQuorum');
-    
-    if (input.value === 'Selecciona un edificio primero') {
-        alert('❌ Selecciona un edificio primero');
-        return;
-    }
-    
-    input.select();
-    input.setSelectionRange(0, 99999);
-    
-    navigator.clipboard.writeText(input.value).then(() => {
-        alert('✅ Enlace copiado al portapapeles\n\nAhora puedes pegarlo en Google Chat, WhatsApp, etc.');
-    }).catch(() => {
-        alert('❌ Error al copiar. Copia manualmente el enlace.');
-    });
-}
 </script>
 
-function copiarEnlaceVotacionPrincipal(){const a=document.getElementById("enlaceVotacionPrincipal");if(!a||a.value==="Crea una votación primero"||a.value===""){alert("❌ Debes crear una votación primero");return}a.select();a.setSelectionRange(0,99999);try{document.execCommand("copy")?alert("✅ Enlace copiado:\n\n"+a.value):alert("❌ Copia manualmente:\n\n"+a.value)}catch(b){alert("❌ Copia manualmente:\n\n"+a.value)}}
 
 </body>
 
