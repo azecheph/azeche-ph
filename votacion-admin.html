@@ -75,6 +75,61 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .opciones-count { color: #666; font-size: 0.85em; }
 .tipo-badge { display: inline-block; background: #0056B8; color: white; padding: 4px 12px; border-radius: 15px; font-size: 0.8em; margin-left: 10px; }
 
+/* Faltantes */
+.faltantes-panel { background: #fff3e0; border: 2px solid #ff9800; border-radius: 15px; padding: 20px; margin-top: 20px; }
+.faltantes-panel h4 { color: #e65100; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.faltantes-badge { background: #ff9800; color: white; padding: 4px 14px; border-radius: 15px; font-size: 0.85em; }
+.faltantes-list-admin { max-height: 250px; overflow-y: auto; }
+.faltante-admin-item { background: #fff8e1; padding: 10px 15px; border-radius: 8px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #ff9800; }
+.faltante-admin-apto { font-weight: 700; color: #e65100; }
+.faltante-admin-nombre { color: #666; font-size: 0.9em; }
+
+.faltantes-voto-panel { background: #fce4ec; border: 2px solid #dc3545; border-radius: 15px; padding: 20px; margin-top: 20px; }
+.faltantes-voto-panel h4 { color: #c62828; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.faltantes-voto-badge { background: #dc3545; color: white; padding: 4px 14px; border-radius: 15px; font-size: 0.85em; }
+.faltante-voto-item { background: #fce4ec; padding: 10px 15px; border-radius: 8px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #dc3545; }
+.faltante-voto-apto { font-weight: 700; color: #c62828; }
+.faltante-voto-nombre { color: #666; font-size: 0.9em; }
+
+/* Historial de votaciones */
+.historial-panel { margin-top: 30px; }
+.historial-panel h3 { color: #0056B8; margin-bottom: 20px; font-size: 1.5em; }
+.historial-empty { text-align: center; padding: 30px; color: #999; }
+.historial-item { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 15px; padding: 20px; margin-bottom: 15px; transition: all 0.3s; }
+.historial-item:hover { border-color: #0056B8; }
+.historial-item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px; flex-wrap: wrap; }
+.historial-item-title { font-size: 1.15em; font-weight: 700; color: #333; }
+.historial-item-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+.historial-meta-badge { padding: 3px 10px; border-radius: 12px; font-size: 0.75em; font-weight: 600; }
+.badge-cerrada { background: #e9ecef; color: #666; }
+.badge-tipo { background: #e3f2fd; color: #0056B8; }
+.badge-fecha { background: #f3e5f5; color: #7b1fa2; }
+.historial-item-desc { color: #666; font-size: 0.9em; margin-bottom: 12px; }
+.historial-resultados { display: grid; gap: 8px; margin-bottom: 12px; }
+.historial-resultado-row { display: flex; align-items: center; gap: 10px; }
+.historial-resultado-label { min-width: 120px; font-weight: 600; font-size: 0.9em; color: #333; }
+.historial-resultado-bar { flex: 1; height: 24px; background: #e9ecef; border-radius: 12px; overflow: hidden; }
+.historial-resultado-fill { height: 100%; border-radius: 12px; display: flex; align-items: center; padding-left: 8px; color: white; font-size: 0.75em; font-weight: 600; transition: width 0.5s; }
+.historial-resultado-value { min-width: 80px; text-align: right; font-size: 0.85em; color: #666; font-weight: 600; }
+.historial-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-edit-hist { background: #0056B8; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85em; }
+.btn-edit-hist:hover { background: #004494; }
+.btn-delete-hist { background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85em; }
+.btn-delete-hist:hover { background: #b02a37; }
+.btn-reactivar-hist { background: #ff9800; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85em; }
+.btn-reactivar-hist:hover { background: #e68900; }
+
+/* Modal edicion */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+.modal-overlay.active { display: flex; }
+.modal-content { background: white; border-radius: 20px; padding: 35px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+.modal-content h3 { color: #0056B8; margin-bottom: 20px; font-size: 1.4em; }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.btn-modal-save { background: #00B853; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 1em; flex: 1; }
+.btn-modal-save:hover { background: #009643; }
+.btn-modal-cancel { background: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 1em; }
+.btn-modal-cancel:hover { background: #5a6268; }
+
 @media (max-width: 968px) { .main-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -142,6 +197,15 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
         <div class="asistentes-list" id="listaAsistentes">
           <p style="text-align:center;color:#999;padding:20px;">Cargando...</p>
         </div>
+
+        <!-- FALTANTES POR REGISTRARSE -->
+        <div class="faltantes-panel" id="faltantesRegistroPanel" style="display:none;">
+          <h4>
+            Faltantes por registrarse
+            <span class="faltantes-badge" id="faltantesRegistroBadge">0</span>
+          </h4>
+          <div class="faltantes-list-admin" id="faltantesRegistroList"></div>
+        </div>
       </div>
     </div>
 
@@ -164,6 +228,15 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
             <p>Crea una nueva votacion abajo</p>
           </div>
         </div>
+      </div>
+
+      <!-- FALTANTES POR VOTAR -->
+      <div class="faltantes-voto-panel" id="faltantesVotoPanel" style="display:none;margin-top:20px;">
+        <h4>
+          Faltantes por votar
+          <span class="faltantes-voto-badge" id="faltantesVotoBadge">0</span>
+        </h4>
+        <div class="faltantes-list-admin" id="faltantesVotoList"></div>
       </div>
 
       <!-- Crear nueva votacion -->
@@ -206,6 +279,45 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 
         <button class="btn-crear" onclick="crearVotacion()">Crear Votacion</button>
       </div>
+
+      <!-- HISTORIAL DE VOTACIONES -->
+      <div class="panel historial-panel">
+        <h3>Historial de Votaciones</h3>
+        <div id="historialContainer">
+          <div class="historial-empty">Selecciona un edificio para ver el historial</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE EDICION -->
+<div class="modal-overlay" id="modalEdicion">
+  <div class="modal-content">
+    <h3>Editar Votacion</h3>
+    <input type="hidden" id="editVotacionId">
+    <div class="form-group">
+      <label>Titulo</label>
+      <input type="text" id="editTitulo">
+    </div>
+    <div class="form-group">
+      <label>Descripcion</label>
+      <textarea id="editDescripcion"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Tipo de Votacion</label>
+      <select id="editTipo">
+        <option value="coeficientes">Por Coeficientes (Ponderado)</option>
+        <option value="nominal">Nominal Simple (1 voto = 1 apartamento)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Opciones</label>
+      <div id="editOpcionesContainer"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-modal-save" onclick="guardarEdicion()">Guardar Cambios</button>
     </div>
   </div>
 </div>
@@ -236,6 +348,8 @@ let edificioActual = '';
 let asistentesData = {};
 let votacionActual = null;
 let datosEdificio = null;
+let todosPropietariosData = {};
+let historialData = {};
 
 // ========== OPCIONES CUSTOM ==========
 let opcionesCount = 2;
@@ -386,6 +500,7 @@ async function cargarDatos() {
     onValue(residentesRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
+        todosPropietariosData = data;
         let totalPropietarios = 0;
         Object.values(data).forEach(persona => {
           if (persona.tipo === "Propietario" || persona.tipo === "propietario" || !persona.tipo) {
@@ -393,7 +508,9 @@ async function cargarDatos() {
           }
         });
         document.getElementById('totalApartamentos').textContent = totalPropietarios;
+        actualizarFaltantesRegistro();
       } else {
+        todosPropietariosData = {};
         document.getElementById('totalApartamentos').textContent = '0';
       }
     });
@@ -408,6 +525,8 @@ async function cargarDatos() {
       asistentesData = snapshot.val() || {};
       actualizarQuorum();
       mostrarAsistentes();
+      actualizarFaltantesRegistro();
+      actualizarFaltantesVoto();
     });
   } catch (error) {
     console.error('Error en asistentes:', error);
@@ -420,9 +539,21 @@ async function cargarDatos() {
       votacionActual = snapshot.val();
       mostrarVotacionActiva();
       actualizarEnlaceVotacion();
+      actualizarFaltantesVoto();
     });
   } catch (error) {
     console.error('Error en votacion:', error);
+  }
+
+  // Cargar historial de votaciones
+  try {
+    const historialRef = ref(db, 'asambleas/' + edificioActual + '/historial_votaciones');
+    onValue(historialRef, (snapshot) => {
+      historialData = snapshot.val() || {};
+      mostrarHistorial();
+    });
+  } catch (error) {
+    console.error('Error en historial:', error);
   }
 }
 
@@ -710,6 +841,315 @@ window.limpiarAsistentes = async function() {
   }
 };
 
+// ========== HISTORIAL ==========
+function mostrarHistorial() {
+  const container = document.getElementById('historialContainer');
+  const entries = Object.entries(historialData);
+
+  if (entries.length === 0) {
+    container.innerHTML = '<div class="historial-empty">No hay votaciones en el historial</div>';
+    return;
+  }
+
+  // Ordenar por fecha de cierre (mas reciente primero)
+  entries.sort((a, b) => {
+    const fechaA = a[1].fechaCierre || a[1].fechaCreacion || '';
+    const fechaB = b[1].fechaCierre || b[1].fechaCreacion || '';
+    return fechaB.localeCompare(fechaA);
+  });
+
+  let html = '';
+  entries.forEach(([id, votacion]) => {
+    const votos = votacion.votos || {};
+    const totalVotos = Object.keys(votos).length;
+    const tipo = votacion.tipo || 'coeficientes';
+    const opciones = votacion.opciones || null;
+    const fechaCierre = votacion.fechaCierre ? new Date(votacion.fechaCierre).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Sin fecha';
+
+    html += `<div class="historial-item">`;
+    html += `<div class="historial-item-header">`;
+    html += `<div class="historial-item-title">${votacion.titulo || 'Sin titulo'}</div>`;
+    html += `<div class="historial-item-meta">`;
+    html += `<span class="historial-meta-badge badge-cerrada">Cerrada</span>`;
+    html += `<span class="historial-meta-badge badge-tipo">${tipo === 'nominal' ? 'Nominal' : 'Coeficientes'}</span>`;
+    html += `<span class="historial-meta-badge badge-fecha">${fechaCierre}</span>`;
+    html += `</div></div>`;
+
+    if (votacion.descripcion) {
+      html += `<div class="historial-item-desc">${votacion.descripcion}</div>`;
+    }
+
+    // Mostrar resultados
+    html += `<div class="historial-resultados">`;
+    const colores = ['#00B853', '#dc3545', '#ff9800', '#0056B8', '#9c27b0'];
+
+    if (opciones && Object.keys(opciones).length > 0) {
+      const conteos = {};
+      Object.keys(opciones).forEach(key => { conteos[key] = 0; });
+      let totalP = 0;
+
+      Object.values(votos).forEach(voto => {
+        const opcionKey = voto.opcion || voto.voto || '';
+        if (conteos.hasOwnProperty(opcionKey)) {
+          if (tipo === 'nominal') { conteos[opcionKey] += 1; }
+          else { conteos[opcionKey] += parseFloat(voto.coeficiente || 0); }
+        }
+      });
+      Object.values(conteos).forEach(v => { totalP += v; });
+
+      let ci = 0;
+      Object.entries(opciones).sort((a, b) => (a[1].orden || 0) - (b[1].orden || 0)).forEach(([key, opt]) => {
+        const valor = conteos[key] || 0;
+        const pct = totalP > 0 ? (valor / totalP * 100) : 0;
+        const color = colores[ci % colores.length];
+        const valorTxt = tipo === 'nominal' ? valor : valor.toFixed(4);
+        html += `<div class="historial-resultado-row">
+          <span class="historial-resultado-label">${opt.label}</span>
+          <div class="historial-resultado-bar"><div class="historial-resultado-fill" style="width:${Math.max(pct, 0)}%;background:${color};">${pct.toFixed(1)}%</div></div>
+          <span class="historial-resultado-value">${valorTxt}</span>
+        </div>`;
+        ci++;
+      });
+    } else {
+      // Legacy
+      let aF = 0, eC = 0, ab = 0;
+      Object.values(votos).forEach(voto => {
+        if (tipo === 'nominal') {
+          if (voto.voto === 'si') aF++; else if (voto.voto === 'no') eC++; else ab++;
+        } else {
+          const c = parseFloat(voto.coeficiente || 0);
+          if (voto.voto === 'si') aF += c; else if (voto.voto === 'no') eC += c; else ab += c;
+        }
+      });
+      const totalP = aF + eC + ab;
+      const pA = totalP > 0 ? (aF/totalP*100) : 0;
+      const pC = totalP > 0 ? (eC/totalP*100) : 0;
+      const pAb = totalP > 0 ? (ab/totalP*100) : 0;
+      html += `<div class="historial-resultado-row"><span class="historial-resultado-label">A Favor</span><div class="historial-resultado-bar"><div class="historial-resultado-fill" style="width:${pA}%;background:#00B853;">${pA.toFixed(1)}%</div></div><span class="historial-resultado-value">${tipo==='nominal'?aF:aF.toFixed(4)}</span></div>`;
+      html += `<div class="historial-resultado-row"><span class="historial-resultado-label">En Contra</span><div class="historial-resultado-bar"><div class="historial-resultado-fill" style="width:${pC}%;background:#dc3545;">${pC.toFixed(1)}%</div></div><span class="historial-resultado-value">${tipo==='nominal'?eC:eC.toFixed(4)}</span></div>`;
+      html += `<div class="historial-resultado-row"><span class="historial-resultado-label">Abstencion</span><div class="historial-resultado-bar"><div class="historial-resultado-fill" style="width:${pAb}%;background:#ff9800;">${pAb.toFixed(1)}%</div></div><span class="historial-resultado-value">${tipo==='nominal'?ab:ab.toFixed(4)}</span></div>`;
+    }
+    html += `</div>`;
+
+    html += `<p style="color:#999;font-size:0.85em;margin-bottom:10px;">Total votos: ${totalVotos}</p>`;
+    html += `<div class="historial-controls">`;
+    html += `<button class="btn-edit-hist" onclick="abrirEdicion('${id}')">Editar</button>`;
+    html += `<button class="btn-reactivar-hist" onclick="reactivarVotacion('${id}')">Reactivar</button>`;
+    html += `<button class="btn-delete-hist" onclick="eliminarDelHistorial('${id}')">Eliminar</button>`;
+    html += `</div>`;
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// ========== MODAL EDICION ==========
+window.abrirEdicion = function(id) {
+  const votacion = historialData[id];
+  if (!votacion) return;
+
+  document.getElementById('editVotacionId').value = id;
+  document.getElementById('editTitulo').value = votacion.titulo || '';
+  document.getElementById('editDescripcion').value = votacion.descripcion || '';
+  document.getElementById('editTipo').value = votacion.tipo || 'coeficientes';
+
+  // Cargar opciones
+  const container = document.getElementById('editOpcionesContainer');
+  const opciones = votacion.opciones || {};
+  const opEntries = Object.entries(opciones).sort((a, b) => (a[1].orden || 0) - (b[1].orden || 0));
+
+  if (opEntries.length > 0) {
+    container.innerHTML = opEntries.map(([key, opt], i) => `
+      <div class="opcion-row" data-key="${key}">
+        <span style="font-weight:600;color:#0056B8;min-width:20px;">${i + 1}.</span>
+        <input type="text" value="${opt.label}" class="edit-opcion-input">
+      </div>
+    `).join('');
+  } else {
+    container.innerHTML = '<p style="color:#999;">Esta votacion usa el formato legacy (Si/No/Abstencion)</p>';
+  }
+
+  document.getElementById('modalEdicion').classList.add('active');
+};
+
+window.cerrarModal = function() {
+  document.getElementById('modalEdicion').classList.remove('active');
+};
+
+window.guardarEdicion = async function() {
+  const id = document.getElementById('editVotacionId').value;
+  if (!id || !edificioActual) return;
+
+  const titulo = document.getElementById('editTitulo').value.trim();
+  const descripcion = document.getElementById('editDescripcion').value.trim();
+  const tipo = document.getElementById('editTipo').value;
+
+  if (!titulo) {
+    alert('El titulo no puede estar vacio');
+    return;
+  }
+
+  const updates = {
+    titulo: titulo,
+    descripcion: descripcion,
+    tipo: tipo
+  };
+
+  // Actualizar opciones si las hay
+  const inputs = document.querySelectorAll('#editOpcionesContainer .edit-opcion-input');
+  if (inputs.length > 0) {
+    const opciones = {};
+    inputs.forEach((input, i) => {
+      const row = input.closest('.opcion-row');
+      const key = row.dataset.key;
+      opciones[key] = { label: input.value.trim(), orden: i + 1 };
+    });
+    updates.opciones = opciones;
+  }
+
+  try {
+    await update(ref(db, 'asambleas/' + edificioActual + '/historial_votaciones/' + id), updates);
+    cerrarModal();
+    alert('Votacion actualizada');
+  } catch (error) {
+    console.error('Error guardando edicion:', error);
+    alert('Error: ' + error.message);
+  }
+};
+
+window.eliminarDelHistorial = async function(id) {
+  if (!confirm('Eliminar esta votacion del historial? Esta accion no se puede deshacer.')) return;
+  try {
+    await remove(ref(db, 'asambleas/' + edificioActual + '/historial_votaciones/' + id));
+    alert('Votacion eliminada del historial');
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
+};
+
+window.reactivarVotacion = async function(id) {
+  if (votacionActual) {
+    alert('Ya hay una votacion activa. Cierra o borra la votacion actual primero.');
+    return;
+  }
+  if (!confirm('Reactivar esta votacion? Se movera del historial a votacion activa y se reiniciaran los votos.')) return;
+
+  const votacion = historialData[id];
+  if (!votacion) return;
+
+  try {
+    // Crear como votacion activa (sin votos, estado activa)
+    const reactivada = {
+      titulo: votacion.titulo,
+      descripcion: votacion.descripcion || '',
+      tipo: votacion.tipo || 'coeficientes',
+      opciones: votacion.opciones || {},
+      fechaCreacion: new Date().toISOString(),
+      estado: 'activa',
+      votos: {}
+    };
+    await set(ref(db, 'asambleas/' + edificioActual + '/votacion_activa'), reactivada);
+    await remove(ref(db, 'asambleas/' + edificioActual + '/historial_votaciones/' + id));
+    alert('Votacion reactivada');
+  } catch (error) {
+    console.error('Error reactivando:', error);
+    alert('Error: ' + error.message);
+  }
+};
+
+// Cerrar modal al hacer click fuera
+document.getElementById('modalEdicion').addEventListener('click', function(e) {
+  if (e.target === this) cerrarModal();
+});
+
+// ========== FALTANTES ==========
+function actualizarFaltantesRegistro() {
+  const panel = document.getElementById('faltantesRegistroPanel');
+  const list = document.getElementById('faltantesRegistroList');
+  const badge = document.getElementById('faltantesRegistroBadge');
+
+  const propKeys = Object.keys(todosPropietariosData);
+  if (propKeys.length === 0) {
+    panel.style.display = 'none';
+    return;
+  }
+
+  const faltantes = [];
+  propKeys.forEach(key => {
+    const prop = todosPropietariosData[key];
+    if (prop.tipo === 'Propietario' || prop.tipo === 'propietario' || !prop.tipo) {
+      if (!asistentesData[key]) {
+        faltantes.push({ apto: prop.apto, nombre: prop.nombre || 'Sin nombre' });
+      }
+    }
+  });
+
+  faltantes.sort((a, b) => (parseInt(a.apto) || 0) - (parseInt(b.apto) || 0));
+
+  const totalPropietarios = Object.values(todosPropietariosData).filter(p =>
+    p.tipo === 'Propietario' || p.tipo === 'propietario' || !p.tipo
+  ).length;
+
+  if (faltantes.length === 0) {
+    panel.style.display = 'none';
+    return;
+  }
+
+  panel.style.display = 'block';
+  badge.textContent = `Faltan ${faltantes.length} de ${totalPropietarios}`;
+
+  list.innerHTML = faltantes.map(f => `
+    <div class="faltante-admin-item">
+      <span class="faltante-admin-apto">Apto ${f.apto}</span>
+      <span class="faltante-admin-nombre">${f.nombre}</span>
+    </div>
+  `).join('');
+}
+
+function actualizarFaltantesVoto() {
+  const panel = document.getElementById('faltantesVotoPanel');
+  const list = document.getElementById('faltantesVotoList');
+  const badge = document.getElementById('faltantesVotoBadge');
+
+  if (!votacionActual) {
+    panel.style.display = 'none';
+    return;
+  }
+
+  const votos = votacionActual.votos || {};
+  const asistentesKeys = Object.keys(asistentesData);
+
+  if (asistentesKeys.length === 0) {
+    panel.style.display = 'none';
+    return;
+  }
+
+  const faltantes = [];
+  asistentesKeys.forEach(key => {
+    if (!votos[key]) {
+      const a = asistentesData[key];
+      faltantes.push({ apto: a.apartamento, nombre: a.nombre || 'Sin nombre' });
+    }
+  });
+
+  faltantes.sort((a, b) => (parseInt(a.apto) || 0) - (parseInt(b.apto) || 0));
+
+  if (faltantes.length === 0) {
+    panel.style.display = 'none';
+    return;
+  }
+
+  panel.style.display = 'block';
+  badge.textContent = `Faltan ${faltantes.length} de ${asistentesKeys.length}`;
+
+  list.innerHTML = faltantes.map(f => `
+    <div class="faltante-voto-item">
+      <span class="faltante-voto-apto">Apto ${f.apto}</span>
+      <span class="faltante-voto-nombre">${f.nombre}</span>
+    </div>
+  `).join('');
+}
+
 function limpiarVista() {
   document.getElementById('edificioNombre').textContent = 'Selecciona edificio';
   document.getElementById('quorumActual').textContent = '0%';
@@ -721,6 +1161,11 @@ function limpiarVista() {
   document.getElementById('votacionActiva').innerHTML = '<div class="no-votacion"><p>Selecciona un edificio</p></div>';
   document.getElementById('enlaceRegistroQuorum').value = 'Selecciona un edificio primero';
   document.getElementById('enlaceVotacionPrincipal').value = 'Crea una votacion primero';
+  document.getElementById('faltantesRegistroPanel').style.display = 'none';
+  document.getElementById('faltantesVotoPanel').style.display = 'none';
+  document.getElementById('historialContainer').innerHTML = '<div class="historial-empty">Selecciona un edificio para ver el historial</div>';
+  todosPropietariosData = {};
+  historialData = {};
 }
 </script>
 </body>

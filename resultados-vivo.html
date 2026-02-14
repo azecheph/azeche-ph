@@ -13,28 +13,62 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .logo-blue { color: white; }
 .logo-green { color: #FFD700; }
 .edificio-nombre { font-size: 2em; opacity: 0.9; }
-.votacion-titulo { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 40px; border-radius: 30px; margin-bottom: 40px; }
-.votacion-titulo h1 { font-size: 3em; margin-bottom: 15px; }
-.votacion-titulo p { font-size: 1.5em; opacity: 0.9; }
+
+/* Votacion titulo y resultados - MAS COMPACTOS */
+.votacion-titulo { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 25px 30px; border-radius: 20px; margin-bottom: 25px; }
+.votacion-titulo h1 { font-size: 2em; margin-bottom: 8px; }
+.votacion-titulo p { font-size: 1.1em; opacity: 0.9; }
+
 .quorum-display { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 30px; border-radius: 30px; text-align: center; margin-bottom: 40px; }
 .quorum-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
 .quorum-item { text-align: center; }
 .quorum-number { font-size: 4em; font-weight: 900; margin-bottom: 10px; }
 .quorum-label { font-size: 1.2em; opacity: 0.9; }
-.resultados-grid { display: grid; gap: 30px; }
-.resultado-card { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 40px; border-radius: 30px; }
-.resultado-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.resultado-icon { font-size: 4em; }
+
+.resultados-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.resultado-card { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 25px; border-radius: 20px; }
+.resultado-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.resultado-icon { font-size: 2.5em; }
 .resultado-stats { text-align: right; }
-.resultado-votos { font-size: 4em; font-weight: 900; }
-.resultado-porcentaje { font-size: 2em; opacity: 0.9; }
-.progress-bar { height: 60px; background: rgba(0,0,0,0.2); border-radius: 30px; overflow: hidden; position: relative; }
-.progress-fill { height: 100%; background: white; border-radius: 30px; transition: width 1s ease; display: flex; align-items: center; justify-content: center; font-size: 2em; font-weight: 900; color: #0056B8; }
-.no-votacion { text-align: center; padding: 100px; font-size: 2em; opacity: 0.7; }
+.resultado-votos { font-size: 2.8em; font-weight: 900; }
+.resultado-porcentaje { font-size: 1.4em; opacity: 0.9; }
+.progress-bar { height: 40px; background: rgba(0,0,0,0.2); border-radius: 20px; overflow: hidden; position: relative; }
+.progress-fill { height: 100%; background: white; border-radius: 20px; transition: width 1s ease; display: flex; align-items: center; justify-content: center; font-size: 1.3em; font-weight: 900; color: #0056B8; }
+.no-votacion { text-align: center; padding: 60px; font-size: 1.8em; opacity: 0.7; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 .live-indicator { display: inline-block; width: 20px; height: 20px; background: #ff4444; border-radius: 50%; margin-right: 10px; animation: pulse 2s infinite; }
 .error-message { background: rgba(220, 53, 69, 0.8); padding: 20px; border-radius: 15px; margin-bottom: 30px; text-align: center; }
-@media (max-width: 768px) { .quorum-grid { grid-template-columns: repeat(2, 1fr); } .votacion-titulo h1 { font-size: 2em; } .logo-text { font-size: 2.5em; } }
+
+/* Enlaces QR - Registro y Votacion lado a lado */
+.enlaces-row { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 40px; }
+.enlace-section { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 25px; border-radius: 25px; display: flex; align-items: center; gap: 20px; }
+.enlace-qr { background: white; padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.enlace-info { flex: 1; min-width: 0; }
+.enlace-info h3 { font-size: 1.3em; margin-bottom: 6px; }
+.enlace-url { background: rgba(255,255,255,0.25); padding: 8px 14px; border-radius: 8px; font-size: 0.85em; word-break: break-all; margin-bottom: 6px; font-family: monospace; }
+.enlace-instruccion { font-size: 0.9em; opacity: 0.8; }
+.enlace-votacion { border: 2px solid rgba(255,215,0,0.5); }
+
+/* Faltantes */
+.faltantes-section { background: rgba(255,165,0,0.25); backdrop-filter: blur(10px); padding: 30px; border-radius: 30px; margin-bottom: 40px; }
+.faltantes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+.faltantes-header h3 { font-size: 1.5em; }
+.faltantes-badge { background: rgba(255,255,255,0.3); padding: 8px 20px; border-radius: 20px; font-size: 1.2em; font-weight: 700; }
+.faltantes-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; max-height: 300px; overflow-y: auto; }
+.faltante-item { background: rgba(255,255,255,0.15); padding: 10px 15px; border-radius: 10px; font-size: 1em; }
+.faltante-apto { font-weight: 700; font-size: 1.1em; }
+.faltante-nombre { opacity: 0.85; font-size: 0.9em; }
+.faltantes-voto-section { background: rgba(220,53,69,0.25); backdrop-filter: blur(10px); padding: 30px; border-radius: 30px; margin-bottom: 40px; }
+
+@media (max-width: 900px) {
+  .quorum-grid { grid-template-columns: repeat(2, 1fr); }
+  .votacion-titulo h1 { font-size: 1.5em; }
+  .logo-text { font-size: 2.5em; }
+  .enlaces-row { grid-template-columns: 1fr; }
+  .enlace-section { flex-direction: column; text-align: center; }
+  .faltantes-list { grid-template-columns: 1fr; }
+  .resultados-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -48,11 +82,32 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 </div>
 </div>
 <div id="errorContainer"></div>
+
+<!-- ENLACES: REGISTRO + VOTACION lado a lado -->
+<div class="enlaces-row">
+  <div class="enlace-section" id="registroSection">
+    <div class="enlace-qr" id="qrRegistroContainer"></div>
+    <div class="enlace-info">
+      <h3>Registro de Asistencia</h3>
+      <div class="enlace-url" id="registroUrl">Cargando...</div>
+      <p class="enlace-instruccion">Escanea el QR o ingresa al enlace para registrar tu asistencia</p>
+    </div>
+  </div>
+  <div class="enlace-section enlace-votacion" id="votacionLinkSection">
+    <div class="enlace-qr" id="qrVotacionContainer"></div>
+    <div class="enlace-info">
+      <h3>Enlace de Votacion</h3>
+      <div class="enlace-url" id="votacionUrl">Cargando...</div>
+      <p class="enlace-instruccion">Escanea el QR o ingresa al enlace para votar durante la asamblea</p>
+    </div>
+  </div>
+</div>
+
 <div class="quorum-display">
 <div class="quorum-grid">
 <div class="quorum-item">
 <div class="quorum-number" id="quorumPorcentaje">-%</div>
-<div class="quorum-label">QUÓRUM</div>
+<div class="quorum-label">QUORUM</div>
 </div>
 <div class="quorum-item">
 <div class="quorum-number" id="totalAsistentes">0</div>
@@ -68,12 +123,33 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 </div>
 </div>
 </div>
+
+<!-- FALTANTES POR REGISTRARSE -->
+<div class="faltantes-section" id="faltantesRegistroSection" style="display:none;">
+<div class="faltantes-header">
+<h3>Faltantes por registrarse</h3>
+<div class="faltantes-badge" id="faltantesRegistroBadge">0 de 0</div>
+</div>
+<div class="faltantes-list" id="faltantesRegistroList"></div>
+</div>
+
+<!-- FALTANTES POR VOTAR -->
+<div class="faltantes-voto-section" id="faltantesVotoSection" style="display:none;">
+<div class="faltantes-header">
+<h3>Faltantes por votar</h3>
+<div class="faltantes-badge" id="faltantesVotoBadge">0 de 0</div>
+</div>
+<div class="faltantes-list" id="faltantesVotoList"></div>
+</div>
+
 <div id="votacionContent">
 <div class="no-votacion">
-<span class="live-indicator"></span> ⏳ Esperando votación activa...
+<span class="live-indicator"></span> Esperando votacion activa...
 </div>
 </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, onValue, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
@@ -94,7 +170,7 @@ const app = initializeApp(firebaseConfig);
 db = getDatabase(app);
 } catch (error) {
 console.error('Error inicializando Firebase:', error);
-mostrarError('Error de conexión. Por favor recarga.');
+mostrarError('Error de conexion. Por favor recarga.');
 }
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -111,9 +187,48 @@ document.getElementById('edificioNombre').innerHTML = `
 <span class="live-indicator"></span> ${nombresEdificios[edificio] || edificio.toUpperCase()} - EN VIVO
 `;
 
-let coefRequerido = 0.5;
+// Generar enlaces y QRs
+const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+const urlRegistro = baseUrl + 'registro-asamblea.html?edificio=' + edificio;
+const urlVotacion = baseUrl + 'votacion-propietario.html?edificio=' + edificio;
 
-// Cargar configuración del edificio
+document.getElementById('registroUrl').textContent = urlRegistro;
+document.getElementById('votacionUrl').textContent = urlVotacion;
+
+// QR Registro
+try {
+new QRCode(document.getElementById('qrRegistroContainer'), {
+  text: urlRegistro,
+  width: 140,
+  height: 140,
+  colorDark: '#0056B8',
+  colorLight: '#ffffff',
+  correctLevel: QRCode.CorrectLevel.M
+});
+} catch (e) {
+console.error('Error generando QR registro:', e);
+}
+
+// QR Votacion
+try {
+new QRCode(document.getElementById('qrVotacionContainer'), {
+  text: urlVotacion,
+  width: 140,
+  height: 140,
+  colorDark: '#00B853',
+  colorLight: '#ffffff',
+  correctLevel: QRCode.CorrectLevel.M
+});
+} catch (e) {
+console.error('Error generando QR votacion:', e);
+}
+
+let coefRequerido = 0.5;
+let todosPropietarios = {};
+let asistentesActuales = {};
+let votacionActualData = null;
+
+// Cargar configuracion del edificio
 async function cargarConfiguracionEdificio() {
 try {
 const edificioRef = ref(db, `edificios/${edificio}`);
@@ -125,51 +240,155 @@ coefRequerido = datos.coeficienteQuorum;
 }
 }
 } catch (error) {
-console.error('Error cargando configuración:', error);
+console.error('Error cargando configuracion:', error);
 }
+}
+
+// Cargar todos los propietarios del edificio
+async function cargarPropietarios() {
+try {
+const propRef = ref(db, `propietarios/${edificio}`);
+const snapshot = await get(propRef);
+if (snapshot.exists()) {
+todosPropietarios = snapshot.val();
+}
+} catch (error) {
+console.error('Error cargando propietarios:', error);
+}
+}
+
+function actualizarFaltantesRegistro() {
+const section = document.getElementById('faltantesRegistroSection');
+const list = document.getElementById('faltantesRegistroList');
+const badge = document.getElementById('faltantesRegistroBadge');
+
+const propKeys = Object.keys(todosPropietarios);
+if (propKeys.length === 0) {
+section.style.display = 'none';
+return;
+}
+
+const faltantes = [];
+propKeys.forEach(key => {
+const prop = todosPropietarios[key];
+if (prop.tipo === 'Propietario' || prop.tipo === 'propietario' || !prop.tipo) {
+if (!asistentesActuales[key]) {
+faltantes.push({ apto: prop.apto, nombre: prop.nombre || 'Sin nombre' });
+}
+}
+});
+
+faltantes.sort((a, b) => (parseInt(a.apto) || 0) - (parseInt(b.apto) || 0));
+
+const totalPropietarios = Object.values(todosPropietarios).filter(p =>
+p.tipo === 'Propietario' || p.tipo === 'propietario' || !p.tipo
+).length;
+
+if (faltantes.length === 0) {
+section.style.display = 'none';
+return;
+}
+
+section.style.display = 'block';
+badge.textContent = `Faltan ${faltantes.length} de ${totalPropietarios}`;
+
+list.innerHTML = faltantes.map(f => `
+<div class="faltante-item">
+<div class="faltante-apto">Apto ${f.apto}</div>
+<div class="faltante-nombre">${f.nombre}</div>
+</div>
+`).join('');
+}
+
+function actualizarFaltantesVoto() {
+const section = document.getElementById('faltantesVotoSection');
+const list = document.getElementById('faltantesVotoList');
+const badge = document.getElementById('faltantesVotoBadge');
+
+if (!votacionActualData) {
+section.style.display = 'none';
+return;
+}
+
+const votos = votacionActualData.votos || {};
+const asistentesKeys = Object.keys(asistentesActuales);
+
+if (asistentesKeys.length === 0) {
+section.style.display = 'none';
+return;
+}
+
+const faltantes = [];
+asistentesKeys.forEach(key => {
+if (!votos[key]) {
+const a = asistentesActuales[key];
+faltantes.push({ apto: a.apartamento, nombre: a.nombre || 'Sin nombre' });
+}
+});
+
+faltantes.sort((a, b) => (parseInt(a.apto) || 0) - (parseInt(b.apto) || 0));
+
+if (faltantes.length === 0) {
+section.style.display = 'none';
+return;
+}
+
+section.style.display = 'block';
+badge.textContent = `Faltan ${faltantes.length} de ${asistentesKeys.length}`;
+
+list.innerHTML = faltantes.map(f => `
+<div class="faltante-item">
+<div class="faltante-apto">Apto ${f.apto}</div>
+<div class="faltante-nombre">${f.nombre}</div>
+</div>
+`).join('');
 }
 
 // Escuchar asistentes
 const asistentesRef = ref(db, `asambleas/${edificio}/asistentes`);
 onValue(asistentesRef, (snapshot) => {
-const asistentes = snapshot.val() || {};
-const total = Object.keys(asistentes).length;
+asistentesActuales = snapshot.val() || {};
+const total = Object.keys(asistentesActuales).length;
 document.getElementById('totalAsistentes').textContent = total;
 
 let coefTotal = 0;
-Object.values(asistentes).forEach(a => {
+Object.values(asistentesActuales).forEach(a => {
 coefTotal += parseFloat(a.coeficiente || 0);
 });
 
 document.getElementById('coeficienteTotal').textContent = coefTotal.toFixed(4);
 
-// Calcular quórum dinámicamente
 const quorum = coefRequerido > 0 ? Math.min(100, (coefTotal / coefRequerido) * 100) : 0;
 document.getElementById('quorumPorcentaje').textContent = Math.round(quorum) + '%';
+
+actualizarFaltantesRegistro();
+actualizarFaltantesVoto();
 }, (error) => {
 console.error('Error en asistentes:', error);
 mostrarError('Error cargando asistentes');
 });
 
-// Escuchar votación activa
+// Escuchar votacion activa
 const votacionRef = ref(db, `asambleas/${edificio}/votacion_activa`);
 onValue(votacionRef, (snapshot) => {
-const votacion = snapshot.val();
-mostrarVotacion(votacion);
+votacionActualData = snapshot.val();
+mostrarVotacion(votacionActualData);
+actualizarFaltantesVoto();
 }, (error) => {
-console.error('Error en votación:', error);
-mostrarError('Error cargando votación');
+console.error('Error en votacion:', error);
+mostrarError('Error cargando votacion');
 });
 
-// Iniciar configuración
+// Iniciar
 cargarConfiguracionEdificio();
+cargarPropietarios();
 
 function mostrarVotacion(votacion) {
 const container = document.getElementById('votacionContent');
 if (!votacion) {
 container.innerHTML = `
 <div class="no-votacion">
-<span class="live-indicator"></span> ⏳ Esperando votación activa...
+<span class="live-indicator"></span> Esperando votacion activa...
 </div>
 `;
 document.getElementById('totalVotos').textContent = '0';
@@ -230,7 +449,7 @@ container.innerHTML = `
 </div>
 </div>
 <div class="progress-bar">
-<div class="progress-fill" style="width: ${porcAbstencion}%; background: rgba(255,255,255,0.7); color: #6c757d;"> ABSTENCIÓN </div>
+<div class="progress-fill" style="width: ${porcAbstencion}%; background: rgba(255,255,255,0.7); color: #6c757d;"> ABSTENCION </div>
 </div>
 </div>
 </div>
