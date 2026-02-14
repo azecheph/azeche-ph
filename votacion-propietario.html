@@ -7,49 +7,107 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
         }
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
-        .voting-card {
             background: white;
+            padding: 40px;
             border-radius: 20px;
-            padding: 30px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
         }
-        .status-badge {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
+        h1 { 
+            color: #667eea; 
+            margin-bottom: 10px; 
+            text-align: center;
+            font-size: 2em;
         }
-        .status-active {
-            background: #d4edda;
-            color: #155724;
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95em;
         }
-        .status-closed {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        .voting-title {
-            font-size: 1.8rem;
+        .form-group { margin-bottom: 20px; }
+        label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
             color: #333;
-            margin: 15px 0;
+            font-size: 1.1em;
         }
-        .options-list {
-            margin-top: 25px;
+        select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 18px;
+            transition: border-color 0.3s;
+            background: white;
+        }
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: opacity 0.3s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        }
+        .info-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+        .info-box p {
+            color: #1976D2;
+            margin: 0;
+            font-size: 0.95em;
+        }
+        .error {
+            background: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+        }
+        .success {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+        }
+        .voting-section {
+            display: none;
         }
         .option {
             display: flex;
@@ -59,19 +117,17 @@
             margin-bottom: 15px;
             background: #f8f9fa;
             border-radius: 12px;
-            border: 2px solid transparent;
+            border: 3px solid transparent;
             transition: all 0.3s ease;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
         }
         .option:hover {
             border-color: #667eea;
             transform: translateX(5px);
         }
         .option.voted {
-            border-color: #28a745;
-            background: #d4edda;
+            border-color: #4CAF50;
+            background: #e8f5e9;
         }
         .option.disabled {
             opacity: 0.6;
@@ -79,485 +135,449 @@
         }
         .option-info {
             flex: 1;
-            z-index: 1;
         }
         .option-name {
-            font-weight: 600;
+            font-weight: 700;
             color: #333;
-            font-size: 1.1rem;
+            font-size: 1.2em;
+            margin-bottom: 5px;
         }
         .progress-bar {
             width: 100%;
-            height: 8px;
+            height: 10px;
             background: #e9ecef;
-            border-radius: 4px;
-            margin-top: 8px;
+            border-radius: 5px;
             overflow: hidden;
+            margin-top: 8px;
         }
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 4px;
+            border-radius: 5px;
             transition: width 0.5s ease;
         }
         .vote-count {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.8em;
+            font-weight: 900;
             color: #667eea;
-            margin-left: 20px;
-            z-index: 1;
+            margin-left: 15px;
         }
-        .no-voting {
+        .loading {
             text-align: center;
-            padding: 60px 20px;
-            color: #666;
+            padding: 20px;
+            display: none;
         }
-        .no-voting-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
         }
-        .last-update {
-            text-align: center;
-            color: rgba(255,255,255,0.8);
-            font-size: 0.9rem;
-            margin-top: 20px;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.1); }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         .live-indicator {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            color: #28a745;
-            font-size: 0.9rem;
-            margin-top: 10px;
+            color: #4CAF50;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
         }
         .live-dot {
             width: 10px;
             height: 10px;
-            background: #28a745;
+            background: #4CAF50;
             border-radius: 50%;
             animation: pulse 1.5s infinite;
         }
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .message {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .voter-id-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-        .voter-id-section input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            margin-top: 10px;
-        }
-        .voter-id-section input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        .stats-grid {
+        .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 15px;
-            margin: 20px 0;
+            margin-bottom: 25px;
         }
         .stat-box {
-            background: #f8f9fa;
+            background: #f0f7ff;
             padding: 15px;
             border-radius: 10px;
             text-align: center;
         }
         .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
+            font-size: 1.8em;
+            font-weight: 900;
             color: #667eea;
         }
         .stat-label {
             color: #666;
-            font-size: 0.9rem;
+            font-size: 0.85em;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🏢 Azeche P.H.</h1>
-            <p>Sistema de Votación de Propietarios</p>
+        <h1>🗳️ Votación</h1>
+        <p class="subtitle" id="subtitulo">Selecciona tu apartamento para votar</p>
+        
+        <div class="error" id="error"></div>
+        
+        <!-- SECCIÓN 1: SELECCIONAR APARTAMENTO -->
+        <div id="seccionApartamento">
+            <div class="info-box">
+                <p>📍 <span id="nombreEdificio">Cargando...</span></p>
+            </div>
+            
+            <div class="form-group">
+                <label>🏠 Selecciona tu Apartamento</label>
+                <select id="apartamento" required>
+                    <option value="">-- Selecciona --</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="verificarYMostrarVotacion()">Continuar</button>
         </div>
 
-        <div id="message-container"></div>
+        <!-- SECCIÓN 2: VOTACIÓN -->
+        <div id="seccionVotacion" class="voting-section">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px; color: #667eea;">Cargando votación...</p>
+            </div>
 
-        <div id="voting-container">
-            <div class="voting-card">
-                <div class="no-voting">
-                    <div class="no-voting-icon">⏳</div>
-                    <h2>Cargando...</h2>
-                    <p>Conectando con el servidor</p>
+            <div id="contenidoVotacion">
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    <span>Votación en tiempo real</span>
                 </div>
+
+                <div class="info-box" style="background: #e8f5e9; border-color: #4CAF50;">
+                    <p>👤 <strong id="infoPropietario"></strong></p>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-number" id="totalVotos">0</div>
+                        <div class="stat-label">Votos registrados</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="tipoVotacion">-</div>
+                        <div class="stat-label">Tipo de votación</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 15px; color: #333;" id="tituloVotacion"></h3>
+                <p style="color: #666; margin-bottom: 20px;" id="descripcionVotacion"></p>
+
+                <div id="opcionesVotacion"></div>
             </div>
         </div>
 
-        <div class="last-update" id="last-update"></div>
+        <!-- MENSAJE DE ÉXITO -->
+        <div class="success" id="mensajeExito">
+            <h2>✅</h2>
+            <h2>¡Voto Registrado!</h2>
+            <p>Tu voto ha sido registrado exitosamente.<br>Gracias por participar.</p>
+        </div>
     </div>
 
-    <!-- Firebase SDK -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue, update, get, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, onValue, get, update, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-        // ============================================
-        // CONFIGURACIÓN FIREBASE - REEMPLAZA CON TUS DATOS
-        // ============================================
+        // Configuración Firebase - USAR LA MISMA QUE REGISTRO-ASAMBLEA
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_PROYECTO.firebaseapp.com",
-            databaseURL: "https://TU_PROYECTO-default-rtdb.firebaseio.com",
-            projectId: "TU_PROYECTO",
-            storageBucket: "TU_PROYECTO.appspot.com",
-            messagingSenderId: "TU_SENDER_ID",
-            appId: "TU_APP_ID"
+            apiKey: "AIzaSyAFWn-qxIC0o6A0f5BBzdJe0NM2UgGP-88",
+            authDomain: "azeche-ph.firebaseapp.com",
+            databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+            projectId: "azeche-ph",
+            storageBucket: "azeche-ph.firebasestorage.app",
+            messagingSenderId: "650847232355",
+            appId: "1:650847232355:web:8a84be8775e96ce03a0e15"
         };
 
-        // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // ============================================
-        // CONFIGURACIÓN DE LA VOTACIÓN
-        // ============================================
-        const VOTING_CONFIG = {
-            // ID único de la votación activa (cámbialo para cada votación)
-            votingId: "votacion_2024_presupuesto",
-            
-            // Nombre del edificio/PH
-            buildingName: "Azeche P.H.",
-            
-            // Verificar ID de propietario antes de votar
-            requireVoterId: true,
-            
-            // Lista de IDs de propietarios válidos (opcional, para validación)
-            // Si está vacío, acepta cualquier ID
-            validVoterIds: []
-        };
+        // Variables globales
+        let edificioActual = '';
+        let propietarioSeleccionado = null;
+        let votacionActual = null;
+        let unsubscribeVotacion = null;
 
-        // ============================================
-        // ESTADO DE LA APLICACIÓN
-        // ============================================
-        let currentVoting = null;
-        let hasVoted = false;
-        let voterId = localStorage.getItem('voterId') || '';
-        let votedOption = localStorage.getItem(`voted_${VOTING_CONFIG.votingId}`) || null;
-        let unsubscribe = null;
+        // Obtener edificio de URL
+        const params = new URLSearchParams(window.location.search);
+        edificioActual = params.get('edificio');
 
-        // ============================================
-        // FUNCIONES DE UI
-        // ============================================
-
-        function showMessage(text, type = 'success') {
-            const container = document.getElementById('message-container');
-            container.innerHTML = `<div class="message ${type}">${text}</div>`;
-            setTimeout(() => container.innerHTML = '', 5000);
+        if (!edificioActual) {
+            mostrarError('❌ Edificio no especificado. Usa: ?edificio=nepal-2');
+            document.getElementById('seccionApartamento').style.display = 'none';
+        } else {
+            document.getElementById('nombreEdificio').textContent = edificioActual.toUpperCase();
+            cargarApartamentos();
         }
 
-        function updateLastUpdate() {
-            document.getElementById('last-update').textContent = 
-                `Última actualización: ${new Date().toLocaleTimeString()}`;
-        }
-
-        // ============================================
-        // RENDERIZADO
-        // ============================================
-
-        function renderNoVoting() {
-            document.getElementById('voting-container').innerHTML = `
-                <div class="voting-card">
-                    <div class="no-voting">
-                        <div class="no-voting-icon">😴</div>
-                        <h2>No hay votaciones activas</h2>
-                        <p>En este momento no hay ninguna votación en curso.</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderVoting(voting) {
-            const isActive = voting.status === 'active';
-            const totalVotes = voting.totalVotes || 0;
-            const maxVotes = Math.max(...voting.options.map(o => o.votes || 0));
-            
-            // Calcular porcentajes de participación
-            const totalOwners = voting.totalOwners || 100; // Ajusta según tu PH
-            const participationRate = ((totalVotes / totalOwners) * 100).toFixed(1);
-
-            const optionsHtml = voting.options.map((option, index) => {
-                const percentage = totalVotes > 0 
-                    ? ((option.votes || 0) / totalVotes * 100).toFixed(1) 
-                    : 0;
-                const barWidth = maxVotes > 0 
-                    ? ((option.votes || 0) / maxVotes * 100) 
-                    : 0;
-                
-                const isVoted = votedOption === index.toString();
-                const canVote = isActive && !votedOption && (!VOTING_CONFIG.requireVoterId || voterId);
-
-                return `
-                    <div class="option ${isVoted ? 'voted' : ''} ${!canVote ? 'disabled' : ''}" 
-                         onclick="${canVote ? `submitVote(${index})` : ''}">
-                        <div class="option-info">
-                            <div class="option-name">${option.name}</div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${barWidth}%"></div>
-                            </div>
-                            <small>${percentage}% (${option.votes || 0} votos)</small>
-                        </div>
-                        <div class="vote-count">${option.votes || 0}</div>
-                        ${isVoted ? '<span style="margin-left: 10px; color: #28a745;">✓</span>' : ''}
-                    </div>
-                `;
-            }).join('');
-
-            // Sección de ID de votante si es requerido
-            const voterSection = VOTING_CONFIG.requireVoterId && !voterId ? `
-                <div class="voter-id-section">
-                    <label><strong>Identificación de Propietario</strong></label>
-                    <input type="text" id="voter-id-input" placeholder="Ingresa tu número de apartamento o ID" 
-                           value="${voterId}">
-                    <button class="btn btn-primary" onclick="setVoterId()" style="margin-top: 10px; width: 100%;">
-                        Confirmar Identidad
-                    </button>
-                </div>
-            ` : VOTING_CONFIG.requireVoterId && voterId ? `
-                <div class="voter-id-section" style="display: flex; justify-content: space-between; align-items: center;">
-                    <span><strong>Propietario:</strong> ${voterId}</span>
-                    <button class="btn" onclick="changeVoterId()" style="background: #6c757d; color: white; padding: 8px 16px;">
-                        Cambiar
-                    </button>
-                </div>
-            ` : '';
-
-            document.getElementById('voting-container').innerHTML = `
-                <div class="voting-card">
-                    <span class="status-badge ${isActive ? 'status-active' : 'status-closed'}">
-                        ${isActive ? '🟢 En curso' : '🔴 Cerrada'}
-                    </span>
-                    <h2 class="voting-title">${voting.title}</h2>
-                    <p style="color: #666; margin-bottom: 15px;">${voting.description || ''}</p>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-box">
-                            <div class="stat-number">${totalVotes}</div>
-                            <div class="stat-label">Votos emitidos</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-number">${participationRate}%</div>
-                            <div class="stat-label">Participación</div>
-                        </div>
-                    </div>
-
-                    ${isActive ? `
-                        <div class="live-indicator">
-                            <span class="live-dot"></span>
-                            <span>En tiempo real • ${new Date().toLocaleTimeString()}</span>
-                        </div>
-                    ` : ''}
-
-                    ${voterSection}
-
-                    ${votedOption ? `
-                        <div class="message success" style="margin-bottom: 20px;">
-                            ✅ Ya emitiste tu voto en esta votación
-                        </div>
-                    ` : isActive ? `
-                        <p style="margin: 15px 0; color: #666; text-align: center;">
-                            ${VOTING_CONFIG.requireVoterId && !voterId 
-                                ? 'Confirma tu identidad para votar' 
-                                : 'Haz clic en una opción para votar'}
-                        </p>
-                    ` : ''}
-                    
-                    <div class="options-list">
-                        ${optionsHtml}
-                    </div>
-                </div>
-            `;
-
-            updateLastUpdate();
-        }
-
-        // ============================================
-        // FUNCIONES DE VOTACIÓN
-        // ============================================
-
-        window.setVoterId = function() {
-            const input = document.getElementById('voter-id-input');
-            const id = input.value.trim().toUpperCase();
-            
-            if (!id) {
-                showMessage('Por favor ingresa tu identificación', 'error');
-                return;
-            }
-
-            // Validar contra lista si existe
-            if (VOTING_CONFIG.validVoterIds.length > 0 && 
-                !VOTING_CONFIG.validVoterIds.includes(id)) {
-                showMessage('Identificación no válida', 'error');
-                return;
-            }
-
-            voterId = id;
-            localStorage.setItem('voterId', voterId);
-            showMessage('Identidad confirmada. Ahora puedes votar.');
-            renderVoting(currentVoting);
-        };
-
-        window.changeVoterId = function() {
-            voterId = '';
-            votedOption = null;
-            localStorage.removeItem('voterId');
-            localStorage.removeItem(`voted_${VOTING_CONFIG.votingId}`);
-            showMessage('Sesión cerrada. Ingresa tu identificación nuevamente.');
-            renderVoting(currentVoting);
-        };
-
-        window.submitVote = async function(optionIndex) {
-            if (!currentVoting || currentVoting.status !== 'active') {
-                showMessage('La votación no está activa', 'error');
-                return;
-            }
-
-            if (votedOption) {
-                showMessage('Ya has votado en esta votación', 'error');
-                return;
-            }
-
-            if (VOTING_CONFIG.requireVoterId && !voterId) {
-                showMessage('Debes confirmar tu identidad primero', 'error');
-                return;
-            }
-
+        // Cargar apartamentos desde Firebase (igual que registro-asamblea)
+        async function cargarApartamentos() {
             try {
-                const votingRef = ref(db, `votaciones/${VOTING_CONFIG.votingId}`);
-                const snapshot = await get(votingRef);
-                const voting = snapshot.val();
-
-                if (!voting) {
-                    showMessage('Error al acceder a la votación', 'error');
+                const propietariosRef = ref(db, `propietarios/${edificioActual}`);
+                const snapshot = await get(propietariosRef);
+                
+                if (!snapshot.exists()) {
+                    mostrarError('❌ No hay propietarios registrados para este edificio');
                     return;
                 }
-
-                // Verificar si ya votó (doble check)
-                if (voting.voters && voting.voters[voterId]) {
-                    showMessage('Ya registraste un voto anteriormente', 'error');
-                    votedOption = voting.voters[voterId];
-                    localStorage.setItem(`voted_${VOTING_CONFIG.votingId}`, votedOption);
-                    renderVoting(currentVoting);
-                    return;
-                }
-
-                // Actualizar voto
-                const updates = {};
-                const currentVotes = voting.options[optionIndex].votes || 0;
                 
-                updates[`options/${optionIndex}/votes`] = currentVotes + 1;
-                updates[`totalVotes`] = (voting.totalVotes || 0) + 1;
-                updates[`voters/${voterId}`] = optionIndex;
-                updates[`lastVoteAt`] = new Date().toISOString();
-
-                await update(votingRef, updates);
-
-                votedOption = optionIndex.toString();
-                localStorage.setItem(`voted_${VOTING_CONFIG.votingId}`, votedOption);
+                const propietarios = snapshot.val();
+                const select = document.getElementById('apartamento');
                 
-                showMessage('¡Voto registrado exitosamente! ✅');
+                const apartamentos = [];
+                
+                Object.entries(propietarios).forEach(([key, prop]) => {
+                    if (prop.tipo === 'Propietario' || prop.tipo === 'propietario' || !prop.tipo) {
+                        apartamentos.push({
+                            key: key,
+                            apto: prop.apto,
+                            nombre: prop.nombre || 'Propietario',
+                            coeficiente: prop.coeficiente || 0
+                        });
+                    }
+                });
+                
+                // Ordenar por número de apartamento
+                apartamentos.sort((a, b) => {
+                    const numA = parseInt(a.apto) || 0;
+                    const numB = parseInt(b.apto) || 0;
+                    return numA - numB;
+                });
+                
+                // Agregar opciones al select
+                apartamentos.forEach(apt => {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify(apt);
+                    option.textContent = `Apto ${apt.apto} - ${apt.nombre}`;
+                    select.appendChild(option);
+                });
                 
             } catch (error) {
-                console.error('Error al votar:', error);
-                showMessage('Error al registrar el voto. Intenta de nuevo.', 'error');
+                console.error('Error:', error);
+                mostrarError('❌ Error al cargar apartamentos: ' + error.message);
             }
-        };
+        }
 
-        // ============================================
-        // ESCUCHAR CAMBIOS EN TIEMPO REAL
-        // ============================================
-
-        function listenToVoting() {
-            const votingRef = ref(db, `votaciones/${VOTING_CONFIG.votingId}`);
+        // Verificar si ya votó y mostrar votación
+        window.verificarYMostrarVotacion = async function() {
+            const select = document.getElementById('apartamento');
+            const valor = select.value;
             
-            unsubscribe = onValue(votingRef, (snapshot) => {
-                const voting = snapshot.val();
+            if (!valor) {
+                mostrarError('❌ Debes seleccionar un apartamento');
+                return;
+            }
+            
+            propietarioSeleccionado = JSON.parse(valor);
+            
+            // Verificar si ya está en asistentes (registró asistencia)
+            try {
+                const asistenteRef = ref(db, `asambleas/${edificioActual}/asistentes/${propietarioSeleccionado.key}`);
+                const asistenciaSnap = await get(asistenteRef);
                 
-                if (!voting) {
-                    renderNoVoting();
+                if (!asistenciaSnap.exists()) {
+                    mostrarError('⚠️ Debes registrar tu asistencia primero. Ve al enlace de registro.');
                     return;
                 }
+            } catch (e) {
+                console.log('Error verificando asistencia:', e);
+            }
+            
+            // Verificar si ya votó
+            try {
+                const votoRef = ref(db, `asambleas/${edificioActual}/votacion_activa/votos/${propietarioSeleccionado.key}`);
+                const votoSnap = await get(votoRef);
+                
+                if (votoSnap.exists()) {
+                    mostrarError('⚠️ Este apartamento ya emitió su voto');
+                    return;
+                }
+            } catch (e) {
+                console.log('Error verificando voto:', e);
+            }
+            
+            // Mostrar sección de votación
+            document.getElementById('seccionApartamento').style.display = 'none';
+            document.getElementById('seccionVotacion').style.display = 'block';
+            document.getElementById('subtitulo').textContent = 'Votación en curso';
+            
+            document.getElementById('infoPropietario').textContent = 
+                `${propietarioSeleccionado.nombre} - Apto ${propietarioSeleccionado.apto}`;
+            
+            // Cargar votación en tiempo real
+            cargarVotacionTiempoReal();
+        };
 
-                currentVoting = voting;
-                renderVoting(voting);
-            }, (error) => {
-                console.error('Error de Firebase:', error);
-                showMessage('Error de conexión. Verifica tu configuración.', 'error');
+        function cargarVotacionTiempoReal() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('contenidoVotacion').style.display = 'none';
+            
+            const votacionRef = ref(db, `asambleas/${edificioActual}/votacion_activa`);
+            
+            unsubscribeVotacion = onValue(votacionRef, (snapshot) => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('contenidoVotacion').style.display = 'block';
+                
+                if (!snapshot.exists()) {
+                    document.getElementById('opcionesVotacion').innerHTML = 
+                        '<p style="text-align:center;color:#999;padding:20px;">No hay votación activa en este momento.</p>';
+                    return;
+                }
+                
+                votacionActual = snapshot.val();
+                renderizarVotacion(votacionActual);
             });
         }
 
-        // ============================================
-        // INICIALIZACIÓN
-        // ============================================
+        function renderizarVotacion(votacion) {
+            const esActiva = votacion.estado === 'activa';
+            const votos = votacion.votos || {};
+            const totalVotos = Object.keys(votos).length;
+            const tipo = votacion.tipo || 'coeficientes';
+            
+            document.getElementById('totalVotos').textContent = totalVotos;
+            document.getElementById('tipoVotacion').textContent = 
+                tipo === 'nominal' ? 'Nominal' : 'Coeficientes';
+            document.getElementById('tituloVotacion').textContent = votacion.titulo || 'Votación';
+            document.getElementById('descripcionVotacion').textContent = votacion.descripcion || '';
+            
+            // Calcular resultados
+            let resultados = {};
+            let totalParticipacion = 0;
+            
+            if (votacion.opciones && Object.keys(votacion.opciones).length > 0) {
+                // Opciones custom
+                Object.entries(votacion.opciones).forEach(([key, opt]) => {
+                    resultados[key] = { label: opt.label, valor: 0, orden: opt.orden || 0 };
+                });
+                
+                Object.entries(votos).forEach(([votanteId, voto]) => {
+                    const opcionKey = voto.opcion || voto.voto || '';
+                    const coef = parseFloat(voto.coeficiente || propietarioSeleccionado.coeficiente || 1);
+                    
+                    if (resultados[opcionKey]) {
+                        if (tipo === 'nominal') {
+                            resultados[opcionKey].valor += 1;
+                        } else {
+                            resultados[opcionKey].valor += coef;
+                        }
+                    }
+                });
+            } else {
+                // Legacy: si/no/abstencion
+                resultados = {
+                    'si': { label: 'Sí, a favor', valor: 0 },
+                    'no': { label: 'No, en contra', valor: 0 },
+                    'abstencion': { label: 'Abstención', valor: 0 }
+                };
+                
+                Object.entries(votos).forEach(([votanteId, voto]) => {
+                    const votoKey = voto.voto || voto.opcion || '';
+                    const coef = parseFloat(voto.coeficiente || 1);
+                    
+                    if (resultados[votoKey]) {
+                        if (tipo === 'nominal') {
+                            resultados[votoKey].valor += 1;
+                        } else {
+                            resultados[votoKey].valor += coef;
+                        }
+                    }
+                });
+            }
+            
+            // Calcular total
+            Object.values(resultados).forEach(r => totalParticipacion += r.valor);
+            
+            // Ordenar
+            const resultadosOrdenados = Object.entries(resultados).sort((a, b) => 
+                (a[1].orden || 0) - (b[1].orden || 0)
+            );
+            
+            // Generar HTML de opciones
+            const colores = ['#4CAF50', '#f44336', '#ff9800', '#2196F3', '#9c27b0'];
+            let html = '';
+            
+            resultadosOrdenados.forEach(([key, data], index) => {
+                const porcentaje = totalParticipacion > 0 ? (data.valor / totalParticipacion * 100) : 0;
+                const color = colores[index % colores.length];
+                const unidad = tipo === 'nominal' ? 'votos' : 'coef.';
+                const valorDisplay = tipo === 'nominal' ? data.valor : data.valor.toFixed(4);
+                
+                html += `
+                    <div class="option ${!esActiva ? 'disabled' : ''}" 
+                         onclick="${esActiva ? `votar('${key}')` : ''}">
+                        <div class="option-info">
+                            <div class="option-name">${data.label}</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${porcentaje}%; background: ${color};"></div>
+                            </div>
+                            <div style="margin-top: 5px; color: #666; font-size: 0.9em;">
+                                ${porcentaje.toFixed(1)}% • ${valorDisplay} ${unidad}
+                            </div>
+                        </div>
+                        <div class="vote-count" style="color: ${color};">${valorDisplay}</div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('opcionesVotacion').innerHTML = html;
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            listenToVoting();
-        });
+        window.votar = async function(opcion) {
+            if (!votacionActual || votacionActual.estado !== 'activa') {
+                mostrarError('La votación no está activa');
+                return;
+            }
+            
+            if (!confirm(`¿Confirmas tu voto: "${votacionActual.opciones?.[opcion]?.label || opcion}"?`)) {
+                return;
+            }
+            
+            try {
+                const votoData = {
+                    opcion: opcion,
+                    apartamento: propietarioSeleccionado.apto,
+                    nombre: propietarioSeleccionado.nombre,
+                    coeficiente: propietarioSeleccionado.coeficiente || 1,
+                    timestamp: new Date().toISOString()
+                };
+                
+                await set(ref(db, `asambleas/${edificioActual}/votacion_activa/votos/${propietarioSeleccionado.key}`), votoData);
+                
+                // Mostrar éxito
+                document.getElementById('seccionVotacion').style.display = 'none';
+                document.getElementById('mensajeExito').style.display = 'block';
+                document.getElementById('subtitulo').textContent = 'Voto registrado';
+                
+            } catch (error) {
+                console.error('Error al votar:', error);
+                mostrarError('❌ Error al registrar el voto: ' + error.message);
+            }
+        };
 
-        // Limpiar al cerrar
-        window.addEventListener('beforeunload', () => {
-            if (unsubscribe) unsubscribe();
-        });
+        function mostrarError(mensaje) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = mensaje;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
     </script>
 </body>
 </html>
