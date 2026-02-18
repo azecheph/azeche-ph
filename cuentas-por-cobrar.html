@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuentas por Cobrar - Azeche P.H.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a237e 0%, #e53935 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 1600px; margin: 0 auto; }
+
+        /* HEADER */
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 { color: #e53935; font-size: 1.8em; font-weight: 800; }
+        .header h1 span { color: #1a237e; }
+
+        .edificio-selector { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+        .edificio-selector select {
+            padding: 12px 20px;
+            border: 2px solid #1a237e;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a237e;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-dash {
+            background: #1a237e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .btn-dash:hover { background: #0d1551; transform: translateY(-2px); }
+
+        /* PANEL ACCIONES */
+        .actions-panel {
+            background: white;
+            padding: 20px 25px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 25px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+
+        .btn-upload { background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%); color: white; }
+        .btn-danger { background: linear-gradient(135deg, #e53935 0%, #c62828 100%); color: white; }
+        .btn-success { background: #00B853; color: white; }
+        .btn-warning { background: #ff9800; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+
+        /* RESUMEN TARJETAS */
+        .resumen-strip {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .resumen-card {
+            flex: 1;
+            min-width: 200px;
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .resumen-card .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 5px; }
+        .resumen-card .valor { font-size: 1.8em; font-weight: 800; }
+        .resumen-card .sub { font-size: 0.8em; opacity: 0.8; margin-top: 5px; }
+
+        .card-total { background: linear-gradient(135deg, #e53935, #c62828); }
+        .card-morosos { background: linear-gradient(135deg, #ff6f00, #e65100); }
+        .card-intereses { background: linear-gradient(135deg, #6a1b9a, #4a148c); }
+        .card-pagos { background: linear-gradient(135deg, #2e7d32, #1b5e20); }
+        .card-aptos { background: linear-gradient(135deg, #1a237e, #0d47a1); }
+
+        /* BARRA PROGRESO CARGA */
+        .upload-progress {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .upload-progress.active { display: block; }
+        .progress-bar-container {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #1a237e, #e53935);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+        .progress-text { text-align: center; font-weight: 600; color: #333; }
+
+        /* TABLA PRINCIPAL */
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 25px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .table-header h2 { color: #1a237e; font-size: 1.3em; }
+
+        .search-box {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 280px;
+            transition: border 0.3s;
+        }
+        .search-box:focus { outline: none; border-color: #1a237e; }
+
+        .tabla-scroll { overflow-x: auto; max-height: 65vh; overflow-y: auto; }
+
+        #tablaCartera {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 1100px;
+        }
+
+        #tablaCartera thead {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        #tablaCartera th {
+            color: white;
+            padding: 14px 10px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 12px;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        #tablaCartera th:hover { background: rgba(255,255,255,0.1); }
+        #tablaCartera th .sort-icon { margin-left: 4px; font-size: 10px; }
+
+        #tablaCartera tbody tr { border-bottom: 1px solid #f0f0f0; transition: all 0.2s; }
+        #tablaCartera tbody tr:hover { background: #f0f4ff; }
+        #tablaCartera tbody tr:nth-child(even) { background: #fafbff; }
+        #tablaCartera tbody tr:nth-child(even):hover { background: #f0f4ff; }
+
+        #tablaCartera td { padding: 12px 10px; font-size: 13px; }
+
+        .col-monto {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .col-saldo-final {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            font-weight: 800;
+            color: #e53935;
+            font-size: 14px !important;
+        }
+
+        .col-pagos {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #2e7d32;
+        }
+
+        /* Fila de totales */
+        #tablaCartera tfoot {
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        #tablaCartera tfoot tr {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: white;
+        }
+
+        #tablaCartera tfoot td {
+            padding: 14px 10px;
+            font-weight: 800;
+            font-size: 14px;
+            border-top: 3px solid #e53935;
+        }
+
+        .tfoot-monto {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Moroso badge */
+        .badge-moroso {
+            background: #e53935;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .badge-aldia {
+            background: #4caf50;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* Columna Apto fija */
+        #tablaCartera th:first-child,
+        #tablaCartera td:first-child,
+        #tablaCartera tfoot td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            background: white;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        #tablaCartera thead th:first-child { background: #1a237e; z-index: 15; }
+        #tablaCartera tfoot td:first-child { background: #1a237e; }
+        #tablaCartera tbody tr:nth-child(even) td:first-child { background: #fafbff; }
+        #tablaCartera tbody tr:hover td:first-child { background: #f0f4ff; }
+
+        /* Modal */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center;
+            align-items: center; padding: 20px;
+        }
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: white; padding: 30px; border-radius: 20px;
+            max-width: 1000px; width: 100%; max-height: 90vh; overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #eee;
+        }
+        .modal-header h2 { color: #1a237e; font-size: 1.5em; }
+
+        .btn-close {
+            background: none; border: none; font-size: 2em;
+            cursor: pointer; color: #999; transition: all 0.3s;
+        }
+        .btn-close:hover { color: #e53935; }
+
+        /* Detalle apartamento */
+        .detalle-tabla { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
+        .detalle-tabla th {
+            background: #f0f4ff; color: #1a237e; padding: 10px;
+            text-align: left; font-size: 12px; font-weight: 700;
+        }
+        .detalle-tabla td { padding: 8px 10px; border-bottom: 1px solid #eee; }
+        .detalle-tabla .fila-cobro { }
+        .detalle-tabla .fila-pago { background: #e8f5e9; }
+        .detalle-tabla .fila-interes { background: #fff8e1; }
+        .detalle-tabla .fila-extra { background: #f3e5f5; }
+
+        .detalle-resumen {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px; margin-bottom: 20px;
+        }
+        .detalle-resumen-item {
+            padding: 15px; border-radius: 10px; text-align: center;
+        }
+        .detalle-resumen-item .det-label { font-size: 0.8em; color: #666; }
+        .detalle-resumen-item .det-valor { font-size: 1.3em; font-weight: 800; }
+
+        /* Empty state */
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .empty-state-icon { font-size: 4em; margin-bottom: 15px; }
+
+        /* Drop zone */
+        .drop-zone {
+            border: 3px dashed #1a237e;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 25px;
+            transition: all 0.3s;
+            background: #f8f9ff;
+            display: none;
+        }
+        .drop-zone.active { display: block; }
+        .drop-zone.dragover { background: #e8eaf6; border-color: #e53935; }
+        .drop-zone-icon { font-size: 3em; margin-bottom: 10px; }
+        .drop-zone h3 { color: #1a237e; margin-bottom: 10px; }
+        .drop-zone p { color: #666; font-size: 0.9em; }
+
+        /* LOG */
+        .upload-log {
+            max-height: 150px;
+            overflow-y: auto;
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+            display: none;
+        }
+        .upload-log.active { display: block; }
+        .log-ok { color: #2e7d32; }
+        .log-err { color: #e53935; }
+        .log-info { color: #1a237e; }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.3em; }
+            .resumen-card .valor { font-size: 1.3em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>📊 Cuentas por <span>Cobrar</span> - Cartera Morosos</h1>
+            <div class="edificio-selector">
+                <select id="edificioSelect" onchange="cambiarEdificio()">
+                    <option value="">Selecciona edificio</option>
+                    <option value="nepal-2">Nepal 2</option>
+                    <option value="avalon">Avalon</option>
+                    <option value="convivienda-1">Convivienda I</option>
+                    <option value="pinos-del-country">Pinos del Country</option>
+                </select>
+                <button class="btn-dash" onclick="location.href='Dashboard.html'">🏠 Dashboard</button>
+            </div>
+        </div>
+
+        <!-- PANEL ACCIONES -->
+        <div class="actions-panel">
+            <button class="btn btn-upload" onclick="toggleDropZone()">
+                📄 Subir PDFs de Extractos
+            </button>
+            <input type="file" id="filePDFs" accept=".pdf" multiple style="display: none;" onchange="procesarPDFs(event)">
+            <button class="btn btn-danger" onclick="verMorosos()">
+                🔴 Ver Solo Morosos
+            </button>
+            <button class="btn btn-success" onclick="descargarExcelCartera()">
+                📥 Descargar Excel
+            </button>
+            <button class="btn btn-secondary" onclick="limpiarCartera()">
+                🗑️ Limpiar Cartera
+            </button>
+            <div style="margin-left: auto; padding: 8px 15px; background: #f0f4ff; border-radius: 8px; font-weight: 600; font-size: 14px;">
+                📊 <span id="contadorAptos">0</span> apartamentos
+            </div>
+        </div>
+
+        <!-- DROP ZONE -->
+        <div class="drop-zone" id="dropZone">
+            <div class="drop-zone-icon">📄</div>
+            <h3>Arrastra aquí los PDFs de extractos de Daytona</h3>
+            <p>O haz clic en el botón para seleccionar archivos (puedes subir varios a la vez)</p>
+            <button class="btn btn-upload" onclick="document.getElementById('filePDFs').click()" style="margin-top: 15px;">
+                📂 Seleccionar PDFs
+            </button>
+        </div>
+
+        <!-- PROGRESO -->
+        <div class="upload-progress" id="uploadProgress">
+            <div class="progress-text" id="progressText">Procesando PDFs...</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+            <div class="upload-log" id="uploadLog"></div>
+        </div>
+
+        <!-- RESUMEN TARJETAS -->
+        <div class="resumen-strip" id="resumenStrip" style="display: none;">
+            <div class="resumen-card card-aptos">
+                <div class="label">🏠 Apartamentos</div>
+                <div class="valor" id="rAptos">0</div>
+            </div>
+            <div class="resumen-card card-total">
+                <div class="label">💰 Deuda Total Cartera</div>
+                <div class="valor" id="rDeudaTotal">$0</div>
+            </div>
+            <div class="resumen-card card-morosos">
+                <div class="label">⚠️ Morosos (saldo > 0)</div>
+                <div class="valor" id="rMorosos">0</div>
+                <div class="sub" id="rPctMorosos">0% del edificio</div>
+            </div>
+            <div class="resumen-card card-intereses">
+                <div class="label">📈 Total Intereses Mora</div>
+                <div class="valor" id="rIntereses">$0</div>
+            </div>
+            <div class="resumen-card card-pagos">
+                <div class="label">✅ Total Pagos Recibidos</div>
+                <div class="valor" id="rPagos">$0</div>
+            </div>
+        </div>
+
+        <!-- TABLA PRINCIPAL -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2>📋 Resumen de Cartera por Apartamento</h2>
+                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Buscar por apto o propietario..." oninput="filtrarTabla()">
+            </div>
+            <div class="tabla-scroll">
+                <table id="tablaCartera">
+                    <thead>
+                        <tr>
+                            <th onclick="ordenarTabla(0)">Apto <span class="sort-icon">↕</span></th>
+                            <th onclick="ordenarTabla(1)">Propietario <span class="sort-icon">↕</span></th>
+                            <th onclick="ordenarTabla(2)">Saldo Inicial <span class="sort-icon">↕</span></th>
+                            <th onclick="ordenarTabla(3)">Cuotas Admon <span class="sort-icon">↕</span></th>
+                            <th onclick="ordenarTabla(4)">Cuotas Extra <span class="sort-icon">↕</span></th>
+                            <th onclick="ordenarTabla(5)">Intereses Mora <span class="sort-icon">↕</span></th>
+                            <th onclick="ordenarTabla(6)">Total Cargos <span class="sort-icon">↕</span></th>
+                            <th onclick="ordenarTabla(7)">Pagos/Abonos <span class="sort-icon">↕</span></th>
+                            <th onclick="ordenarTabla(8)">Saldo Final <span class="sort-icon">↕</span></th>
+                            <th>Estado</th>
+                            <th>Detalle</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaCuerpo">
+                        <tr>
+                            <td colspan="11">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">📄</div>
+                                    <h3>Selecciona un edificio y sube los PDFs de extractos</h3>
+                                    <p>Sube los extractos individuales de Daytona InterCloud en formato PDF</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot id="tablaFoot" style="display: none;">
+                        <tr>
+                            <td colspan="2" style="text-align: right; font-size: 14px;">TOTALES</td>
+                            <td class="tfoot-monto" id="tSaldoInicial">$0</td>
+                            <td class="tfoot-monto" id="tAdmon">$0</td>
+                            <td class="tfoot-monto" id="tExtra">$0</td>
+                            <td class="tfoot-monto" id="tIntereses">$0</td>
+                            <td class="tfoot-monto" id="tCargos">$0</td>
+                            <td class="tfoot-monto" id="tPagos" style="color: #81c784;">$0</td>
+                            <td class="tfoot-monto" id="tSaldoFinal" style="color: #ef9a9a; font-size: 16px;">$0</td>
+                            <td colspan="2"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLE APARTAMENTO -->
+    <div class="modal" id="modalDetalle">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalDetalleTitulo">📋 Detalle Apartamento</h2>
+                <button class="btn-close" onclick="cerrarModal('modalDetalle')">&times;</button>
+            </div>
+            <div id="modalDetalleContenido"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, onValue, remove, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAS9c6-ың_xF-p7r2eL36yaKpuwTbCg-AE",
+            authDomain: "azeche-ph.firebaseapp.com",
+            databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+            projectId: "azeche-ph",
+            storageBucket: "azeche-ph.firebasestorage.app",
+            messagingSenderId: "357588904299",
+            appId: "1:357588904299:web:7f5e83f259569477d82b1f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let edificioActual = '';
+        let carteraData = {}; // { apto: { propietario, saldoInicial, movimientos[], resumen } }
+        let sortCol = -1;
+        let sortAsc = true;
+        let soloMorosos = false;
+
+        // ═══════════════════════════════════════════════════════════════
+        // CAMBIAR EDIFICIO
+        // ═══════════════════════════════════════════════════════════════
+        window.cambiarEdificio = function() {
+            edificioActual = document.getElementById('edificioSelect').value;
+            soloMorosos = false;
+            if (!edificioActual) {
+                carteraData = {};
+                renderTabla();
+                return;
+            }
+            cargarDesdeFirebase();
+        };
+
+        function cargarDesdeFirebase() {
+            const carteraRef = ref(db, `cartera_morosos/${edificioActual}`);
+            onValue(carteraRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    carteraData = snapshot.val();
+                } else {
+                    carteraData = {};
+                }
+                renderTabla();
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // PARSER PDF DAYTONA INTERCLOUD
+        // ═══════════════════════════════════════════════════════════════
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        async function parsearPDF(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+            let textoCompleto = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(' ');
+                textoCompleto += pageText + '\n';
+            }
+
+            return extraerDatosExtracto(textoCompleto);
+        }
+
+        function extraerDatosExtracto(texto) {
+            const resultado = {
+                inmueble: '',
+                propietario: '',
+                saldoInicial: 0,
+                saldoFinal: 0,
+                movimientos: [],
+                totalAdmon: 0,
+                totalExtras: 0,
+                totalIntereses: 0,
+                totalPagos: 0,
+                totalCargos: 0
+            };
+
+            // Extraer inmueble (Apto XXX)
+            const matchInmueble = texto.match(/Inmueble:\s*(Apto?\s*\d+[A-Za-z]*)/i) ||
+                                   texto.match(/Inmueble\s*:?\s*(Apto?\s*\d+[A-Za-z]*)/i) ||
+                                   texto.match(/(Apto?\s*\d+[A-Za-z]*)/i);
+            if (matchInmueble) {
+                resultado.inmueble = matchInmueble[1].trim();
+            }
+
+            // Extraer propietario
+            const matchProp = texto.match(/Propietario\s+\d+\s+(.+?)(?=Saldo|$)/i);
+            if (matchProp) {
+                resultado.propietario = matchProp[1].trim()
+                    .replace(/\s+/g, ' ')
+                    .replace(/Saldo.*$/i, '')
+                    .trim();
+            }
+
+            // Extraer saldo inicial
+            const matchSaldo = texto.match(/Saldo\s+Inicial\s+Inmueble\s*:?\s*\$?([\d.,]+)/i);
+            if (matchSaldo) {
+                resultado.saldoInicial = parsearMonto(matchSaldo[1]);
+            }
+
+            // Extraer saldo final
+            const matchSaldoFinal = texto.match(/Saldo\s+Total\s+Inmueble\s*:?\s*\$?([\d.,]+)/i);
+            if (matchSaldoFinal) {
+                resultado.saldoFinal = parsearMonto(matchSaldoFinal[1]);
+            }
+
+            // Extraer movimientos individuales
+            // Patrón para Cuota De Administracion
+            const regAdmon = /Cuota\s+De\s+Administraci[oó]n\s+(\w+\s+\d{4})/gi;
+            let match;
+            const admonMeses = new Set();
+            while ((match = regAdmon.exec(texto)) !== null) {
+                admonMeses.add(match[1]);
+            }
+
+            // Buscar montos de cuotas de administración (débitos)
+            const regLinea = /\d{5}\s+(.*?)\$([0-9.,]+)\s+\$([0-9.,]+)\s+\$([0-9.,]+)\s+\$([0-9.,]+)\s+\$([\d.,]+)/g;
+            while ((match = regLinea.exec(texto)) !== null) {
+                const desc = match[1].trim();
+                const aplicado = parsearMonto(match[2]);
+                const saldo = parsearMonto(match[3]);
+                const debito = parsearMonto(match[4]);
+                const credito = parsearMonto(match[5]);
+                const acumulado = parsearMonto(match[6]);
+
+                let tipo = 'otro';
+                if (/cuota\s+de\s+administraci/i.test(desc)) tipo = 'admon';
+                else if (/cuota\s+extra/i.test(desc)) tipo = 'extra';
+                else if (/inter[eé]s/i.test(desc)) tipo = 'interes';
+                else if (/saldos?\s+iniciales/i.test(desc)) tipo = 'pago';
+
+                if (debito > 0 && credito === 0) {
+                    // Es un cargo
+                    resultado.movimientos.push({
+                        descripcion: desc,
+                        tipo: tipo,
+                        debito: debito,
+                        credito: 0,
+                        acumulado: acumulado
+                    });
+                    if (tipo === 'admon') resultado.totalAdmon += debito;
+                    else if (tipo === 'extra') resultado.totalExtras += debito;
+                    else if (tipo === 'interes') resultado.totalIntereses += debito;
+                    else resultado.totalAdmon += debito; // otros cargos van a admon
+                    resultado.totalCargos += debito;
+                } else if (credito > 0) {
+                    // Es un pago/abono
+                    resultado.movimientos.push({
+                        descripcion: desc,
+                        tipo: 'pago',
+                        debito: 0,
+                        credito: credito,
+                        acumulado: acumulado
+                    });
+                    resultado.totalPagos += credito;
+                }
+            }
+
+            // Si no pudimos parsear movimientos detallados, intentar con Total Documento
+            if (resultado.movimientos.length === 0) {
+                const regTotalDoc = /Total\s+Documento\s*:?\s*-*\s*\$?([\d.,]+)\s+\$?([\d.,]+)/gi;
+                while ((match = regTotalDoc.exec(texto)) !== null) {
+                    const debito = parsearMonto(match[1]);
+                    const credito = parsearMonto(match[2]);
+                    if (debito > 0) resultado.totalCargos += debito;
+                    if (credito > 0) resultado.totalPagos += credito;
+                }
+            }
+
+            // Si saldo final no se encontró, calcularlo
+            if (resultado.saldoFinal === 0 && resultado.saldoInicial > 0) {
+                resultado.saldoFinal = resultado.saldoInicial + resultado.totalCargos - resultado.totalPagos;
+            }
+
+            return resultado;
+        }
+
+        function parsearMonto(str) {
+            if (!str) return 0;
+            // Formato colombiano: 8.044.026,00 -> 8044026.00
+            let limpio = str.replace(/\$/g, '').trim();
+            // Si tiene coma como decimal (formato colombiano)
+            if (limpio.includes(',')) {
+                limpio = limpio.replace(/\./g, ''); // quitar puntos de miles
+                limpio = limpio.replace(',', '.'); // coma -> punto decimal
+            }
+            const num = parseFloat(limpio);
+            return isNaN(num) ? 0 : num;
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // PROCESAR MULTIPLES PDFs
+        // ═══════════════════════════════════════════════════════════════
+        window.procesarPDFs = async function(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            if (!edificioActual) {
+                alert('❌ Selecciona un edificio primero');
+                event.target.value = '';
+                return;
+            }
+
+            const progress = document.getElementById('uploadProgress');
+            const bar = document.getElementById('progressBar');
+            const text = document.getElementById('progressText');
+            const log = document.getElementById('uploadLog');
+
+            progress.classList.add('active');
+            log.classList.add('active');
+            log.innerHTML = '';
+
+            let exitosos = 0;
+            let fallidos = 0;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const pct = Math.round(((i + 1) / files.length) * 100);
+                bar.style.width = pct + '%';
+                text.textContent = `Procesando ${i + 1} de ${files.length}: ${file.name}`;
+
+                try {
+                    const datos = await parsearPDF(file);
+
+                    if (!datos.inmueble) {
+                        log.innerHTML += `<div class="log-err">❌ ${file.name}: No se pudo identificar el apartamento</div>`;
+                        fallidos++;
+                        continue;
+                    }
+
+                    // Guardar en carteraData local
+                    const key = datos.inmueble.replace(/\s+/g, '').toLowerCase();
+                    carteraData[key] = {
+                        inmueble: datos.inmueble,
+                        propietario: datos.propietario,
+                        saldoInicial: datos.saldoInicial,
+                        saldoFinal: datos.saldoFinal,
+                        totalAdmon: datos.totalAdmon,
+                        totalExtras: datos.totalExtras,
+                        totalIntereses: datos.totalIntereses,
+                        totalPagos: datos.totalPagos,
+                        totalCargos: datos.totalCargos,
+                        movimientos: datos.movimientos,
+                        fechaCarga: new Date().toISOString()
+                    };
+
+                    log.innerHTML += `<div class="log-ok">✅ ${file.name}: ${datos.inmueble} - ${datos.propietario} | Saldo: $${datos.saldoFinal.toLocaleString('es-CO')}</div>`;
+                    exitosos++;
+
+                } catch (error) {
+                    log.innerHTML += `<div class="log-err">❌ ${file.name}: ${error.message}</div>`;
+                    fallidos++;
+                }
+            }
+
+            // Guardar todo en Firebase
+            try {
+                const carteraRef = ref(db, `cartera_morosos/${edificioActual}`);
+                await set(carteraRef, carteraData);
+                log.innerHTML += `<div class="log-info">💾 Datos guardados en Firebase</div>`;
+            } catch (err) {
+                log.innerHTML += `<div class="log-err">❌ Error guardando en Firebase: ${err.message}</div>`;
+            }
+
+            text.textContent = `✅ Completado: ${exitosos} exitosos, ${fallidos} fallidos de ${files.length} PDFs`;
+            bar.style.width = '100%';
+
+            event.target.value = '';
+            renderTabla();
+
+            // Ocultar progreso después de 5s
+            setTimeout(() => {
+                progress.classList.remove('active');
+                document.getElementById('dropZone').classList.remove('active');
+            }, 5000);
+        };
+
+        // ═══════════════════════════════════════════════════════════════
+        // RENDER TABLA
+        // ═══════════════════════════════════════════════════════════════
+        function renderTabla() {
+            const tbody = document.getElementById('tablaCuerpo');
+            const tfoot = document.getElementById('tablaFoot');
+            const resumen = document.getElementById('resumenStrip');
+            const keys = Object.keys(carteraData);
+
+            if (keys.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state">
+                    <div class="empty-state-icon">📄</div>
+                    <h3>${edificioActual ? 'No hay extractos cargados' : 'Selecciona un edificio'}</h3>
+                    <p>Sube los PDFs de extractos de Daytona InterCloud</p>
+                </div></td></tr>`;
+                tfoot.style.display = 'none';
+                resumen.style.display = 'none';
+                document.getElementById('contadorAptos').textContent = '0';
+                return;
+            }
+
+            // Preparar datos para tabla
+            let filas = keys.map(k => carteraData[k]);
+
+            // Filtro morosos
+            if (soloMorosos) {
+                filas = filas.filter(f => f.saldoFinal > 0);
+            }
+
+            // Ordenar
+            if (sortCol >= 0) {
+                filas.sort((a, b) => {
+                    let va, vb;
+                    switch(sortCol) {
+                        case 0: va = a.inmueble; vb = b.inmueble; break;
+                        case 1: va = a.propietario; vb = b.propietario; break;
+                        case 2: va = a.saldoInicial; vb = b.saldoInicial; break;
+                        case 3: va = a.totalAdmon; vb = b.totalAdmon; break;
+                        case 4: va = a.totalExtras; vb = b.totalExtras; break;
+                        case 5: va = a.totalIntereses; vb = b.totalIntereses; break;
+                        case 6: va = a.totalCargos; vb = b.totalCargos; break;
+                        case 7: va = a.totalPagos; vb = b.totalPagos; break;
+                        case 8: va = a.saldoFinal; vb = b.saldoFinal; break;
+                        default: return 0;
+                    }
+                    if (typeof va === 'string') return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+                    return sortAsc ? va - vb : vb - va;
+                });
+            }
+
+            // Totales
+            let tSaldoI = 0, tAdmon = 0, tExtra = 0, tInt = 0, tCargos = 0, tPag = 0, tSaldoF = 0;
+            let morosos = 0;
+
+            let html = '';
+            filas.forEach(f => {
+                const esMoroso = f.saldoFinal > 0;
+                if (esMoroso) morosos++;
+
+                tSaldoI += f.saldoInicial || 0;
+                tAdmon += f.totalAdmon || 0;
+                tExtra += f.totalExtras || 0;
+                tInt += f.totalIntereses || 0;
+                tCargos += f.totalCargos || 0;
+                tPag += f.totalPagos || 0;
+                tSaldoF += f.saldoFinal || 0;
+
+                const key = f.inmueble.replace(/\s+/g, '').toLowerCase();
+
+                html += `
+                <tr data-apto="${(f.inmueble || '').toLowerCase()}" data-prop="${(f.propietario || '').toLowerCase()}">
+                    <td><strong>${f.inmueble || '-'}</strong></td>
+                    <td>${f.propietario || '-'}</td>
+                    <td class="col-monto">$${(f.saldoInicial || 0).toLocaleString('es-CO')}</td>
+                    <td class="col-monto">$${(f.totalAdmon || 0).toLocaleString('es-CO')}</td>
+                    <td class="col-monto" style="color: #6a1b9a;">$${(f.totalExtras || 0).toLocaleString('es-CO')}</td>
+                    <td class="col-monto" style="color: #e65100;">$${(f.totalIntereses || 0).toLocaleString('es-CO')}</td>
+                    <td class="col-monto">$${(f.totalCargos || 0).toLocaleString('es-CO')}</td>
+                    <td class="col-pagos">-$${(f.totalPagos || 0).toLocaleString('es-CO')}</td>
+                    <td class="col-saldo-final">$${(f.saldoFinal || 0).toLocaleString('es-CO')}</td>
+                    <td>${esMoroso ? '<span class="badge-moroso">MOROSO</span>' : '<span class="badge-aldia">Al día</span>'}</td>
+                    <td><button class="btn" style="padding:6px 12px; font-size:12px; background:#1a237e; color:white;" onclick="verDetalle('${key}')">🔍 Ver</button></td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = html;
+
+            // Totales footer
+            tfoot.style.display = '';
+            document.getElementById('tSaldoInicial').textContent = '$' + tSaldoI.toLocaleString('es-CO');
+            document.getElementById('tAdmon').textContent = '$' + tAdmon.toLocaleString('es-CO');
+            document.getElementById('tExtra').textContent = '$' + tExtra.toLocaleString('es-CO');
+            document.getElementById('tIntereses').textContent = '$' + tInt.toLocaleString('es-CO');
+            document.getElementById('tCargos').textContent = '$' + tCargos.toLocaleString('es-CO');
+            document.getElementById('tPagos').textContent = '-$' + tPag.toLocaleString('es-CO');
+            document.getElementById('tSaldoFinal').textContent = '$' + tSaldoF.toLocaleString('es-CO');
+
+            // Resumen tarjetas
+            resumen.style.display = 'flex';
+            document.getElementById('rAptos').textContent = filas.length;
+            document.getElementById('rDeudaTotal').textContent = '$' + tSaldoF.toLocaleString('es-CO');
+            document.getElementById('rMorosos').textContent = morosos;
+            document.getElementById('rPctMorosos').textContent = `${Math.round((morosos / filas.length) * 100)}% del edificio`;
+            document.getElementById('rIntereses').textContent = '$' + tInt.toLocaleString('es-CO');
+            document.getElementById('rPagos').textContent = '$' + tPag.toLocaleString('es-CO');
+            document.getElementById('contadorAptos').textContent = filas.length;
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // FUNCIONES DE UI
+        // ═══════════════════════════════════════════════════════════════
+        window.toggleDropZone = function() {
+            if (!edificioActual) {
+                alert('❌ Selecciona un edificio primero');
+                return;
+            }
+            const dz = document.getElementById('dropZone');
+            dz.classList.toggle('active');
+        };
+
+        window.verMorosos = function() {
+            soloMorosos = !soloMorosos;
+            renderTabla();
+        };
+
+        window.ordenarTabla = function(col) {
+            if (sortCol === col) {
+                sortAsc = !sortAsc;
+            } else {
+                sortCol = col;
+                sortAsc = true;
+            }
+            renderTabla();
+        };
+
+        window.filtrarTabla = function() {
+            const q = document.getElementById('searchBox').value.toLowerCase();
+            const filas = document.querySelectorAll('#tablaCuerpo tr');
+            let count = 0;
+            filas.forEach(fila => {
+                const apto = fila.getAttribute('data-apto') || '';
+                const prop = fila.getAttribute('data-prop') || '';
+                if (!q || apto.includes(q) || prop.includes(q)) {
+                    fila.style.display = '';
+                    count++;
+                } else {
+                    fila.style.display = 'none';
+                }
+            });
+            document.getElementById('contadorAptos').textContent = count;
+        };
+
+        window.cerrarModal = function(id) {
+            document.getElementById(id).classList.remove('active');
+        };
+
+        // VER DETALLE
+        window.verDetalle = function(key) {
+            const data = carteraData[key];
+            if (!data) { alert('❌ No se encontraron datos'); return; }
+
+            document.getElementById('modalDetalleTitulo').textContent = `📋 ${data.inmueble} - ${data.propietario}`;
+
+            let html = `
+            <div class="detalle-resumen">
+                <div class="detalle-resumen-item" style="background: #e8eaf6;">
+                    <div class="det-label">Saldo Inicial</div>
+                    <div class="det-valor" style="color: #1a237e;">$${(data.saldoInicial || 0).toLocaleString('es-CO')}</div>
+                </div>
+                <div class="detalle-resumen-item" style="background: #fce4ec;">
+                    <div class="det-label">Total Cargos</div>
+                    <div class="det-valor" style="color: #c62828;">$${(data.totalCargos || 0).toLocaleString('es-CO')}</div>
+                </div>
+                <div class="detalle-resumen-item" style="background: #e8f5e9;">
+                    <div class="det-label">Total Pagos</div>
+                    <div class="det-valor" style="color: #2e7d32;">$${(data.totalPagos || 0).toLocaleString('es-CO')}</div>
+                </div>
+                <div class="detalle-resumen-item" style="background: #ffebee;">
+                    <div class="det-label">Saldo Final</div>
+                    <div class="det-valor" style="color: #e53935;">$${(data.saldoFinal || 0).toLocaleString('es-CO')}</div>
+                </div>
+            </div>`;
+
+            if (data.movimientos && data.movimientos.length > 0) {
+                html += `
+                <table class="detalle-tabla">
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Tipo</th>
+                            <th style="text-align:right;">Débito</th>
+                            <th style="text-align:right;">Crédito</th>
+                            <th style="text-align:right;">Acumulado</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+                data.movimientos.forEach(m => {
+                    const clase = m.tipo === 'pago' ? 'fila-pago' :
+                                  m.tipo === 'interes' ? 'fila-interes' :
+                                  m.tipo === 'extra' ? 'fila-extra' : 'fila-cobro';
+                    const tipoLabel = m.tipo === 'admon' ? '📋 Admon' :
+                                      m.tipo === 'extra' ? '🟣 Extra' :
+                                      m.tipo === 'interes' ? '🟠 Interés' :
+                                      m.tipo === 'pago' ? '🟢 Pago' : '📄 Otro';
+
+                    html += `
+                        <tr class="${clase}">
+                            <td>${m.descripcion}</td>
+                            <td>${tipoLabel}</td>
+                            <td style="text-align:right; font-family:monospace; font-weight:600;">${m.debito > 0 ? '$' + m.debito.toLocaleString('es-CO') : '-'}</td>
+                            <td style="text-align:right; font-family:monospace; font-weight:600; color:#2e7d32;">${m.credito > 0 ? '$' + m.credito.toLocaleString('es-CO') : '-'}</td>
+                            <td style="text-align:right; font-family:monospace; font-weight:700;">${m.acumulado > 0 ? '$' + m.acumulado.toLocaleString('es-CO') : '-'}</td>
+                        </tr>`;
+                });
+
+                html += '</tbody></table>';
+            } else {
+                html += '<div class="empty-state"><p>No hay movimientos detallados disponibles</p></div>';
+            }
+
+            document.getElementById('modalDetalleContenido').innerHTML = html;
+            document.getElementById('modalDetalle').classList.add('active');
+        };
+
+        // DESCARGAR EXCEL
+        window.descargarExcelCartera = function() {
+            const keys = Object.keys(carteraData);
+            if (keys.length === 0) { alert('❌ No hay datos para exportar'); return; }
+
+            const datosExcel = keys.map(k => {
+                const d = carteraData[k];
+                return {
+                    'Apartamento': d.inmueble || '',
+                    'Propietario': d.propietario || '',
+                    'Saldo Inicial': d.saldoInicial || 0,
+                    'Cuotas Admon': d.totalAdmon || 0,
+                    'Cuotas Extraordinarias': d.totalExtras || 0,
+                    'Intereses de Mora': d.totalIntereses || 0,
+                    'Total Cargos': d.totalCargos || 0,
+                    'Pagos/Abonos': d.totalPagos || 0,
+                    'Saldo Final': d.saldoFinal || 0,
+                    'Estado': (d.saldoFinal || 0) > 0 ? 'MOROSO' : 'AL DIA'
+                };
+            });
+
+            // Agregar fila de totales
+            datosExcel.push({
+                'Apartamento': 'TOTALES',
+                'Propietario': '',
+                'Saldo Inicial': datosExcel.reduce((s, r) => s + (r['Saldo Inicial'] || 0), 0),
+                'Cuotas Admon': datosExcel.reduce((s, r) => s + (r['Cuotas Admon'] || 0), 0),
+                'Cuotas Extraordinarias': datosExcel.reduce((s, r) => s + (r['Cuotas Extraordinarias'] || 0), 0),
+                'Intereses de Mora': datosExcel.reduce((s, r) => s + (r['Intereses de Mora'] || 0), 0),
+                'Total Cargos': datosExcel.reduce((s, r) => s + (r['Total Cargos'] || 0), 0),
+                'Pagos/Abonos': datosExcel.reduce((s, r) => s + (r['Pagos/Abonos'] || 0), 0),
+                'Saldo Final': datosExcel.reduce((s, r) => s + (r['Saldo Final'] || 0), 0),
+                'Estado': ''
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(datosExcel);
+            ws['!cols'] = [
+                { wch: 15 }, { wch: 30 }, { wch: 18 }, { wch: 18 },
+                { wch: 22 }, { wch: 18 }, { wch: 18 }, { wch: 18 },
+                { wch: 18 }, { wch: 12 }
+            ];
+            XLSX.utils.book_append_sheet(wb, ws, 'Cartera Morosos');
+
+            const nombre = `Cartera_Morosos_${edificioActual}_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, nombre);
+            alert(`✅ Excel descargado: ${nombre}`);
+        };
+
+        // LIMPIAR CARTERA
+        window.limpiarCartera = async function() {
+            if (!edificioActual) { alert('❌ Selecciona un edificio'); return; }
+            if (!confirm(`⚠️ ¿Eliminar TODA la cartera de ${edificioActual}?\nEsta acción no se puede deshacer.`)) return;
+
+            try {
+                await remove(ref(db, `cartera_morosos/${edificioActual}`));
+                carteraData = {};
+                renderTabla();
+                alert('✅ Cartera eliminada');
+            } catch (err) {
+                alert('❌ Error: ' + err.message);
+            }
+        };
+
+        // DRAG & DROP
+        const dropZone = document.getElementById('dropZone');
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                // Crear un evento fake para reusar procesarPDFs
+                const fakeEvent = { target: { files: files, value: '' } };
+                procesarPDFs(fakeEvent);
+            }
+        });
+
+        // Init
+        renderTabla();
+    </script>
+</body>
+</html>
