@@ -397,7 +397,7 @@
         }
 
         // ═══════════════════════════════════════════════════════════════
-        // PARSER PDF DAYTONA - REESCRITO CON POSICIONES
+        // PARSER PDF DAYTONA v3 - TEXTO COMPLETO CON REGEX INTELIGENTE
         // ═══════════════════════════════════════════════════════════════
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -405,41 +405,38 @@
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
-            // Extraer texto con posiciones para reconstruir lineas
-            let todasLasLineas = [];
+            // Extraer texto COMPLETO de todas las páginas con saltos de línea reales
+            let textoCompleto = '';
 
             for (let i = 1; i <= pdf.numPages; i++) {
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
                 const items = textContent.items;
 
-                // Agrupar items por posición Y (misma linea)
+                // Agrupar por Y con tolerancia de 3px
                 const lineasMap = {};
                 items.forEach(item => {
-                    const y = Math.round(item.transform[5]); // posición Y redondeada
+                    if (!item.str.trim()) return;
+                    const y = Math.round(item.transform[5] / 3) * 3; // agrupar con tolerancia
                     if (!lineasMap[y]) lineasMap[y] = [];
-                    lineasMap[y].push({
-                        text: item.str,
-                        x: item.transform[4]
-                    });
+                    lineasMap[y].push({ text: item.str, x: item.transform[4] });
                 });
 
-                // Ordenar por Y descendente (arriba a abajo en PDF)
                 const ys = Object.keys(lineasMap).map(Number).sort((a, b) => b - a);
                 ys.forEach(y => {
-                    // Ordenar items de izquierda a derecha
-                    const items = lineasMap[y].sort((a, b) => a.x - b.x);
-                    const lineaTexto = items.map(i => i.text).join(' ').trim();
-                    if (lineaTexto) {
-                        todasLasLineas.push(lineaTexto);
+                    const partes = lineasMap[y].sort((a, b) => a.x - b.x);
+                    const linea = partes.map(p => p.text).join('  ').trim();
+                    if (linea && !/^-+$/.test(linea)) {
+                        textoCompleto += linea + '\n';
                     }
                 });
             }
 
-            return extraerDatosDeLineas(todasLasLineas);
+            console.log('📄 TEXTO EXTRAIDO DEL PDF:\n', textoCompleto);
+            return extraerDatosDaytona(textoCompleto);
         }
 
-        function extraerDatosDeLineas(lineas) {
+        function extraerDatosDaytona(texto) {
             const resultado = {
                 inmueble: '',
                 propietario: '',
@@ -453,162 +450,154 @@
                 totalCargos: 0
             };
 
-            const textoCompleto = lineas.join('\n');
+            // ═══ INMUEBLE ═══
+            // Buscar "Inmueble:  Apto 105" o "Inmueble  Apto 105"
+            const mInm = texto.match(/Inmueble\s*:?\s*(Apto?\s*\d+[A-Za-z]*)/i);
+            if (mInm) resultado.inmueble = mInm[1].trim();
 
-            // ---- INMUEBLE ----
-            for (const linea of lineas) {
-                const mInm = linea.match(/Inmueble\s*:?\s*(Apto?\s*\d+[A-Za-z]*)/i);
-                if (mInm) { resultado.inmueble = mInm[1].trim(); break; }
-            }
-            // Si no encontró, buscar patrón "Apto XXX" en el texto
-            if (!resultado.inmueble) {
-                const mApto = textoCompleto.match(/(Apto?\s*\d+[A-Za-z]*)/i);
-                if (mApto) resultado.inmueble = mApto[1].trim();
+            // ═══ PROPIETARIO ═══
+            // Buscar "Propietario  00105  GONZALEZ DARIO" - limpiar montos que se peguen
+            const mProp = texto.match(/Propietario\s+\d+\s+([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑA-Za-záéíóúñ\s]+?)(?=\s*\$|\s*Saldo|\n)/i);
+            if (mProp) {
+                resultado.propietario = mProp[1].trim().replace(/\s+/g, ' ');
             }
 
-            // ---- PROPIETARIO ----
-            for (const linea of lineas) {
-                // Buscar "Propietario 00XXX NOMBRE APELLIDO"
-                const mProp = linea.match(/Propietario\s+\d+\s+(.+)/i);
-                if (mProp) {
-                    resultado.propietario = mProp[1].trim().replace(/\s+/g, ' ');
-                    break;
-                }
-            }
-            // Si no encontró, buscar patrón "00XXX APELLIDO NOMBRE" al inicio de línea
-            if (!resultado.propietario) {
-                for (const linea of lineas) {
-                    const mAlt = linea.match(/^00\d+\s+([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ\s]+)/);
-                    if (mAlt && mAlt[1].length > 3) {
-                        resultado.propietario = mAlt[1].trim();
-                        break;
+            // ═══ SALDO INICIAL ═══
+            // Buscar "Saldo Inicial Inmueble: $8.044.026,00" en cualquier formato
+            const mSI = texto.match(/Saldo\s+Inicial\s+Inmueble\s*:?\s*\$?([\d.,]+)/i);
+            if (mSI) resultado.saldoInicial = parsearMontoCO(mSI[1]);
+
+            // ═══ SALDO FINAL ═══
+            const mSF = texto.match(/Saldo\s+Total\s+Inmueble\s*:?\s*\$?([\d.,]+)/i);
+            if (mSF) resultado.saldoFinal = parsearMontoCO(mSF[1]);
+
+            // ═══ DETECTAR TIPO DE DOCUMENTO (CO o RC) PARA CADA SECCIÓN ═══
+            // Dividir el texto en secciones por "Documento CO/RC XXX"
+            const secciones = texto.split(/(?=Documento\s+(?:CO|RC)\s+\d+)/i);
+
+            for (const seccion of secciones) {
+                // Determinar si es CO (cobro/cargo) o RC (recibo de caja/pago)
+                const mDoc = seccion.match(/^Documento\s+(CO|RC)\s+(\d+)/i);
+                if (!mDoc) continue;
+
+                const tipoDoc = mDoc[1].toUpperCase(); // CO o RC
+                const esRecibo = tipoDoc === 'RC'; // RC = pago/abono
+
+                // Buscar líneas con código 00XXX y montos
+                // Patron: "00XXX  Descripcion Texto  $monto  $monto ..."
+                const regLinea = /00\d+\s+(.+?)(?:\s+\$)([\d.,]+(?:\s+\$[\d.,]+)*)/g;
+                let matchLinea;
+
+                while ((matchLinea = regLinea.exec(seccion)) !== null) {
+                    const desc = matchLinea[1].trim();
+                    const montosStr = '$' + matchLinea[2];
+
+                    // Extraer todos los montos de la línea
+                    const montos = [];
+                    const regM = /\$([\d.,]+)/g;
+                    let mm;
+                    while ((mm = regM.exec(montosStr)) !== null) {
+                        montos.push(parsearMontoCO(mm[1]));
+                    }
+
+                    if (montos.length === 0) continue;
+
+                    // Ignorar líneas tipo header
+                    if (/^(Propietario|Tercero|Descripci)/i.test(desc)) continue;
+
+                    // Clasificar por contenido de la descripción
+                    let tipo = 'otro';
+                    if (/cuota\s+de\s+administraci[oó]n/i.test(desc)) tipo = 'admon';
+                    else if (/cuota\s+extra/i.test(desc)) tipo = 'extra';
+                    else if (/inter[eé]s\s+de\s+mora/i.test(desc)) tipo = 'interes';
+                    else if (/saldos?\s+iniciales/i.test(desc)) tipo = 'saldo_inicial_pago';
+
+                    const acumulado = montos[montos.length - 1];
+
+                    if (esRecibo) {
+                        // ══ DOCUMENTO RC = PAGO ══
+                        // Formato RC: 00105 Descripcion (REF) (FECHA) $0,00 $CREDITO $ACUMULADO
+                        // El crédito es el penúltimo monto (antes del acumulado)
+                        let credito = 0;
+                        if (montos.length >= 3) {
+                            credito = montos[montos.length - 2]; // penúltimo = crédito
+                        } else if (montos.length === 2) {
+                            credito = montos[0]; // primer monto si solo hay 2
+                        } else {
+                            credito = montos[0];
+                        }
+
+                        if (credito > 0) {
+                            resultado.movimientos.push({
+                                descripcion: '🟢 [PAGO] ' + desc,
+                                tipo: 'pago',
+                                debito: 0,
+                                credito: credito,
+                                acumulado: acumulado
+                            });
+                            resultado.totalPagos += credito;
+                        }
+                    } else {
+                        // ══ DOCUMENTO CO = CARGO ══
+                        // Formato CO: 00105 Descripcion $APLICADO $SALDO $DEBITO $CREDITO $ACUMULADO
+                        // O variante: $SALDO $DEBITO $CREDITO $ACUMULADO
+                        // El débito es el que coincide con el concepto (no es 0)
+                        let debito = 0;
+
+                        if (montos.length >= 5) {
+                            debito = montos[2]; // posición 3 = débito
+                        } else if (montos.length === 4) {
+                            debito = montos[1]; // posición 2
+                        } else if (montos.length === 3) {
+                            // $DEBITO $CREDITO(0) $ACUMULADO
+                            debito = montos[0];
+                        } else if (montos.length === 2) {
+                            debito = montos[0];
+                        } else {
+                            debito = montos[0];
+                        }
+
+                        if (debito > 0) {
+                            resultado.movimientos.push({
+                                descripcion: desc,
+                                tipo: tipo === 'saldo_inicial_pago' ? 'otro' : tipo,
+                                debito: debito,
+                                credito: 0,
+                                acumulado: acumulado
+                            });
+
+                            if (tipo === 'admon') resultado.totalAdmon += debito;
+                            else if (tipo === 'extra') resultado.totalExtras += debito;
+                            else if (tipo === 'interes') resultado.totalIntereses += debito;
+                            // 'otro' no se suma a ninguna categoría específica
+                            resultado.totalCargos += debito;
+                        }
                     }
                 }
             }
 
-            // ---- SALDO INICIAL ----
-            for (const linea of lineas) {
-                const mSI = linea.match(/Saldo\s+Inicial\s+Inmueble\s*:?\s*\$?([\d.,]+)/i);
-                if (mSI) { resultado.saldoInicial = parsearMontoCO(mSI[1]); break; }
+            // Recalcular totalCargos como suma de categorías si no tiene "otros"
+            const sumaCateg = resultado.totalAdmon + resultado.totalExtras + resultado.totalIntereses;
+            if (sumaCateg > 0 && resultado.totalCargos === 0) {
+                resultado.totalCargos = sumaCateg;
             }
 
-            // ---- SALDO FINAL ----
-            for (let i = lineas.length - 1; i >= 0; i--) {
-                const mSF = lineas[i].match(/Saldo\s+Total\s+Inmueble\s*:?\s*\$?([\d.,]+)/i);
-                if (mSF) { resultado.saldoFinal = parsearMontoCO(mSF[1]); break; }
-            }
-
-            // ---- MOVIMIENTOS ----
-            // Buscar lineas que tengan código 00XXX seguido de descripción y montos
-            for (const linea of lineas) {
-                // Patrón: 00XXX Descripcion $monto $monto $monto $monto $monto
-                // Puede tener entre 3 y 6 montos con $
-                const montos = [];
-                const regMonto = /\$([\d.,]+)/g;
-                let m;
-                while ((m = regMonto.exec(linea)) !== null) {
-                    montos.push(parsearMontoCO(m[1]));
-                }
-
-                if (montos.length < 3) continue; // No es una línea de movimiento
-
-                // Extraer descripción (lo que está entre el código y el primer $)
-                const mDesc = linea.match(/(?:00\d+\s+)?(.+?)\s*\$/);
-                if (!mDesc) continue;
-                let desc = mDesc[1].trim();
-
-                // Ignorar líneas de encabezado, total, etc
-                if (/^(Doc|Documento|Total|Saldo|Propietario|Página|Software|Edificio|Extracto|Entre)/i.test(desc)) continue;
-                if (/^(Tercero|Descripci[oó]n|Aplicado)/i.test(desc)) continue;
-
-                // Clasificar tipo
-                let tipo = 'otro';
-                const descLower = desc.toLowerCase();
-                if (/cuota\s+de\s+administraci[oó]n/i.test(desc)) tipo = 'admon';
-                else if (/cuota\s+extra/i.test(desc)) tipo = 'extra';
-                else if (/inter[eé]s\s+de\s+mora/i.test(desc)) tipo = 'interes';
-                else if (/saldos?\s+iniciales/i.test(desc)) tipo = 'pago';
-
-                // Determinar si es débito o crédito basado en contexto
-                // En Daytona: lineas CO son cargos (débitos), lineas RC son pagos (créditos)
-                // Si tiene acumulado creciente = cargo, decreciente = pago
-                // Método más simple: si la descripción está en contexto de pago (RC), es crédito
-
-                // Buscar el último monto como acumulado (es el más grande generalmente)
-                const acumulado = montos[montos.length - 1];
-
-                // Para líneas con referencia a documento anterior como "(CO 149)" = es un pago aplicado
-                const esPagoAplicado = /\(CO\s+\d+\)|\(SI\s+\d+\)/i.test(desc);
-
-                if (esPagoAplicado || tipo === 'pago') {
-                    // Es un pago/abono - buscar el monto del crédito
-                    // En pagos, generalmente el patrón es: $0,00 $CREDITO $ACUMULADO
-                    const creditoMonto = montos.length >= 2 ? montos[montos.length - 2] : montos[0];
-                    if (creditoMonto > 0) {
-                        resultado.movimientos.push({
-                            descripcion: desc,
-                            tipo: 'pago',
-                            debito: 0,
-                            credito: creditoMonto,
-                            acumulado: acumulado
-                        });
-                        resultado.totalPagos += creditoMonto;
-                    }
-                } else {
-                    // Es un cargo - buscar el débito
-                    // En cargos: $APLICADO $SALDO $DEBITO $CREDITO(0) $ACUMULADO
-                    // O: $SALDO $DEBITO $CREDITO(0) $ACUMULADO
-                    let debitoMonto = 0;
-
-                    if (montos.length >= 5) {
-                        // Formato completo: aplicado, saldo, debito, credito, acumulado
-                        debitoMonto = montos[2]; // tercer monto = débito
-                    } else if (montos.length === 4) {
-                        // saldo, debito, credito, acumulado
-                        debitoMonto = montos[1];
-                    } else if (montos.length === 3) {
-                        debitoMonto = montos[0];
-                    }
-
-                    if (debitoMonto > 0) {
-                        resultado.movimientos.push({
-                            descripcion: desc,
-                            tipo: tipo,
-                            debito: debitoMonto,
-                            credito: 0,
-                            acumulado: acumulado
-                        });
-
-                        if (tipo === 'admon') resultado.totalAdmon += debitoMonto;
-                        else if (tipo === 'extra') resultado.totalExtras += debitoMonto;
-                        else if (tipo === 'interes') resultado.totalIntereses += debitoMonto;
-                        else resultado.totalAdmon += debitoMonto;
-
-                        resultado.totalCargos += debitoMonto;
-                    }
-                }
-            }
-
-            // Calcular total cargos si no se calculó
-            if (resultado.totalCargos === 0) {
-                resultado.totalCargos = resultado.totalAdmon + resultado.totalExtras + resultado.totalIntereses;
-            }
-
-            // Si saldo final no se encontró, calcularlo
+            // Si no se encontró saldo final, calcularlo
             if (resultado.saldoFinal === 0 && (resultado.saldoInicial > 0 || resultado.totalCargos > 0)) {
                 resultado.saldoFinal = resultado.saldoInicial + resultado.totalCargos - resultado.totalPagos;
             }
 
+            console.log('📊 RESULTADO PARSER:', JSON.stringify(resultado, null, 2));
             return resultado;
         }
 
         function parsearMontoCO(str) {
             if (!str) return 0;
             let limpio = str.replace(/\$/g, '').trim();
-            // Formato colombiano: 8.044.026,00
+            // Formato colombiano: 8.044.026,00 -> 8044026.00
             if (limpio.includes(',')) {
-                limpio = limpio.replace(/\./g, '');
-                limpio = limpio.replace(',', '.');
+                limpio = limpio.replace(/\./g, ''); // quitar puntos de miles
+                limpio = limpio.replace(',', '.'); // coma -> punto decimal
             }
             const num = parseFloat(limpio);
             return isNaN(num) ? 0 : num;
