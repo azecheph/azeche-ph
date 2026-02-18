@@ -19,7 +19,6 @@
 
         .container { max-width: 1600px; margin: 0 auto; }
 
-        /* HEADER */
         .header {
             background: white;
             padding: 25px 30px;
@@ -32,329 +31,73 @@
             flex-wrap: wrap;
             gap: 15px;
         }
-
         .header h1 { color: #e53935; font-size: 1.8em; font-weight: 800; }
         .header h1 span { color: #1a237e; }
 
         .edificio-selector { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-
         .edificio-selector select {
-            padding: 12px 20px;
-            border: 2px solid #1a237e;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            color: #1a237e;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s;
+            padding: 12px 20px; border: 2px solid #1a237e; border-radius: 10px;
+            font-size: 15px; font-weight: 600; color: #1a237e; background: white; cursor: pointer;
         }
 
         .btn-dash {
-            background: #1a237e;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
+            background: #1a237e; color: white; border: none; padding: 12px 24px;
+            border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 14px;
         }
         .btn-dash:hover { background: #0d1551; transform: translateY(-2px); }
 
-        /* PANEL ACCIONES */
         .actions-panel {
-            background: white;
-            padding: 20px 25px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            margin-bottom: 25px;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            align-items: center;
+            background: white; padding: 20px 25px; border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); margin-bottom: 25px;
+            display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
         }
 
         .btn {
-            padding: 14px 24px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            padding: 14px 24px; border: none; border-radius: 12px; font-weight: 600;
+            font-size: 15px; cursor: pointer; transition: all 0.3s; display: flex;
+            align-items: center; gap: 8px;
         }
         .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-
         .btn-upload { background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%); color: white; }
         .btn-danger { background: linear-gradient(135deg, #e53935 0%, #c62828 100%); color: white; }
         .btn-success { background: #00B853; color: white; }
         .btn-warning { background: #ff9800; color: white; }
         .btn-secondary { background: #6c757d; color: white; }
+        .btn-sm { padding: 6px 14px; font-size: 12px; }
 
-        /* RESUMEN TARJETAS */
-        .resumen-strip {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-
+        /* RESUMEN */
+        .resumen-strip { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
         .resumen-card {
-            flex: 1;
-            min-width: 200px;
-            padding: 20px;
-            border-radius: 15px;
-            color: white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            flex: 1; min-width: 180px; padding: 18px; border-radius: 15px;
+            color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-
-        .resumen-card .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 5px; }
-        .resumen-card .valor { font-size: 1.8em; font-weight: 800; }
-        .resumen-card .sub { font-size: 0.8em; opacity: 0.8; margin-top: 5px; }
-
+        .resumen-card .label { font-size: 0.82em; opacity: 0.9; margin-bottom: 4px; }
+        .resumen-card .valor { font-size: 1.6em; font-weight: 800; }
+        .resumen-card .sub { font-size: 0.78em; opacity: 0.8; margin-top: 4px; }
         .card-total { background: linear-gradient(135deg, #e53935, #c62828); }
         .card-morosos { background: linear-gradient(135deg, #ff6f00, #e65100); }
         .card-intereses { background: linear-gradient(135deg, #6a1b9a, #4a148c); }
         .card-pagos { background: linear-gradient(135deg, #2e7d32, #1b5e20); }
         .card-aptos { background: linear-gradient(135deg, #1a237e, #0d47a1); }
 
-        /* BARRA PROGRESO CARGA */
-        .upload-progress {
-            display: none;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        }
+        /* PROGRESO */
+        .upload-progress { display: none; background: white; padding: 20px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
         .upload-progress.active { display: block; }
-        .progress-bar-container {
-            background: #e0e0e0;
-            border-radius: 10px;
-            height: 20px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-        .progress-bar-fill {
-            background: linear-gradient(90deg, #1a237e, #e53935);
-            height: 100%;
-            border-radius: 10px;
-            transition: width 0.3s;
-            width: 0%;
-        }
+        .progress-bar-container { background: #e0e0e0; border-radius: 10px; height: 20px; overflow: hidden; margin: 10px 0; }
+        .progress-bar-fill { background: linear-gradient(90deg, #1a237e, #e53935); height: 100%; border-radius: 10px; transition: width 0.3s; width: 0%; }
         .progress-text { text-align: center; font-weight: 600; color: #333; }
+        .upload-log { max-height: 200px; overflow-y: auto; background: #f5f5f5; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 12px; margin-top: 10px; display: none; }
+        .upload-log.active { display: block; }
+        .log-ok { color: #2e7d32; }
+        .log-err { color: #e53935; }
+        .log-info { color: #1a237e; }
+        .log-warn { color: #ff9800; }
 
-        /* TABLA PRINCIPAL */
-        .table-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 25px;
-            overflow: hidden;
-        }
-
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .table-header h2 { color: #1a237e; font-size: 1.3em; }
-
-        .search-box {
-            padding: 10px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            width: 280px;
-            transition: border 0.3s;
-        }
-        .search-box:focus { outline: none; border-color: #1a237e; }
-
-        .tabla-scroll { overflow-x: auto; max-height: 65vh; overflow-y: auto; }
-
-        #tablaCartera {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            min-width: 1100px;
-        }
-
-        #tablaCartera thead {
-            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        #tablaCartera th {
-            color: white;
-            padding: 14px 10px;
-            text-align: left;
-            font-weight: 700;
-            font-size: 12px;
-            white-space: nowrap;
-            cursor: pointer;
-            user-select: none;
-            transition: background 0.2s;
-        }
-        #tablaCartera th:hover { background: rgba(255,255,255,0.1); }
-        #tablaCartera th .sort-icon { margin-left: 4px; font-size: 10px; }
-
-        #tablaCartera tbody tr { border-bottom: 1px solid #f0f0f0; transition: all 0.2s; }
-        #tablaCartera tbody tr:hover { background: #f0f4ff; }
-        #tablaCartera tbody tr:nth-child(even) { background: #fafbff; }
-        #tablaCartera tbody tr:nth-child(even):hover { background: #f0f4ff; }
-
-        #tablaCartera td { padding: 12px 10px; font-size: 13px; }
-
-        .col-monto {
-            text-align: right;
-            font-family: 'Courier New', monospace;
-            font-weight: 600;
-        }
-
-        .col-saldo-final {
-            text-align: right;
-            font-family: 'Courier New', monospace;
-            font-weight: 800;
-            color: #e53935;
-            font-size: 14px !important;
-        }
-
-        .col-pagos {
-            text-align: right;
-            font-family: 'Courier New', monospace;
-            font-weight: 600;
-            color: #2e7d32;
-        }
-
-        /* Fila de totales */
-        #tablaCartera tfoot {
-            position: sticky;
-            bottom: 0;
-            z-index: 10;
-        }
-
-        #tablaCartera tfoot tr {
-            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-            color: white;
-        }
-
-        #tablaCartera tfoot td {
-            padding: 14px 10px;
-            font-weight: 800;
-            font-size: 14px;
-            border-top: 3px solid #e53935;
-        }
-
-        .tfoot-monto {
-            text-align: right;
-            font-family: 'Courier New', monospace;
-        }
-
-        /* Moroso badge */
-        .badge-moroso {
-            background: #e53935;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-        .badge-aldia {
-            background: #4caf50;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        /* Columna Apto fija */
-        #tablaCartera th:first-child,
-        #tablaCartera td:first-child,
-        #tablaCartera tfoot td:first-child {
-            position: sticky;
-            left: 0;
-            z-index: 5;
-            background: white;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-        }
-        #tablaCartera thead th:first-child { background: #1a237e; z-index: 15; }
-        #tablaCartera tfoot td:first-child { background: #1a237e; }
-        #tablaCartera tbody tr:nth-child(even) td:first-child { background: #fafbff; }
-        #tablaCartera tbody tr:hover td:first-child { background: #f0f4ff; }
-
-        /* Modal */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center;
-            align-items: center; padding: 20px;
-        }
-        .modal.active { display: flex; }
-
-        .modal-content {
-            background: white; padding: 30px; border-radius: 20px;
-            max-width: 1000px; width: 100%; max-height: 90vh; overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #eee;
-        }
-        .modal-header h2 { color: #1a237e; font-size: 1.5em; }
-
-        .btn-close {
-            background: none; border: none; font-size: 2em;
-            cursor: pointer; color: #999; transition: all 0.3s;
-        }
-        .btn-close:hover { color: #e53935; }
-
-        /* Detalle apartamento */
-        .detalle-tabla { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
-        .detalle-tabla th {
-            background: #f0f4ff; color: #1a237e; padding: 10px;
-            text-align: left; font-size: 12px; font-weight: 700;
-        }
-        .detalle-tabla td { padding: 8px 10px; border-bottom: 1px solid #eee; }
-        .detalle-tabla .fila-cobro { }
-        .detalle-tabla .fila-pago { background: #e8f5e9; }
-        .detalle-tabla .fila-interes { background: #fff8e1; }
-        .detalle-tabla .fila-extra { background: #f3e5f5; }
-
-        .detalle-resumen {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px; margin-bottom: 20px;
-        }
-        .detalle-resumen-item {
-            padding: 15px; border-radius: 10px; text-align: center;
-        }
-        .detalle-resumen-item .det-label { font-size: 0.8em; color: #666; }
-        .detalle-resumen-item .det-valor { font-size: 1.3em; font-weight: 800; }
-
-        /* Empty state */
-        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
-        .empty-state-icon { font-size: 4em; margin-bottom: 15px; }
-
-        /* Drop zone */
+        /* DROP ZONE */
         .drop-zone {
-            border: 3px dashed #1a237e;
-            border-radius: 15px;
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 25px;
-            transition: all 0.3s;
-            background: #f8f9ff;
-            display: none;
+            border: 3px dashed #1a237e; border-radius: 15px; padding: 40px;
+            text-align: center; margin-bottom: 25px; transition: all 0.3s;
+            background: #f8f9ff; display: none;
         }
         .drop-zone.active { display: block; }
         .drop-zone.dragover { background: #e8eaf6; border-color: #e53935; }
@@ -362,34 +105,98 @@
         .drop-zone h3 { color: #1a237e; margin-bottom: 10px; }
         .drop-zone p { color: #666; font-size: 0.9em; }
 
-        /* LOG */
-        .upload-log {
-            max-height: 150px;
-            overflow-y: auto;
-            background: #f5f5f5;
-            border-radius: 8px;
-            padding: 10px;
-            font-family: monospace;
-            font-size: 12px;
-            margin-top: 10px;
-            display: none;
+        /* TABLA */
+        .table-container { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); padding: 25px; overflow: hidden; }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .table-header h2 { color: #1a237e; font-size: 1.3em; }
+        .search-box { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; width: 280px; transition: border 0.3s; }
+        .search-box:focus { outline: none; border-color: #1a237e; }
+
+        .tabla-scroll { overflow-x: auto; max-height: 65vh; overflow-y: auto; }
+
+        #tablaCartera { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1100px; }
+        #tablaCartera thead { background: linear-gradient(135deg, #1a237e 0%, #283593 100%); position: sticky; top: 0; z-index: 10; }
+        #tablaCartera th {
+            color: white; padding: 14px 10px; text-align: left; font-weight: 700;
+            font-size: 12px; white-space: nowrap; cursor: pointer; user-select: none;
         }
-        .upload-log.active { display: block; }
-        .log-ok { color: #2e7d32; }
-        .log-err { color: #e53935; }
-        .log-info { color: #1a237e; }
+        #tablaCartera th:hover { background: rgba(255,255,255,0.1); }
+        #tablaCartera tbody tr { border-bottom: 1px solid #f0f0f0; transition: all 0.2s; }
+        #tablaCartera tbody tr:hover { background: #f0f4ff; }
+        #tablaCartera tbody tr:nth-child(even) { background: #fafbff; }
+        #tablaCartera tbody tr:nth-child(even):hover { background: #f0f4ff; }
+        #tablaCartera td { padding: 12px 10px; font-size: 13px; }
+
+        .col-monto { text-align: right; font-family: 'Courier New', monospace; font-weight: 600; }
+        .col-saldo { text-align: right; font-family: 'Courier New', monospace; font-weight: 800; color: #e53935; font-size: 14px !important; }
+        .col-pagos { text-align: right; font-family: 'Courier New', monospace; font-weight: 600; color: #2e7d32; }
+
+        #tablaCartera tfoot { position: sticky; bottom: 0; z-index: 10; }
+        #tablaCartera tfoot tr { background: linear-gradient(135deg, #1a237e 0%, #283593 100%); color: white; }
+        #tablaCartera tfoot td { padding: 14px 10px; font-weight: 800; font-size: 14px; border-top: 3px solid #e53935; }
+        .tfoot-monto { text-align: right; font-family: 'Courier New', monospace; }
+
+        /* Sticky primera columna */
+        #tablaCartera th:first-child, #tablaCartera td:first-child, #tablaCartera tfoot td:first-child {
+            position: sticky; left: 0; z-index: 5; background: white; box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        #tablaCartera thead th:first-child { background: #1a237e; z-index: 15; }
+        #tablaCartera tfoot td:first-child { background: #1a237e; }
+        #tablaCartera tbody tr:nth-child(even) td:first-child { background: #fafbff; }
+        #tablaCartera tbody tr:hover td:first-child { background: #f0f4ff; }
+
+        .badge-moroso { background: #e53935; color: white; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+        .badge-aldia { background: #4caf50; color: white; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .empty-state-icon { font-size: 4em; margin-bottom: 15px; }
+
+        /* MODAL */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center;
+            align-items: center; padding: 20px;
+        }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; max-width: 1000px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #eee; }
+        .modal-header h2 { color: #1a237e; font-size: 1.4em; }
+        .btn-close { background: none; border: none; font-size: 2em; cursor: pointer; color: #999; }
+        .btn-close:hover { color: #e53935; }
+
+        /* DETALLE */
+        .detalle-resumen { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .detalle-resumen-item { padding: 14px; border-radius: 10px; text-align: center; }
+        .det-label { font-size: 0.78em; color: #666; }
+        .det-valor { font-size: 1.2em; font-weight: 800; }
+
+        .detalle-tabla { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
+        .detalle-tabla th { background: #f0f4ff; color: #1a237e; padding: 10px; text-align: left; font-size: 12px; font-weight: 700; }
+        .detalle-tabla td { padding: 8px 10px; border-bottom: 1px solid #eee; }
+        .fila-cobro { }
+        .fila-pago { background: #e8f5e9 !important; }
+        .fila-interes { background: #fff8e1 !important; }
+        .fila-extra { background: #f3e5f5 !important; }
+
+        /* FORM EDICION */
+        .edit-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; padding-top: 20px; border-top: 2px solid #eee; }
+        .edit-form .form-group { }
+        .edit-form label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; font-size: 13px; }
+        .edit-form input, .edit-form select { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .edit-form input:focus, .edit-form select:focus { outline: none; border-color: #1a237e; }
+        .edit-form .full-width { grid-column: 1 / -1; }
 
         @media (max-width: 768px) {
             .header h1 { font-size: 1.3em; }
             .resumen-card .valor { font-size: 1.3em; }
+            .edit-form { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- HEADER -->
         <div class="header">
-            <h1>📊 Cuentas por <span>Cobrar</span> - Cartera Morosos</h1>
+            <h1>📊 Cuentas por <span>Cobrar</span> - Cartera</h1>
             <div class="edificio-selector">
                 <select id="edificioSelect" onchange="cambiarEdificio()">
                     <option value="">Selecciona edificio</option>
@@ -402,114 +209,74 @@
             </div>
         </div>
 
-        <!-- PANEL ACCIONES -->
         <div class="actions-panel">
-            <button class="btn btn-upload" onclick="toggleDropZone()">
-                📄 Subir PDFs de Extractos
-            </button>
+            <button class="btn btn-upload" onclick="toggleDropZone()">📄 Subir PDFs Extractos</button>
             <input type="file" id="filePDFs" accept=".pdf" multiple style="display: none;" onchange="procesarPDFs(event)">
-            <button class="btn btn-danger" onclick="verMorosos()">
-                🔴 Ver Solo Morosos
-            </button>
-            <button class="btn btn-success" onclick="descargarExcelCartera()">
-                📥 Descargar Excel
-            </button>
-            <button class="btn btn-secondary" onclick="limpiarCartera()">
-                🗑️ Limpiar Cartera
-            </button>
+            <button class="btn btn-danger" onclick="toggleMorosos()">🔴 <span id="btnMorososTxt">Ver Solo Morosos</span></button>
+            <button class="btn btn-warning" onclick="agregarManual()">✏️ Agregar Manual</button>
+            <button class="btn btn-success" onclick="descargarExcelCartera()">📥 Descargar Excel</button>
+            <button class="btn btn-secondary" onclick="limpiarCartera()">🗑️ Limpiar Todo</button>
             <div style="margin-left: auto; padding: 8px 15px; background: #f0f4ff; border-radius: 8px; font-weight: 600; font-size: 14px;">
                 📊 <span id="contadorAptos">0</span> apartamentos
             </div>
         </div>
 
-        <!-- DROP ZONE -->
         <div class="drop-zone" id="dropZone">
             <div class="drop-zone-icon">📄</div>
-            <h3>Arrastra aquí los PDFs de extractos de Daytona</h3>
-            <p>O haz clic en el botón para seleccionar archivos (puedes subir varios a la vez)</p>
-            <button class="btn btn-upload" onclick="document.getElementById('filePDFs').click()" style="margin-top: 15px;">
-                📂 Seleccionar PDFs
-            </button>
+            <h3>Arrastra los PDFs de extractos de Daytona aquí</h3>
+            <p>O haz clic en el botón para seleccionar (puedes subir varios a la vez)</p>
+            <button class="btn btn-upload" onclick="document.getElementById('filePDFs').click()" style="margin-top: 15px;">📂 Seleccionar PDFs</button>
         </div>
 
-        <!-- PROGRESO -->
         <div class="upload-progress" id="uploadProgress">
             <div class="progress-text" id="progressText">Procesando PDFs...</div>
-            <div class="progress-bar-container">
-                <div class="progress-bar-fill" id="progressBar"></div>
-            </div>
+            <div class="progress-bar-container"><div class="progress-bar-fill" id="progressBar"></div></div>
             <div class="upload-log" id="uploadLog"></div>
         </div>
 
-        <!-- RESUMEN TARJETAS -->
         <div class="resumen-strip" id="resumenStrip" style="display: none;">
-            <div class="resumen-card card-aptos">
-                <div class="label">🏠 Apartamentos</div>
-                <div class="valor" id="rAptos">0</div>
-            </div>
-            <div class="resumen-card card-total">
-                <div class="label">💰 Deuda Total Cartera</div>
-                <div class="valor" id="rDeudaTotal">$0</div>
-            </div>
-            <div class="resumen-card card-morosos">
-                <div class="label">⚠️ Morosos (saldo > 0)</div>
-                <div class="valor" id="rMorosos">0</div>
-                <div class="sub" id="rPctMorosos">0% del edificio</div>
-            </div>
-            <div class="resumen-card card-intereses">
-                <div class="label">📈 Total Intereses Mora</div>
-                <div class="valor" id="rIntereses">$0</div>
-            </div>
-            <div class="resumen-card card-pagos">
-                <div class="label">✅ Total Pagos Recibidos</div>
-                <div class="valor" id="rPagos">$0</div>
-            </div>
+            <div class="resumen-card card-aptos"><div class="label">🏠 Apartamentos</div><div class="valor" id="rAptos">0</div></div>
+            <div class="resumen-card card-total"><div class="label">💰 Deuda Total</div><div class="valor" id="rDeudaTotal">$0</div></div>
+            <div class="resumen-card card-morosos"><div class="label">⚠️ Morosos</div><div class="valor" id="rMorosos">0</div><div class="sub" id="rPctMorosos">0%</div></div>
+            <div class="resumen-card card-intereses"><div class="label">📈 Intereses Mora</div><div class="valor" id="rIntereses">$0</div></div>
+            <div class="resumen-card card-pagos"><div class="label">✅ Pagos Recibidos</div><div class="valor" id="rPagos">$0</div></div>
         </div>
 
-        <!-- TABLA PRINCIPAL -->
         <div class="table-container">
             <div class="table-header">
                 <h2>📋 Resumen de Cartera por Apartamento</h2>
-                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Buscar por apto o propietario..." oninput="filtrarTabla()">
+                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Buscar apto o propietario..." oninput="filtrarTabla()">
             </div>
             <div class="tabla-scroll">
                 <table id="tablaCartera">
                     <thead>
                         <tr>
-                            <th onclick="ordenarTabla(0)">Apto <span class="sort-icon">↕</span></th>
-                            <th onclick="ordenarTabla(1)">Propietario <span class="sort-icon">↕</span></th>
-                            <th onclick="ordenarTabla(2)">Saldo Inicial <span class="sort-icon">↕</span></th>
-                            <th onclick="ordenarTabla(3)">Cuotas Admon <span class="sort-icon">↕</span></th>
-                            <th onclick="ordenarTabla(4)">Cuotas Extra <span class="sort-icon">↕</span></th>
-                            <th onclick="ordenarTabla(5)">Intereses Mora <span class="sort-icon">↕</span></th>
-                            <th onclick="ordenarTabla(6)">Total Cargos <span class="sort-icon">↕</span></th>
-                            <th onclick="ordenarTabla(7)">Pagos/Abonos <span class="sort-icon">↕</span></th>
-                            <th onclick="ordenarTabla(8)">Saldo Final <span class="sort-icon">↕</span></th>
+                            <th onclick="ordenarTabla(0)">Apto ↕</th>
+                            <th onclick="ordenarTabla(1)">Propietario ↕</th>
+                            <th onclick="ordenarTabla(2)">Saldo Inicial ↕</th>
+                            <th onclick="ordenarTabla(3)">Cuotas Admon ↕</th>
+                            <th onclick="ordenarTabla(4)">Cuotas Extra ↕</th>
+                            <th onclick="ordenarTabla(5)">Intereses Mora ↕</th>
+                            <th onclick="ordenarTabla(6)">Total Cargos ↕</th>
+                            <th onclick="ordenarTabla(7)">Pagos/Abonos ↕</th>
+                            <th onclick="ordenarTabla(8)">Saldo Final ↕</th>
                             <th>Estado</th>
-                            <th>Detalle</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tablaCuerpo">
-                        <tr>
-                            <td colspan="11">
-                                <div class="empty-state">
-                                    <div class="empty-state-icon">📄</div>
-                                    <h3>Selecciona un edificio y sube los PDFs de extractos</h3>
-                                    <p>Sube los extractos individuales de Daytona InterCloud en formato PDF</p>
-                                </div>
-                            </td>
-                        </tr>
+                        <tr><td colspan="11"><div class="empty-state"><div class="empty-state-icon">📄</div><h3>Selecciona un edificio y sube los PDFs</h3><p>Extractos individuales de Daytona InterCloud</p></div></td></tr>
                     </tbody>
                     <tfoot id="tablaFoot" style="display: none;">
                         <tr>
-                            <td colspan="2" style="text-align: right; font-size: 14px;">TOTALES</td>
-                            <td class="tfoot-monto" id="tSaldoInicial">$0</td>
+                            <td colspan="2" style="text-align: right;">TOTALES</td>
+                            <td class="tfoot-monto" id="tSaldoI">$0</td>
                             <td class="tfoot-monto" id="tAdmon">$0</td>
                             <td class="tfoot-monto" id="tExtra">$0</td>
-                            <td class="tfoot-monto" id="tIntereses">$0</td>
+                            <td class="tfoot-monto" id="tInt">$0</td>
                             <td class="tfoot-monto" id="tCargos">$0</td>
                             <td class="tfoot-monto" id="tPagos" style="color: #81c784;">$0</td>
-                            <td class="tfoot-monto" id="tSaldoFinal" style="color: #ef9a9a; font-size: 16px;">$0</td>
+                            <td class="tfoot-monto" id="tSaldoF" style="color: #ef9a9a; font-size: 16px;">$0</td>
                             <td colspan="2"></td>
                         </tr>
                     </tfoot>
@@ -518,20 +285,78 @@
         </div>
     </div>
 
-    <!-- MODAL DETALLE APARTAMENTO -->
+    <!-- MODAL DETALLE -->
     <div class="modal" id="modalDetalle">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalDetalleTitulo">📋 Detalle Apartamento</h2>
+                <h2 id="modalDetTitulo">📋 Detalle</h2>
                 <button class="btn-close" onclick="cerrarModal('modalDetalle')">&times;</button>
             </div>
-            <div id="modalDetalleContenido"></div>
+            <div id="modalDetContenido"></div>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR -->
+    <div class="modal" id="modalEditar">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalEditTitulo">✏️ Editar Apartamento</h2>
+                <button class="btn-close" onclick="cerrarModal('modalEditar')">&times;</button>
+            </div>
+            <div id="modalEditContenido"></div>
+        </div>
+    </div>
+
+    <!-- MODAL AGREGAR MANUAL -->
+    <div class="modal" id="modalManual">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Agregar Apartamento Manual</h2>
+                <button class="btn-close" onclick="cerrarModal('modalManual')">&times;</button>
+            </div>
+            <div class="edit-form" id="formManual">
+                <div class="form-group">
+                    <label>Apartamento *</label>
+                    <input type="text" id="manInmueble" placeholder="Ej: Apto 105">
+                </div>
+                <div class="form-group">
+                    <label>Propietario *</label>
+                    <input type="text" id="manPropietario" placeholder="Nombre completo">
+                </div>
+                <div class="form-group">
+                    <label>Saldo Inicial ($)</label>
+                    <input type="number" id="manSaldoInicial" value="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Cuotas Administración ($)</label>
+                    <input type="number" id="manAdmon" value="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Cuotas Extraordinarias ($)</label>
+                    <input type="number" id="manExtras" value="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Intereses de Mora ($)</label>
+                    <input type="number" id="manIntereses" value="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Total Pagos/Abonos ($)</label>
+                    <input type="number" id="manPagos" value="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Saldo Final ($)</label>
+                    <input type="number" id="manSaldoFinal" value="0" step="0.01">
+                </div>
+                <div class="full-width" style="text-align: center; margin-top: 10px;">
+                    <button class="btn btn-upload" onclick="guardarManual()" style="width: 100%;">💾 Guardar Apartamento</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, set, onValue, remove, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, set, onValue, remove, get, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyAS9c6-ың_xF-p7r2eL36yaKpuwTbCg-AE",
@@ -547,9 +372,9 @@
         const db = getDatabase(app);
 
         let edificioActual = '';
-        let carteraData = {}; // { apto: { propietario, saldoInicial, movimientos[], resumen } }
-        let sortCol = -1;
-        let sortAsc = true;
+        let carteraData = {};
+        let sortCol = 8; // Por defecto ordenar por saldo final
+        let sortAsc = false; // Mayor a menor
         let soloMorosos = false;
 
         // ═══════════════════════════════════════════════════════════════
@@ -558,28 +383,21 @@
         window.cambiarEdificio = function() {
             edificioActual = document.getElementById('edificioSelect').value;
             soloMorosos = false;
-            if (!edificioActual) {
-                carteraData = {};
-                renderTabla();
-                return;
-            }
+            document.getElementById('btnMorososTxt').textContent = 'Ver Solo Morosos';
+            if (!edificioActual) { carteraData = {}; renderTabla(); return; }
             cargarDesdeFirebase();
         };
 
         function cargarDesdeFirebase() {
             const carteraRef = ref(db, `cartera_morosos/${edificioActual}`);
             onValue(carteraRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    carteraData = snapshot.val();
-                } else {
-                    carteraData = {};
-                }
+                carteraData = snapshot.exists() ? snapshot.val() : {};
                 renderTabla();
             });
         }
 
         // ═══════════════════════════════════════════════════════════════
-        // PARSER PDF DAYTONA INTERCLOUD
+        // PARSER PDF DAYTONA - REESCRITO CON POSICIONES
         // ═══════════════════════════════════════════════════════════════
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -587,18 +405,41 @@
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
-            let textoCompleto = '';
+            // Extraer texto con posiciones para reconstruir lineas
+            let todasLasLineas = [];
+
             for (let i = 1; i <= pdf.numPages; i++) {
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
-                const pageText = textContent.items.map(item => item.str).join(' ');
-                textoCompleto += pageText + '\n';
+                const items = textContent.items;
+
+                // Agrupar items por posición Y (misma linea)
+                const lineasMap = {};
+                items.forEach(item => {
+                    const y = Math.round(item.transform[5]); // posición Y redondeada
+                    if (!lineasMap[y]) lineasMap[y] = [];
+                    lineasMap[y].push({
+                        text: item.str,
+                        x: item.transform[4]
+                    });
+                });
+
+                // Ordenar por Y descendente (arriba a abajo en PDF)
+                const ys = Object.keys(lineasMap).map(Number).sort((a, b) => b - a);
+                ys.forEach(y => {
+                    // Ordenar items de izquierda a derecha
+                    const items = lineasMap[y].sort((a, b) => a.x - b.x);
+                    const lineaTexto = items.map(i => i.text).join(' ').trim();
+                    if (lineaTexto) {
+                        todasLasLineas.push(lineaTexto);
+                    }
+                });
             }
 
-            return extraerDatosExtracto(textoCompleto);
+            return extraerDatosDeLineas(todasLasLineas);
         }
 
-        function extraerDatosExtracto(texto) {
+        function extraerDatosDeLineas(lineas) {
             const resultado = {
                 inmueble: '',
                 propietario: '',
@@ -612,131 +453,174 @@
                 totalCargos: 0
             };
 
-            // Extraer inmueble (Apto XXX)
-            const matchInmueble = texto.match(/Inmueble:\s*(Apto?\s*\d+[A-Za-z]*)/i) ||
-                                   texto.match(/Inmueble\s*:?\s*(Apto?\s*\d+[A-Za-z]*)/i) ||
-                                   texto.match(/(Apto?\s*\d+[A-Za-z]*)/i);
-            if (matchInmueble) {
-                resultado.inmueble = matchInmueble[1].trim();
+            const textoCompleto = lineas.join('\n');
+
+            // ---- INMUEBLE ----
+            for (const linea of lineas) {
+                const mInm = linea.match(/Inmueble\s*:?\s*(Apto?\s*\d+[A-Za-z]*)/i);
+                if (mInm) { resultado.inmueble = mInm[1].trim(); break; }
+            }
+            // Si no encontró, buscar patrón "Apto XXX" en el texto
+            if (!resultado.inmueble) {
+                const mApto = textoCompleto.match(/(Apto?\s*\d+[A-Za-z]*)/i);
+                if (mApto) resultado.inmueble = mApto[1].trim();
             }
 
-            // Extraer propietario
-            const matchProp = texto.match(/Propietario\s+\d+\s+(.+?)(?=Saldo|$)/i);
-            if (matchProp) {
-                resultado.propietario = matchProp[1].trim()
-                    .replace(/\s+/g, ' ')
-                    .replace(/Saldo.*$/i, '')
-                    .trim();
+            // ---- PROPIETARIO ----
+            for (const linea of lineas) {
+                // Buscar "Propietario 00XXX NOMBRE APELLIDO"
+                const mProp = linea.match(/Propietario\s+\d+\s+(.+)/i);
+                if (mProp) {
+                    resultado.propietario = mProp[1].trim().replace(/\s+/g, ' ');
+                    break;
+                }
+            }
+            // Si no encontró, buscar patrón "00XXX APELLIDO NOMBRE" al inicio de línea
+            if (!resultado.propietario) {
+                for (const linea of lineas) {
+                    const mAlt = linea.match(/^00\d+\s+([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ\s]+)/);
+                    if (mAlt && mAlt[1].length > 3) {
+                        resultado.propietario = mAlt[1].trim();
+                        break;
+                    }
+                }
             }
 
-            // Extraer saldo inicial
-            const matchSaldo = texto.match(/Saldo\s+Inicial\s+Inmueble\s*:?\s*\$?([\d.,]+)/i);
-            if (matchSaldo) {
-                resultado.saldoInicial = parsearMonto(matchSaldo[1]);
+            // ---- SALDO INICIAL ----
+            for (const linea of lineas) {
+                const mSI = linea.match(/Saldo\s+Inicial\s+Inmueble\s*:?\s*\$?([\d.,]+)/i);
+                if (mSI) { resultado.saldoInicial = parsearMontoCO(mSI[1]); break; }
             }
 
-            // Extraer saldo final
-            const matchSaldoFinal = texto.match(/Saldo\s+Total\s+Inmueble\s*:?\s*\$?([\d.,]+)/i);
-            if (matchSaldoFinal) {
-                resultado.saldoFinal = parsearMonto(matchSaldoFinal[1]);
+            // ---- SALDO FINAL ----
+            for (let i = lineas.length - 1; i >= 0; i--) {
+                const mSF = lineas[i].match(/Saldo\s+Total\s+Inmueble\s*:?\s*\$?([\d.,]+)/i);
+                if (mSF) { resultado.saldoFinal = parsearMontoCO(mSF[1]); break; }
             }
 
-            // Extraer movimientos individuales
-            // Patrón para Cuota De Administracion
-            const regAdmon = /Cuota\s+De\s+Administraci[oó]n\s+(\w+\s+\d{4})/gi;
-            let match;
-            const admonMeses = new Set();
-            while ((match = regAdmon.exec(texto)) !== null) {
-                admonMeses.add(match[1]);
-            }
+            // ---- MOVIMIENTOS ----
+            // Buscar lineas que tengan código 00XXX seguido de descripción y montos
+            for (const linea of lineas) {
+                // Patrón: 00XXX Descripcion $monto $monto $monto $monto $monto
+                // Puede tener entre 3 y 6 montos con $
+                const montos = [];
+                const regMonto = /\$([\d.,]+)/g;
+                let m;
+                while ((m = regMonto.exec(linea)) !== null) {
+                    montos.push(parsearMontoCO(m[1]));
+                }
 
-            // Buscar montos de cuotas de administración (débitos)
-            const regLinea = /\d{5}\s+(.*?)\$([0-9.,]+)\s+\$([0-9.,]+)\s+\$([0-9.,]+)\s+\$([0-9.,]+)\s+\$([\d.,]+)/g;
-            while ((match = regLinea.exec(texto)) !== null) {
-                const desc = match[1].trim();
-                const aplicado = parsearMonto(match[2]);
-                const saldo = parsearMonto(match[3]);
-                const debito = parsearMonto(match[4]);
-                const credito = parsearMonto(match[5]);
-                const acumulado = parsearMonto(match[6]);
+                if (montos.length < 3) continue; // No es una línea de movimiento
 
+                // Extraer descripción (lo que está entre el código y el primer $)
+                const mDesc = linea.match(/(?:00\d+\s+)?(.+?)\s*\$/);
+                if (!mDesc) continue;
+                let desc = mDesc[1].trim();
+
+                // Ignorar líneas de encabezado, total, etc
+                if (/^(Doc|Documento|Total|Saldo|Propietario|Página|Software|Edificio|Extracto|Entre)/i.test(desc)) continue;
+                if (/^(Tercero|Descripci[oó]n|Aplicado)/i.test(desc)) continue;
+
+                // Clasificar tipo
                 let tipo = 'otro';
-                if (/cuota\s+de\s+administraci/i.test(desc)) tipo = 'admon';
+                const descLower = desc.toLowerCase();
+                if (/cuota\s+de\s+administraci[oó]n/i.test(desc)) tipo = 'admon';
                 else if (/cuota\s+extra/i.test(desc)) tipo = 'extra';
-                else if (/inter[eé]s/i.test(desc)) tipo = 'interes';
+                else if (/inter[eé]s\s+de\s+mora/i.test(desc)) tipo = 'interes';
                 else if (/saldos?\s+iniciales/i.test(desc)) tipo = 'pago';
 
-                if (debito > 0 && credito === 0) {
-                    // Es un cargo
-                    resultado.movimientos.push({
-                        descripcion: desc,
-                        tipo: tipo,
-                        debito: debito,
-                        credito: 0,
-                        acumulado: acumulado
-                    });
-                    if (tipo === 'admon') resultado.totalAdmon += debito;
-                    else if (tipo === 'extra') resultado.totalExtras += debito;
-                    else if (tipo === 'interes') resultado.totalIntereses += debito;
-                    else resultado.totalAdmon += debito; // otros cargos van a admon
-                    resultado.totalCargos += debito;
-                } else if (credito > 0) {
-                    // Es un pago/abono
-                    resultado.movimientos.push({
-                        descripcion: desc,
-                        tipo: 'pago',
-                        debito: 0,
-                        credito: credito,
-                        acumulado: acumulado
-                    });
-                    resultado.totalPagos += credito;
+                // Determinar si es débito o crédito basado en contexto
+                // En Daytona: lineas CO son cargos (débitos), lineas RC son pagos (créditos)
+                // Si tiene acumulado creciente = cargo, decreciente = pago
+                // Método más simple: si la descripción está en contexto de pago (RC), es crédito
+
+                // Buscar el último monto como acumulado (es el más grande generalmente)
+                const acumulado = montos[montos.length - 1];
+
+                // Para líneas con referencia a documento anterior como "(CO 149)" = es un pago aplicado
+                const esPagoAplicado = /\(CO\s+\d+\)|\(SI\s+\d+\)/i.test(desc);
+
+                if (esPagoAplicado || tipo === 'pago') {
+                    // Es un pago/abono - buscar el monto del crédito
+                    // En pagos, generalmente el patrón es: $0,00 $CREDITO $ACUMULADO
+                    const creditoMonto = montos.length >= 2 ? montos[montos.length - 2] : montos[0];
+                    if (creditoMonto > 0) {
+                        resultado.movimientos.push({
+                            descripcion: desc,
+                            tipo: 'pago',
+                            debito: 0,
+                            credito: creditoMonto,
+                            acumulado: acumulado
+                        });
+                        resultado.totalPagos += creditoMonto;
+                    }
+                } else {
+                    // Es un cargo - buscar el débito
+                    // En cargos: $APLICADO $SALDO $DEBITO $CREDITO(0) $ACUMULADO
+                    // O: $SALDO $DEBITO $CREDITO(0) $ACUMULADO
+                    let debitoMonto = 0;
+
+                    if (montos.length >= 5) {
+                        // Formato completo: aplicado, saldo, debito, credito, acumulado
+                        debitoMonto = montos[2]; // tercer monto = débito
+                    } else if (montos.length === 4) {
+                        // saldo, debito, credito, acumulado
+                        debitoMonto = montos[1];
+                    } else if (montos.length === 3) {
+                        debitoMonto = montos[0];
+                    }
+
+                    if (debitoMonto > 0) {
+                        resultado.movimientos.push({
+                            descripcion: desc,
+                            tipo: tipo,
+                            debito: debitoMonto,
+                            credito: 0,
+                            acumulado: acumulado
+                        });
+
+                        if (tipo === 'admon') resultado.totalAdmon += debitoMonto;
+                        else if (tipo === 'extra') resultado.totalExtras += debitoMonto;
+                        else if (tipo === 'interes') resultado.totalIntereses += debitoMonto;
+                        else resultado.totalAdmon += debitoMonto;
+
+                        resultado.totalCargos += debitoMonto;
+                    }
                 }
             }
 
-            // Si no pudimos parsear movimientos detallados, intentar con Total Documento
-            if (resultado.movimientos.length === 0) {
-                const regTotalDoc = /Total\s+Documento\s*:?\s*-*\s*\$?([\d.,]+)\s+\$?([\d.,]+)/gi;
-                while ((match = regTotalDoc.exec(texto)) !== null) {
-                    const debito = parsearMonto(match[1]);
-                    const credito = parsearMonto(match[2]);
-                    if (debito > 0) resultado.totalCargos += debito;
-                    if (credito > 0) resultado.totalPagos += credito;
-                }
+            // Calcular total cargos si no se calculó
+            if (resultado.totalCargos === 0) {
+                resultado.totalCargos = resultado.totalAdmon + resultado.totalExtras + resultado.totalIntereses;
             }
 
             // Si saldo final no se encontró, calcularlo
-            if (resultado.saldoFinal === 0 && resultado.saldoInicial > 0) {
+            if (resultado.saldoFinal === 0 && (resultado.saldoInicial > 0 || resultado.totalCargos > 0)) {
                 resultado.saldoFinal = resultado.saldoInicial + resultado.totalCargos - resultado.totalPagos;
             }
 
             return resultado;
         }
 
-        function parsearMonto(str) {
+        function parsearMontoCO(str) {
             if (!str) return 0;
-            // Formato colombiano: 8.044.026,00 -> 8044026.00
             let limpio = str.replace(/\$/g, '').trim();
-            // Si tiene coma como decimal (formato colombiano)
+            // Formato colombiano: 8.044.026,00
             if (limpio.includes(',')) {
-                limpio = limpio.replace(/\./g, ''); // quitar puntos de miles
-                limpio = limpio.replace(',', '.'); // coma -> punto decimal
+                limpio = limpio.replace(/\./g, '');
+                limpio = limpio.replace(',', '.');
             }
             const num = parseFloat(limpio);
             return isNaN(num) ? 0 : num;
         }
 
         // ═══════════════════════════════════════════════════════════════
-        // PROCESAR MULTIPLES PDFs
+        // PROCESAR PDFs
         // ═══════════════════════════════════════════════════════════════
         window.procesarPDFs = async function(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
-
-            if (!edificioActual) {
-                alert('❌ Selecciona un edificio primero');
-                event.target.value = '';
-                return;
-            }
+            if (!edificioActual) { alert('❌ Selecciona un edificio primero'); event.target.value = ''; return; }
 
             const progress = document.getElementById('uploadProgress');
             const bar = document.getElementById('progressBar');
@@ -746,9 +630,9 @@
             progress.classList.add('active');
             log.classList.add('active');
             log.innerHTML = '';
+            bar.style.width = '0%';
 
-            let exitosos = 0;
-            let fallidos = 0;
+            let exitosos = 0, fallidos = 0;
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
@@ -760,16 +644,15 @@
                     const datos = await parsearPDF(file);
 
                     if (!datos.inmueble) {
-                        log.innerHTML += `<div class="log-err">❌ ${file.name}: No se pudo identificar el apartamento</div>`;
+                        log.innerHTML += `<div class="log-err">❌ ${file.name}: No se identificó apartamento</div>`;
                         fallidos++;
                         continue;
                     }
 
-                    // Guardar en carteraData local
-                    const key = datos.inmueble.replace(/\s+/g, '').toLowerCase();
+                    const key = datos.inmueble.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
                     carteraData[key] = {
                         inmueble: datos.inmueble,
-                        propietario: datos.propietario,
+                        propietario: datos.propietario || 'Sin nombre',
                         saldoInicial: datos.saldoInicial,
                         saldoFinal: datos.saldoFinal,
                         totalAdmon: datos.totalAdmon,
@@ -777,39 +660,42 @@
                         totalIntereses: datos.totalIntereses,
                         totalPagos: datos.totalPagos,
                         totalCargos: datos.totalCargos,
-                        movimientos: datos.movimientos,
+                        movimientos: datos.movimientos || [],
                         fechaCarga: new Date().toISOString()
                     };
 
-                    log.innerHTML += `<div class="log-ok">✅ ${file.name}: ${datos.inmueble} - ${datos.propietario} | Saldo: $${datos.saldoFinal.toLocaleString('es-CO')}</div>`;
-                    exitosos++;
+                    const info = `${datos.inmueble} | ${datos.propietario} | Saldo: $${datos.saldoFinal.toLocaleString('es-CO')}`;
+                    const movCount = datos.movimientos ? datos.movimientos.length : 0;
+                    log.innerHTML += `<div class="log-ok">✅ ${file.name}: ${info} (${movCount} movimientos)</div>`;
 
+                    if (datos.totalCargos === 0 && datos.saldoFinal > 0) {
+                        log.innerHTML += `<div class="log-warn">⚠️ ${datos.inmueble}: Cargos en $0 pero saldo final $${datos.saldoFinal.toLocaleString('es-CO')} - revisa si necesitas editar</div>`;
+                    }
+
+                    exitosos++;
                 } catch (error) {
                     log.innerHTML += `<div class="log-err">❌ ${file.name}: ${error.message}</div>`;
                     fallidos++;
                 }
             }
 
-            // Guardar todo en Firebase
+            // Guardar en Firebase
             try {
-                const carteraRef = ref(db, `cartera_morosos/${edificioActual}`);
-                await set(carteraRef, carteraData);
-                log.innerHTML += `<div class="log-info">💾 Datos guardados en Firebase</div>`;
+                await set(ref(db, `cartera_morosos/${edificioActual}`), carteraData);
+                log.innerHTML += `<div class="log-info">💾 Guardado en Firebase correctamente</div>`;
             } catch (err) {
-                log.innerHTML += `<div class="log-err">❌ Error guardando en Firebase: ${err.message}</div>`;
+                log.innerHTML += `<div class="log-err">❌ Error Firebase: ${err.message}</div>`;
             }
 
-            text.textContent = `✅ Completado: ${exitosos} exitosos, ${fallidos} fallidos de ${files.length} PDFs`;
+            text.textContent = `✅ ${exitosos} exitosos, ${fallidos} fallidos de ${files.length} PDFs`;
             bar.style.width = '100%';
-
             event.target.value = '';
             renderTabla();
 
-            // Ocultar progreso después de 5s
             setTimeout(() => {
                 progress.classList.remove('active');
                 document.getElementById('dropZone').classList.remove('active');
-            }, 5000);
+            }, 8000);
         };
 
         // ═══════════════════════════════════════════════════════════════
@@ -822,128 +708,284 @@
             const keys = Object.keys(carteraData);
 
             if (keys.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state">
-                    <div class="empty-state-icon">📄</div>
-                    <h3>${edificioActual ? 'No hay extractos cargados' : 'Selecciona un edificio'}</h3>
-                    <p>Sube los PDFs de extractos de Daytona InterCloud</p>
-                </div></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state"><div class="empty-state-icon">📄</div><h3>${edificioActual ? 'No hay extractos cargados' : 'Selecciona un edificio'}</h3></div></td></tr>`;
                 tfoot.style.display = 'none';
                 resumen.style.display = 'none';
                 document.getElementById('contadorAptos').textContent = '0';
                 return;
             }
 
-            // Preparar datos para tabla
-            let filas = keys.map(k => carteraData[k]);
-
-            // Filtro morosos
-            if (soloMorosos) {
-                filas = filas.filter(f => f.saldoFinal > 0);
-            }
+            let filas = keys.map(k => ({ ...carteraData[k], _key: k }));
+            if (soloMorosos) filas = filas.filter(f => (f.saldoFinal || 0) > 0);
 
             // Ordenar
             if (sortCol >= 0) {
                 filas.sort((a, b) => {
-                    let va, vb;
-                    switch(sortCol) {
-                        case 0: va = a.inmueble; vb = b.inmueble; break;
-                        case 1: va = a.propietario; vb = b.propietario; break;
-                        case 2: va = a.saldoInicial; vb = b.saldoInicial; break;
-                        case 3: va = a.totalAdmon; vb = b.totalAdmon; break;
-                        case 4: va = a.totalExtras; vb = b.totalExtras; break;
-                        case 5: va = a.totalIntereses; vb = b.totalIntereses; break;
-                        case 6: va = a.totalCargos; vb = b.totalCargos; break;
-                        case 7: va = a.totalPagos; vb = b.totalPagos; break;
-                        case 8: va = a.saldoFinal; vb = b.saldoFinal; break;
-                        default: return 0;
-                    }
+                    const campos = ['inmueble','propietario','saldoInicial','totalAdmon','totalExtras','totalIntereses','totalCargos','totalPagos','saldoFinal'];
+                    let va = a[campos[sortCol]] || 0;
+                    let vb = b[campos[sortCol]] || 0;
                     if (typeof va === 'string') return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
                     return sortAsc ? va - vb : vb - va;
                 });
             }
 
-            // Totales
-            let tSaldoI = 0, tAdmon = 0, tExtra = 0, tInt = 0, tCargos = 0, tPag = 0, tSaldoF = 0;
-            let morosos = 0;
-
+            let tSI=0, tAd=0, tEx=0, tIn=0, tCa=0, tPa=0, tSF=0, morosos=0;
             let html = '';
+
             filas.forEach(f => {
-                const esMoroso = f.saldoFinal > 0;
+                const esMoroso = (f.saldoFinal || 0) > 0;
                 if (esMoroso) morosos++;
-
-                tSaldoI += f.saldoInicial || 0;
-                tAdmon += f.totalAdmon || 0;
-                tExtra += f.totalExtras || 0;
-                tInt += f.totalIntereses || 0;
-                tCargos += f.totalCargos || 0;
-                tPag += f.totalPagos || 0;
-                tSaldoF += f.saldoFinal || 0;
-
-                const key = f.inmueble.replace(/\s+/g, '').toLowerCase();
+                tSI += f.saldoInicial || 0;
+                tAd += f.totalAdmon || 0;
+                tEx += f.totalExtras || 0;
+                tIn += f.totalIntereses || 0;
+                tCa += f.totalCargos || 0;
+                tPa += f.totalPagos || 0;
+                tSF += f.saldoFinal || 0;
 
                 html += `
-                <tr data-apto="${(f.inmueble || '').toLowerCase()}" data-prop="${(f.propietario || '').toLowerCase()}">
+                <tr data-apto="${(f.inmueble||'').toLowerCase()}" data-prop="${(f.propietario||'').toLowerCase()}">
                     <td><strong>${f.inmueble || '-'}</strong></td>
                     <td>${f.propietario || '-'}</td>
-                    <td class="col-monto">$${(f.saldoInicial || 0).toLocaleString('es-CO')}</td>
-                    <td class="col-monto">$${(f.totalAdmon || 0).toLocaleString('es-CO')}</td>
-                    <td class="col-monto" style="color: #6a1b9a;">$${(f.totalExtras || 0).toLocaleString('es-CO')}</td>
-                    <td class="col-monto" style="color: #e65100;">$${(f.totalIntereses || 0).toLocaleString('es-CO')}</td>
-                    <td class="col-monto">$${(f.totalCargos || 0).toLocaleString('es-CO')}</td>
-                    <td class="col-pagos">-$${(f.totalPagos || 0).toLocaleString('es-CO')}</td>
-                    <td class="col-saldo-final">$${(f.saldoFinal || 0).toLocaleString('es-CO')}</td>
+                    <td class="col-monto">$${(f.saldoInicial||0).toLocaleString('es-CO')}</td>
+                    <td class="col-monto">$${(f.totalAdmon||0).toLocaleString('es-CO')}</td>
+                    <td class="col-monto" style="color:#6a1b9a;">$${(f.totalExtras||0).toLocaleString('es-CO')}</td>
+                    <td class="col-monto" style="color:#e65100;">$${(f.totalIntereses||0).toLocaleString('es-CO')}</td>
+                    <td class="col-monto">$${(f.totalCargos||0).toLocaleString('es-CO')}</td>
+                    <td class="col-pagos">-$${(f.totalPagos||0).toLocaleString('es-CO')}</td>
+                    <td class="col-saldo">$${(f.saldoFinal||0).toLocaleString('es-CO')}</td>
                     <td>${esMoroso ? '<span class="badge-moroso">MOROSO</span>' : '<span class="badge-aldia">Al día</span>'}</td>
-                    <td><button class="btn" style="padding:6px 12px; font-size:12px; background:#1a237e; color:white;" onclick="verDetalle('${key}')">🔍 Ver</button></td>
+                    <td style="white-space:nowrap;">
+                        <button class="btn btn-sm" style="background:#1a237e;color:white;display:inline-flex;" onclick="verDetalle('${f._key}')">🔍</button>
+                        <button class="btn btn-sm" style="background:#ff9800;color:white;display:inline-flex;" onclick="editarApto('${f._key}')">✏️</button>
+                        <button class="btn btn-sm" style="background:#e53935;color:white;display:inline-flex;" onclick="eliminarApto('${f._key}')">🗑️</button>
+                    </td>
                 </tr>`;
             });
 
             tbody.innerHTML = html;
-
-            // Totales footer
             tfoot.style.display = '';
-            document.getElementById('tSaldoInicial').textContent = '$' + tSaldoI.toLocaleString('es-CO');
-            document.getElementById('tAdmon').textContent = '$' + tAdmon.toLocaleString('es-CO');
-            document.getElementById('tExtra').textContent = '$' + tExtra.toLocaleString('es-CO');
-            document.getElementById('tIntereses').textContent = '$' + tInt.toLocaleString('es-CO');
-            document.getElementById('tCargos').textContent = '$' + tCargos.toLocaleString('es-CO');
-            document.getElementById('tPagos').textContent = '-$' + tPag.toLocaleString('es-CO');
-            document.getElementById('tSaldoFinal').textContent = '$' + tSaldoF.toLocaleString('es-CO');
 
-            // Resumen tarjetas
+            const fmt = n => '$' + n.toLocaleString('es-CO');
+            document.getElementById('tSaldoI').textContent = fmt(tSI);
+            document.getElementById('tAdmon').textContent = fmt(tAd);
+            document.getElementById('tExtra').textContent = fmt(tEx);
+            document.getElementById('tInt').textContent = fmt(tIn);
+            document.getElementById('tCargos').textContent = fmt(tCa);
+            document.getElementById('tPagos').textContent = '-' + fmt(tPa);
+            document.getElementById('tSaldoF').textContent = fmt(tSF);
+
             resumen.style.display = 'flex';
             document.getElementById('rAptos').textContent = filas.length;
-            document.getElementById('rDeudaTotal').textContent = '$' + tSaldoF.toLocaleString('es-CO');
+            document.getElementById('rDeudaTotal').textContent = fmt(tSF);
             document.getElementById('rMorosos').textContent = morosos;
-            document.getElementById('rPctMorosos').textContent = `${Math.round((morosos / filas.length) * 100)}% del edificio`;
-            document.getElementById('rIntereses').textContent = '$' + tInt.toLocaleString('es-CO');
-            document.getElementById('rPagos').textContent = '$' + tPag.toLocaleString('es-CO');
+            document.getElementById('rPctMorosos').textContent = filas.length > 0 ? Math.round((morosos/filas.length)*100) + '% del edificio' : '0%';
+            document.getElementById('rIntereses').textContent = fmt(tIn);
+            document.getElementById('rPagos').textContent = fmt(tPa);
             document.getElementById('contadorAptos').textContent = filas.length;
         }
 
         // ═══════════════════════════════════════════════════════════════
-        // FUNCIONES DE UI
+        // VER DETALLE
         // ═══════════════════════════════════════════════════════════════
-        window.toggleDropZone = function() {
-            if (!edificioActual) {
-                alert('❌ Selecciona un edificio primero');
-                return;
+        window.verDetalle = function(key) {
+            const d = carteraData[key];
+            if (!d) { alert('❌ No encontrado'); return; }
+
+            document.getElementById('modalDetTitulo').textContent = `📋 ${d.inmueble} - ${d.propietario}`;
+            const fmt = n => '$' + (n || 0).toLocaleString('es-CO');
+
+            let html = `
+            <div class="detalle-resumen">
+                <div class="detalle-resumen-item" style="background:#e8eaf6;"><div class="det-label">Saldo Inicial</div><div class="det-valor" style="color:#1a237e;">${fmt(d.saldoInicial)}</div></div>
+                <div class="detalle-resumen-item" style="background:#e3f2fd;"><div class="det-label">Cuotas Admon</div><div class="det-valor" style="color:#1565c0;">${fmt(d.totalAdmon)}</div></div>
+                <div class="detalle-resumen-item" style="background:#f3e5f5;"><div class="det-label">Cuotas Extra</div><div class="det-valor" style="color:#6a1b9a;">${fmt(d.totalExtras)}</div></div>
+                <div class="detalle-resumen-item" style="background:#fff8e1;"><div class="det-label">Intereses Mora</div><div class="det-valor" style="color:#e65100;">${fmt(d.totalIntereses)}</div></div>
+                <div class="detalle-resumen-item" style="background:#e8f5e9;"><div class="det-label">Pagos</div><div class="det-valor" style="color:#2e7d32;">${fmt(d.totalPagos)}</div></div>
+                <div class="detalle-resumen-item" style="background:#ffebee;"><div class="det-label">Saldo Final</div><div class="det-valor" style="color:#e53935;">${fmt(d.saldoFinal)}</div></div>
+            </div>`;
+
+            if (d.movimientos && d.movimientos.length > 0) {
+                html += `<h3 style="margin:15px 0 10px;color:#1a237e;">📋 Movimientos (${d.movimientos.length})</h3>
+                <div style="overflow-x:auto;">
+                <table class="detalle-tabla"><thead><tr>
+                    <th>Descripción</th><th>Tipo</th><th style="text-align:right;">Débito</th><th style="text-align:right;">Crédito</th><th style="text-align:right;">Acumulado</th>
+                </tr></thead><tbody>`;
+
+                d.movimientos.forEach(m => {
+                    const clase = m.tipo === 'pago' ? 'fila-pago' : m.tipo === 'interes' ? 'fila-interes' : m.tipo === 'extra' ? 'fila-extra' : 'fila-cobro';
+                    const tipoLabel = { admon:'📋 Admon', extra:'🟣 Extra', interes:'🟠 Interés', pago:'🟢 Pago', otro:'📄 Otro' }[m.tipo] || '📄 Otro';
+
+                    html += `<tr class="${clase}">
+                        <td>${m.descripcion}</td>
+                        <td>${tipoLabel}</td>
+                        <td style="text-align:right;font-family:monospace;font-weight:600;">${m.debito > 0 ? fmt(m.debito) : '-'}</td>
+                        <td style="text-align:right;font-family:monospace;font-weight:600;color:#2e7d32;">${m.credito > 0 ? fmt(m.credito) : '-'}</td>
+                        <td style="text-align:right;font-family:monospace;font-weight:700;">${m.acumulado > 0 ? fmt(m.acumulado) : '-'}</td>
+                    </tr>`;
+                });
+
+                html += '</tbody></table></div>';
+            } else {
+                html += '<div class="empty-state" style="padding:30px;"><p>Sin movimientos detallados. Puedes editar los totales manualmente.</p></div>';
             }
-            const dz = document.getElementById('dropZone');
-            dz.classList.toggle('active');
+
+            document.getElementById('modalDetContenido').innerHTML = html;
+            document.getElementById('modalDetalle').classList.add('active');
         };
 
-        window.verMorosos = function() {
+        // ═══════════════════════════════════════════════════════════════
+        // EDITAR APARTAMENTO
+        // ═══════════════════════════════════════════════════════════════
+        window.editarApto = function(key) {
+            const d = carteraData[key];
+            if (!d) { alert('❌ No encontrado'); return; }
+
+            document.getElementById('modalEditTitulo').textContent = `✏️ Editar ${d.inmueble}`;
+
+            const html = `
+            <div class="edit-form">
+                <div class="form-group">
+                    <label>Apartamento</label>
+                    <input type="text" id="editInmueble" value="${d.inmueble || ''}">
+                </div>
+                <div class="form-group">
+                    <label>Propietario</label>
+                    <input type="text" id="editPropietario" value="${d.propietario || ''}">
+                </div>
+                <div class="form-group">
+                    <label>Saldo Inicial ($)</label>
+                    <input type="number" id="editSaldoInicial" value="${d.saldoInicial || 0}" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Cuotas Administración ($)</label>
+                    <input type="number" id="editAdmon" value="${d.totalAdmon || 0}" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Cuotas Extraordinarias ($)</label>
+                    <input type="number" id="editExtras" value="${d.totalExtras || 0}" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Intereses de Mora ($)</label>
+                    <input type="number" id="editIntereses" value="${d.totalIntereses || 0}" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Total Pagos/Abonos ($)</label>
+                    <input type="number" id="editPagos" value="${d.totalPagos || 0}" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Saldo Final ($)</label>
+                    <input type="number" id="editSaldoFinal" value="${d.saldoFinal || 0}" step="0.01">
+                </div>
+                <div class="full-width" style="text-align:center;margin-top:10px;">
+                    <button class="btn btn-upload" onclick="guardarEdicion('${key}')" style="width:100%;">💾 Guardar Cambios</button>
+                </div>
+            </div>`;
+
+            document.getElementById('modalEditContenido').innerHTML = html;
+            document.getElementById('modalEditar').classList.add('active');
+        };
+
+        window.guardarEdicion = async function(key) {
+            const datos = {
+                inmueble: document.getElementById('editInmueble').value.trim(),
+                propietario: document.getElementById('editPropietario').value.trim(),
+                saldoInicial: parseFloat(document.getElementById('editSaldoInicial').value) || 0,
+                totalAdmon: parseFloat(document.getElementById('editAdmon').value) || 0,
+                totalExtras: parseFloat(document.getElementById('editExtras').value) || 0,
+                totalIntereses: parseFloat(document.getElementById('editIntereses').value) || 0,
+                totalPagos: parseFloat(document.getElementById('editPagos').value) || 0,
+                saldoFinal: parseFloat(document.getElementById('editSaldoFinal').value) || 0,
+            };
+            datos.totalCargos = datos.totalAdmon + datos.totalExtras + datos.totalIntereses;
+
+            if (!datos.inmueble) { alert('❌ El apartamento es obligatorio'); return; }
+
+            // Actualizar en memoria
+            carteraData[key] = { ...carteraData[key], ...datos };
+
+            // Guardar en Firebase
+            try {
+                await update(ref(db, `cartera_morosos/${edificioActual}/${key}`), datos);
+                alert('✅ Datos actualizados');
+                cerrarModal('modalEditar');
+                renderTabla();
+            } catch (err) {
+                alert('❌ Error: ' + err.message);
+            }
+        };
+
+        // ELIMINAR
+        window.eliminarApto = async function(key) {
+            const d = carteraData[key];
+            if (!d) return;
+            if (!confirm(`⚠️ ¿Eliminar ${d.inmueble} - ${d.propietario}?`)) return;
+
+            delete carteraData[key];
+            try {
+                await set(ref(db, `cartera_morosos/${edificioActual}`), carteraData);
+                renderTabla();
+                alert('✅ Eliminado');
+            } catch (err) {
+                alert('❌ Error: ' + err.message);
+            }
+        };
+
+        // AGREGAR MANUAL
+        window.agregarManual = function() {
+            if (!edificioActual) { alert('❌ Selecciona un edificio primero'); return; }
+            document.getElementById('modalManual').classList.add('active');
+        };
+
+        window.guardarManual = async function() {
+            const inmueble = document.getElementById('manInmueble').value.trim();
+            const propietario = document.getElementById('manPropietario').value.trim();
+            if (!inmueble || !propietario) { alert('❌ Apartamento y Propietario son obligatorios'); return; }
+
+            const key = inmueble.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const totalAdmon = parseFloat(document.getElementById('manAdmon').value) || 0;
+            const totalExtras = parseFloat(document.getElementById('manExtras').value) || 0;
+            const totalIntereses = parseFloat(document.getElementById('manIntereses').value) || 0;
+
+            carteraData[key] = {
+                inmueble, propietario,
+                saldoInicial: parseFloat(document.getElementById('manSaldoInicial').value) || 0,
+                totalAdmon, totalExtras, totalIntereses,
+                totalCargos: totalAdmon + totalExtras + totalIntereses,
+                totalPagos: parseFloat(document.getElementById('manPagos').value) || 0,
+                saldoFinal: parseFloat(document.getElementById('manSaldoFinal').value) || 0,
+                movimientos: [],
+                fechaCarga: new Date().toISOString()
+            };
+
+            try {
+                await set(ref(db, `cartera_morosos/${edificioActual}`), carteraData);
+                alert('✅ Apartamento agregado');
+                cerrarModal('modalManual');
+                // Limpiar form
+                ['manInmueble','manPropietario','manSaldoInicial','manAdmon','manExtras','manIntereses','manPagos','manSaldoFinal'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = el.type === 'number' ? '0' : '';
+                });
+                renderTabla();
+            } catch (err) { alert('❌ Error: ' + err.message); }
+        };
+
+        // UTILIDADES
+        window.toggleDropZone = function() {
+            if (!edificioActual) { alert('❌ Selecciona un edificio primero'); return; }
+            document.getElementById('dropZone').classList.toggle('active');
+        };
+
+        window.toggleMorosos = function() {
             soloMorosos = !soloMorosos;
+            document.getElementById('btnMorososTxt').textContent = soloMorosos ? 'Ver Todos' : 'Ver Solo Morosos';
             renderTabla();
         };
 
         window.ordenarTabla = function(col) {
-            if (sortCol === col) {
-                sortAsc = !sortAsc;
-            } else {
-                sortCol = col;
-                sortAsc = true;
-            }
+            if (sortCol === col) sortAsc = !sortAsc;
+            else { sortCol = col; sortAsc = true; }
             renderTabla();
         };
 
@@ -954,93 +996,17 @@
             filas.forEach(fila => {
                 const apto = fila.getAttribute('data-apto') || '';
                 const prop = fila.getAttribute('data-prop') || '';
-                if (!q || apto.includes(q) || prop.includes(q)) {
-                    fila.style.display = '';
-                    count++;
-                } else {
-                    fila.style.display = 'none';
-                }
+                if (!q || apto.includes(q) || prop.includes(q)) { fila.style.display = ''; count++; }
+                else { fila.style.display = 'none'; }
             });
             document.getElementById('contadorAptos').textContent = count;
         };
 
-        window.cerrarModal = function(id) {
-            document.getElementById(id).classList.remove('active');
-        };
+        window.cerrarModal = function(id) { document.getElementById(id).classList.remove('active'); };
 
-        // VER DETALLE
-        window.verDetalle = function(key) {
-            const data = carteraData[key];
-            if (!data) { alert('❌ No se encontraron datos'); return; }
-
-            document.getElementById('modalDetalleTitulo').textContent = `📋 ${data.inmueble} - ${data.propietario}`;
-
-            let html = `
-            <div class="detalle-resumen">
-                <div class="detalle-resumen-item" style="background: #e8eaf6;">
-                    <div class="det-label">Saldo Inicial</div>
-                    <div class="det-valor" style="color: #1a237e;">$${(data.saldoInicial || 0).toLocaleString('es-CO')}</div>
-                </div>
-                <div class="detalle-resumen-item" style="background: #fce4ec;">
-                    <div class="det-label">Total Cargos</div>
-                    <div class="det-valor" style="color: #c62828;">$${(data.totalCargos || 0).toLocaleString('es-CO')}</div>
-                </div>
-                <div class="detalle-resumen-item" style="background: #e8f5e9;">
-                    <div class="det-label">Total Pagos</div>
-                    <div class="det-valor" style="color: #2e7d32;">$${(data.totalPagos || 0).toLocaleString('es-CO')}</div>
-                </div>
-                <div class="detalle-resumen-item" style="background: #ffebee;">
-                    <div class="det-label">Saldo Final</div>
-                    <div class="det-valor" style="color: #e53935;">$${(data.saldoFinal || 0).toLocaleString('es-CO')}</div>
-                </div>
-            </div>`;
-
-            if (data.movimientos && data.movimientos.length > 0) {
-                html += `
-                <table class="detalle-tabla">
-                    <thead>
-                        <tr>
-                            <th>Descripción</th>
-                            <th>Tipo</th>
-                            <th style="text-align:right;">Débito</th>
-                            <th style="text-align:right;">Crédito</th>
-                            <th style="text-align:right;">Acumulado</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-
-                data.movimientos.forEach(m => {
-                    const clase = m.tipo === 'pago' ? 'fila-pago' :
-                                  m.tipo === 'interes' ? 'fila-interes' :
-                                  m.tipo === 'extra' ? 'fila-extra' : 'fila-cobro';
-                    const tipoLabel = m.tipo === 'admon' ? '📋 Admon' :
-                                      m.tipo === 'extra' ? '🟣 Extra' :
-                                      m.tipo === 'interes' ? '🟠 Interés' :
-                                      m.tipo === 'pago' ? '🟢 Pago' : '📄 Otro';
-
-                    html += `
-                        <tr class="${clase}">
-                            <td>${m.descripcion}</td>
-                            <td>${tipoLabel}</td>
-                            <td style="text-align:right; font-family:monospace; font-weight:600;">${m.debito > 0 ? '$' + m.debito.toLocaleString('es-CO') : '-'}</td>
-                            <td style="text-align:right; font-family:monospace; font-weight:600; color:#2e7d32;">${m.credito > 0 ? '$' + m.credito.toLocaleString('es-CO') : '-'}</td>
-                            <td style="text-align:right; font-family:monospace; font-weight:700;">${m.acumulado > 0 ? '$' + m.acumulado.toLocaleString('es-CO') : '-'}</td>
-                        </tr>`;
-                });
-
-                html += '</tbody></table>';
-            } else {
-                html += '<div class="empty-state"><p>No hay movimientos detallados disponibles</p></div>';
-            }
-
-            document.getElementById('modalDetalleContenido').innerHTML = html;
-            document.getElementById('modalDetalle').classList.add('active');
-        };
-
-        // DESCARGAR EXCEL
         window.descargarExcelCartera = function() {
             const keys = Object.keys(carteraData);
-            if (keys.length === 0) { alert('❌ No hay datos para exportar'); return; }
+            if (keys.length === 0) { alert('❌ No hay datos'); return; }
 
             const datosExcel = keys.map(k => {
                 const d = carteraData[k];
@@ -1058,70 +1024,46 @@
                 };
             });
 
-            // Agregar fila de totales
-            datosExcel.push({
-                'Apartamento': 'TOTALES',
-                'Propietario': '',
-                'Saldo Inicial': datosExcel.reduce((s, r) => s + (r['Saldo Inicial'] || 0), 0),
-                'Cuotas Admon': datosExcel.reduce((s, r) => s + (r['Cuotas Admon'] || 0), 0),
-                'Cuotas Extraordinarias': datosExcel.reduce((s, r) => s + (r['Cuotas Extraordinarias'] || 0), 0),
-                'Intereses de Mora': datosExcel.reduce((s, r) => s + (r['Intereses de Mora'] || 0), 0),
-                'Total Cargos': datosExcel.reduce((s, r) => s + (r['Total Cargos'] || 0), 0),
-                'Pagos/Abonos': datosExcel.reduce((s, r) => s + (r['Pagos/Abonos'] || 0), 0),
-                'Saldo Final': datosExcel.reduce((s, r) => s + (r['Saldo Final'] || 0), 0),
-                'Estado': ''
+            // Fila totales
+            const totales = { 'Apartamento': 'TOTALES', 'Propietario': '', 'Estado': '' };
+            ['Saldo Inicial','Cuotas Admon','Cuotas Extraordinarias','Intereses de Mora','Total Cargos','Pagos/Abonos','Saldo Final'].forEach(col => {
+                totales[col] = datosExcel.reduce((s, r) => s + (r[col] || 0), 0);
             });
+            datosExcel.push(totales);
 
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.json_to_sheet(datosExcel);
-            ws['!cols'] = [
-                { wch: 15 }, { wch: 30 }, { wch: 18 }, { wch: 18 },
-                { wch: 22 }, { wch: 18 }, { wch: 18 }, { wch: 18 },
-                { wch: 18 }, { wch: 12 }
-            ];
-            XLSX.utils.book_append_sheet(wb, ws, 'Cartera Morosos');
+            ws['!cols'] = [{wch:15},{wch:30},{wch:18},{wch:18},{wch:22},{wch:18},{wch:18},{wch:18},{wch:18},{wch:12}];
+            XLSX.utils.book_append_sheet(wb, ws, 'Cartera');
 
-            const nombre = `Cartera_Morosos_${edificioActual}_${new Date().toISOString().split('T')[0]}.xlsx`;
+            const nombre = `Cartera_${edificioActual}_${new Date().toISOString().split('T')[0]}.xlsx`;
             XLSX.writeFile(wb, nombre);
             alert(`✅ Excel descargado: ${nombre}`);
         };
 
-        // LIMPIAR CARTERA
         window.limpiarCartera = async function() {
             if (!edificioActual) { alert('❌ Selecciona un edificio'); return; }
-            if (!confirm(`⚠️ ¿Eliminar TODA la cartera de ${edificioActual}?\nEsta acción no se puede deshacer.`)) return;
-
+            if (!confirm(`⚠️ ¿Eliminar TODA la cartera de ${edificioActual}?`)) return;
             try {
                 await remove(ref(db, `cartera_morosos/${edificioActual}`));
                 carteraData = {};
                 renderTabla();
                 alert('✅ Cartera eliminada');
-            } catch (err) {
-                alert('❌ Error: ' + err.message);
-            }
+            } catch (err) { alert('❌ Error: ' + err.message); }
         };
 
-        // DRAG & DROP
+        // Drag & Drop
         const dropZone = document.getElementById('dropZone');
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                // Crear un evento fake para reusar procesarPDFs
-                const fakeEvent = { target: { files: files, value: '' } };
-                procesarPDFs(fakeEvent);
+            if (e.dataTransfer.files.length > 0) {
+                procesarPDFs({ target: { files: e.dataTransfer.files, value: '' } });
             }
         });
 
-        // Init
         renderTabla();
     </script>
 </body>

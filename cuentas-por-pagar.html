@@ -1891,12 +1891,17 @@
             contenedor.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><h3>Cargando cuentas pendientes...</h3></div>';
             document.getElementById('modalPendientes').classList.add('active');
 
-            const edificios = [
+            const todosEdificios = [
                 { id: 'nepal-2', nombre: 'Nepal 2', icono: '🏢' },
                 { id: 'avalon', nombre: 'Avalon', icono: '🏰' },
                 { id: 'convivienda-1', nombre: 'Convivienda I', icono: '🏘️' },
                 { id: 'pinos-del-country', nombre: 'Pinos del Country', icono: '🌲' }
             ];
+
+            // Si hay edificio seleccionado, solo mostrar ese; si no, mostrar todos
+            const edificios = edificioActual
+                ? todosEdificios.filter(e => e.id === edificioActual)
+                : todosEdificios;
 
             let htmlBloques = '';
             let totalGeneralCuentas = 0;
