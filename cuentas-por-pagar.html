@@ -768,7 +768,16 @@
                     <label>Número de Cuenta</label>
                     <input type="text" id="numeroCuenta">
                 </div>
-                
+
+                <!-- Selector cuando el proveedor tiene múltiples cuentas -->
+                <div id="selectorCuentaManualWrap" class="form-group" style="display:none; background:#f0f8ff; padding:12px; border-radius:8px; border:2px solid #cce0ff;">
+                    <label style="color:#0056B8; font-weight:700;">💳 Seleccionar Cuenta de Pago</label>
+                    <select id="selectorCuentaManual" onchange="aplicarCuentaSeleccionada('manual')"
+                            style="background:white; border:2px solid #0056B8; border-radius:8px; padding:10px; font-size:14px; width:100%;">
+                        <option value="">— Elegir cuenta —</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label>Concepto *</label>
                     <input type="text" id="concepto" required>
@@ -924,7 +933,16 @@
                     <label>Número de Cuenta</label>
                     <input type="text" id="editarNumeroCuenta">
                 </div>
-                
+
+                <!-- Selector cuando el proveedor tiene múltiples cuentas -->
+                <div id="selectorCuentaEditarWrap" class="form-group" style="display:none; background:#f0f8ff; padding:12px; border-radius:8px; border:2px solid #cce0ff;">
+                    <label style="color:#0056B8; font-weight:700;">💳 Seleccionar Cuenta de Pago</label>
+                    <select id="selectorCuentaEditar" onchange="aplicarCuentaSeleccionada('editar')"
+                            style="background:white; border:2px solid #0056B8; border-radius:8px; padding:10px; font-size:14px; width:100%;">
+                        <option value="">— Elegir cuenta —</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label>Concepto *</label>
                     <input type="text" id="editarConcepto" required>
@@ -1102,15 +1120,26 @@
                     const nombre = prov.nombre || prov.razonSocial || '';
                     
                     if (nombre) {
+                        // Normalizar cuentasPago
+                        let cuentasPago = [];
+                        if (prov.cuentasPago) {
+                            cuentasPago = Array.isArray(prov.cuentasPago)
+                                ? prov.cuentasPago
+                                : Object.values(prov.cuentasPago);
+                        } else if (prov.banco || prov.tipoCuenta || prov.numeroCuenta) {
+                            cuentasPago = [{ banco: prov.banco || '', tipoCuenta: prov.tipoCuenta || '', numeroCuenta: prov.numeroCuenta || prov.cuentaBancaria || '' }];
+                        }
+
                         // Guardar en memoria
                         proveedoresDB[nombre.toLowerCase()] = {
                             nombre: nombre,
                             tipoId: prov.tipoIdentificacion || prov.tipoId || 'NIT',
                             numeroId: prov.noIdentificacion || prov.numeroId || prov.nit || '',
-                            banco: prov.banco || '',
-                            tipoCuenta: prov.tipoCuenta || '',
-                            numeroCuenta: prov.numeroCuenta || prov.cuentaBancaria || '',
-                            metodoPago: prov.metodoPago || ''
+                            banco: cuentasPago[0]?.banco || prov.banco || '',
+                            tipoCuenta: cuentasPago[0]?.tipoCuenta || prov.tipoCuenta || '',
+                            numeroCuenta: cuentasPago[0]?.numeroCuenta || prov.numeroCuenta || prov.cuentaBancaria || '',
+                            metodoPago: prov.metodoPago || '',
+                            cuentasPago: cuentasPago
                         };
                         
                         // Agregar al datalist
@@ -1126,45 +1155,73 @@
         // Listener para autocompletar cuando cambie el proveedor
         document.getElementById('proveedor').addEventListener('input', function() {
             const nombreBuscado = this.value.trim().toLowerCase();
-            
             if (!nombreBuscado) return;
-            
-            // Búsqueda exacta primero
+
             let proveedor = proveedoresDB[nombreBuscado];
-            
-            // Si no encuentra, buscar por coincidencia parcial
             if (!proveedor) {
                 for (const [key, prov] of Object.entries(proveedoresDB)) {
                     if (key.includes(nombreBuscado) || nombreBuscado.includes(key)) {
                         proveedor = prov;
-                        console.log(`🔍 Coincidencia parcial: "${nombreBuscado}" → "${prov.nombre}"`);
                         break;
                     }
                 }
             }
-            
+
             if (proveedor) {
-                // Auto-llenar todos los campos
-                document.getElementById('tipoId').value = proveedor.tipoId || 'NIT';
+                document.getElementById('tipoId').value  = proveedor.tipoId || 'NIT';
                 document.getElementById('numeroId').value = proveedor.numeroId || '';
-                document.getElementById('banco').value = proveedor.banco || '';
-                document.getElementById('tipoCuenta').value = proveedor.tipoCuenta || '';
-                document.getElementById('numeroCuenta').value = proveedor.numeroCuenta || '';
-                if (proveedor.metodoPago) {
-                    document.getElementById('metodoPago').value = proveedor.metodoPago;
+                if (proveedor.metodoPago) document.getElementById('metodoPago').value = proveedor.metodoPago;
+
+                const cuentas = proveedor.cuentasPago || [];
+                const wrap = document.getElementById('selectorCuentaManualWrap');
+                const sel  = document.getElementById('selectorCuentaManual');
+
+                if (cuentas.length > 1) {
+                    // Mostrar selector con todas las cuentas
+                    sel.innerHTML = '<option value="">— Elegir cuenta —</option>';
+                    cuentas.forEach((c, i) => {
+                        const opt = document.createElement('option');
+                        opt.value = i;
+                        opt.textContent = `Cuenta ${i+1}: ${c.banco || 'Sin banco'} – ${c.tipoCuenta || ''} ${c.numeroCuenta ? '(' + c.numeroCuenta + ')' : ''}`.trim();
+                        sel.appendChild(opt);
+                    });
+                    sel.dataset.cuentas = JSON.stringify(cuentas);
+                    wrap.style.display = 'block';
+                    // Pre-cargar la primera cuenta
+                    document.getElementById('banco').value        = cuentas[0].banco || '';
+                    document.getElementById('tipoCuenta').value   = cuentas[0].tipoCuenta || '';
+                    document.getElementById('numeroCuenta').value = cuentas[0].numeroCuenta || '';
+                } else {
+                    wrap.style.display = 'none';
+                    document.getElementById('banco').value        = (cuentas[0] || proveedor).banco || '';
+                    document.getElementById('tipoCuenta').value   = (cuentas[0] || proveedor).tipoCuenta || '';
+                    document.getElementById('numeroCuenta').value = (cuentas[0] || proveedor).numeroCuenta || '';
                 }
-                
-                console.log('✅ Datos autocompletados:', {
-                    nombre: proveedor.nombre,
-                    banco: proveedor.banco || '(vacío)',
-                    tipoCuenta: proveedor.tipoCuenta || '(vacío)',
-                    numeroCuenta: proveedor.numeroCuenta || '(vacío)'
-                });
-            } else {
-                console.log(`⚠️ Proveedor "${nombreBuscado}" no encontrado en la base de datos`);
             }
         });
         
+        // Aplicar cuenta seleccionada en el selector
+        window.aplicarCuentaSeleccionada = function(tipo) {
+            const esManual = tipo === 'manual';
+            const sel = document.getElementById(esManual ? 'selectorCuentaManual' : 'selectorCuentaEditar');
+            const idx = parseInt(sel.value);
+            if (isNaN(idx)) return;
+
+            const cuentas = JSON.parse(sel.dataset.cuentas || '[]');
+            const cuenta  = cuentas[idx];
+            if (!cuenta) return;
+
+            if (esManual) {
+                document.getElementById('banco').value        = cuenta.banco || '';
+                document.getElementById('tipoCuenta').value   = cuenta.tipoCuenta || '';
+                document.getElementById('numeroCuenta').value = cuenta.numeroCuenta || '';
+            } else {
+                document.getElementById('editarBanco').value        = cuenta.banco || '';
+                document.getElementById('editarTipoCuenta').value   = cuenta.tipoCuenta || '';
+                document.getElementById('editarNumeroCuenta').value = cuenta.numeroCuenta || '';
+            }
+        };
+
         // Links de Google Drive
         const driveLinks = {
             'nepal-2': 'https://drive.google.com/drive/folders/11zgqRM4LhNRW5luW0B6pA06e42Xzu4Hc',
