@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Insumos - Azeche P.H.</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',sans-serif;background:#f5f7fa;min-height:100vh;}
+
+        /* HEADER */
+        .header{background:linear-gradient(135deg,#0056B8 0%,#00B853 100%);color:white;padding:18px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;box-shadow:0 4px 20px rgba(0,0,0,.25);}
+        .header-left{display:flex;align-items:center;gap:18px;}
+        .logo-box{background:white;padding:8px 16px;border-radius:8px;}
+        .logo-text{font-size:1.5em;font-weight:900;letter-spacing:-1px;}
+        .logo-blue{color:#0056B8;} .logo-green{color:#00B853;}
+        .header-title h1{font-size:1.25em;font-weight:700;}
+        .header-title p{font-size:.78em;opacity:.8;margin-top:2px;}
+        .header-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+        .btn-back{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5);color:white;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.88em;font-weight:600;text-decoration:none;transition:background .2s;}
+        .btn-back:hover{background:rgba(255,255,255,.35);}
+        .user-badge{background:rgba(255,255,255,.15);border-radius:20px;padding:6px 14px;font-size:.8em;}
+
+        /* FILTROS */
+        .toolbar{max-width:1200px;margin:22px auto 0;padding:0 20px;}
+        .filter-bar{background:white;border-radius:14px;padding:18px 22px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;box-shadow:0 2px 12px rgba(0,0,0,.08);}
+        .filter-bar h2{font-size:1em;font-weight:700;color:#333;flex-shrink:0;}
+        .filter-btn{padding:8px 18px;border:2px solid #e0e0e0;background:white;border-radius:20px;cursor:pointer;font-size:.85em;font-weight:600;color:#666;transition:all .2s;}
+        .filter-btn.active{background:#0056B8;border-color:#0056B8;color:white;}
+        .filter-btn.pend.active{background:#f59e0b;border-color:#f59e0b;color:white;}
+        .filter-btn.apro.active{background:#10b981;border-color:#10b981;color:white;}
+        .filter-btn.rech.active{background:#ef4444;border-color:#ef4444;color:white;}
+        .filter-btn:hover:not(.active){border-color:#0056B8;color:#0056B8;}
+        .search-box{margin-left:auto;padding:8px 14px;border:2px solid #e0e0e0;border-radius:20px;font-size:.85em;width:200px;}
+        .search-box:focus{outline:none;border-color:#0056B8;}
+
+        /* STATS */
+        .stats-row{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;}
+        .stat{background:white;border-radius:12px;padding:14px 20px;flex:1;min-width:120px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.07);}
+        .stat .sn{font-size:1.8em;font-weight:700;}
+        .stat .sl{font-size:.75em;color:#888;margin-top:3px;font-weight:600;text-transform:uppercase;}
+        .stat.pend .sn{color:#f59e0b;} .stat.apro .sn{color:#10b981;} .stat.rech .sn{color:#ef4444;} .stat.total .sn{color:#0056B8;}
+
+        /* GRID SOLICITUDES */
+        .solicitudes-grid{max-width:1200px;margin:18px auto;padding:0 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;}
+        .sol-card{background:white;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden;transition:transform .2s,box-shadow .2s;}
+        .sol-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.13);}
+        .sol-card-header{padding:16px 18px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #f0f2f5;}
+        .folio-info .folio{font-size:1em;font-weight:700;color:#0056B8;letter-spacing:.5px;}
+        .folio-info .edif{font-size:.82em;color:#666;margin-top:3px;}
+        .folio-info .fecha{font-size:.77em;color:#aaa;margin-top:2px;}
+        .estado-badge{padding:5px 13px;border-radius:20px;font-size:.75em;font-weight:700;flex-shrink:0;}
+        .estado-badge.Pendiente{background:#fef3c7;color:#d97706;}
+        .estado-badge.Aprobado{background:#d1fae5;color:#065f46;}
+        .estado-badge.Rechazado{background:#fee2e2;color:#991b1b;}
+        .sol-card-body{padding:14px 18px;}
+        .sol-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:.8em;color:#555;margin-bottom:12px;}
+        .sol-meta span{display:flex;align-items:center;gap:4px;}
+        .prod-summary{display:flex;gap:8px;flex-wrap:wrap;}
+        .prod-chip{background:#f0f4ff;border:1px solid #dde6ff;border-radius:20px;padding:3px 10px;font-size:.75em;color:#0056B8;font-weight:600;}
+        .prod-chip.v{background:#e6f9ed;border-color:#c3f0d2;color:#065f46;}
+        .sol-card-actions{padding:12px 18px;background:#fafbfc;border-top:1px solid #f0f2f5;display:flex;gap:8px;flex-wrap:wrap;}
+        .btn-action{flex:1;padding:9px;border:none;border-radius:8px;cursor:pointer;font-size:.82em;font-weight:700;transition:opacity .2s;min-width:80px;}
+        .btn-action:hover{opacity:.85;}
+        .btn-ver{background:#0056B8;color:white;}
+        .btn-apr{background:#10b981;color:white;}
+        .btn-rec{background:#ef4444;color:white;}
+        .btn-pdf{background:#7c3aed;color:white;}
+        .btn-wa{background:#25D366;color:white;}
+        .btn-action:disabled{opacity:.4;cursor:not-allowed;}
+
+        /* ESTADO vacío */
+        .empty-state{max-width:1200px;margin:40px auto;padding:0 20px;text-align:center;color:#aaa;}
+        .empty-state .em{font-size:3.5em;margin-bottom:12px;}
+        .empty-state p{font-size:1em;color:#999;}
+
+        /* LOADING */
+        .loading{text-align:center;padding:60px;color:#aaa;font-size:1em;}
+        .spinner{display:inline-block;width:36px;height:36px;border:4px solid #e0e0e0;border-top-color:#0056B8;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px;}
+        @keyframes spin{to{transform:rotate(360deg);}}
+
+        /* MODAL DETALLE */
+        .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;justify-content:center;align-items:center;padding:14px;}
+        .modal.active{display:flex;}
+        .mbox{background:white;border-radius:18px;width:100%;max-width:720px;max-height:94vh;display:flex;flex-direction:column;overflow:hidden;}
+        .mhdr{background:linear-gradient(135deg,#0056B8,#00B853);color:white;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+        .mhdr h2{font-size:1.1em;}
+        .mhdr .folio-badge{font-size:.82em;opacity:.85;margin-top:3px;}
+        .btn-x{background:rgba(255,255,255,.2);border:none;color:white;font-size:1.3em;width:32px;height:32px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+        .btn-x:hover{background:rgba(255,255,255,.38);}
+        .mscroll{flex:1;overflow-y:auto;padding:22px 24px;}
+        .msec{margin-bottom:22px;}
+        .msec-title{font-size:.78em;font-weight:700;color:#0056B8;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #e8f0ff;padding-bottom:6px;margin-bottom:12px;}
+        .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+        .info-item label{font-size:.72em;color:#888;font-weight:700;text-transform:uppercase;display:block;margin-bottom:3px;}
+        .info-item span{font-size:.92em;color:#333;font-weight:600;}
+        .prod-list-m{display:flex;flex-direction:column;gap:7px;}
+        .prod-row-m{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;background:#f8f9fa;border-radius:8px;padding:9px 12px;font-size:.85em;}
+        .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+        .dot.azul{background:#0056B8;} .dot.verde{background:#00B853;}
+        .pname-m{font-weight:600;color:#333;}
+        .pname-m small{color:#888;font-weight:400;font-size:.8em;display:block;}
+        .qty-badge{background:#0056B8;color:white;border-radius:6px;padding:3px 10px;font-size:.8em;font-weight:700;white-space:nowrap;}
+        .qty-badge.v{background:#10b981;}
+        .obs-box{background:#f8f9fa;border-radius:8px;padding:12px;font-size:.88em;color:#555;line-height:1.5;}
+        .mfooter{padding:16px 24px;background:#f8f9fa;border-top:1px solid #eee;display:flex;gap:10px;flex-wrap:wrap;}
+        .btn-maction{flex:1;padding:11px;border:none;border-radius:9px;cursor:pointer;font-size:.88em;font-weight:700;transition:opacity .2s;min-width:120px;}
+        .btn-maction:hover{opacity:.85;}
+        .btn-maction:disabled{opacity:.4;cursor:not-allowed;}
+
+        /* TOAST */
+        .toast{position:fixed;bottom:24px;right:24px;background:#333;color:white;padding:12px 22px;border-radius:10px;font-size:.88em;font-weight:600;z-index:2000;opacity:0;transition:opacity .3s;pointer-events:none;}
+        .toast.show{opacity:1;}
+
+        @media(max-width:600px){
+            .header{padding:14px 16px;}
+            .info-grid{grid-template-columns:1fr;}
+            .solicitudes-grid{padding:0 12px;}
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-left">
+        <div class="logo-box">
+            <div class="logo-text"><span class="logo-blue">Azeche</span> <span class="logo-green">P.H.</span></div>
+        </div>
+        <div class="header-title">
+            <h1>📦 Gestión de Insumos</h1>
+            <p>Panel de administración · Aprobación de solicitudes</p>
+        </div>
+    </div>
+    <div class="header-right">
+        <span class="user-badge" id="userBadge">👤 Cargando...</span>
+        <a href="Dashboard.html" class="btn-back">← Dashboard</a>
+    </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+    <div class="filter-bar">
+        <h2>Filtrar por estado:</h2>
+        <button class="filter-btn active" onclick="filtrar('Todos')">Todos</button>
+        <button class="filter-btn pend" onclick="filtrar('Pendiente')">🟡 Pendientes</button>
+        <button class="filter-btn apro" onclick="filtrar('Aprobado')">🟢 Aprobados</button>
+        <button class="filter-btn rech" onclick="filtrar('Rechazado')">🔴 Rechazados</button>
+        <input class="search-box" type="text" id="buscarInput" placeholder="🔍 Buscar edificio, folio..." oninput="renderCards()">
+    </div>
+    <div class="stats-row">
+        <div class="stat total"><div class="sn" id="sTot">0</div><div class="sl">Total</div></div>
+        <div class="stat pend"><div class="sn" id="sPend">0</div><div class="sl">Pendientes</div></div>
+        <div class="stat apro"><div class="sn" id="sApro">0</div><div class="sl">Aprobados</div></div>
+        <div class="stat rech"><div class="sn" id="sRech">0</div><div class="sl">Rechazados</div></div>
+    </div>
+</div>
+
+<!-- GRID -->
+<div id="solicitudesGrid" class="solicitudes-grid">
+    <div class="loading" style="grid-column:1/-1;">
+        <div class="spinner"></div>
+        <p>Cargando solicitudes...</p>
+    </div>
+</div>
+
+<!-- MODAL DETALLE -->
+<div class="modal" id="modalDetalle">
+    <div class="mbox">
+        <div class="mhdr">
+            <div>
+                <h2 id="mFolio">Detalle de Solicitud</h2>
+                <div class="folio-badge" id="mEdificio"></div>
+            </div>
+            <button class="btn-x" onclick="cerrar()">✕</button>
+        </div>
+        <div class="mscroll" id="mScroll">
+            <!-- contenido dinámico -->
+        </div>
+        <div class="mfooter" id="mFooter">
+            <!-- botones dinámicos -->
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getDatabase, ref, onValue, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+const cfg = {
+    apiKey:"AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
+    authDomain:"azeche-ph.firebaseapp.com",
+    databaseURL:"https://azeche-ph-default-rtdb.firebaseio.com",
+    projectId:"azeche-ph",
+    storageBucket:"azeche-ph.firebasestorage.app",
+    messagingSenderId:"905337990521",
+    appId:"1:905337990521:web:c2ca4932672c59fef6c5c9"
+};
+const app  = initializeApp(cfg);
+const db   = getDatabase(app);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.href = 'index.html';
+        return;
+    }
+    const info = JSON.parse(localStorage.getItem('azecheUser') || '{}');
+    document.getElementById('userBadge').textContent = '👤 ' + (info.nombre || user.email || 'Admin');
+
+    // Escuchar cambios en tiempo real
+    onValue(ref(db, 'solicitudes_insumos'), (snap) => {
+        window._all = [];
+        if (snap.exists()) {
+            snap.forEach(child => {
+                window._all.push({ key: child.key, ...child.val() });
+            });
+            window._all.reverse(); // más recientes primero
+        }
+        renderStats();
+        renderCards();
+    });
+});
+
+window._update = async (key, estado) => {
+    await update(ref(db, 'solicitudes_insumos/' + key), {
+        estado,
+        fechaGestion: new Date().toISOString()
+    });
+};
+</script>
+
+<script>
+window._all = [];
+let filtroActivo = 'Todos';
+
+function renderStats(){
+    const all = window._all || [];
+    document.getElementById('sTot').textContent  = all.length;
+    document.getElementById('sPend').textContent = all.filter(s=>s.estado==='Pendiente').length;
+    document.getElementById('sApro').textContent = all.filter(s=>s.estado==='Aprobado').length;
+    document.getElementById('sRech').textContent = all.filter(s=>s.estado==='Rechazado').length;
+}
+
+window.filtrar = function(estado) {
+    filtroActivo = estado;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    const btn = [...document.querySelectorAll('.filter-btn')].find(b=>b.textContent.includes(estado==='Todos'?'Todos':estado));
+    if(btn) btn.classList.add('active');
+    renderCards();
+};
+
+window.renderCards = function(){
+    const busq = (document.getElementById('buscarInput').value||'').toLowerCase();
+    let list = window._all || [];
+    if(filtroActivo !== 'Todos') list = list.filter(s=>s.estado===filtroActivo);
+    if(busq) list = list.filter(s=>(s.folio+s.edificio+s.solicitante).toLowerCase().includes(busq));
+
+    const grid = document.getElementById('solicitudesGrid');
+    if(list.length === 0){
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+            <div class="em">📭</div>
+            <p>${filtroActivo==='Todos'?'No hay solicitudes registradas todavía.':'No hay solicitudes con estado "'+filtroActivo+'".'}</p>
+        </div>`;
+        return;
+    }
+    grid.innerHTML = list.map(s => cardHTML(s)).join('');
+};
+
+function cardHTML(s){
+    const cons = (s.conserjeria||[]), cafe = (s.cafeteria||[]);
+    const total = cons.length + cafe.length;
+    const chips = [
+        ...cons.slice(0,3).map(p=>`<span class="prod-chip">${p.emoji||'📦'} ${p.nombre}</span>`),
+        ...cafe.slice(0,3).map(p=>`<span class="prod-chip v">${p.emoji||'📦'} ${p.nombre}</span>`)
+    ].join('');
+    const masText = total > 6 ? `<span class="prod-chip">+${total-6} más</span>` : '';
+    const fch = s.fecha ? new Date(s.fecha+'T00:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'}) : (s.fechaCreacion ? new Date(s.fechaCreacion).toLocaleDateString('es-CO') : '');
+    const pend = s.estado==='Pendiente';
+    return `<div class="sol-card">
+        <div class="sol-card-header">
+            <div class="folio-info">
+                <div class="folio">${s.folio||'SIN FOLIO'}</div>
+                <div class="edif">🏢 ${s.edificio||'-'} · ${s.mes||''}</div>
+                <div class="fecha">📅 ${fch} · 👤 ${s.solicitante||'-'}</div>
+            </div>
+            <span class="estado-badge ${s.estado||'Pendiente'}">${s.estado||'Pendiente'}</span>
+        </div>
+        <div class="sol-card-body">
+            <div class="sol-meta">
+                ${cons.length>0?`<span>🧹 ${cons.length} conserjería</span>`:''}
+                ${cafe.length>0?`<span>☕ ${cafe.length} cafetería</span>`:''}
+                ${s.cargo?`<span>💼 ${s.cargo}</span>`:''}
+            </div>
+            <div class="prod-summary">${chips}${masText}</div>
+        </div>
+        <div class="sol-card-actions">
+            <button class="btn-action btn-ver" onclick="verDetalle('${s.key}')">👁 Ver</button>
+            ${pend?`<button class="btn-action btn-apr" onclick="cambiarEstado('${s.key}','Aprobado')">✅ Aprobar</button>`:''}
+            ${pend?`<button class="btn-action btn-rec" onclick="cambiarEstado('${s.key}','Rechazado')">❌ Rechazar</button>`:''}
+            ${s.estado==='Aprobado'?`<button class="btn-action btn-pdf" onclick="generarPDF('${s.key}')">🖨️ PDF</button>`:''}
+            ${s.estado==='Aprobado'?`<button class="btn-action btn-wa" onclick="enviarWA('${s.key}')">📱 WhatsApp</button>`:''}
+        </div>
+    </div>`;
+}
+
+window.cambiarEstado = async (key, estado) => {
+    const solicitud = (window._all||[]).find(s=>s.key===key);
+    if(!solicitud) return;
+    if(!confirm(`¿${estado==='Aprobado'?'Aprobar':'Rechazar'} la solicitud ${solicitud.folio}?`)) return;
+    try {
+        await window._update(key, estado);
+        toast(`✅ Solicitud ${estado.toLowerCase()} correctamente`);
+        cerrar();
+    } catch(e) { toast('❌ Error: '+e.message); }
+};
+
+window.verDetalle = (key) => {
+    const s = (window._all||[]).find(s=>s.key===key);
+    if(!s) return;
+    const cons = s.conserjeria||[], cafe = s.cafeteria||[];
+    const pend = s.estado==='Pendiente';
+    const fch = s.fecha ? new Date(s.fecha+'T00:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'}) : '-';
+
+    document.getElementById('mFolio').textContent = s.folio||'Sin folio';
+    document.getElementById('mEdificio').textContent = `🏢 ${s.edificio||'-'} · ${s.mes||''} ${s.fecha ? '('+fch+')' : ''}`;
+
+    document.getElementById('mScroll').innerHTML = `
+        <div class="msec">
+            <div class="msec-title">Información general</div>
+            <div class="info-grid">
+                <div class="info-item"><label>Edificio</label><span>${s.edificio||'-'}</span></div>
+                <div class="info-item"><label>Fecha</label><span>${fch}</span></div>
+                <div class="info-item"><label>Mes</label><span>${s.mes||'-'}</span></div>
+                <div class="info-item"><label>Solicitante</label><span>${s.solicitante||'-'}</span></div>
+                <div class="info-item"><label>Cargo</label><span>${s.cargo||'-'}</span></div>
+                <div class="info-item"><label>NIT Edificio</label><span>${s.nit||'-'}</span></div>
+                <div class="info-item"><label>Dirección</label><span>${s.dir||'-'}</span></div>
+                <div class="info-item"><label>Estado</label><span class="estado-badge ${s.estado||'Pendiente'}" style="font-size:.8em;">${s.estado||'Pendiente'}</span></div>
+            </div>
+        </div>
+        ${cons.length>0?`
+        <div class="msec">
+            <div class="msec-title">🧹 Conserjería (${cons.length} productos)</div>
+            <div class="prod-list-m">
+                ${cons.map(p=>`<div class="prod-row-m">
+                    <div class="dot azul"></div>
+                    <div class="pname-m">${p.emoji||'📦'} ${p.nombre}<small>${p.cat||'Conserjería'}</small></div>
+                    <span class="qty-badge">${p.cantidad} ${p.unidad}</span>
+                </div>`).join('')}
+            </div>
+        </div>`:''}
+        ${cafe.length>0?`
+        <div class="msec">
+            <div class="msec-title">☕ Cafetería (${cafe.length} productos)</div>
+            <div class="prod-list-m">
+                ${cafe.map(p=>`<div class="prod-row-m">
+                    <div class="dot verde"></div>
+                    <div class="pname-m">${p.emoji||'📦'} ${p.nombre}<small>${p.cat||'Cafetería'}</small></div>
+                    <span class="qty-badge v">${p.cantidad} ${p.unidad}</span>
+                </div>`).join('')}
+            </div>
+        </div>`:''}
+        ${s.observaciones?`
+        <div class="msec">
+            <div class="msec-title">Observaciones</div>
+            <div class="obs-box">${s.observaciones}</div>
+        </div>`:''}
+    `;
+
+    document.getElementById('mFooter').innerHTML = `
+        ${pend?`<button class="btn-maction btn-apr" onclick="cambiarEstado('${key}','Aprobado')">✅ Aprobar Solicitud</button>`:''}
+        ${pend?`<button class="btn-maction btn-rec" onclick="cambiarEstado('${key}','Rechazado')">❌ Rechazar</button>`:''}
+        ${s.estado==='Aprobado'?`<button class="btn-maction btn-pdf" onclick="generarPDF('${key}')">🖨️ Generar PDF</button>`:''}
+        ${s.estado==='Aprobado'?`<button class="btn-maction btn-wa" onclick="enviarWA('${key}')">📱 Enviar por WhatsApp</button>`:''}
+        <button class="btn-maction" style="background:#e5e7eb;color:#333;" onclick="cerrar()">Cerrar</button>
+    `;
+
+    document.getElementById('modalDetalle').classList.add('active');
+};
+
+window.cerrar = () => document.getElementById('modalDetalle').classList.remove('active');
+
+/* ─── PDF ─── */
+window.generarPDF = (key) => {
+    const s = (window._all||[]).find(s=>s.key===key);
+    if(!s) return;
+
+    // Cargar jsPDF dinámicamente si no está presente
+    if(typeof window.jspdf === 'undefined'){
+        const sc = document.createElement('script');
+        sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        sc.onload = () => _buildPDF(s);
+        document.head.appendChild(sc);
+    } else { _buildPDF(s); }
+};
+
+function _buildPDF(s){
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit:'mm', format:'a4' });
+    const A = 210, M = 18;
+    let y = 0;
+
+    // ── Cabecera azul ──
+    doc.setFillColor(0,86,184);
+    doc.rect(0,0,A,32,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold'); doc.setFontSize(18);
+    doc.text('AZECHE P.H.', M, 13);
+    doc.setFont('helvetica','normal'); doc.setFontSize(10);
+    doc.text('ORDEN DE COMPRA DE INSUMOS', M, 22);
+    doc.setFontSize(9);
+    doc.text('Folio: '+(s.folio||'-'),   A-M, 12, {align:'right'});
+    doc.text('Fecha: '+(s.fecha||'-'),   A-M, 19, {align:'right'});
+    doc.text('Estado: '+(s.estado||'-'), A-M, 26, {align:'right'});
+    // Franja verde
+    doc.setFillColor(0,184,83);
+    doc.rect(0,32,A,4,'F');
+    y = 44;
+
+    // ── Destinatario ──
+    doc.setFillColor(248,249,250);
+    doc.rect(M, y-4, A-M*2, 32,'F');
+    doc.setTextColor(50,50,50);
+    doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    doc.text('DESTINATARIO / EDIFICIO', M+4, y+3);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    doc.text('Edificio: '+(s.edificio||'-')+'   NIT: '+(s.nit||'-'), M+4, y+10);
+    doc.text('Direccion: '+(s.dir||'-'), M+4, y+17);
+    doc.text('Solicitante: '+(s.solicitante||'-')+'  ('+( s.cargo||'-')+')   Mes: '+(s.mes||'-'), M+4, y+24);
+    y += 36;
+
+    // ── Tabla de productos ──
+    const tabla = (titulo, prods, color) => {
+        if(!prods||prods.length===0) return;
+        if(y > 250){ doc.addPage(); y=18; }
+        doc.setFillColor(...color);
+        doc.rect(M, y, A-M*2, 8,'F');
+        doc.setTextColor(255,255,255);
+        doc.setFont('helvetica','bold'); doc.setFontSize(10);
+        doc.text(titulo, M+4, y+5.5);
+        doc.setTextColor(0,0,0);
+        y += 10;
+        doc.setFillColor(230,240,255);
+        doc.rect(M, y, A-M*2, 7,'F');
+        doc.setFont('helvetica','bold'); doc.setFontSize(8);
+        doc.text('#',        M+3,     y+5);
+        doc.text('PRODUCTO', M+10,    y+5);
+        doc.text('CANT.',    A-M-28,  y+5);
+        doc.text('UNIDAD',   A-M-14,  y+5);
+        y += 9;
+        prods.forEach((p,i) => {
+            if(y > 265){ doc.addPage(); y=18; }
+            if(i%2===0){ doc.setFillColor(250,252,255); doc.rect(M,y,A-M*2,7,'F'); }
+            doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(0,0,0);
+            doc.text(String(i+1),               M+3,    y+5);
+            doc.text(p.nombre.substring(0,55),  M+10,   y+5);
+            doc.text(String(p.cantidad),         A-M-26, y+5);
+            doc.text(p.unidad||'-',              A-M-14, y+5);
+            y += 7;
+        });
+        y += 5;
+    };
+
+    tabla('CONSERJERIA', s.conserjeria||[], [0,86,184]);
+    tabla('CAFETERIA',   s.cafeteria||[],   [0,132,80]);
+
+    if(s.observaciones){
+        if(y > 248){ doc.addPage(); y=18; }
+        doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(50,50,50);
+        doc.text('OBSERVACIONES:', M, y+5);
+        doc.setFont('helvetica','normal');
+        const lines = doc.splitTextToSize(s.observaciones, A-M*2-38);
+        doc.text(lines, M+38, y+5);
+        y += lines.length*5 + 10;
+    }
+
+    // ── Firmas ──
+    if(y > 230){ doc.addPage(); y=18; }
+    y = Math.max(y+16, 215);
+    const fw = (A-M*2-16)/2;
+    doc.setDrawColor(100,100,100);
+    // Firma solicitante
+    doc.line(M, y, M+fw, y);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(50,50,50);
+    doc.text('FIRMA DEL SOLICITANTE', M+fw/2, y+5, {align:'center'});
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(100,100,100);
+    doc.text(s.solicitante||'', M+fw/2, y+10, {align:'center'});
+    doc.text(s.cargo||'',       M+fw/2, y+15, {align:'center'});
+    // Firma administracion
+    const x2 = M+fw+16;
+    doc.line(x2, y, x2+fw, y);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(50,50,50);
+    doc.text('APROBACION ADMINISTRACION', x2+fw/2, y+5, {align:'center'});
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(100,100,100);
+    doc.text('Azeche P.H.', x2+fw/2, y+10, {align:'center'});
+    const fGestion = s.fechaGestion ? new Date(s.fechaGestion).toLocaleDateString('es-CO') : '___________';
+    doc.text('Fecha: '+fGestion, x2+fw/2, y+15, {align:'center'});
+    y += 22;
+
+    // ── Pie ──
+    doc.setDrawColor(200,200,200);
+    doc.line(M, y, A-M, y);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(150,150,150);
+    doc.text('Documento generado por Azeche P.H. | '+new Date().toLocaleString('es-CO'), A/2, y+5, {align:'center'});
+
+    doc.save('Orden_'+s.folio+'_'+s.edificio+'.pdf');
+    toast('Documento PDF descargado');
+}
+
+/* ─── WhatsApp ─── */
+window.enviarWA = (key) => {
+    const s = (window._all||[]).find(s=>s.key===key);
+    if(!s) return;
+    const cons = s.conserjeria||[], cafe = s.cafeteria||[];
+    let msg = `*ORDEN DE COMPRA - AZECHE P.H.*\n`;
+    msg += `\nFolio: *${s.folio}*`;
+    msg += `\nEdificio: *${s.edificio}*`;
+    msg += `\nFecha: ${s.fecha||'-'} · Mes: ${s.mes||'-'}`;
+    msg += `\nSolicitante: ${s.solicitante||'-'}`;
+    if(cons.length){
+        msg += `\n\n*🧹 CONSERJERÍA:*`;
+        cons.forEach(p=>{ msg += `\n• ${p.nombre}: ${p.cantidad} ${p.unidad}`; });
+    }
+    if(cafe.length){
+        msg += `\n\n*☕ CAFETERÍA:*`;
+        cafe.forEach(p=>{ msg += `\n• ${p.nombre}: ${p.cantidad} ${p.unidad}`; });
+    }
+    if(s.observaciones) msg += `\n\n📝 ${s.observaciones}`;
+    msg += `\n\n_Favor confirmar recepción y disponibilidad._`;
+    window.open('https://wa.me/?text='+encodeURIComponent(msg), '_blank');
+};
+
+/* Toast */
+function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>

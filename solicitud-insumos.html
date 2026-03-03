@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud de Insumos - Azeche P.H.</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:16px;}
+        .page{max-width:860px;margin:0 auto;}
+
+        .hdr{background:linear-gradient(135deg,#0056B8,#00B853);border-radius:18px 18px 0 0;padding:24px 30px;color:white;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+        .hdr-left h1{font-size:1.5em;font-weight:700;}
+        .hdr-left p{font-size:.85em;opacity:.85;margin-top:3px;}
+        .folio{background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.45);border-radius:10px;padding:10px 16px;text-align:center;}
+        .folio strong{display:block;font-size:1.5em;letter-spacing:1px;}
+        .folio small{font-size:.72em;opacity:.85;}
+
+        .fbody{background:white;padding:28px;border-radius:0 0 18px 18px;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+
+        .sec{margin-bottom:26px;}
+        .sec-title{display:flex;align-items:center;gap:8px;font-size:.92em;font-weight:700;color:#0056B8;text-transform:uppercase;letter-spacing:.4px;border-bottom:3px solid #0056B8;padding-bottom:7px;margin-bottom:16px;}
+        .badge{background:#0056B8;color:white;border-radius:12px;padding:2px 10px;font-size:.73em;font-weight:700;margin-left:auto;}
+
+        .fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+        .f{display:flex;flex-direction:column;}
+        .f label{font-size:.76em;font-weight:700;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px;}
+        .f input,.f select,.f textarea{padding:10px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:.93em;background:#fafafa;font-family:inherit;transition:border-color .2s;}
+        .f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:#0056B8;background:white;}
+        .f.full{grid-column:1/-1;}
+        .f textarea{resize:vertical;min-height:70px;}
+        .f input[readonly]{background:#f0f4ff;color:#0056B8;font-weight:600;cursor:default;}
+
+        /* Selector de productos */
+        .sel-wrap{background:#f8f9fa;border:2px solid #e8ecf5;border-radius:12px;padding:18px;}
+        .btn-cat{width:100%;padding:15px;color:white;border:none;border-radius:10px;font-size:1em;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity .2s;}
+        .btn-cat:hover{opacity:.88;}
+        .btn-cat.azul{background:linear-gradient(135deg,#0056B8,#1a7fe0);}
+        .btn-cat.verde{background:linear-gradient(135deg,#00843d,#00B853);margin-top:10px;}
+
+        .lista-sel{margin-top:14px;}
+        .empty-msg{text-align:center;color:#bbb;padding:18px;font-size:.88em;}
+        .prod-row{display:grid;grid-template-columns:auto 1fr auto auto auto;align-items:center;gap:8px;background:white;border:1px solid #dde6ff;border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:.88em;}
+        .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+        .dot.azul{background:#0056B8;} .dot.verde{background:#00B853;}
+        .pname{font-weight:600;color:#333;}
+        .pname small{font-weight:400;color:#888;display:block;font-size:.8em;}
+        .qty{display:flex;align-items:center;gap:5px;}
+        .qty button{width:26px;height:26px;border:2px solid #0056B8;border-radius:6px;background:white;color:#0056B8;font-size:1em;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+        .qty button:hover{background:#0056B8;color:white;}
+        .qty span{min-width:24px;text-align:center;font-weight:700;color:#0056B8;}
+        select.uni{padding:5px 7px;border:1px solid #ddd;border-radius:6px;font-size:.8em;background:white;}
+        .btn-del{background:none;border:none;color:#dc3545;font-size:1.2em;cursor:pointer;padding:2px 5px;border-radius:4px;}
+        .btn-del:hover{background:#fde8ea;}
+
+        .resumen{display:flex;gap:14px;background:#f0f4ff;border-radius:8px;padding:10px 14px;margin-top:10px;font-size:.83em;flex-wrap:wrap;}
+        .ri{color:#0056B8;font-weight:700;}
+        .ri span{color:#333;font-weight:400;}
+
+        /* Modal */
+        .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;justify-content:center;align-items:center;padding:14px;}
+        .modal.active{display:flex;}
+        .mbox{background:white;border-radius:18px;width:100%;max-width:780px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;}
+        .mhdr{background:linear-gradient(135deg,#0056B8,#00B853);color:white;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+        .mhdr h2{font-size:1.1em;}
+        .btn-x{background:rgba(255,255,255,.2);border:none;color:white;font-size:1.4em;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+        .btn-x:hover{background:rgba(255,255,255,.4);}
+        .msearch{padding:12px 18px;border-bottom:1px solid #eee;flex-shrink:0;}
+        .msearch input{width:100%;padding:9px 13px;border:2px solid #e0e0e0;border-radius:8px;font-size:.92em;}
+        .msearch input:focus{outline:none;border-color:#0056B8;}
+        .mscroll{flex:1;overflow-y:auto;padding:14px 18px;}
+        .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:9px;}
+        .pcard{border:2px solid #e8ecf5;border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .2s;background:white;}
+        .pcard:hover{border-color:#0056B8;box-shadow:0 3px 12px rgba(0,86,184,.15);}
+        .pcard.sel{border-color:#0056B8;background:#f0f4ff;}
+        .pcard.sel.v{border-color:#00B853;background:#e6f9ed;}
+        .pcard .em{font-size:1.7em;margin-bottom:5px;}
+        .pcard .pn{font-size:.75em;font-weight:600;color:#333;line-height:1.3;margin-bottom:7px;min-height:30px;}
+        .pcard .cq{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:3px;}
+        .pcard .cq button{width:24px;height:24px;border:2px solid #ddd;border-radius:5px;background:white;font-size:.95em;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+        .pcard.sel .cq button{border-color:#0056B8;color:#0056B8;}
+        .pcard.sel.v .cq button{border-color:#00B853;color:#00B853;}
+        .pcard .cq button:hover{background:#0056B8;color:white;border-color:#0056B8;}
+        .pcard.sel.v .cq button:hover{background:#00B853;border-color:#00B853;}
+        .pcard .cq .qn{min-width:20px;text-align:center;font-weight:700;font-size:.88em;color:#0056B8;}
+        .pcard.sel.v .cq .qn{color:#00B853;}
+        .custom-wrap{background:#fffbf0;border:2px dashed #ffc107;border-radius:10px;padding:13px 15px;margin-top:10px;}
+        .custom-wrap p{font-size:.8em;font-weight:700;color:#856404;margin-bottom:7px;}
+        .custom-row{display:flex;gap:7px;flex-wrap:wrap;}
+        .custom-row input,.custom-row select{padding:8px 10px;border:1px solid #ddd;border-radius:7px;font-size:.86em;background:white;flex:1;min-width:110px;}
+        .custom-row button{padding:8px 14px;background:#ffc107;color:#333;border:none;border-radius:7px;font-weight:700;cursor:pointer;font-size:.86em;white-space:nowrap;}
+        .mfooter{padding:14px 18px;border-top:2px solid #eee;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:white;}
+        .sel-cnt{font-weight:700;color:#0056B8;font-size:.87em;}
+        .btn-ok{padding:11px 26px;background:linear-gradient(135deg,#0056B8,#00B853);color:white;border:none;border-radius:10px;font-size:.97em;font-weight:700;cursor:pointer;}
+        .btn-ok:hover{opacity:.9;}
+
+        /* Acciones */
+        .abar{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:24px;padding-top:20px;border-top:2px solid #eee;}
+        .btn{padding:12px 24px;border:none;border-radius:10px;font-size:.96em;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px;}
+        .btn-primary{background:linear-gradient(135deg,#0056B8,#00B853);color:white;}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,86,184,.35);}
+        .btn-secondary{background:#6c757d;color:white;}
+        .btn-secondary:hover{background:#5a6268;}
+
+        /* Modal OK */
+        .ok-box{background:white;border-radius:18px;padding:36px;max-width:380px;width:90%;text-align:center;}
+        .ok-box .ic{font-size:3.2em;margin-bottom:12px;}
+        .ok-box h2{color:#0056B8;margin-bottom:8px;}
+        .ok-box p{color:#666;font-size:.9em;margin-bottom:20px;}
+
+        @media(max-width:580px){.pgrid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));}
+        .prod-row{grid-template-columns:auto 1fr auto auto;}.prod-row .btn-del{grid-column:4;}}
+    </style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+    <div class="hdr-left">
+        <h1>🏢 AZECHE P.H.</h1>
+        <p>Solicitud de Insumos — Conserjería &amp; Cafetería</p>
+    </div>
+    <div class="folio">
+        <small>Folio</small>
+        <strong id="folioNum">—</strong>
+        <small id="fechaHoy"></small>
+    </div>
+</div>
+
+<div class="fbody">
+
+    <!-- INFO GENERAL -->
+    <div class="sec">
+        <div class="sec-title">📋 Información General</div>
+        <div class="fg">
+            <div class="f"><label>Fecha *</label><input type="date" id="fechaSol" required></div>
+            <div class="f">
+                <label>Mes Correspondiente *</label>
+                <select id="mesSol" required>
+                    <option value="">Seleccionar...</option>
+                    <option>Enero</option><option>Febrero</option><option>Marzo</option>
+                    <option>Abril</option><option>Mayo</option><option>Junio</option>
+                    <option>Julio</option><option>Agosto</option><option>Septiembre</option>
+                    <option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+                </select>
+            </div>
+            <div class="f">
+                <label>Edificio *</label>
+                <select id="edificio" required onchange="autoEd()">
+                    <option value="">Seleccionar...</option>
+                    <option>Nepal 2</option><option>Pinos del Country</option>
+                    <option>Convivienda</option><option>Avalon</option>
+                </select>
+            </div>
+            <div class="f"><label>NIT</label><input type="text" id="nit" readonly></div>
+            <div class="f full"><label>Dirección</label><input type="text" id="dir" readonly></div>
+            <div class="f"><label>Nombre del Solicitante *</label><input type="text" id="solicitante" required placeholder="Nombre completo"></div>
+            <div class="f">
+                <label>Cargo</label>
+                <select id="cargo">
+                    <option value="">Seleccionar...</option>
+                    <option>Conserje</option><option>Recepcionista</option>
+                    <option>Vigilante</option><option>Supervisor</option><option>Otro</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCTOS -->
+    <div class="sec">
+        <div class="sec-title">🛒 Productos Solicitados <span class="badge" id="badgeTotal">0 productos</span></div>
+        <div class="sel-wrap">
+            <button class="btn-cat azul" onclick="abrirSel('conserjeria')">🧹 Agregar Productos de Conserjería</button>
+            <button class="btn-cat verde" onclick="abrirSel('cafeteria')">☕ Agregar Productos de Cafetería</button>
+            <div class="lista-sel" id="listaSel">
+                <div class="empty-msg">Aún no has agregado productos.</div>
+            </div>
+            <div class="resumen">
+                <div class="ri">🧹 Conserjería: <span id="resC">0</span></div>
+                <div class="ri">☕ Cafetería: <span id="resF">0</span></div>
+                <div class="ri">📦 Total: <span id="resT">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OBSERVACIONES -->
+    <div class="sec">
+        <div class="sec-title">📝 Observaciones</div>
+        <div class="fg">
+            <div class="f full">
+                <label>Notas adicionales o urgencias</label>
+                <textarea id="obs" placeholder="Ej: Los guantes son urgentes..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="abar">
+        <button class="btn btn-secondary" onclick="limpiar()">🔄 Limpiar</button>
+        <button class="btn btn-primary"   onclick="enviar()">📤 Enviar Solicitud</button>
+    </div>
+</div>
+</div>
+
+<!-- MODAL SELECTOR -->
+<div class="modal" id="modalSel">
+    <div class="mbox">
+        <div class="mhdr">
+            <h2 id="mTitle">Seleccionar Productos</h2>
+            <button class="btn-x" onclick="cerrar('modalSel')">✕</button>
+        </div>
+        <div class="msearch"><input type="text" id="buscar" placeholder="🔍 Buscar producto..." oninput="renderGrid()"></div>
+        <div class="mscroll">
+            <div class="pgrid" id="pgrid"></div>
+            <div class="custom-wrap">
+                <p>➕ Producto personalizado</p>
+                <div class="custom-row">
+                    <input type="text"   id="cNombre"  placeholder="Nombre del producto...">
+                    <input type="number" id="cCant"    min="1" value="1" style="max-width:75px;">
+                    <select id="cUnidad">
+                        <option>Unidad</option><option>Par</option><option>Caja</option>
+                        <option>Paquete</option><option>Bolsa</option><option>Galón</option>
+                        <option>Litro</option><option>Kilo</option><option>500g</option>
+                        <option>Rollo</option><option>Docena</option>
+                    </select>
+                    <button onclick="addCustom()">+ Agregar</button>
+                </div>
+            </div>
+        </div>
+        <div class="mfooter">
+            <span class="sel-cnt" id="selCnt">0 seleccionados</span>
+            <button class="btn-ok" onclick="confirmar()">✅ Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ÉXITO -->
+<div class="modal" id="modalOk">
+    <div class="ok-box">
+        <div class="ic">✅</div>
+        <h2>¡Solicitud Enviada!</h2>
+        <p>La administración recibirá tu orden y te notificará cuando sea aprobada.</p>
+        <p style="font-weight:700;color:#0056B8;margin-bottom:18px;" id="folioConfirm"></p>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="cerrar('modalOk');limpiar()">📋 Nueva Solicitud</button>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getDatabase, ref, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+const app = initializeApp({
+    apiKey:"AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
+    authDomain:"azeche-ph.firebaseapp.com",
+    databaseURL:"https://azeche-ph-default-rtdb.firebaseio.com",
+    projectId:"azeche-ph",
+    storageBucket:"azeche-ph.firebasestorage.app",
+    messagingSenderId:"905337990521",
+    appId:"1:905337990521:web:c2ca4932672c59fef6c5c9"
+});
+const db = getDatabase(app);
+
+window._save = async (data) => {
+    await push(ref(db, 'solicitudes_insumos'), data);
+};
+</script>
+
+<script>
+const CATS = {
+    conserjeria:[
+        {e:'🗑️',n:'Bolsa negra 55x60',u:'Paquete'},{e:'🗑️',n:'Bolsa negra 75x90',u:'Paquete'},
+        {e:'🗑️',n:'Bolsa negra 100x120',u:'Paquete'},{e:'🧹',n:'Escoba plástica',u:'Unidad'},
+        {e:'🧹',n:'Recogedor plástico',u:'Unidad'},{e:'🪣',n:'Trapero de mopa',u:'Unidad'},
+        {e:'🪣',n:'Trapero de flecos',u:'Unidad'},{e:'🪣',n:'Balde plástico 10L',u:'Unidad'},
+        {e:'🧤',n:'Guantes de caucho',u:'Par'},{e:'🧤',n:'Guantes desechables',u:'Caja'},
+        {e:'🧴',n:'Jabón líquido multiusos',u:'Galón'},{e:'🧴',n:'Desinfectante pino',u:'Galón'},
+        {e:'🧴',n:'Desinfectante lavanda',u:'Galón'},{e:'🧴',n:'Hipoclorito de sodio',u:'Galón'},
+        {e:'🧴',n:'Limpiavidrios',u:'Unidad'},{e:'🧴',n:'Limpiador de baños',u:'Unidad'},
+        {e:'💨',n:'Ambientador spray',u:'Unidad'},{e:'💨',n:'Ambientador líquido',u:'Unidad'},
+        {e:'🧻',n:'Papel higiénico x4',u:'Paquete'},{e:'🧻',n:'Papel higiénico institucional',u:'Rollo'},
+        {e:'🧻',n:'Papel toalla',u:'Rollo'},{e:'🧼',n:'Jabón de manos líquido',u:'Unidad'},
+        {e:'🧼',n:'Gel antibacterial',u:'Unidad'},{e:'🧽',n:'Esponja de limpiar',u:'Unidad'},
+        {e:'🧽',n:'Fibra verde (paquete)',u:'Paquete'},{e:'🧽',n:'Paños de microfibra',u:'Paquete'},
+        {e:'🪠',n:'Escobilla WC',u:'Unidad'},{e:'🌸',n:'Pastilla desodorante WC',u:'Unidad'},
+        {e:'😷',n:'Tapabocas (paquete)',u:'Paquete'},{e:'🌿',n:'Limpión de piso',u:'Unidad'},
+    ],
+    cafeteria:[
+        {e:'☕',n:'Café molido 500g',u:'500g'},{e:'☕',n:'Café molido 1kg',u:'Kilo'},
+        {e:'☕',n:'Café instantáneo',u:'Unidad'},{e:'🍬',n:'Azúcar blanca 2.5kg',u:'Kilo'},
+        {e:'🍬',n:'Azúcar morena 1kg',u:'Kilo'},{e:'🌿',n:'Endulzante stevia',u:'Caja'},
+        {e:'🌿',n:'Aromáticas surtidas x50',u:'Caja'},{e:'🍵',n:'Té verde x20',u:'Caja'},
+        {e:'🥛',n:'Creamer en polvo',u:'Kilo'},{e:'🥛',n:'Leche en polvo',u:'Kilo'},
+        {e:'🥤',n:'Vasos desechables 7oz x50',u:'Paquete'},{e:'🥤',n:'Vasos desechables 10oz x50',u:'Paquete'},
+        {e:'🍽️',n:'Platos desechables x25',u:'Paquete'},{e:'🥄',n:'Cucharas desechables x50',u:'Paquete'},
+        {e:'🍴',n:'Tenedores desechables x50',u:'Paquete'},{e:'📄',n:'Servilletas (paquete)',u:'Paquete'},
+        {e:'💧',n:'Agua en botellón 20L',u:'Unidad'},{e:'💧',n:'Agua botella 600ml x12',u:'Paquete'},
+        {e:'🧂',n:'Sal x1kg',u:'Kilo'},{e:'🫙',n:'Aceite x1L',u:'Litro'},
+    ]
+};
+const EDIF = {
+    'Nepal 2':          {nit:'830142380-4', dir:'Calle 55 #4a-24'},
+    'Pinos del Country':{nit:'830059667-8', dir:'CR 12 127 B - 23'},
+    'Convivienda':      {nit:'830112728-5', dir:'CR 10a #138-71'},
+    'Avalon':           {nit:'800245101-1', dir:'Calle 65 #9-07'}
+};
+const UNIS = ['Unidad','Par','Caja','Paquete','Bolsa','Galón','Litro','Kilo','500g','Rollo','Docena'];
+
+let sel = [], cat = 'conserjeria', tmp = {};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const h = new Date();
+    document.getElementById('fechaSol').value = h.toISOString().split('T')[0];
+    document.getElementById('fechaHoy').textContent = h.toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'});
+    const ms = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    document.getElementById('mesSol').value = ms[h.getMonth()];
+    document.getElementById('folioNum').textContent = folio();
+});
+
+function folio(){ return 'INS-'+String(Math.floor(Math.random()*90000)+10000); }
+window.autoEd = () => {
+    const ed = EDIF[document.getElementById('edificio').value]||{};
+    document.getElementById('nit').value = ed.nit||'';
+    document.getElementById('dir').value = ed.dir||'';
+};
+window.abrirSel = (c) => {
+    cat = c;
+    tmp = {};
+    sel.filter(p=>p.cat===c).forEach(p=>{ tmp[p.nombre]={cantidad:p.cantidad,unidad:p.unidad}; });
+    document.getElementById('mTitle').textContent = c==='conserjeria'?'🧹 Conserjería':'☕ Cafetería';
+    document.getElementById('buscar').value = '';
+    renderGrid();
+    document.getElementById('modalSel').classList.add('active');
+};
+window.renderGrid = () => {
+    const q = document.getElementById('buscar').value.toLowerCase();
+    const ps = CATS[cat].filter(p=>p.n.toLowerCase().includes(q));
+    const ev = cat==='cafeteria';
+    document.getElementById('pgrid').innerHTML = ps.map(p=>{
+        const t  = tmp[p.n]||{cantidad:0,unidad:p.u};
+        const qty = t.cantidad, s = qty>0;
+        const pn = p.n.replace(/'/g,"\\'");
+        return `<div class="pcard ${s?'sel':''} ${s&&ev?'v':''}">
+            <div class="em">${p.e}</div>
+            <div class="pn">${p.n}</div>
+            <div class="cq">
+                <button onclick="cq('${pn}','${p.u}',-1)" ${qty===0?'disabled':''}>−</button>
+                <span class="qn">${qty}</span>
+                <button onclick="cq('${pn}','${p.u}',1)">+</button>
+            </div>
+        </div>`;
+    }).join('');
+    updCnt();
+};
+window.cq = (n,u,d) => {
+    if(!tmp[n]) tmp[n]={cantidad:0,unidad:u};
+    tmp[n].cantidad = Math.max(0,(tmp[n].cantidad||0)+d);
+    if(tmp[n].cantidad===0) delete tmp[n];
+    renderGrid();
+};
+function updCnt(){
+    const n = Object.values(tmp).filter(v=>v.cantidad>0).length;
+    document.getElementById('selCnt').textContent = n+' seleccionado'+(n!==1?'s':'');
+}
+window.addCustom = () => {
+    const n = document.getElementById('cNombre').value.trim();
+    const c = parseInt(document.getElementById('cCant').value)||1;
+    const u = document.getElementById('cUnidad').value;
+    if(!n){alert('Escribe el nombre del producto');return;}
+    tmp[n]={cantidad:c,unidad:u};
+    document.getElementById('cNombre').value='';
+    document.getElementById('cCant').value='1';
+    updCnt();
+    alert(`✅ "${n}" agregado`);
+};
+window.confirmar = () => {
+    sel = sel.filter(p=>p.cat!==cat);
+    const em = {}; CATS[cat].forEach(p=>em[p.n]=p.e);
+    Object.entries(tmp).forEach(([n,t])=>{
+        if(t.cantidad>0) sel.push({cat,nombre:n,emoji:em[n]||'📦',cantidad:t.cantidad,unidad:t.unidad});
+    });
+    renderLista();
+    cerrar('modalSel');
+};
+function renderLista(){
+    const l = document.getElementById('listaSel');
+    if(sel.length===0){
+        l.innerHTML='<div class="empty-msg">Aún no has agregado productos.</div>';
+    } else {
+        l.innerHTML = sel.map((p,i)=>`
+            <div class="prod-row">
+                <div class="dot ${p.cat==='conserjeria'?'azul':'verde'}"></div>
+                <div class="pname">${p.emoji} ${p.nombre}<small>${p.cat==='conserjeria'?'🧹 Conserjería':'☕ Cafetería'}</small></div>
+                <div class="qty">
+                    <button onclick="chgQ(${i},-1)">−</button>
+                    <span>${p.cantidad}</span>
+                    <button onclick="chgQ(${i},1)">+</button>
+                </div>
+                <select class="uni" onchange="sel[${i}].unidad=this.value">
+                    ${UNIS.map(u=>`<option ${u===p.unidad?'selected':''}>${u}</option>`).join('')}
+                </select>
+                <button class="btn-del" onclick="delP(${i})">✕</button>
+            </div>`).join('');
+    }
+    const c=sel.filter(p=>p.cat==='conserjeria').length, f=sel.filter(p=>p.cat==='cafeteria').length;
+    document.getElementById('resC').textContent=c;
+    document.getElementById('resF').textContent=f;
+    document.getElementById('resT').textContent=c+f;
+    document.getElementById('badgeTotal').textContent=(c+f)+' productos';
+}
+window.chgQ = (i,d) => { sel[i].cantidad=Math.max(1,sel[i].cantidad+d); renderLista(); };
+window.delP = (i) => { sel.splice(i,1); renderLista(); };
+
+window.enviar = async () => {
+    const edificio = document.getElementById('edificio').value;
+    const solicitante = document.getElementById('solicitante').value.trim();
+    const fecha = document.getElementById('fechaSol').value;
+    const mes   = document.getElementById('mesSol').value;
+    if(!fecha)       {alert('❌ Ingresa la fecha');return;}
+    if(!mes)         {alert('❌ Selecciona el mes');return;}
+    if(!edificio)    {alert('❌ Selecciona el edificio');return;}
+    if(!solicitante) {alert('❌ Ingresa tu nombre');return;}
+    if(sel.length===0){alert('❌ Agrega al menos un producto');return;}
+
+    const data = {
+        folio: document.getElementById('folioNum').textContent,
+        fecha, mes, edificio,
+        nit:   document.getElementById('nit').value,
+        dir:   document.getElementById('dir').value,
+        solicitante, cargo: document.getElementById('cargo').value,
+        conserjeria: sel.filter(p=>p.cat==='conserjeria'),
+        cafeteria:   sel.filter(p=>p.cat==='cafeteria'),
+        observaciones: document.getElementById('obs').value.trim(),
+        estado: 'Pendiente',
+        fechaCreacion: new Date().toISOString()
+    };
+
+    const btn = document.querySelector('.btn-primary');
+    btn.textContent='⏳ Enviando...'; btn.disabled=true;
+    try {
+        if(window._save) await window._save(data);
+        document.getElementById('folioConfirm').textContent='Folio: '+data.folio;
+        document.getElementById('modalOk').classList.add('active');
+    } catch(e){ alert('❌ Error: '+e.message); }
+    finally { btn.textContent='📤 Enviar Solicitud'; btn.disabled=false; }
+};
+
+window.limpiar = () => {
+    if(sel.length>0 && !confirm('¿Limpiar el formulario?')) return;
+    document.getElementById('edificio').value='';
+    document.getElementById('nit').value='';
+    document.getElementById('dir').value='';
+    document.getElementById('solicitante').value='';
+    document.getElementById('cargo').value='';
+    document.getElementById('obs').value='';
+    sel=[]; renderLista();
+    document.getElementById('folioNum').textContent=folio();
+};
+window.cerrar = (id) => document.getElementById(id).classList.remove('active');
+</script>
+</body>
+</html>
