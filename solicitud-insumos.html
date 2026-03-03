@@ -148,8 +148,11 @@
                 <label>Edificio *</label>
                 <select id="edificio" required onchange="autoEd()">
                     <option value="">Seleccionar...</option>
-                    <option>Nepal 2</option><option>Pinos del Country</option>
-                    <option>Convivienda</option><option>Avalon</option>
+                    <option>Nepal 2</option>
+                    <option>Pinos del Country</option>
+                    <option>Convivienda I</option>
+                    <option>Avalon</option>
+                    <option>Gloria M Azcarate</option>
                 </select>
             </div>
             <div class="f"><label>NIT</label><input type="text" id="nit" readonly></div>
@@ -267,40 +270,54 @@ window._save = async (data) => {
 <script>
 const CATS = {
     conserjeria:[
-        {e:'🗑️',n:'Bolsa negra 55x60',u:'Paquete'},{e:'🗑️',n:'Bolsa negra 75x90',u:'Paquete'},
-        {e:'🗑️',n:'Bolsa negra 100x120',u:'Paquete'},{e:'🧹',n:'Escoba plástica',u:'Unidad'},
-        {e:'🧹',n:'Recogedor plástico',u:'Unidad'},{e:'🪣',n:'Trapero de mopa',u:'Unidad'},
-        {e:'🪣',n:'Trapero de flecos',u:'Unidad'},{e:'🪣',n:'Balde plástico 10L',u:'Unidad'},
-        {e:'🧤',n:'Guantes de caucho',u:'Par'},{e:'🧤',n:'Guantes desechables',u:'Caja'},
-        {e:'🧴',n:'Jabón líquido multiusos',u:'Galón'},{e:'🧴',n:'Desinfectante pino',u:'Galón'},
-        {e:'🧴',n:'Desinfectante lavanda',u:'Galón'},{e:'🧴',n:'Hipoclorito de sodio',u:'Galón'},
-        {e:'🧴',n:'Limpiavidrios',u:'Unidad'},{e:'🧴',n:'Limpiador de baños',u:'Unidad'},
-        {e:'💨',n:'Ambientador spray',u:'Unidad'},{e:'💨',n:'Ambientador líquido',u:'Unidad'},
-        {e:'🧻',n:'Papel higiénico x4',u:'Paquete'},{e:'🧻',n:'Papel higiénico institucional',u:'Rollo'},
-        {e:'🧻',n:'Papel toalla',u:'Rollo'},{e:'🧼',n:'Jabón de manos líquido',u:'Unidad'},
-        {e:'🧼',n:'Gel antibacterial',u:'Unidad'},{e:'🧽',n:'Esponja de limpiar',u:'Unidad'},
-        {e:'🧽',n:'Fibra verde (paquete)',u:'Paquete'},{e:'🧽',n:'Paños de microfibra',u:'Paquete'},
-        {e:'🪠',n:'Escobilla WC',u:'Unidad'},{e:'🌸',n:'Pastilla desodorante WC',u:'Unidad'},
-        {e:'😷',n:'Tapabocas (paquete)',u:'Paquete'},{e:'🌿',n:'Limpión de piso',u:'Unidad'},
+        // ── Ambientadores (Galón) ──
+        {e:'💨',n:'Galón Ambientador Tutty',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Talco',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Fuego',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Lavanda',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Cereza',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Ocean',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Canela',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Coco-Limón',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Roxana',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Floral',u:'Galón'},
+        // ── Productos de Limpieza ──
+        {e:'🧴',n:'Galón Jabón Lavaplatos',u:'Galón'},
+        {e:'🧴',n:'Galón Jabón Líquido para Aseo',u:'Galón'},
+        {e:'🧴',n:'Galón Blanqueador',u:'Galón'},
+        {e:'🧴',n:'Galón Desengrasante',u:'Galón'},
+        {e:'🧴',n:'Galón Varsol',u:'Galón'},
+        {e:'🧴',n:'Galón Vinagre',u:'Galón'},
+        {e:'🧴',n:'Galón Desengrasante Oxigenado',u:'Galón'},
+        {e:'🧴',n:'Galón Eliminador de Olores',u:'Galón'},
+        {e:'🧴',n:'Galón Creolina',u:'Galón'},
+        {e:'🗑️',n:'Bolsas de Basura 80 cm x 60 cm',u:'Paquete'},
+        {e:'🗑️',n:'Bolsas de Basura Extra Jumbo 100 cm x 70 cm',u:'Paquete'},
+        {e:'🧼',n:'Jabón de Manos',u:'Unidad'},
+        {e:'🧻',n:'Toallas de Manos',u:'Rollo'},
+        {e:'🪣',n:'Traperos',u:'Unidad'},
+        {e:'🧹',n:'Escobas',u:'Unidad'},
+        {e:'🧻',n:'Papel Higiénico',u:'Paquete'},
+        {e:'🪟',n:'Limpia Vidrios en Spray',u:'Unidad'},
+        {e:'💨',n:'Spray Ambientador',u:'Unidad'},
+        {e:'✨',n:'Lustramuebles',u:'Unidad'},
+        {e:'🧽',n:'Esponjillas',u:'Paquete'},
+        {e:'🧼',n:'Jabón Rey',u:'Unidad'},
+        {e:'🧼',n:'Jabón en Polvo',u:'Unidad'},
+        {e:'🧤',n:'Guantes',u:'Par'},
     ],
     cafeteria:[
-        {e:'☕',n:'Café molido 500g',u:'500g'},{e:'☕',n:'Café molido 1kg',u:'Kilo'},
-        {e:'☕',n:'Café instantáneo',u:'Unidad'},{e:'🍬',n:'Azúcar blanca 2.5kg',u:'Kilo'},
-        {e:'🍬',n:'Azúcar morena 1kg',u:'Kilo'},{e:'🌿',n:'Endulzante stevia',u:'Caja'},
-        {e:'🌿',n:'Aromáticas surtidas x50',u:'Caja'},{e:'🍵',n:'Té verde x20',u:'Caja'},
-        {e:'🥛',n:'Creamer en polvo',u:'Kilo'},{e:'🥛',n:'Leche en polvo',u:'Kilo'},
-        {e:'🥤',n:'Vasos desechables 7oz x50',u:'Paquete'},{e:'🥤',n:'Vasos desechables 10oz x50',u:'Paquete'},
-        {e:'🍽️',n:'Platos desechables x25',u:'Paquete'},{e:'🥄',n:'Cucharas desechables x50',u:'Paquete'},
-        {e:'🍴',n:'Tenedores desechables x50',u:'Paquete'},{e:'📄',n:'Servilletas (paquete)',u:'Paquete'},
-        {e:'💧',n:'Agua en botellón 20L',u:'Unidad'},{e:'💧',n:'Agua botella 600ml x12',u:'Paquete'},
-        {e:'🧂',n:'Sal x1kg',u:'Kilo'},{e:'🫙',n:'Aceite x1L',u:'Litro'},
+        {e:'☕',n:'Café',u:'500g'},
+        {e:'🍬',n:'Panela',u:'Kilo'},
+        {e:'🍬',n:'Azúcar',u:'Kilo'},
     ]
 };
 const EDIF = {
     'Nepal 2':          {nit:'830142380-4', dir:'Calle 55 #4a-24'},
     'Pinos del Country':{nit:'830059667-8', dir:'CR 12 127 B - 23'},
-    'Convivienda':      {nit:'830112728-5', dir:'CR 10a #138-71'},
-    'Avalon':           {nit:'800245101-1', dir:'Calle 65 #9-07'}
+    'Convivienda I':    {nit:'830112728-5', dir:'CR 10a #138-71'},
+    'Avalon':           {nit:'800245101-1', dir:'Calle 65 #9-07'},
+    'Gloria M Azcarate':{nit:'38854830',    dir:'Calle 141 #7b-30 apto 101'}
 };
 const UNIS = ['Unidad','Par','Caja','Paquete','Bolsa','Galón','Litro','Kilo','500g','Rollo','Docena'];
 
