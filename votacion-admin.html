@@ -54,6 +54,9 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .btn-cerrar { background: #dc3545; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 600; margin-top: 20px; }
 .btn-danger { background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9em; }
 .btn-warning { background: #ff9800; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9em; }
+.btn-print { background: #7c3aed; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; transition: opacity .2s; }
+.btn-print:hover { opacity: .85; }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .no-votacion { text-align: center; padding: 40px; color: #999; }
 .admin-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
 .error-message { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #f5c6cb; }
@@ -193,7 +196,10 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
             <div class="stat-label">Votos</div>
           </div>
         </div>
-        <h4>Asistentes</h4>
+        <div class="section-header">
+          <h4 style="margin:0;">Asistentes</h4>
+          <button class="btn-print" onclick="imprimirAsistencia()">🖨️ Imprimir Asistencia</button>
+        </div>
         <div class="asistentes-list" id="listaAsistentes">
           <p style="text-align:center;color:#999;padding:20px;">Cargando...</p>
         </div>
@@ -282,7 +288,10 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 
       <!-- HISTORIAL DE VOTACIONES -->
       <div class="panel historial-panel">
-        <h3>Historial de Votaciones</h3>
+        <div class="section-header">
+          <h3 style="margin:0;">Historial de Votaciones</h3>
+          <button class="btn-print" onclick="imprimirResultados()">🖨️ Imprimir Resultados</button>
+        </div>
         <div id="historialContainer">
           <div class="historial-empty">Selecciona un edificio para ver el historial</div>
         </div>
@@ -1167,6 +1176,158 @@ function limpiarVista() {
   todosPropietariosData = {};
   historialData = {};
 }
+
+// ========== IMPRIMIR ASISTENCIA ==========
+window.imprimirAsistencia = function() {
+  const edificio = document.getElementById('edificioNombre').textContent || edificioActual;
+  const asistentes = Object.values(asistentesData);
+  if (asistentes.length === 0) { alert('No hay asistentes registrados.'); return; }
+
+  const totalCoef = asistentes.reduce((s, a) => s + parseFloat(a.coeficiente || 0), 0);
+  const quorum = document.getElementById('quorumActual').textContent;
+  const fecha = new Date().toLocaleDateString('es-CO', {day:'2-digit', month:'long', year:'numeric'});
+
+  const filas = asistentes
+    .sort((a, b) => (a.apartamento||'').localeCompare(b.apartamento||''))
+    .map((a, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${a.apartamento || '-'}</td>
+        <td>${a.nombre || 'Sin nombre'}</td>
+        <td>${parseFloat(a.coeficiente || 0).toFixed(4)}</td>
+        <td>${a.horaRegistro ? new Date(a.horaRegistro).toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'}) : '-'}</td>
+      </tr>`).join('');
+
+  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+    <title>Asistencia - ${edificio}</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 30px; color: #222; }
+      .cab { background: #0056B8; color: white; padding: 18px 24px; border-radius: 8px; margin-bottom: 20px; }
+      .cab h1 { margin: 0; font-size: 1.3em; }
+      .cab p  { margin: 4px 0 0; font-size: .85em; opacity: .85; }
+      .stats { display: flex; gap: 20px; margin-bottom: 18px; flex-wrap: wrap; }
+      .stat { background: #f0f4ff; border-radius: 8px; padding: 10px 18px; text-align: center; }
+      .stat strong { display: block; font-size: 1.5em; color: #0056B8; }
+      .stat span { font-size: .78em; color: #666; }
+      table { width: 100%; border-collapse: collapse; font-size: .9em; }
+      th { background: #0056B8; color: white; padding: 9px 12px; text-align: left; }
+      td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+      tr:nth-child(even) td { background: #f8f9ff; }
+      .pie { margin-top: 40px; font-size: .8em; color: #999; text-align: center; border-top: 1px solid #eee; padding-top: 10px; }
+      @media print { body { margin: 15px; } }
+    </style></head><body>
+    <div class="cab">
+      <h1>📋 Lista de Asistencia — ${edificio}</h1>
+      <p>Fecha: ${fecha} &nbsp;|&nbsp; Quórum: ${quorum}</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><strong>${asistentes.length}</strong><span>Asistentes</span></div>
+      <div class="stat"><strong>${totalCoef.toFixed(4)}</strong><span>Coeficiente Total</span></div>
+      <div class="stat"><strong>${quorum}</strong><span>Quórum</span></div>
+    </div>
+    <table>
+      <thead><tr><th>#</th><th>Apartamento</th><th>Nombre / Propietario</th><th>Coeficiente</th><th>Hora Registro</th></tr></thead>
+      <tbody>${filas}</tbody>
+    </table>
+    <div class="pie">Documento generado por Azeche P.H. | ${new Date().toLocaleString('es-CO')}</div>
+    <script>window.onload = () => { window.print(); }<\/script>
+  </body></html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+};
+
+// ========== IMPRIMIR RESULTADOS VOTACIONES ==========
+window.imprimirResultados = function() {
+  const edificio = document.getElementById('edificioNombre').textContent || edificioActual;
+  const colores = ['#00B853','#dc3545','#ff9800','#0056B8','#9c27b0'];
+  const fecha = new Date().toLocaleDateString('es-CO', {day:'2-digit', month:'long', year:'numeric'});
+
+  const renderVotacion = (votacion, esActiva) => {
+    const votos = votacion.votos || {};
+    const tipo = votacion.tipo || 'coeficientes';
+    const opciones = votacion.opciones || {};
+    const totalVotantes = Object.keys(votos).length;
+    const fechaCierre = votacion.fechaCierre ? new Date(votacion.fechaCierre).toLocaleDateString('es-CO') : (esActiva ? 'En curso' : '-');
+
+    const conteos = {};
+    Object.keys(opciones).forEach(k => { conteos[k] = 0; });
+    let totalP = 0;
+    Object.values(votos).forEach(v => {
+      const k = v.opcion || v.voto || '';
+      if (conteos.hasOwnProperty(k)) {
+        conteos[k] += tipo === 'nominal' ? 1 : parseFloat(v.coeficiente || 0);
+      }
+    });
+    Object.values(conteos).forEach(v => { totalP += v; });
+
+    const opcsHtml = Object.entries(opciones)
+      .sort((a,b) => (a[1].orden||0)-(b[1].orden||0))
+      .map(([k, opt], i) => {
+        const val = conteos[k] || 0;
+        const pct = totalP > 0 ? (val / totalP * 100).toFixed(1) : '0.0';
+        const color = colores[i % colores.length];
+        const display = tipo === 'nominal' ? `${val} votos` : `${val.toFixed(4)} coef.`;
+        return `<div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+            <span style="font-weight:600;">${opt.label}</span>
+            <span style="color:${color};font-weight:700;">${display} (${pct}%)</span>
+          </div>
+          <div style="background:#eee;border-radius:20px;height:18px;overflow:hidden;">
+            <div style="width:${pct}%;background:${color};height:100%;border-radius:20px;"></div>
+          </div>
+        </div>`;
+      }).join('');
+
+    return `<div style="border:2px solid ${esActiva ? '#00B853' : '#ddd'};border-radius:10px;padding:18px;margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <h3 style="margin:0;color:#333;">${votacion.titulo || 'Sin título'}</h3>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span style="background:${esActiva?'#d1fae5':'#f0f0f0'};color:${esActiva?'#065f46':'#555'};padding:3px 10px;border-radius:20px;font-size:.8em;font-weight:700;">${esActiva ? 'ACTIVA' : 'CERRADA'}</span>
+          <span style="background:#e8f0ff;color:#0056B8;padding:3px 10px;border-radius:20px;font-size:.8em;font-weight:700;">${tipo==='nominal'?'Nominal':'Coeficientes'}</span>
+          <span style="background:#f8f8f8;color:#888;padding:3px 10px;border-radius:20px;font-size:.8em;">${fechaCierre}</span>
+        </div>
+      </div>
+      ${votacion.descripcion ? `<p style="color:#666;font-size:.88em;margin-bottom:14px;">${votacion.descripcion}</p>` : ''}
+      <p style="font-size:.82em;color:#888;margin-bottom:12px;">Total votantes: <strong>${totalVotantes}</strong> &nbsp;|&nbsp; Tipo de conteo: <strong>${tipo==='nominal'?'Por votante':'Por coeficiente'}</strong></p>
+      ${opcsHtml || '<p style="color:#aaa;font-size:.85em;">Sin opciones registradas</p>'}
+    </div>`;
+  };
+
+  let seccionesHtml = '';
+  if (votacionActual) seccionesHtml += renderVotacion(votacionActual, true);
+
+  const histEntries = Object.entries(historialData).sort((a,b) => {
+    return (b[1].fechaCierre||'').localeCompare(a[1].fechaCierre||'');
+  });
+  histEntries.forEach(([, v]) => { seccionesHtml += renderVotacion(v, false); });
+
+  if (!seccionesHtml) { alert('No hay votaciones para imprimir.'); return; }
+
+  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+    <title>Resultados Votaciones - ${edificio}</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 30px; color: #222; }
+      .cab { background: linear-gradient(135deg,#0056B8,#00B853); color: white; padding: 18px 24px; border-radius: 8px; margin-bottom: 24px; }
+      .cab h1 { margin: 0; font-size: 1.3em; }
+      .cab p  { margin: 4px 0 0; font-size: .85em; opacity: .85; }
+      .pie { margin-top: 30px; font-size: .8em; color: #999; text-align: center; border-top: 1px solid #eee; padding-top: 10px; }
+      @media print { body { margin: 15px; } }
+    </style></head><body>
+    <div class="cab">
+      <h1>🗳️ Resultados de Votaciones — ${edificio}</h1>
+      <p>Fecha: ${fecha} &nbsp;|&nbsp; ${histEntries.length + (votacionActual ? 1 : 0)} votación(es)</p>
+    </div>
+    ${seccionesHtml}
+    <div class="pie">Documento generado por Azeche P.H. | ${new Date().toLocaleString('es-CO')}</div>
+    <script>window.onload = () => { window.print(); }<\/script>
+  </body></html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+};
 </script>
 </body>
 </html>
