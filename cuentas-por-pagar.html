@@ -168,11 +168,13 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             padding: 30px;
-            overflow: hidden;
         }
-        
+
         .table-wrapper {
-            overflow-x: auto;
+            overflow: auto;
+            max-height: 70vh;
+            border-radius: 10px;
+            border: 1px solid #e8e8e8;
         }
         
         table {
@@ -585,6 +587,27 @@
         .tarjeta-edificio h3 { margin-bottom: 15px; font-size: 1.2em; }
         .tarjeta-dato { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2); }
         .tarjeta-valor { font-weight: 700; font-size: 1.1em; }
+
+        /* ── ABONOS ── */
+        .abono-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: #ede7f6; color: #6a1b9a;
+            padding: 3px 10px; border-radius: 12px;
+            font-size: 11px; font-weight: 700;
+            cursor: pointer; border: none; white-space: nowrap;
+        }
+        .abono-badge:hover { background: #d1c4e9; }
+        .btn-abonar {
+            background: #8e44ad; color: white;
+            padding: 5px 10px; border: none; border-radius: 6px;
+            cursor: pointer; font-weight: 700; font-size: 11px;
+            margin-left: 4px;
+        }
+        .btn-abonar:hover { background: #7d3c98; }
+        #tablaCuentas th:nth-child(16),
+        #tablaCuentas td:nth-child(16) { color: #e53935; }
+        #tablaCuentas th:nth-child(17) { color: #8e44ad; }
+        .saldo-pend-ant { color: #e53935; font-weight: 700; font-family: 'Courier New', monospace; }
     </style>
 </head>
 <body>
@@ -691,6 +714,8 @@
                             <th>Valor Neto a Pagar</th>
                             <th>💰 Anticipo</th>
                             <th>📅 Fecha Anticipo</th>
+                            <th style="color: #e53935;">⚡ Saldo Ant.</th>
+                            <th style="color: #8e44ad;">💳 Abonos</th>
                             <th style="background: #e8f5e9; color: #00B853;">✅ Saldo a Pagar</th>
                             <th>Fecha de Recepción</th>
                             <th>Fecha de Vencimiento</th>
@@ -809,6 +834,13 @@
                 <div class="form-group">
                     <label>Valor Neto a Pagar (calculado)</label>
                     <input type="number" id="valorNeto" step="0.01" readonly>
+
+                <!-- SALDO PENDIENTE ANTERIOR -->
+                <div class="form-group" style="background: #fff5f5; padding: 12px; border-radius: 8px; border: 2px solid #ffcccc; margin-top: 15px;">
+                    <label style="color: #e53935; font-weight: 700;">⚡ Saldo Pendiente Anterior</label>
+                    <input type="number" id="saldoPendienteAnterior" step="0.01" value="0" placeholder="0" oninput="calcularRestoAPagar()">
+                    <small style="color: #999; display: block; margin-top: 4px;">Deuda arrastrada de períodos anteriores (ej. 2024). Se suma al saldo final.</small>
+                </div>
 
                 <div class="form-row" style="border-top: 2px solid #667eea; padding-top: 15px; margin-top: 15px;">
                     <div class="form-group">
@@ -975,7 +1007,14 @@
                     <label>Valor Neto a Pagar (calculado)</label>
                     <input type="number" id="editarValorNeto" step="0.01" readonly>
                 </div>
-                
+
+                <!-- SALDO PENDIENTE ANTERIOR -->
+                <div class="form-group" style="background: #fff5f5; padding: 12px; border-radius: 8px; border: 2px solid #ffcccc;">
+                    <label style="color: #e53935; font-weight: 700;">⚡ Saldo Pendiente Anterior</label>
+                    <input type="number" id="editarSaldoPendienteAnterior" step="0.01" value="0" oninput="calcularRestoEditar()">
+                    <small style="color: #999; display: block; margin-top: 4px;">Deuda arrastrada de períodos anteriores. Se suma al saldo final.</small>
+                </div>
+
                 <!-- ADELANTO EN EDICIÓN -->
                 <div class="form-row" style="border-top: 2px solid #667eea; padding-top: 15px; margin-top: 15px;">
                     <div class="form-group">
@@ -1082,6 +1121,44 @@
             <button class="btn btn-primary" onclick="confirmarCargaExcel()" style="width: 100%; margin-top: 20px;">
                 ✅ Confirmar y Cargar Todas
             </button>
+        </div>
+    </div>
+
+    <!-- MODAL REGISTRAR ABONO -->
+    <div class="modal" id="modalAbono">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>💳 Registrar Abono</h2>
+                <button class="btn-close" onclick="cerrarModal('modalAbono')">&times;</button>
+            </div>
+            <div id="abonoInfoCuenta" style="background: #f0f4ff; padding: 15px; border-radius: 10px; margin-bottom: 20px;"></div>
+            <div class="form-group">
+                <label>💰 Monto del Abono *</label>
+                <input type="number" id="abonoMonto" step="0.01" placeholder="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>📅 Fecha del Abono *</label>
+                <input type="date" id="abonoFecha">
+            </div>
+            <div class="form-group">
+                <label>📝 Descripción / Referencia</label>
+                <input type="text" id="abonoDescripcion" placeholder="Ej: Pago parcial enero, transferencia #123...">
+            </div>
+            <input type="hidden" id="abonoIdCuenta">
+            <button type="button" class="btn btn-primary" onclick="guardarAbono()" style="width: 100%; margin-top: 10px;">
+                💾 Guardar Abono
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL HISTORIAL DE ABONOS -->
+    <div class="modal" id="modalHistorialAbonos">
+        <div class="modal-content" style="max-width: 650px;">
+            <div class="modal-header">
+                <h2>📋 Historial de Abonos</h2>
+                <button class="btn-close" onclick="cerrarModal('modalHistorialAbonos')">&times;</button>
+            </div>
+            <div id="historialAbonosContenido"></div>
         </div>
     </div>
 
@@ -1367,9 +1444,26 @@
         }
         
         function crearFilaCuenta(cuenta, id) {
-            const estadoClass = cuenta.estado === 'Pagada' ? 'estado-pagada' : 
+            const estadoClass = cuenta.estado === 'Pagada' ? 'estado-pagada' :
                                (new Date(cuenta.fechaVencimiento) < new Date() ? 'estado-vencida' : 'estado-pendiente');
-            
+
+            // Calcular total de abonos
+            const totalAbonos = cuenta.abonos
+                ? Object.values(cuenta.abonos).reduce((s, a) => s + (parseFloat(a.monto) || 0), 0)
+                : 0;
+            const numAbonos = cuenta.abonos ? Object.keys(cuenta.abonos).length : 0;
+
+            // Saldo pendiente anterior (deuda preexistente)
+            const saldoPendAnterior = parseFloat(cuenta.saldoPendienteAnterior) || 0;
+
+            // Saldo actual = valorNeto + saldoPendAnterior - anticipo - totalAbonos
+            const saldoActual = (parseFloat(cuenta.valorNeto) || 0)
+                + saldoPendAnterior
+                - (parseFloat(cuenta.anticipo) || 0)
+                - totalAbonos;
+
+            const saldoColor = saldoActual <= 0 ? '#00B853' : '#e53935';
+
             return `
                 <tr data-proveedor="${(cuenta.proveedor || '').toLowerCase()}" data-fecha="${cuenta.fechaVencimiento || ''}">
                     <td>${cuenta.proveedor || ''}</td>
@@ -1387,7 +1481,13 @@
                     <td><strong>$${Number(cuenta.valorNeto || 0).toLocaleString('es-CO')}</strong></td>
                     <td style="color: #ff9800;">${cuenta.anticipo ? '$' + Number(cuenta.anticipo).toLocaleString('es-CO') : '-'}</td>
                     <td>${cuenta.fechaAnticipo || '-'}</td>
-                    <td style="background: #e8f5e9; font-weight: 700; color: #00B853;"><strong>$${Number((cuenta.valorNeto || 0) - (cuenta.anticipo || 0)).toLocaleString('es-CO')}</strong></td>
+                    <td class="saldo-pend-ant">${saldoPendAnterior > 0 ? '$' + saldoPendAnterior.toLocaleString('es-CO') : '-'}</td>
+                    <td>
+                        ${numAbonos > 0
+                            ? `<button class="abono-badge" onclick="verHistorialAbonos('${id}')">💳 ${numAbonos} abono${numAbonos !== 1 ? 's' : ''}</button>`
+                            : '-'}
+                    </td>
+                    <td style="background: #e8f5e9; font-weight: 700; color: ${saldoColor};"><strong>$${saldoActual.toLocaleString('es-CO')}</strong></td>
                     <td>${cuenta.fechaRecepcion || '-'}</td>
                     <td>${cuenta.fechaVencimiento || '-'}</td>
                     <td>${cuenta.fechaPago || '-'}</td>
@@ -1398,8 +1498,9 @@
                     <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${cuenta.observaciones || ''}">${cuenta.observaciones || '-'}</td>
                     <td style="white-space: nowrap;">
                         <button class="btn-table" style="background: #4a90e2; color: white;" onclick="abrirEditar('${id}')">✏️</button>
-                        ${cuenta.estado !== 'Pagada' ? 
-                            `<button class="btn-table btn-pagar" onclick="marcarPagada('${id}')">✅</button>` : ''}
+                        ${cuenta.estado !== 'Pagada' ?
+                            `<button class="btn-table btn-pagar" onclick="marcarPagada('${id}')">✅</button>
+                             <button class="btn-table btn-abonar" onclick="abrirModalAbono('${id}')">💳</button>` : ''}
                         <button class="btn-table btn-eliminar" onclick="eliminarCuenta('${id}')">🗑️</button>
                     </td>
                 </tr>
@@ -1558,15 +1659,17 @@
         function calcularRestoAPagar() {
             const valorNeto = parseFloat(document.getElementById('valorNeto').value) || 0;
             const anticipo = parseFloat(document.getElementById('anticipo').value) || 0;
-            const resto = valorNeto - anticipo;
+            const saldoPendAnterior = parseFloat(document.getElementById('saldoPendienteAnterior').value) || 0;
+            const resto = valorNeto + saldoPendAnterior - anticipo;
             document.getElementById('restoAPagar').value = resto.toFixed(2);
         }
-        
+
         // Calcular Resto a Pagar en formulario editar
         function calcularRestoEditar() {
             const valorNeto = parseFloat(document.getElementById('editarValorNeto').value) || 0;
             const anticipo = parseFloat(document.getElementById('editarAnticipo').value) || 0;
-            const resto = valorNeto - anticipo;
+            const saldoPendAnterior = parseFloat(document.getElementById('editarSaldoPendienteAnterior').value) || 0;
+            const resto = valorNeto + saldoPendAnterior - anticipo;
             document.getElementById('editarRestoAPagar').value = resto.toFixed(2);
         }
         
@@ -1607,6 +1710,7 @@
                 iva: parseFloat(document.getElementById('iva').value) || 0,
                 retencion: parseFloat(document.getElementById('retencion').value) || 0,
                 valorNeto: parseFloat(document.getElementById('valorNeto').value) || parseFloat(valorBruto),
+                saldoPendienteAnterior: parseFloat(document.getElementById('saldoPendienteAnterior').value) || 0,
                 anticipo: parseFloat(document.getElementById('anticipo').value) || 0,
                 fechaAnticipo: document.getElementById('fechaAnticipo').value || null,
                 restoAPagar: parseFloat(document.getElementById('restoAPagar').value) || parseFloat(document.getElementById('valorNeto').value),
@@ -1695,6 +1799,7 @@
                 document.getElementById('editarPrioridad').value = cuenta.prioridad || 'Media';
                 document.getElementById('editarCategoriaGasto').value = cuenta.categoriaGasto || '';
                 document.getElementById('editarObservaciones').value = cuenta.observaciones || '';
+                document.getElementById('editarSaldoPendienteAnterior').value = cuenta.saldoPendienteAnterior || 0;
                 document.getElementById('editarAnticipo').value = cuenta.anticipo || 0;
                 document.getElementById('editarFechaAnticipo').value = cuenta.fechaAnticipo || '';
                 document.getElementById('editarRestoAPagar').value = cuenta.restoAPagar || cuenta.valorNeto || 0;
@@ -1750,6 +1855,7 @@
                     iva: parseFloat(document.getElementById('editarIva').value) || 0,
                     retencion: parseFloat(document.getElementById('editarRetencion').value) || 0,
                     valorNeto: parseFloat(document.getElementById('editarValorNeto').value) || parseFloat(valorBruto),
+                    saldoPendienteAnterior: parseFloat(document.getElementById('editarSaldoPendienteAnterior').value) || 0,
                     anticipo: parseFloat(document.getElementById('editarAnticipo').value) || 0,
                     fechaAnticipo: document.getElementById('editarFechaAnticipo').value || null,
                     restoAPagar: parseFloat(document.getElementById('editarRestoAPagar').value) || parseFloat(document.getElementById('editarValorNeto').value),
@@ -1930,7 +2036,19 @@
                     snap.forEach((c) => {
                         const ct = c.val();
                         total++;
-                        if (ct.estado === 'Pagada' || ct.estado === 'pagada') pag++; else { pend++; deuda += parseFloat(ct.valorNeto || 0); }
+                        if (ct.estado === 'Pagada' || ct.estado === 'pagada') {
+                            pag++;
+                        } else {
+                            pend++;
+                            const totalAbonos = ct.abonos
+                                ? Object.values(ct.abonos).reduce((s, a) => s + (parseFloat(a.monto) || 0), 0)
+                                : 0;
+                            const saldoEdif = (parseFloat(ct.valorNeto) || 0)
+                                + (parseFloat(ct.saldoPendienteAnterior) || 0)
+                                - (parseFloat(ct.anticipo) || 0)
+                                - totalAbonos;
+                            deuda += saldoEdif;
+                        }
                     });
                 }
                 html += `<div class="tarjeta-edificio"><h3>${ed.icono} ${ed.nombre}</h3><div class="tarjeta-dato"><span>Total:</span><span class="tarjeta-valor">${total}</span></div><div class="tarjeta-dato" style="background:rgba(255,255,255,0.1);padding:10px;border-radius:8px;margin:8px 0"><span>⚠️ Pendientes:</span><span class="tarjeta-valor" style="font-size:1.5em">${pend}</span></div><div class="tarjeta-dato"><span>✅ Pagadas:</span><span class="tarjeta-valor">${pag}</span></div><div class="tarjeta-dato" style="border-top:2px solid rgba(255,255,255,0.3);margin-top:8px;padding-top:8px"><span>Deuda:</span><span class="tarjeta-valor">$${deuda.toLocaleString('es-CO')}</span></div></div>`;
@@ -1976,7 +2094,14 @@
                         snap.forEach((c) => {
                             const ct = c.val();
                             if (ct.estado !== 'Pagada' && ct.estado !== 'pagada') {
-                                const saldo = (parseFloat(ct.valorNeto) || 0) - (parseFloat(ct.anticipo) || 0);
+                                const totalAbonos = ct.abonos
+                                    ? Object.values(ct.abonos).reduce((s, a) => s + (parseFloat(a.monto) || 0), 0)
+                                    : 0;
+                                const saldoPendAnterior = parseFloat(ct.saldoPendienteAnterior) || 0;
+                                const saldo = (parseFloat(ct.valorNeto) || 0)
+                                    + saldoPendAnterior
+                                    - (parseFloat(ct.anticipo) || 0)
+                                    - totalAbonos;
                                 const fVenc = ct.fechaVencimiento ? new Date(ct.fechaVencimiento + 'T00:00:00') : null;
                                 const vencida = fVenc && fVenc < hoy;
                                 if (vencida) totalGeneralVencidas++;
@@ -1986,6 +2111,8 @@
                                     facturaNo: ct.facturaNo || '-',
                                     valorNeto: parseFloat(ct.valorNeto) || 0,
                                     anticipo: parseFloat(ct.anticipo) || 0,
+                                    saldoPendAnterior: saldoPendAnterior,
+                                    totalAbonos: totalAbonos,
                                     saldo: saldo,
                                     fechaVencimiento: ct.fechaVencimiento || '-',
                                     prioridad: ct.prioridad || 'Media',
@@ -2023,7 +2150,9 @@
                                         <th>Nro Factura</th>
                                         <th>Valor Neto</th>
                                         <th>Anticipo</th>
-                                        <th>Saldo a Pagar</th>
+                                        <th style="color:#e53935;">⚡ Saldo Ant.</th>
+                                        <th style="color:#8e44ad;">💳 Abonado</th>
+                                        <th style="color:#00B853;">✅ Saldo a Pagar</th>
                                         <th>F. Vencimiento</th>
                                         <th>Prioridad</th>
                                     </tr>
@@ -2033,23 +2162,26 @@
                     for (const p of pendientes) {
                         const claseVencida = p.vencida ? 'vencida-row' : '';
                         const prioridadColor = p.prioridad === 'Urgente' ? '#e53935' : p.prioridad === 'Alta' ? '#ff9800' : p.prioridad === 'Baja' ? '#4caf50' : '#757575';
+                        const saldoColor = p.saldo <= 0 ? '#00B853' : '#e53935';
                         htmlBloques += `
                                     <tr class="${claseVencida}">
                                         <td>${p.proveedor}</td>
                                         <td>${p.concepto}</td>
                                         <td>${p.facturaNo}</td>
                                         <td class="monto-col">$${p.valorNeto.toLocaleString('es-CO')}</td>
-                                        <td class="monto-col" style="color: #ff9800;">${p.anticipo > 0 ? '$' + p.anticipo.toLocaleString('es-CO') : '-'}</td>
-                                        <td class="monto-col" style="color: #e53935; font-weight: 700;">$${p.saldo.toLocaleString('es-CO')}</td>
+                                        <td class="monto-col" style="color:#ff9800;">${p.anticipo > 0 ? '$' + p.anticipo.toLocaleString('es-CO') : '-'}</td>
+                                        <td class="monto-col" style="color:#e53935;">${p.saldoPendAnterior > 0 ? '$' + p.saldoPendAnterior.toLocaleString('es-CO') : '-'}</td>
+                                        <td class="monto-col" style="color:#8e44ad;">${p.totalAbonos > 0 ? '$' + p.totalAbonos.toLocaleString('es-CO') : '-'}</td>
+                                        <td class="monto-col" style="color:${saldoColor}; font-weight:700;">$${p.saldo.toLocaleString('es-CO')}</td>
                                         <td>${p.vencida ? '⚠️ ' : ''}${p.fechaVencimiento}</td>
-                                        <td><span style="color: ${prioridadColor}; font-weight: 600;">${p.prioridad}</span></td>
+                                        <td><span style="color:${prioridadColor}; font-weight:600;">${p.prioridad}</span></td>
                                     </tr>`;
                     }
 
                     htmlBloques += `
                                     <tr class="total-row">
-                                        <td colspan="5" style="text-align: right;">Total ${ed.nombre}:</td>
-                                        <td class="monto-col" style="color: #e53935; font-size: 1.1em;">$${totalEdificio.toLocaleString('es-CO')}</td>
+                                        <td colspan="7" style="text-align:right;">Total pendiente ${ed.nombre}:</td>
+                                        <td class="monto-col" style="color:#e53935; font-size:1.1em;">$${totalEdificio.toLocaleString('es-CO')}</td>
                                         <td colspan="2"></td>
                                     </tr>
                                 </tbody>
@@ -2083,6 +2215,177 @@
                 </div>`;
 
             contenedor.innerHTML = htmlFinal;
+        };
+
+        // ═══════════════════════════════════════════════════════════════
+        // SISTEMA DE ABONOS
+        // ═══════════════════════════════════════════════════════════════
+
+        window.abrirModalAbono = async function(id) {
+            try {
+                const cuentaRef = ref(db, `cuentas_por_pagar/${edificioActual}/${id}`);
+                const snapshot = await new Promise((resolve) => {
+                    onValue(cuentaRef, resolve, { onlyOnce: true });
+                });
+                if (!snapshot.exists()) return;
+
+                const cuenta = snapshot.val();
+                const totalAbonos = cuenta.abonos
+                    ? Object.values(cuenta.abonos).reduce((s, a) => s + (parseFloat(a.monto) || 0), 0)
+                    : 0;
+                const saldoPendAnterior = parseFloat(cuenta.saldoPendienteAnterior) || 0;
+                const saldoActual = (parseFloat(cuenta.valorNeto) || 0)
+                    + saldoPendAnterior
+                    - (parseFloat(cuenta.anticipo) || 0)
+                    - totalAbonos;
+
+                document.getElementById('abonoIdCuenta').value = id;
+                document.getElementById('abonoFecha').valueAsDate = new Date();
+                document.getElementById('abonoMonto').value = '';
+                document.getElementById('abonoDescripcion').value = '';
+
+                document.getElementById('abonoInfoCuenta').innerHTML = `
+                    <div style="font-weight:700; font-size:1.1em; color:#667eea; margin-bottom:10px;">${cuenta.proveedor}</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:13px;">
+                        <div><span style="color:#666;">Factura:</span> <strong>${cuenta.facturaNo || 'N/A'}</strong></div>
+                        <div><span style="color:#666;">Valor Neto:</span> <strong>$${Number(cuenta.valorNeto||0).toLocaleString('es-CO')}</strong></div>
+                        ${saldoPendAnterior > 0 ? `<div><span style="color:#e53935;">Saldo Ant.:</span> <strong style="color:#e53935;">$${saldoPendAnterior.toLocaleString('es-CO')}</strong></div>` : ''}
+                        ${totalAbonos > 0 ? `<div><span style="color:#8e44ad;">Ya abonado:</span> <strong style="color:#8e44ad;">$${totalAbonos.toLocaleString('es-CO')}</strong></div>` : ''}
+                        <div style="grid-column:1/-1; background:white; padding:8px; border-radius:6px; text-align:center; margin-top:4px;">
+                            <span style="color:#666; font-size:11px;">SALDO PENDIENTE ACTUAL</span><br>
+                            <span style="color:${saldoActual <= 0 ? '#00B853' : '#e53935'}; font-weight:700; font-size:1.4em;">$${saldoActual.toLocaleString('es-CO')}</span>
+                        </div>
+                    </div>`;
+
+                document.getElementById('modalAbono').classList.add('active');
+            } catch (err) {
+                console.error(err);
+                alert('❌ Error al abrir modal de abono');
+            }
+        };
+
+        window.guardarAbono = async function() {
+            const id = document.getElementById('abonoIdCuenta').value;
+            const monto = parseFloat(document.getElementById('abonoMonto').value);
+            const fecha = document.getElementById('abonoFecha').value;
+            const descripcion = document.getElementById('abonoDescripcion').value.trim();
+
+            if (!monto || monto <= 0) {
+                alert('❌ El monto del abono debe ser mayor a 0');
+                return;
+            }
+            if (!fecha) {
+                alert('❌ Ingresa la fecha del abono');
+                return;
+            }
+
+            try {
+                const abonosRef = ref(db, `cuentas_por_pagar/${edificioActual}/${id}/abonos`);
+                await push(abonosRef, {
+                    monto: monto,
+                    fecha: fecha,
+                    descripcion: descripcion || 'Abono',
+                    creadoEn: new Date().toISOString()
+                });
+                alert(`✅ Abono de $${monto.toLocaleString('es-CO')} registrado correctamente`);
+                cerrarModal('modalAbono');
+            } catch (err) {
+                console.error(err);
+                alert('❌ Error al guardar abono: ' + err.message);
+            }
+        };
+
+        window.verHistorialAbonos = async function(id) {
+            try {
+                const cuentaRef = ref(db, `cuentas_por_pagar/${edificioActual}/${id}`);
+                const snapshot = await new Promise((resolve) => {
+                    onValue(cuentaRef, resolve, { onlyOnce: true });
+                });
+                if (!snapshot.exists()) return;
+
+                const cuenta = snapshot.val();
+                const abonos = cuenta.abonos ? Object.entries(cuenta.abonos) : [];
+                const totalAbonos = abonos.reduce((s, [, a]) => s + (parseFloat(a.monto) || 0), 0);
+                const saldoPendAnterior = parseFloat(cuenta.saldoPendienteAnterior) || 0;
+                const saldoActual = (parseFloat(cuenta.valorNeto) || 0)
+                    + saldoPendAnterior
+                    - (parseFloat(cuenta.anticipo) || 0)
+                    - totalAbonos;
+
+                let html = `
+                    <div style="background:#f0f4ff; padding:15px; border-radius:10px; margin-bottom:15px;">
+                        <div style="font-weight:700; color:#667eea; margin-bottom:10px;">${cuenta.proveedor} — Factura: ${cuenta.facturaNo||'N/A'}</div>
+                        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; font-size:13px; text-align:center;">
+                            <div style="background:white; padding:10px; border-radius:8px;">
+                                <div style="color:#666; font-size:11px;">Valor Neto</div>
+                                <div style="font-weight:700; color:#333;">$${Number(cuenta.valorNeto||0).toLocaleString('es-CO')}</div>
+                            </div>
+                            ${saldoPendAnterior > 0 ? `
+                            <div style="background:white; padding:10px; border-radius:8px;">
+                                <div style="color:#666; font-size:11px;">Saldo Ant. (anterior)</div>
+                                <div style="font-weight:700; color:#e53935;">$${saldoPendAnterior.toLocaleString('es-CO')}</div>
+                            </div>` : ''}
+                            <div style="background:white; padding:10px; border-radius:8px;">
+                                <div style="color:#666; font-size:11px;">Total Abonado</div>
+                                <div style="font-weight:700; color:#8e44ad;">$${totalAbonos.toLocaleString('es-CO')}</div>
+                            </div>
+                            <div style="background:white; padding:10px; border-radius:8px; ${saldoPendAnterior > 0 ? '' : 'grid-column:3/4;'}">
+                                <div style="color:#666; font-size:11px;">Saldo Pendiente</div>
+                                <div style="font-weight:700; color:${saldoActual<=0?'#00B853':'#e53935'}; font-size:1.2em;">$${saldoActual.toLocaleString('es-CO')}</div>
+                            </div>
+                        </div>
+                    </div>`;
+
+                if (abonos.length === 0) {
+                    html += '<div class="empty-state"><div class="empty-state-icon">💳</div><h3>No hay abonos registrados</h3><p>Usa el botón 💳 en la tabla para registrar el primer abono</p></div>';
+                } else {
+                    abonos.sort((a, b) => (a[1].fecha||'').localeCompare(b[1].fecha||''));
+                    html += `<table style="width:100%; border-collapse:collapse; font-size:13px;">
+                        <thead>
+                            <tr style="background:#667eea; color:white;">
+                                <th style="padding:10px; text-align:left;">Fecha</th>
+                                <th style="padding:10px; text-align:right;">Monto</th>
+                                <th style="padding:10px; text-align:left;">Descripción</th>
+                                <th style="padding:10px; text-align:center;">Eliminar</th>
+                            </tr>
+                        </thead><tbody>`;
+                    for (const [abonoId, abono] of abonos) {
+                        html += `<tr style="border-bottom:1px solid #f0f0f0;">
+                            <td style="padding:10px;">${abono.fecha||'-'}</td>
+                            <td style="padding:10px; text-align:right; font-weight:700; color:#8e44ad;">$${Number(abono.monto||0).toLocaleString('es-CO')}</td>
+                            <td style="padding:10px; color:#666;">${abono.descripcion||'Abono'}</td>
+                            <td style="padding:10px; text-align:center;">
+                                <button onclick="eliminarAbono('${id}','${abonoId}')"
+                                    style="background:#e53935;color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700;">🗑️</button>
+                            </td>
+                        </tr>`;
+                    }
+                    html += '</tbody></table>';
+                }
+
+                // Botón para registrar nuevo abono desde historial
+                html += `<button onclick="cerrarModal('modalHistorialAbonos'); setTimeout(()=>abrirModalAbono('${id}'),200);"
+                    style="margin-top:15px; background:linear-gradient(135deg,#8e44ad,#6a1b9a); color:white; border:none; padding:12px 20px; border-radius:10px; cursor:pointer; font-weight:700; width:100%;">
+                    ➕ Registrar Nuevo Abono</button>`;
+
+                document.getElementById('historialAbonosContenido').innerHTML = html;
+                document.getElementById('modalHistorialAbonos').classList.add('active');
+            } catch (err) {
+                console.error(err);
+                alert('❌ Error al cargar historial: ' + err.message);
+            }
+        };
+
+        window.eliminarAbono = async function(cuentaId, abonoId) {
+            if (!confirm('¿Eliminar este abono? No se puede deshacer.')) return;
+            try {
+                const abonoRef = ref(db, `cuentas_por_pagar/${edificioActual}/${cuentaId}/abonos/${abonoId}`);
+                await remove(abonoRef);
+                cerrarModal('modalHistorialAbonos');
+                alert('✅ Abono eliminado');
+            } catch (err) {
+                alert('❌ Error al eliminar abono: ' + err.message);
+            }
         };
     </script>
 </body>
