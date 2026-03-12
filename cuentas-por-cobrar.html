@@ -186,6 +186,23 @@
         .edit-form input:focus, .edit-form select:focus { outline: none; border-color: #1a237e; }
         .edit-form .full-width { grid-column: 1 / -1; }
 
+        .btn-abono {
+            background: #8e44ad; color: white; padding: 5px 10px;
+            border: none; border-radius: 6px; cursor: pointer;
+            font-weight: 700; font-size: 12px; display: inline-flex;
+            align-items: center; gap: 3px;
+        }
+        .btn-abono:hover { background: #7d3c98; }
+        .abono-badge-cobrar {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: #ede7f6; color: #6a1b9a;
+            padding: 3px 10px; border-radius: 12px;
+            font-size: 11px; font-weight: 700;
+            cursor: pointer; border: none; white-space: nowrap;
+        }
+        .abono-badge-cobrar:hover { background: #d1c4e9; }
+        .saldo-calculado { background: #fff8e1; font-weight: 700; font-size: 1.05em; color: #e65100; }
+
         @media (max-width: 768px) {
             .header h1 { font-size: 1.3em; }
             .resumen-card .valor { font-size: 1.3em; }
@@ -325,27 +342,27 @@
                 </div>
                 <div class="form-group">
                     <label>Saldo Inicial ($)</label>
-                    <input type="number" id="manSaldoInicial" value="0" step="0.01">
+                    <input type="number" id="manSaldoInicial" value="0" step="0.01" oninput="calcularSaldoManual()">
                 </div>
                 <div class="form-group">
                     <label>Cuotas Administración ($)</label>
-                    <input type="number" id="manAdmon" value="0" step="0.01">
+                    <input type="number" id="manAdmon" value="0" step="0.01" oninput="calcularSaldoManual()">
                 </div>
                 <div class="form-group">
                     <label>Cuotas Extraordinarias ($)</label>
-                    <input type="number" id="manExtras" value="0" step="0.01">
+                    <input type="number" id="manExtras" value="0" step="0.01" oninput="calcularSaldoManual()">
                 </div>
                 <div class="form-group">
                     <label>Intereses de Mora ($)</label>
-                    <input type="number" id="manIntereses" value="0" step="0.01">
+                    <input type="number" id="manIntereses" value="0" step="0.01" oninput="calcularSaldoManual()">
                 </div>
                 <div class="form-group">
-                    <label>Total Pagos/Abonos ($)</label>
-                    <input type="number" id="manPagos" value="0" step="0.01">
+                    <label>Pagos/Abonos ya recibidos ($)</label>
+                    <input type="number" id="manPagos" value="0" step="0.01" oninput="calcularSaldoManual()">
                 </div>
                 <div class="form-group">
-                    <label>Saldo Final ($)</label>
-                    <input type="number" id="manSaldoFinal" value="0" step="0.01">
+                    <label style="color:#e65100; font-weight:700;">✅ Saldo Final (calculado)</label>
+                    <input type="number" id="manSaldoFinal" value="0" step="0.01" readonly class="saldo-calculado">
                 </div>
                 <div class="full-width" style="text-align: center; margin-top: 10px;">
                     <button class="btn btn-upload" onclick="guardarManual()" style="width: 100%;">💾 Guardar Apartamento</button>
@@ -354,9 +371,49 @@
         </div>
     </div>
 
+    <!-- MODAL REGISTRAR ABONO COBRAR -->
+    <div class="modal" id="modalAbonoCobrar">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>💳 Registrar Abono / Pago</h2>
+                <button class="btn-close" onclick="cerrarModal('modalAbonoCobrar')">&times;</button>
+            </div>
+            <div id="abonoInfoApto" style="background:#f0f4ff; padding:15px; border-radius:10px; margin-bottom:20px;"></div>
+            <div class="edit-form" style="grid-template-columns:1fr;">
+                <div class="form-group">
+                    <label>💰 Monto del Abono *</label>
+                    <input type="number" id="abonoMontoApto" step="0.01" placeholder="0" min="0">
+                </div>
+                <div class="form-group">
+                    <label>📅 Fecha del Abono *</label>
+                    <input type="date" id="abonoFechaApto">
+                </div>
+                <div class="form-group">
+                    <label>📝 Descripción / Referencia</label>
+                    <input type="text" id="abonoDescApto" placeholder="Ej: Pago enero, consignación #123...">
+                </div>
+                <input type="hidden" id="abonoKeyApto">
+                <div>
+                    <button type="button" class="btn btn-upload" onclick="guardarAbonoApto()" style="width:100%;">💾 Registrar Abono</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HISTORIAL ABONOS COBRAR -->
+    <div class="modal" id="modalHistorialAbonoCobrar">
+        <div class="modal-content" style="max-width: 650px;">
+            <div class="modal-header">
+                <h2>📋 Historial de Abonos</h2>
+                <button class="btn-close" onclick="cerrarModal('modalHistorialAbonoCobrar')">&times;</button>
+            </div>
+            <div id="historialAbonoCobrarContenido"></div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, set, onValue, remove, get, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, set, onValue, remove, get, update, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyAS9c6-ың_xF-p7r2eL36yaKpuwTbCg-AE",
@@ -722,15 +779,22 @@
             let html = '';
 
             filas.forEach(f => {
-                const esMoroso = (f.saldoFinal || 0) > 0;
+                // Sumar abonos manuales al totalPagos efectivo
+                const abonosArr = f.abonos ? Object.values(f.abonos) : [];
+                const totalAbonosExtra = abonosArr.reduce((s, a) => s + (parseFloat(a.monto) || 0), 0);
+                const numAbonos = abonosArr.length;
+                const totalPagosEfectivo = (f.totalPagos || 0) + totalAbonosExtra;
+                const saldoFinalEfectivo = (f.saldoInicial || 0) + (f.totalCargos || 0) - totalPagosEfectivo;
+
+                const esMoroso = saldoFinalEfectivo > 0;
                 if (esMoroso) morosos++;
                 tSI += f.saldoInicial || 0;
                 tAd += f.totalAdmon || 0;
                 tEx += f.totalExtras || 0;
                 tIn += f.totalIntereses || 0;
                 tCa += f.totalCargos || 0;
-                tPa += f.totalPagos || 0;
-                tSF += f.saldoFinal || 0;
+                tPa += totalPagosEfectivo;
+                tSF += saldoFinalEfectivo;
 
                 html += `
                 <tr data-apto="${(f.inmueble||'').toLowerCase()}" data-prop="${(f.propietario||'').toLowerCase()}">
@@ -741,12 +805,16 @@
                     <td class="col-monto" style="color:#6a1b9a;">$${(f.totalExtras||0).toLocaleString('es-CO')}</td>
                     <td class="col-monto" style="color:#e65100;">$${(f.totalIntereses||0).toLocaleString('es-CO')}</td>
                     <td class="col-monto">$${(f.totalCargos||0).toLocaleString('es-CO')}</td>
-                    <td class="col-pagos">-$${(f.totalPagos||0).toLocaleString('es-CO')}</td>
-                    <td class="col-saldo">$${(f.saldoFinal||0).toLocaleString('es-CO')}</td>
+                    <td class="col-pagos">
+                        -$${totalPagosEfectivo.toLocaleString('es-CO')}
+                        ${numAbonos > 0 ? `<br><button class="abono-badge-cobrar" onclick="verHistorialAbonosApto('${f._key}')">💳 ${numAbonos} abono${numAbonos!==1?'s':''}</button>` : ''}
+                    </td>
+                    <td class="col-saldo" style="color:${saldoFinalEfectivo<=0?'#2e7d32':'#e53935'};">$${saldoFinalEfectivo.toLocaleString('es-CO')}</td>
                     <td>${esMoroso ? '<span class="badge-moroso">MOROSO</span>' : '<span class="badge-aldia">Al día</span>'}</td>
                     <td style="white-space:nowrap;">
                         <button class="btn btn-sm" style="background:#1a237e;color:white;display:inline-flex;" onclick="verDetalle('${f._key}')">🔍</button>
                         <button class="btn btn-sm" style="background:#ff9800;color:white;display:inline-flex;" onclick="editarApto('${f._key}')">✏️</button>
+                        ${esMoroso ? `<button class="btn-abono" onclick="abrirAbonoApto('${f._key}')">💳 Abonar</button>` : ''}
                         <button class="btn btn-sm" style="background:#e53935;color:white;display:inline-flex;" onclick="eliminarApto('${f._key}')">🗑️</button>
                     </td>
                 </tr>`;
@@ -844,27 +912,27 @@
                 </div>
                 <div class="form-group">
                     <label>Saldo Inicial ($)</label>
-                    <input type="number" id="editSaldoInicial" value="${d.saldoInicial || 0}" step="0.01">
+                    <input type="number" id="editSaldoInicial" value="${d.saldoInicial || 0}" step="0.01" oninput="calcularSaldoEditar()">
                 </div>
                 <div class="form-group">
                     <label>Cuotas Administración ($)</label>
-                    <input type="number" id="editAdmon" value="${d.totalAdmon || 0}" step="0.01">
+                    <input type="number" id="editAdmon" value="${d.totalAdmon || 0}" step="0.01" oninput="calcularSaldoEditar()">
                 </div>
                 <div class="form-group">
                     <label>Cuotas Extraordinarias ($)</label>
-                    <input type="number" id="editExtras" value="${d.totalExtras || 0}" step="0.01">
+                    <input type="number" id="editExtras" value="${d.totalExtras || 0}" step="0.01" oninput="calcularSaldoEditar()">
                 </div>
                 <div class="form-group">
                     <label>Intereses de Mora ($)</label>
-                    <input type="number" id="editIntereses" value="${d.totalIntereses || 0}" step="0.01">
+                    <input type="number" id="editIntereses" value="${d.totalIntereses || 0}" step="0.01" oninput="calcularSaldoEditar()">
                 </div>
                 <div class="form-group">
-                    <label>Total Pagos/Abonos ($)</label>
-                    <input type="number" id="editPagos" value="${d.totalPagos || 0}" step="0.01">
+                    <label>Pagos/Abonos ya recibidos ($)</label>
+                    <input type="number" id="editPagos" value="${d.totalPagos || 0}" step="0.01" oninput="calcularSaldoEditar()">
                 </div>
                 <div class="form-group">
-                    <label>Saldo Final ($)</label>
-                    <input type="number" id="editSaldoFinal" value="${d.saldoFinal || 0}" step="0.01">
+                    <label style="color:#e65100; font-weight:700;">✅ Saldo Final (calculado)</label>
+                    <input type="number" id="editSaldoFinal" value="${d.saldoFinal || 0}" step="0.01" readonly class="saldo-calculado">
                 </div>
                 <div class="full-width" style="text-align:center;margin-top:10px;">
                     <button class="btn btn-upload" onclick="guardarEdicion('${key}')" style="width:100%;">💾 Guardar Cambios</button>
@@ -1039,6 +1107,154 @@
                 renderTabla();
                 alert('✅ Cartera eliminada');
             } catch (err) { alert('❌ Error: ' + err.message); }
+        };
+
+        // ═══════════════════════════════════════════════════════════════
+        // CÁLCULO AUTOMÁTICO SALDO FINAL
+        // ═══════════════════════════════════════════════════════════════
+        window.calcularSaldoManual = function() {
+            const si   = parseFloat(document.getElementById('manSaldoInicial').value) || 0;
+            const adm  = parseFloat(document.getElementById('manAdmon').value) || 0;
+            const ext  = parseFloat(document.getElementById('manExtras').value) || 0;
+            const inte = parseFloat(document.getElementById('manIntereses').value) || 0;
+            const pag  = parseFloat(document.getElementById('manPagos').value) || 0;
+            document.getElementById('manSaldoFinal').value = (si + adm + ext + inte - pag).toFixed(2);
+        };
+
+        window.calcularSaldoEditar = function() {
+            const si   = parseFloat(document.getElementById('editSaldoInicial').value) || 0;
+            const adm  = parseFloat(document.getElementById('editAdmon').value) || 0;
+            const ext  = parseFloat(document.getElementById('editExtras').value) || 0;
+            const inte = parseFloat(document.getElementById('editIntereses').value) || 0;
+            const pag  = parseFloat(document.getElementById('editPagos').value) || 0;
+            document.getElementById('editSaldoFinal').value = (si + adm + ext + inte - pag).toFixed(2);
+        };
+
+        // ═══════════════════════════════════════════════════════════════
+        // SISTEMA DE ABONOS — CUENTAS POR COBRAR
+        // ═══════════════════════════════════════════════════════════════
+        window.abrirAbonoApto = function(key) {
+            const d = carteraData[key];
+            if (!d) return;
+
+            const abonosArr = d.abonos ? Object.values(d.abonos) : [];
+            const totalAbonosExtra = abonosArr.reduce((s, a) => s + (parseFloat(a.monto) || 0), 0);
+            const totalPagosEfectivo = (d.totalPagos || 0) + totalAbonosExtra;
+            const saldoActual = (d.saldoInicial || 0) + (d.totalCargos || 0) - totalPagosEfectivo;
+
+            document.getElementById('abonoKeyApto').value = key;
+            document.getElementById('abonoFechaApto').valueAsDate = new Date();
+            document.getElementById('abonoMontoApto').value = '';
+            document.getElementById('abonoDescApto').value = '';
+
+            document.getElementById('abonoInfoApto').innerHTML = `
+                <div style="font-weight:700;font-size:1.1em;color:#1a237e;margin-bottom:10px;">${d.inmueble} — ${d.propietario}</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;">
+                    <div><span style="color:#666;">Total Cargos:</span> <strong>$${(d.totalCargos||0).toLocaleString('es-CO')}</strong></div>
+                    <div><span style="color:#2e7d32;">Ya pagado:</span> <strong style="color:#2e7d32;">$${totalPagosEfectivo.toLocaleString('es-CO')}</strong></div>
+                    <div style="grid-column:1/-1;background:white;padding:10px;border-radius:8px;text-align:center;margin-top:4px;">
+                        <div style="color:#666;font-size:11px;">SALDO PENDIENTE</div>
+                        <div style="color:#e53935;font-weight:700;font-size:1.5em;">$${saldoActual.toLocaleString('es-CO')}</div>
+                    </div>
+                </div>`;
+
+            document.getElementById('modalAbonoCobrar').classList.add('active');
+        };
+
+        window.guardarAbonoApto = async function() {
+            const key = document.getElementById('abonoKeyApto').value;
+            const monto = parseFloat(document.getElementById('abonoMontoApto').value);
+            const fecha = document.getElementById('abonoFechaApto').value;
+            const desc  = document.getElementById('abonoDescApto').value.trim();
+
+            if (!monto || monto <= 0) { alert('❌ El monto debe ser mayor a 0'); return; }
+            if (!fecha) { alert('❌ Ingresa la fecha'); return; }
+
+            try {
+                const abonosRef = ref(db, `cartera_morosos/${edificioActual}/${key}/abonos`);
+                await push(abonosRef, {
+                    monto: monto,
+                    fecha: fecha,
+                    descripcion: desc || 'Abono',
+                    creadoEn: new Date().toISOString()
+                });
+                alert(`✅ Abono de $${monto.toLocaleString('es-CO')} registrado`);
+                cerrarModal('modalAbonoCobrar');
+            } catch (err) {
+                alert('❌ Error al guardar: ' + err.message);
+            }
+        };
+
+        window.verHistorialAbonosApto = function(key) {
+            const d = carteraData[key];
+            if (!d) return;
+
+            const abonos = d.abonos ? Object.entries(d.abonos) : [];
+            const totalAbonosExtra = abonos.reduce((s, [, a]) => s + (parseFloat(a.monto) || 0), 0);
+            const totalPagosEfectivo = (d.totalPagos || 0) + totalAbonosExtra;
+            const saldoActual = (d.saldoInicial || 0) + (d.totalCargos || 0) - totalPagosEfectivo;
+
+            let html = `
+                <div style="background:#f0f4ff;padding:15px;border-radius:10px;margin-bottom:15px;">
+                    <div style="font-weight:700;color:#1a237e;margin-bottom:10px;">${d.inmueble} — ${d.propietario}</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:13px;text-align:center;">
+                        <div style="background:white;padding:10px;border-radius:8px;">
+                            <div style="color:#666;font-size:11px;">Total Cargos</div>
+                            <div style="font-weight:700;color:#1a237e;">$${(d.totalCargos||0).toLocaleString('es-CO')}</div>
+                        </div>
+                        <div style="background:white;padding:10px;border-radius:8px;">
+                            <div style="color:#666;font-size:11px;">Total Abonado</div>
+                            <div style="font-weight:700;color:#8e44ad;">$${totalAbonosExtra.toLocaleString('es-CO')}</div>
+                        </div>
+                        <div style="background:white;padding:10px;border-radius:8px;">
+                            <div style="color:#666;font-size:11px;">Saldo Pendiente</div>
+                            <div style="font-weight:700;color:${saldoActual<=0?'#2e7d32':'#e53935'};font-size:1.2em;">$${saldoActual.toLocaleString('es-CO')}</div>
+                        </div>
+                    </div>
+                </div>`;
+
+            if (abonos.length === 0) {
+                html += '<div class="empty-state"><div class="empty-state-icon">💳</div><h3>No hay abonos manuales registrados</h3></div>';
+            } else {
+                abonos.sort((a, b) => (a[1].fecha||'').localeCompare(b[1].fecha||''));
+                html += `<table style="width:100%;border-collapse:collapse;font-size:13px;">
+                    <thead><tr style="background:#1a237e;color:white;">
+                        <th style="padding:10px;text-align:left;">Fecha</th>
+                        <th style="padding:10px;text-align:right;">Monto</th>
+                        <th style="padding:10px;text-align:left;">Descripción</th>
+                        <th style="padding:10px;text-align:center;">Eliminar</th>
+                    </tr></thead><tbody>`;
+                for (const [abonoId, abono] of abonos) {
+                    html += `<tr style="border-bottom:1px solid #f0f0f0;">
+                        <td style="padding:10px;">${abono.fecha||'-'}</td>
+                        <td style="padding:10px;text-align:right;font-weight:700;color:#8e44ad;">$${Number(abono.monto||0).toLocaleString('es-CO')}</td>
+                        <td style="padding:10px;color:#666;">${abono.descripcion||'Abono'}</td>
+                        <td style="padding:10px;text-align:center;">
+                            <button onclick="eliminarAbonoApto('${key}','${abonoId}')"
+                                style="background:#e53935;color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700;">🗑️</button>
+                        </td>
+                    </tr>`;
+                }
+                html += '</tbody></table>';
+            }
+
+            html += `<button onclick="cerrarModal('modalHistorialAbonoCobrar'); setTimeout(()=>abrirAbonoApto('${key}'),200);"
+                style="margin-top:15px;background:linear-gradient(135deg,#1a237e,#3949ab);color:white;border:none;padding:12px 20px;border-radius:10px;cursor:pointer;font-weight:700;width:100%;">
+                ➕ Registrar Nuevo Abono</button>`;
+
+            document.getElementById('historialAbonoCobrarContenido').innerHTML = html;
+            document.getElementById('modalHistorialAbonoCobrar').classList.add('active');
+        };
+
+        window.eliminarAbonoApto = async function(key, abonoId) {
+            if (!confirm('¿Eliminar este abono?')) return;
+            try {
+                await remove(ref(db, `cartera_morosos/${edificioActual}/${key}/abonos/${abonoId}`));
+                cerrarModal('modalHistorialAbonoCobrar');
+                alert('✅ Abono eliminado');
+            } catch (err) {
+                alert('❌ Error: ' + err.message);
+            }
         };
 
         // Drag & Drop
