@@ -761,16 +761,16 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Tipo de ID *</label>
-                        <select id="tipoId" required>
+                        <label>Tipo de ID</label>
+                        <select id="tipoId">
                             <option value="NIT">NIT</option>
                             <option value="CC">CC</option>
                             <option value="CE">CE</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>No. Identificación *</label>
-                        <input type="text" id="numeroId" required>
+                        <label>No. Identificación</label>
+                        <input type="text" id="numeroId" placeholder="Opcional">
                     </div>
                 </div>
                 
@@ -933,16 +933,16 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Tipo de ID *</label>
-                        <select id="editarTipoId" required>
+                        <label>Tipo de ID</label>
+                        <select id="editarTipoId">
                             <option value="NIT">NIT</option>
                             <option value="CC">CC</option>
                             <option value="CE">CE</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>No. Identificación *</label>
-                        <input type="text" id="editarNumeroId" required>
+                        <label>No. Identificación</label>
+                        <input type="text" id="editarNumeroId" placeholder="Opcional">
                     </div>
                 </div>
                 
@@ -1690,9 +1690,9 @@
             const numeroId = document.getElementById('numeroId').value.trim();
             const concepto = document.getElementById('concepto').value.trim();
             const valorBruto = document.getElementById('valorBruto').value;
-            
-            if (!proveedor || !numeroId || !concepto || !valorBruto) {
-                alert('❌ Completa los campos obligatorios:\n• Proveedor\n• No. Identificación\n• Concepto\n• Valor Bruto');
+
+            if (!proveedor || !valorBruto) {
+                alert('❌ Completa los campos obligatorios:\n• Proveedor\n• Valor Bruto');
                 return;
             }
             
@@ -1834,9 +1834,9 @@
             const numeroId = document.getElementById('editarNumeroId').value.trim();
             const concepto = document.getElementById('editarConcepto').value.trim();
             const valorBruto = document.getElementById('editarValorBruto').value;
-            
-            if (!proveedor || !numeroId || !concepto || !valorBruto) {
-                alert('❌ Completa los campos obligatorios:\n• Proveedor\n• No. Identificación\n• Concepto\n• Valor Bruto');
+
+            if (!proveedor || !valorBruto) {
+                alert('❌ Completa los campos obligatorios:\n• Proveedor\n• Valor Bruto');
                 return;
             }
             
