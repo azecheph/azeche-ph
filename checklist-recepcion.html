@@ -487,6 +487,14 @@
                     <input type="text" id="administradorSaliente" placeholder="Nombre completo">
                 </div>
                 <div class="form-group">
+                    <label for="personaEntregaNombre">Persona que Entrega el Edificio *</label>
+                    <input type="text" id="personaEntregaNombre" required placeholder="Nombre completo de quien hace entrega">
+                </div>
+                <div class="form-group">
+                    <label for="personaEntregaCedula">Cédula de quien Entrega *</label>
+                    <input type="text" id="personaEntregaCedula" required placeholder="C.C. o C.E.">
+                </div>
+                <div class="form-group">
                     <label for="administradorEntrante">Administrador Entrante (Tu nombre) *</label>
                     <input type="text" id="administradorEntrante" required placeholder="Carla Castellano Madriz">
                 </div>
@@ -786,6 +794,8 @@
                     administradorSaliente: document.getElementById('administradorSaliente').value,
                     administradorEntrante: document.getElementById('administradorEntrante').value,
                     cedulaEntrante: document.getElementById('cedulaEntrante').value,
+                    personaEntregaNombre: document.getElementById('personaEntregaNombre').value,
+                    personaEntregaCedula: document.getElementById('personaEntregaCedula').value,
                     testigos: document.getElementById('testigos').value,
                     observacionesGenerales: document.getElementById('observacionesGenerales').value
                 },
@@ -918,7 +928,7 @@
             
             doc.setFontSize(12);
             doc.setFont(undefined, 'normal');
-            doc.text('Propiedad Horizontal - Compliance Pro', pageWidth / 2, 25, { align: 'center' });
+            doc.text('Azeche P.H. — Sistema de Administración de Propiedad Horizontal', pageWidth / 2, 25, { align: 'center' });
             doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-CO')}`, pageWidth / 2, 33, { align: 'center' });
 
             yPos = 50;
@@ -1121,6 +1131,20 @@
                 doc.text(info.administradorSaliente, marginLeft, yPos);
             }
 
+            // Firma Persona que Entrega
+            if (info.personaEntregaNombre) {
+                yPos += 25;
+                doc.setFont(undefined, 'bold');
+                doc.text('PERSONA QUE ENTREGA EL EDIFICIO:', marginLeft, yPos);
+                yPos += 20;
+                doc.line(marginLeft, yPos, marginLeft + 70, yPos);
+                yPos += 5;
+                doc.setFont(undefined, 'normal');
+                doc.text(info.personaEntregaNombre, marginLeft, yPos);
+                yPos += 5;
+                doc.text(`C.C./C.E. ${info.personaEntregaCedula}`, marginLeft, yPos);
+            }
+
             // Testigos
             if (info.testigos) {
                 yPos += 25;
@@ -1144,7 +1168,7 @@
                 doc.setPage(i);
                 doc.setFontSize(8);
                 doc.setTextColor(150, 150, 150);
-                doc.text(`Compliance Pro - Carla Castellano Madriz C.E. 679955`, marginLeft, 290);
+                doc.text(`Azeche P.H. | Administradora: ${info.administradorEntrante} — C.C./C.E. ${info.cedulaEntrante}`, marginLeft, 290);
                 doc.text(`Página ${i} de ${totalPages}`, pageWidth - marginRight, 290, { align: 'right' });
             }
 

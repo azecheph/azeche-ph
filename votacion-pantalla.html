@@ -140,6 +140,33 @@
             margin-right: 10px;
             animation: pulse 2s infinite;
         }
+
+        /* Registro QR + Enlace */
+        .registro-section { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 30px; border-radius: 30px; margin-bottom: 40px; display: flex; align-items: center; gap: 30px; flex-wrap: wrap; justify-content: center; }
+        .registro-qr { background: white; padding: 15px; border-radius: 15px; display: flex; align-items: center; justify-content: center; }
+        .registro-info { flex: 1; min-width: 250px; }
+        .registro-info h3 { font-size: 1.8em; margin-bottom: 10px; }
+        .registro-url { background: rgba(255,255,255,0.25); padding: 12px 20px; border-radius: 10px; font-size: 1.1em; word-break: break-all; margin-bottom: 10px; font-family: monospace; }
+        .registro-instruccion { font-size: 1.1em; opacity: 0.85; }
+
+        /* Faltantes */
+        .faltantes-section { background: rgba(255,165,0,0.25); backdrop-filter: blur(10px); padding: 30px; border-radius: 30px; margin-bottom: 40px; }
+        .faltantes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .faltantes-header h3 { font-size: 1.5em; }
+        .faltantes-badge { background: rgba(255,255,255,0.3); padding: 8px 20px; border-radius: 20px; font-size: 1.2em; font-weight: 700; }
+        .faltantes-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; max-height: 300px; overflow-y: auto; }
+        .faltante-item { background: rgba(255,255,255,0.15); padding: 10px 15px; border-radius: 10px; font-size: 1em; }
+        .faltante-apto { font-weight: 700; font-size: 1.1em; }
+        .faltante-nombre { opacity: 0.85; font-size: 0.9em; }
+        .faltantes-voto-section { background: rgba(220,53,69,0.25); backdrop-filter: blur(10px); padding: 30px; border-radius: 30px; margin-bottom: 40px; }
+
+        @media (max-width: 768px) {
+            .quorum-grid { grid-template-columns: repeat(2, 1fr); }
+            .votacion-titulo h1 { font-size: 2em; }
+            .logo-text { font-size: 2.5em; }
+            .registro-section { flex-direction: column; text-align: center; }
+            .faltantes-list { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -154,11 +181,21 @@
             </div>
         </div>
 
+        <!-- ENLACE DE REGISTRO + QR -->
+        <div class="registro-section" id="registroSection">
+            <div class="registro-qr" id="qrContainer"></div>
+            <div class="registro-info">
+                <h3>Registrate escaneando el QR</h3>
+                <div class="registro-url" id="registroUrl">Cargando...</div>
+                <p class="registro-instruccion">Escanea el codigo QR con tu celular o ingresa al enlace para registrar tu asistencia</p>
+            </div>
+        </div>
+
         <div class="quorum-display">
             <div class="quorum-grid">
                 <div class="quorum-item">
                     <div class="quorum-number" id="quorumPorcentaje">0%</div>
-                    <div class="quorum-label">QUÓRUM</div>
+                    <div class="quorum-label">QUORUM</div>
                 </div>
                 <div class="quorum-item">
                     <div class="quorum-number" id="totalAsistentes">0</div>
@@ -175,16 +212,35 @@
             </div>
         </div>
 
+        <!-- FALTANTES POR REGISTRARSE -->
+        <div class="faltantes-section" id="faltantesRegistroSection" style="display:none;">
+            <div class="faltantes-header">
+                <h3>Faltantes por registrarse</h3>
+                <div class="faltantes-badge" id="faltantesRegistroBadge">0 de 0</div>
+            </div>
+            <div class="faltantes-list" id="faltantesRegistroList"></div>
+        </div>
+
+        <!-- FALTANTES POR VOTAR -->
+        <div class="faltantes-voto-section" id="faltantesVotoSection" style="display:none;">
+            <div class="faltantes-header">
+                <h3>Faltantes por votar</h3>
+                <div class="faltantes-badge" id="faltantesVotoBadge">0 de 0</div>
+            </div>
+            <div class="faltantes-list" id="faltantesVotoList"></div>
+        </div>
+
         <div id="votacionContent">
             <div class="no-votacion">
-                ⏳ Esperando votación activa...
+                Esperando votacion activa...
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, onValue, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
@@ -211,40 +267,188 @@
 
         document.getElementById('edificioNombre').innerHTML = `
             <span class="live-indicator"></span>
-            ${nombresEdificios[edificio]} - EN VIVO
+            ${nombresEdificios[edificio] || edificio.toUpperCase()} - EN VIVO
         `;
 
-        // Escuchar asistentes
+        // Generar enlace de registro y QR
+        const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+        const urlRegistro = baseUrl + 'registro-asamblea.html?edificio=' + edificio;
+        document.getElementById('registroUrl').textContent = urlRegistro;
+
+        try {
+            new QRCode(document.getElementById('qrContainer'), {
+                text: urlRegistro,
+                width: 180,
+                height: 180,
+                colorDark: '#0056B8',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        } catch (e) {
+            console.error('Error generando QR:', e);
+        }
+
+        let coefRequerido = 0.5;
+        let todosPropietarios = {};
+        let asistentesActuales = {};
+        let votacionActualData = null;
+
+        // Cargar configuracion del edificio
+        async function cargarConfiguracionEdificio() {
+            try {
+                const edificioRef = ref(db, `edificios/${edificio}`);
+                const snapshot = await get(edificioRef);
+                if (snapshot.exists()) {
+                    const datos = snapshot.val();
+                    if (datos.coeficienteQuorum) {
+                        coefRequerido = datos.coeficienteQuorum;
+                    }
+                }
+            } catch (error) {
+                console.error('Error cargando configuracion:', error);
+            }
+        }
+
+        // Cargar todos los propietarios del edificio
+        async function cargarPropietarios() {
+            try {
+                const propRef = ref(db, `propietarios/${edificio}`);
+                const snapshot = await get(propRef);
+                if (snapshot.exists()) {
+                    todosPropietarios = snapshot.val();
+                }
+            } catch (error) {
+                console.error('Error cargando propietarios:', error);
+            }
+        }
+
+        function actualizarFaltantesRegistro() {
+            const section = document.getElementById('faltantesRegistroSection');
+            const list = document.getElementById('faltantesRegistroList');
+            const badge = document.getElementById('faltantesRegistroBadge');
+
+            const propKeys = Object.keys(todosPropietarios);
+            if (propKeys.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            const faltantes = [];
+            propKeys.forEach(key => {
+                const prop = todosPropietarios[key];
+                if (prop.tipo === 'Propietario' || prop.tipo === 'propietario' || !prop.tipo) {
+                    if (!asistentesActuales[key]) {
+                        faltantes.push({ apto: prop.apto, nombre: prop.nombre || 'Sin nombre' });
+                    }
+                }
+            });
+
+            faltantes.sort((a, b) => (parseInt(a.apto) || 0) - (parseInt(b.apto) || 0));
+
+            const totalPropietarios = Object.values(todosPropietarios).filter(p =>
+                p.tipo === 'Propietario' || p.tipo === 'propietario' || !p.tipo
+            ).length;
+
+            if (faltantes.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            badge.textContent = `Faltan ${faltantes.length} de ${totalPropietarios}`;
+
+            list.innerHTML = faltantes.map(f => `
+                <div class="faltante-item">
+                    <div class="faltante-apto">Apto ${f.apto}</div>
+                    <div class="faltante-nombre">${f.nombre}</div>
+                </div>
+            `).join('');
+        }
+
+        function actualizarFaltantesVoto() {
+            const section = document.getElementById('faltantesVotoSection');
+            const list = document.getElementById('faltantesVotoList');
+            const badge = document.getElementById('faltantesVotoBadge');
+
+            if (!votacionActualData) {
+                section.style.display = 'none';
+                return;
+            }
+
+            const votos = votacionActualData.votos || {};
+            const asistentesKeys = Object.keys(asistentesActuales);
+
+            if (asistentesKeys.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            const faltantes = [];
+            asistentesKeys.forEach(key => {
+                if (!votos[key]) {
+                    const a = asistentesActuales[key];
+                    faltantes.push({ apto: a.apartamento, nombre: a.nombre || 'Sin nombre' });
+                }
+            });
+
+            faltantes.sort((a, b) => (parseInt(a.apto) || 0) - (parseInt(b.apto) || 0));
+
+            if (faltantes.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            badge.textContent = `Faltan ${faltantes.length} de ${asistentesKeys.length}`;
+
+            list.innerHTML = faltantes.map(f => `
+                <div class="faltante-item">
+                    <div class="faltante-apto">Apto ${f.apto}</div>
+                    <div class="faltante-nombre">${f.nombre}</div>
+                </div>
+            `).join('');
+        }
+
+        // Escuchar asistentes (con quorum dinamico por coeficiente)
         const asistentesRef = ref(db, `asambleas/${edificio}/asistentes`);
         onValue(asistentesRef, (snapshot) => {
-            const asistentes = snapshot.val() || {};
-            const total = Object.keys(asistentes).length;
+            asistentesActuales = snapshot.val() || {};
+            const total = Object.keys(asistentesActuales).length;
             document.getElementById('totalAsistentes').textContent = total;
-            
-            const quorum = total > 0 ? Math.min(100, (total / 23) * 100) : 0;
-            document.getElementById('quorumPorcentaje').textContent = Math.round(quorum) + '%';
-            
+
             let coefTotal = 0;
-            Object.values(asistentes).forEach(a => {
+            Object.values(asistentesActuales).forEach(a => {
                 coefTotal += parseFloat(a.coeficiente || 0);
             });
-            document.getElementById('coeficienteTotal').textContent = coefTotal.toFixed(2);
+            document.getElementById('coeficienteTotal').textContent = (coefTotal * 100).toFixed(2) + '%';
+
+            // Quorum dinamico basado en coeficiente requerido
+            const quorum = coefRequerido > 0 ? Math.min(100, (coefTotal / coefRequerido) * 100) : 0;
+            document.getElementById('quorumPorcentaje').textContent = Math.round(quorum) + '%';
+
+            actualizarFaltantesRegistro();
+            actualizarFaltantesVoto();
         });
 
-        // Escuchar votación activa
+        // Escuchar votacion activa
         const votacionRef = ref(db, `asambleas/${edificio}/votacion_activa`);
         onValue(votacionRef, (snapshot) => {
-            const votacion = snapshot.val();
-            mostrarVotacion(votacion);
+            votacionActualData = snapshot.val();
+            mostrarVotacion(votacionActualData);
+            actualizarFaltantesVoto();
         });
+
+        // Iniciar
+        cargarConfiguracionEdificio();
+        cargarPropietarios();
 
         function mostrarVotacion(votacion) {
             const container = document.getElementById('votacionContent');
-            
+
             if (!votacion) {
                 container.innerHTML = `
                     <div class="no-votacion">
-                        ⏳ Esperando votación activa...
+                        Esperando votacion activa...
                     </div>
                 `;
                 document.getElementById('totalVotos').textContent = '0';
@@ -314,7 +518,7 @@
                         </div>
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: ${porcAbstencion}%; background: rgba(255,255,255,0.7);">
-                                ABSTENCIÓN
+                                ABSTENCION
                             </div>
                         </div>
                     </div>

@@ -509,6 +509,18 @@
                     <input type="number" step="0.0001" id="inputCoeficiente">
                 </div>
                 <div class="form-group">
+                    <label>🏷️ Matrícula Catastral — Apartamento <span style="color:#999;font-weight:400;">(cuando aplique)</span></label>
+                    <input type="text" id="inputMatriculaApto" placeholder="Ej: 50N-20-0001234">
+                </div>
+                <div class="form-group">
+                    <label>🚗 Matrícula Catastral — Garaje <span style="color:#999;font-weight:400;">(cuando aplique)</span></label>
+                    <input type="text" id="inputMatriculaGaraje" placeholder="Ej: 50N-20-0001235">
+                </div>
+                <div class="form-group">
+                    <label>📦 Matrícula Catastral — Depósito <span style="color:#999;font-weight:400;">(cuando aplique)</span></label>
+                    <input type="text" id="inputMatriculaDeposito" placeholder="Ej: 50N-20-0001236">
+                </div>
+                <div class="form-group">
                     <label>Observaciones / Tips</label>
                     <textarea id="inputObservaciones" placeholder="Notas, recordatorios, información adicional..."></textarea>
                 </div>
@@ -718,6 +730,14 @@
                             <span class="info-value">${persona.documento}</span>
                         </div>
                         ` : ''}
+                        ${(persona.matriculaApto || persona.matriculaGaraje || persona.matriculaDeposito) ? `
+                        <div class="info-item" style="flex-direction:column; align-items:flex-start; gap:4px; background:#f0f4ff; padding:8px 10px; border-radius:8px; margin-top:4px;">
+                            <span class="info-label" style="margin-bottom:4px;">🏷️ Matrículas catastrales:</span>
+                            ${persona.matriculaApto ? `<span class="info-value">🏠 Apto: ${persona.matriculaApto}</span>` : ''}
+                            ${persona.matriculaGaraje ? `<span class="info-value">🚗 Garaje: ${persona.matriculaGaraje}</span>` : ''}
+                            ${persona.matriculaDeposito ? `<span class="info-value">📦 Depósito: ${persona.matriculaDeposito}</span>` : ''}
+                        </div>
+                        ` : ''}
                         ${persona.observaciones ? `
                         <div class="observaciones-box">
                             <div class="observaciones-label">💡 Observaciones:</div>
@@ -774,6 +794,9 @@
             document.getElementById('inputEmail').value = data.email || '';
             document.getElementById('inputDocumento').value = data.documento || '';
             document.getElementById('inputCoeficiente').value = data.coeficiente || '';
+            document.getElementById('inputMatriculaApto').value = data.matriculaApto || '';
+            document.getElementById('inputMatriculaGaraje').value = data.matriculaGaraje || '';
+            document.getElementById('inputMatriculaDeposito').value = data.matriculaDeposito || '';
             document.getElementById('inputObservaciones').value = data.observaciones || '';
             
             document.getElementById('groupCoeficiente').style.display = 
@@ -793,6 +816,9 @@
                 telefono: document.getElementById('inputTelefono').value,
                 email: document.getElementById('inputEmail').value,
                 documento: document.getElementById('inputDocumento').value,
+                matriculaApto: document.getElementById('inputMatriculaApto').value,
+                matriculaGaraje: document.getElementById('inputMatriculaGaraje').value,
+                matriculaDeposito: document.getElementById('inputMatriculaDeposito').value,
                 observaciones: document.getElementById('inputObservaciones').value,
                 estado: 'activo'
             };
