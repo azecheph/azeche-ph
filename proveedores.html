@@ -354,6 +354,7 @@
         <div class="content">
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="toggleFormulario()">➕ Nuevo Proveedor</button>
+                <button class="btn btn-secondary" onclick="imprimirProveedores()" style="background:linear-gradient(135deg,#0056B8,#00B853);color:white;border:none;">🖨️ Imprimir Lista PDF</button>
             </div>
 
             <!-- FORMULARIO -->
@@ -696,6 +697,122 @@
                 document.getElementById('formContainer').classList.add('active');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }, { onlyOnce: true });
+        };
+
+        // ─── IMPRIMIR LISTA PDF ────────────────────────────────────────
+        window.imprimirProveedores = () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape' });
+            const pageWidth  = doc.internal.pageSize.width;
+            const pageHeight = doc.internal.pageSize.height;
+            const marginL = 12;
+            let yPos = 0;
+
+            function addHeader() {
+                // Barra azul
+                doc.setFillColor(0, 86, 184);
+                doc.rect(0, 0, pageWidth, 18, 'F');
+                // Logo blanco
+                doc.setFillColor(255, 255, 255);
+                doc.rect(marginL, 2, 30, 14, 'F');
+                doc.setFontSize(11); doc.setFont(undefined, 'bold');
+                doc.setTextColor(0, 86, 184);  doc.text('Azeche', marginL + 1, 10);
+                doc.setTextColor(0, 184, 83);   doc.text('P.H.',   marginL + 1, 16);
+                // Título
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(14); doc.setFont(undefined, 'bold');
+                doc.text('LISTA DE PROVEEDORES', pageWidth / 2 + 10, 10, { align: 'center' });
+                doc.setFontSize(8); doc.setFont(undefined, 'normal');
+                doc.text(`Generado: ${new Date().toLocaleDateString('es-CO')}  — Azeche P.H.`, pageWidth / 2 + 10, 15, { align: 'center' });
+                yPos = 24;
+            }
+
+            function addFooter(pageNum, totalPages) {
+                doc.setFontSize(7); doc.setTextColor(150, 150, 150);
+                doc.text(`Azeche P.H. | Lista de Proveedores`, marginL, pageHeight - 6);
+                doc.text(`Página ${pageNum} de ${totalPages}`, pageWidth - marginL, pageHeight - 6, { align: 'right' });
+            }
+
+            // Recolectar datos de la tabla activa
+            const filas = [];
+            document.querySelectorAll('#tbodyProveedores tr').forEach(tr => {
+                const celdas = tr.querySelectorAll('td');
+                if (celdas.length < 8) return;
+                // Extraer texto limpio de cada celda
+                const nombre    = celdas[0]?.querySelector('strong')?.textContent?.trim() || '-';
+                const id_fiscal = celdas[1]?.textContent?.trim() || '-';
+                const tel       = celdas[3]?.textContent?.trim() || '-';
+                const whatsapp  = celdas[4]?.textContent?.trim() || '-';
+                const telAlt    = celdas[5]?.textContent?.trim() || '-';
+                const emergencia= celdas[6]?.textContent?.trim() || '-';
+                const correo    = celdas[7]?.textContent?.trim() || '-';
+                filas.push([nombre, id_fiscal, tel, whatsapp, telAlt, emergencia, correo]);
+            });
+
+            if (filas.length === 0) {
+                alert('No hay proveedores para imprimir.');
+                return;
+            }
+
+            addHeader();
+
+            // Encabezado de tabla
+            const cols = ['Proveedor', 'Identificación', 'Tel. Principal', 'WhatsApp', 'Tel. Alterno', 'Emergencias', 'Correo'];
+            const colW = [52, 34, 30, 30, 30, 30, 50];
+            const rowH = 7;
+
+            function drawTableHeader() {
+                doc.setFillColor(0, 86, 184);
+                let xc = marginL;
+                cols.forEach((col, i) => {
+                    doc.rect(xc, yPos, colW[i], 8, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(7.5); doc.setFont(undefined, 'bold');
+                    doc.text(col, xc + 2, yPos + 5.5);
+                    xc += colW[i];
+                });
+                yPos += 9;
+            }
+
+            drawTableHeader();
+
+            let pageNum = 1;
+            filas.forEach((fila, idx) => {
+                if (yPos + rowH + 6 > pageHeight - 14) {
+                    addFooter(pageNum, '?');
+                    doc.addPage();
+                    pageNum++;
+                    addHeader();
+                    drawTableHeader();
+                }
+                // Fondo alternado
+                doc.setFillColor(idx % 2 === 0 ? 247 : 255, idx % 2 === 0 ? 249 : 255, idx % 2 === 0 ? 252 : 255);
+                let xc = marginL;
+                colW.forEach(w => { doc.rect(xc, yPos, w, rowH, 'F'); xc += w; });
+                // Bordes
+                doc.setDrawColor(220, 220, 220);
+                xc = marginL;
+                colW.forEach(w => { doc.rect(xc, yPos, w, rowH); xc += w; });
+                // Texto
+                doc.setTextColor(30, 30, 30);
+                doc.setFontSize(7); doc.setFont(undefined, 'normal');
+                xc = marginL;
+                fila.forEach((txt, ci) => {
+                    const truncated = doc.splitTextToSize(txt, colW[ci] - 3)[0] || '';
+                    doc.text(truncated, xc + 2, yPos + 4.8);
+                    xc += colW[ci];
+                });
+                yPos += rowH;
+            });
+
+            // Actualizar footers con número correcto de páginas
+            const totalPagesNum = doc.internal.getNumberOfPages();
+            for (let p = 1; p <= totalPagesNum; p++) {
+                doc.setPage(p);
+                addFooter(p, totalPagesNum);
+            }
+
+            doc.save(`Proveedores-AzechePH-${new Date().toISOString().slice(0,10)}.pdf`);
         };
 
         // ─── ELIMINAR PROVEEDOR ────────────────────────────────────────

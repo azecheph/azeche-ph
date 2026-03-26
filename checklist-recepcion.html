@@ -438,8 +438,18 @@
         </a>
 
         <div class="header">
-            <h1>📋 Checklist de Recepción de Edificios</h1>
-            <p>Sistema profesional para documentar la recepción de edificios en propiedad horizontal</p>
+            <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap;">
+                <div style="background:white;padding:10px 18px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.15);text-align:center;flex-shrink:0;">
+                    <div style="font-size:1.9em;font-weight:900;letter-spacing:-1px;line-height:1;">
+                        <span style="color:#0056B8;">Azeche</span><span style="color:#00B853;">P.H.</span>
+                    </div>
+                    <div style="font-size:0.55em;letter-spacing:2px;color:#888;margin-top:2px;">PROPIEDAD HORIZONTAL</div>
+                </div>
+                <div>
+                    <h1>📋 Checklist de Recepción de Edificios</h1>
+                    <p>Sistema profesional para documentar la recepción de edificios en propiedad horizontal</p>
+                </div>
+            </div>
         </div>
 
         <div class="overall-progress">
@@ -922,21 +932,39 @@
                 return false;
             }
 
-            // Encabezado principal
-            doc.setFillColor(102, 126, 234);
-            doc.rect(0, 0, pageWidth, 40, 'F');
-            
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(20);
-            doc.setFont(undefined, 'bold');
-            doc.text('ACTA DE RECEPCIÓN DE EDIFICIO', pageWidth / 2, 15, { align: 'center' });
-            
-            doc.setFontSize(12);
-            doc.setFont(undefined, 'normal');
-            doc.text('Azeche P.H. — Sistema de Administración de Propiedad Horizontal', pageWidth / 2, 25, { align: 'center' });
-            doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-CO')}`, pageWidth / 2, 33, { align: 'center' });
+            // ── Encabezado principal ──
+            // Barra de fondo azul
+            doc.setFillColor(0, 86, 184);
+            doc.rect(0, 0, pageWidth, 44, 'F');
 
-            yPos = 50;
+            // Recuadro blanco para el logo Azeche PH
+            doc.setFillColor(255, 255, 255);
+            doc.rect(10, 5, 38, 34, 'F');
+            // "Azeche" en azul
+            doc.setFontSize(13);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(0, 86, 184);
+            doc.text('Azeche', 12, 19);
+            // "P.H." en verde
+            doc.setTextColor(0, 184, 83);
+            doc.text('P.H.', 12, 29);
+            // Subtítulo pequeño
+            doc.setFontSize(5.5);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(120, 120, 120);
+            doc.text('PROPIEDAD HORIZONTAL', 12, 35);
+
+            // Títulos centrados en la barra azul
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(17);
+            doc.setFont(undefined, 'bold');
+            doc.text('ACTA DE RECEPCIÓN DE EDIFICIO', pageWidth / 2 + 15, 16, { align: 'center' });
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text('Azeche P.H. — Sistema de Administración de Propiedad Horizontal', pageWidth / 2 + 15, 25, { align: 'center' });
+            doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-CO')}`, pageWidth / 2 + 15, 34, { align: 'center' });
+
+            yPos = 54;
 
             // INFORMACIÓN GENERAL
             doc.setTextColor(0, 0, 0);
@@ -1097,82 +1125,111 @@
                 yPos += 5;
             });
 
-            // PÁGINA DE FIRMAS
+            // ── PÁGINA DE FIRMAS ──
             doc.addPage();
             yPos = 20;
 
-            doc.setFontSize(14);
+            // Barra de título
+            doc.setFillColor(0, 86, 184);
+            doc.rect(0, 0, pageWidth, 14, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(13);
             doc.setFont(undefined, 'bold');
-            doc.text('FIRMAS Y DECLARACIONES', pageWidth / 2, yPos, { align: 'center' });
-            
-            yPos += 20;
-            doc.setFontSize(10);
+            doc.text('FIRMAS Y DECLARACIONES', pageWidth / 2, 9, { align: 'center' });
+
+            yPos = 24;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(9);
             doc.setFont(undefined, 'normal');
 
-            const declaracion = 'Por medio de la presente, declaro que he recibido el edificio antes mencionado en las condiciones descritas en este documento. He verificado el estado de los bienes comunes, la documentación entregada y confirmo que la información contenida en este checklist corresponde a la realidad al momento de la recepción.';
+            const declaracion = 'Los abajo firmantes declaramos que la recepción/entrega del edificio antes mencionado se realizó en las condiciones descritas en este documento, habiendo verificado el estado de los bienes comunes, la documentación entregada y confirmando que la información corresponde a la realidad al momento de la recepción.';
             const declLines = doc.splitTextToSize(declaracion, maxWidth);
             declLines.forEach(line => {
                 doc.text(line, marginLeft, yPos);
-                yPos += 6;
+                yPos += 5;
             });
 
-            yPos += 20;
+            yPos += 12;
 
-            // Firma Administrador Entrante
-            doc.setFont(undefined, 'bold');
-            doc.text('ADMINISTRADOR ENTRANTE:', marginLeft, yPos);
-            yPos += 20;
-            doc.line(marginLeft, yPos, marginLeft + 70, yPos);
-            yPos += 5;
-            doc.setFont(undefined, 'normal');
-            doc.text(info.administradorEntrante, marginLeft, yPos);
-            yPos += 5;
-            doc.text(`C.E./C.C. ${info.cedulaEntrante}`, marginLeft, yPos);
-
-            // Firma Administrador Saliente
-            if (info.administradorSaliente) {
-                yPos += 25;
+            // ── Helper para dibujar un bloque de firma ──
+            function drawFirmaBox(xLeft, yStart, titulo, nombre, cedula, cargo) {
+                const boxW = 78;
+                // Título del bloque
+                doc.setFillColor(237, 242, 247);
+                doc.rect(xLeft, yStart, boxW, 8, 'F');
                 doc.setFont(undefined, 'bold');
-                doc.text('ADMINISTRADOR(A) SALIENTE:', marginLeft, yPos);
-                yPos += 20;
-                doc.line(marginLeft, yPos, marginLeft + 70, yPos);
-                yPos += 5;
+                doc.setFontSize(8);
+                doc.setTextColor(0, 86, 184);
+                doc.text(titulo, xLeft + 2, yStart + 5.5);
+                // Línea de firma
+                doc.setDrawColor(80, 80, 80);
+                doc.line(xLeft, yStart + 28, xLeft + boxW, yStart + 28);
+                // Nombre
+                doc.setFont(undefined, 'bold');
+                doc.setFontSize(9);
+                doc.setTextColor(0, 0, 0);
+                const nombreTxt = nombre || '___________________________';
+                doc.text(doc.splitTextToSize(nombreTxt, boxW)[0], xLeft, yStart + 33);
+                // Cédula
                 doc.setFont(undefined, 'normal');
-                doc.text(info.administradorSaliente, marginLeft, yPos);
-                if (info.cedulaSaliente) {
-                    yPos += 5;
-                    doc.text(`C.C./C.E. ${info.cedulaSaliente}`, marginLeft, yPos);
+                doc.setFontSize(8);
+                doc.setTextColor(80, 80, 80);
+                doc.text(cedula ? `C.C./C.E. ${cedula}` : 'C.C./C.E. ___________', xLeft, yStart + 39);
+                // Cargo
+                if (cargo) {
+                    doc.setFontSize(7.5);
+                    doc.setTextColor(120, 120, 120);
+                    doc.text(cargo, xLeft, yStart + 45);
                 }
             }
 
-            // Firma Persona que Entrega
-            if (info.personaEntregaNombre) {
-                yPos += 25;
-                doc.setFont(undefined, 'bold');
-                doc.text('PERSONA QUE ENTREGA EL EDIFICIO:', marginLeft, yPos);
-                yPos += 20;
-                doc.line(marginLeft, yPos, marginLeft + 70, yPos);
-                yPos += 5;
-                doc.setFont(undefined, 'normal');
-                doc.text(info.personaEntregaNombre, marginLeft, yPos);
-                yPos += 5;
-                doc.text(`C.C./C.E. ${info.personaEntregaCedula}`, marginLeft, yPos);
+            const colLeft  = marginLeft;
+            const colRight = marginLeft + 90;
+
+            // Fila 1: Administrador Entrante | Persona que Entrega
+            drawFirmaBox(colLeft,  yPos,
+                'ADMINISTRADOR(A) ENTRANTE',
+                info.administradorEntrante,
+                info.cedulaEntrante,
+                'Administrador(a) Entrante');
+
+            drawFirmaBox(colRight, yPos,
+                'PERSONA QUE ENTREGA EL EDIFICIO',
+                info.personaEntregaNombre || info.administradorSaliente,
+                info.personaEntregaCedula || info.cedulaSaliente,
+                'Cargo: ________________________');
+
+            yPos += 58;
+
+            // Fila 2: Administrador Saliente (si es diferente a quien entrega) | Testigos
+            const mostrarSaliente = info.administradorSaliente && info.administradorSaliente !== info.personaEntregaNombre;
+            if (mostrarSaliente) {
+                drawFirmaBox(colLeft, yPos,
+                    'ADMINISTRADOR(A) SALIENTE',
+                    info.administradorSaliente,
+                    info.cedulaSaliente,
+                    'Administrador(a) Saliente');
             }
 
-            // Testigos
             if (info.testigos) {
-                yPos += 25;
+                const testigos = info.testigos.split(',').map(t => t.trim()).filter(Boolean);
+                const tgX = mostrarSaliente ? colRight : colLeft;
+                doc.setFillColor(237, 242, 247);
+                doc.rect(tgX, yPos, 78, 8, 'F');
                 doc.setFont(undefined, 'bold');
-                doc.text('TESTIGOS:', marginLeft, yPos);
-                yPos += 7;
-                doc.setFont(undefined, 'normal');
-                const testigos = info.testigos.split(',').map(t => t.trim());
+                doc.setFontSize(8);
+                doc.setTextColor(0, 86, 184);
+                doc.text('TESTIGOS', tgX + 2, yPos + 5.5);
+                let tgy = yPos + 18;
                 testigos.forEach((testigo, i) => {
-                    if (i > 0) yPos += 15;
-                    yPos += 13;
-                    doc.line(marginLeft, yPos, marginLeft + 70, yPos);
-                    yPos += 5;
-                    doc.text(testigo, marginLeft, yPos);
+                    doc.setDrawColor(80, 80, 80);
+                    doc.line(tgX, tgy, tgX + 78, tgy);
+                    tgy += 4;
+                    doc.setFont(undefined, 'normal');
+                    doc.setFontSize(8);
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(testigo, tgX, tgy);
+                    tgy += 12;
                 });
             }
 
