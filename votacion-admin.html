@@ -687,13 +687,13 @@ function mostrarVotacionActiva() {
       const valor = conteos[key] || 0;
       const porcentaje = totalParticipacion > 0 ? (valor / totalParticipacion * 100) : 0;
       const color = colores[i % colores.length];
-      const unidad = tipoActual === 'nominal' ? 'voto(s)' : 'coef.';
-      const valorDisplay = tipoActual === 'nominal' ? valor : valor.toFixed(4);
+      const unidad = tipoActual === 'nominal' ? 'voto(s)' : '%';
+      const valorDisplay = tipoActual === 'nominal' ? valor : (valor * 100).toFixed(2);
       html += `
         <div class="resultado-bar">
           <div class="resultado-label">
             <span class="resultado-nombre">${opt.label}</span>
-            <span class="resultado-valor">${valorDisplay} ${unidad} (${porcentaje.toFixed(1)}%)</span>
+            <span class="resultado-valor">${valorDisplay}${unidad} (${porcentaje.toFixed(1)}% de votos)</span>
           </div>
           <div class="progress-bar">
             <div class="progress-fill" style="width:${Math.max(porcentaje, 0)}%;background:${color};">${porcentaje.toFixed(1)}%</div>
@@ -725,27 +725,27 @@ function mostrarVotacionActiva() {
     const pA = totalP > 0 ? (aFavor / totalP * 100) : 0;
     const pC = totalP > 0 ? (enContra / totalP * 100) : 0;
     const pAb = totalP > 0 ? (abstencion / totalP * 100) : 0;
-    const u = tipoActual === 'nominal' ? '' : ' coef.';
+    const fmtVal = (v) => tipoActual === 'nominal' ? v : (v * 100).toFixed(2) + '%';
 
     html += `
       <div class="resultado-bar">
         <div class="resultado-label">
           <span class="resultado-nombre">A Favor</span>
-          <span class="resultado-valor">${tipoActual === 'nominal' ? aFavor : aFavor.toFixed(4)}${u} (${pA.toFixed(1)}%)</span>
+          <span class="resultado-valor">${fmtVal(aFavor)} (${pA.toFixed(1)}% de votos)</span>
         </div>
         <div class="progress-bar"><div class="progress-fill" style="width:${pA}%;background:#00B853;">${pA.toFixed(1)}%</div></div>
       </div>
       <div class="resultado-bar">
         <div class="resultado-label">
           <span class="resultado-nombre">En Contra</span>
-          <span class="resultado-valor">${tipoActual === 'nominal' ? enContra : enContra.toFixed(4)}${u} (${pC.toFixed(1)}%)</span>
+          <span class="resultado-valor">${fmtVal(enContra)} (${pC.toFixed(1)}% de votos)</span>
         </div>
         <div class="progress-bar"><div class="progress-fill" style="width:${pC}%;background:#dc3545;">${pC.toFixed(1)}%</div></div>
       </div>
       <div class="resultado-bar">
         <div class="resultado-label">
           <span class="resultado-nombre">Abstencion</span>
-          <span class="resultado-valor">${tipoActual === 'nominal' ? abstencion : abstencion.toFixed(4)}${u} (${pAb.toFixed(1)}%)</span>
+          <span class="resultado-valor">${fmtVal(abstencion)} (${pAb.toFixed(1)}% de votos)</span>
         </div>
         <div class="progress-bar"><div class="progress-fill" style="width:${pAb}%;background:#ff9800;">${pAb.toFixed(1)}%</div></div>
       </div>
@@ -929,7 +929,7 @@ function mostrarHistorial() {
         const valor = conteos[key] || 0;
         const pct = totalP > 0 ? (valor / totalP * 100) : 0;
         const color = colores[ci % colores.length];
-        const valorTxt = tipo === 'nominal' ? valor : valor.toFixed(4);
+        const valorTxt = tipo === 'nominal' ? valor : (valor * 100).toFixed(2) + '%';
         html += `<div class="historial-resultado-row">
           <span class="historial-resultado-label">${opt.label}</span>
           <div class="historial-resultado-bar"><div class="historial-resultado-fill" style="width:${Math.max(pct, 0)}%;background:${color};">${pct.toFixed(1)}%</div></div>
@@ -952,9 +952,10 @@ function mostrarHistorial() {
       const pA = totalP > 0 ? (aF/totalP*100) : 0;
       const pC = totalP > 0 ? (eC/totalP*100) : 0;
       const pAb = totalP > 0 ? (ab/totalP*100) : 0;
-      html += `<div class="historial-resultado-row"><span class="historial-resultado-label">A Favor</span><div class="historial-resultado-bar"><div class="historial-resultado-fill" style="width:${pA}%;background:#00B853;">${pA.toFixed(1)}%</div></div><span class="historial-resultado-value">${tipo==='nominal'?aF:aF.toFixed(4)}</span></div>`;
-      html += `<div class="historial-resultado-row"><span class="historial-resultado-label">En Contra</span><div class="historial-resultado-bar"><div class="historial-resultado-fill" style="width:${pC}%;background:#dc3545;">${pC.toFixed(1)}%</div></div><span class="historial-resultado-value">${tipo==='nominal'?eC:eC.toFixed(4)}</span></div>`;
-      html += `<div class="historial-resultado-row"><span class="historial-resultado-label">Abstencion</span><div class="historial-resultado-bar"><div class="historial-resultado-fill" style="width:${pAb}%;background:#ff9800;">${pAb.toFixed(1)}%</div></div><span class="historial-resultado-value">${tipo==='nominal'?ab:ab.toFixed(4)}</span></div>`;
+      const fmtH = (v) => tipo === 'nominal' ? v : (v * 100).toFixed(2) + '%';
+      html += `<div class="historial-resultado-row"><span class="historial-resultado-label">A Favor</span><div class="historial-resultado-bar"><div class="historial-resultado-fill" style="width:${pA}%;background:#00B853;">${pA.toFixed(1)}%</div></div><span class="historial-resultado-value">${fmtH(aF)}</span></div>`;
+      html += `<div class="historial-resultado-row"><span class="historial-resultado-label">En Contra</span><div class="historial-resultado-bar"><div class="historial-resultado-fill" style="width:${pC}%;background:#dc3545;">${pC.toFixed(1)}%</div></div><span class="historial-resultado-value">${fmtH(eC)}</span></div>`;
+      html += `<div class="historial-resultado-row"><span class="historial-resultado-label">Abstencion</span><div class="historial-resultado-bar"><div class="historial-resultado-fill" style="width:${pAb}%;background:#ff9800;">${pAb.toFixed(1)}%</div></div><span class="historial-resultado-value">${fmtH(ab)}</span></div>`;
     }
     html += `</div>`;
 
@@ -1350,7 +1351,7 @@ window.imprimirResultados = function() {
         const val = conteos[k] || 0;
         const pct = totalP > 0 ? (val / totalP * 100).toFixed(1) : '0.0';
         const color = colores[i % colores.length];
-        const display = tipo === 'nominal' ? `${val} votos` : `${val.toFixed(4)} coef.`;
+        const display = tipo === 'nominal' ? `${val} votos` : `${(val * 100).toFixed(2)}%`;
         return `<div style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
             <span style="font-weight:600;">${opt.label}</span>
@@ -1374,6 +1375,34 @@ window.imprimirResultados = function() {
       ${votacion.descripcion ? `<p style="color:#666;font-size:.88em;margin-bottom:14px;">${votacion.descripcion}</p>` : ''}
       <p style="font-size:.82em;color:#888;margin-bottom:12px;">Total votantes: <strong>${totalVotantes}</strong> &nbsp;|&nbsp; Tipo de conteo: <strong>${tipo==='nominal'?'Por votante':'Por coeficiente'}</strong></p>
       ${opcsHtml || '<p style="color:#aaa;font-size:.85em;">Sin opciones registradas</p>'}
+      ${(() => {
+        const votantesRows = Object.values(votos)
+          .sort((a,b) => (a.apartamento||'').localeCompare(b.apartamento||''))
+          .map((v,i) => {
+            const opcionKey = v.opcion || v.voto || '';
+            const opcionLabel = opciones[opcionKey]?.label || (opcionKey==='si'?'Sí':opcionKey==='no'?'No':opcionKey==='abstencion'?'Abstención':opcionKey);
+            const coefDisplay = tipo==='nominal' ? '-' : (parseFloat(v.coeficiente||0)*100).toFixed(2)+'%';
+            return `<tr style="background:${i%2===0?'#f9f9f9':'white'}">
+              <td style="padding:5px 8px;">${v.apartamento||'-'}</td>
+              <td style="padding:5px 8px;">${v.nombre||'Sin nombre'}</td>
+              <td style="padding:5px 8px;font-weight:700;color:#0056B8;">${opcionLabel}</td>
+              <td style="padding:5px 8px;text-align:right;">${coefDisplay}</td>
+            </tr>`;
+          }).join('');
+        if (!votantesRows) return '';
+        return `<details style="margin-top:12px;">
+          <summary style="cursor:pointer;font-weight:700;font-size:.85em;color:#555;padding:6px 0;">Ver detalle de votantes (${Object.keys(votos).length})</summary>
+          <table style="width:100%;border-collapse:collapse;font-size:.82em;margin-top:8px;">
+            <thead><tr style="background:#0056B8;color:white;">
+              <th style="padding:5px 8px;text-align:left;">Apto</th>
+              <th style="padding:5px 8px;text-align:left;">Nombre</th>
+              <th style="padding:5px 8px;text-align:left;">Opción votada</th>
+              <th style="padding:5px 8px;text-align:right;">Coeficiente</th>
+            </tr></thead>
+            <tbody>${votantesRows}</tbody>
+          </table>
+        </details>`;
+      })()}
     </div>`;
   };
 
