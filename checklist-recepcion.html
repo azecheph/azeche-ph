@@ -483,8 +483,12 @@
                     <input type="time" id="horaRecepcion">
                 </div>
                 <div class="form-group">
-                    <label for="administradorSaliente">Administrador Saliente</label>
+                    <label for="administradorSaliente">Administrador(a) Saliente</label>
                     <input type="text" id="administradorSaliente" placeholder="Nombre completo">
+                </div>
+                <div class="form-group">
+                    <label for="cedulaSaliente">Cédula Administrador(a) Saliente</label>
+                    <input type="text" id="cedulaSaliente" placeholder="C.C. o C.E.">
                 </div>
                 <div class="form-group">
                     <label for="personaEntregaNombre">Persona que Entrega el Edificio *</label>
@@ -792,6 +796,7 @@
                     fechaRecepcion: document.getElementById('fechaRecepcion').value,
                     horaRecepcion: document.getElementById('horaRecepcion').value,
                     administradorSaliente: document.getElementById('administradorSaliente').value,
+                    cedulaSaliente: document.getElementById('cedulaSaliente').value,
                     administradorEntrante: document.getElementById('administradorEntrante').value,
                     cedulaEntrante: document.getElementById('cedulaEntrante').value,
                     personaEntregaNombre: document.getElementById('personaEntregaNombre').value,
@@ -1010,19 +1015,24 @@
             
             yPos += 15;
 
+            // Helper: eliminar emojis para jsPDF
+            function sinEmoji(str) {
+                return str.replace(/[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]|[\u{FE00}-\u{FEFF}]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|\uD83E[\uDD00-\uDDFF]/gu, '').replace(/\s+/g,' ').trim();
+            }
+
             // DETALLE DEL CHECKLIST POR SECCIONES
             Object.keys(checklistData).forEach(sectionKey => {
                 const section = checklistData[sectionKey];
-                
+
                 checkNewPage(30);
-                
-                // Título de sección
+
+                // Título de sección (sin emojis)
                 doc.setFillColor(102, 126, 234);
                 doc.rect(marginLeft - 5, yPos - 6, maxWidth + 10, 10, 'F');
                 doc.setTextColor(255, 255, 255);
                 doc.setFontSize(12);
                 doc.setFont(undefined, 'bold');
-                doc.text(section.title, marginLeft, yPos);
+                doc.text(sinEmoji(section.title), marginLeft, yPos);
                 
                 yPos += 12;
                 doc.setTextColor(0, 0, 0);
@@ -1123,12 +1133,16 @@
             if (info.administradorSaliente) {
                 yPos += 25;
                 doc.setFont(undefined, 'bold');
-                doc.text('ADMINISTRADOR SALIENTE:', marginLeft, yPos);
+                doc.text('ADMINISTRADOR(A) SALIENTE:', marginLeft, yPos);
                 yPos += 20;
                 doc.line(marginLeft, yPos, marginLeft + 70, yPos);
                 yPos += 5;
                 doc.setFont(undefined, 'normal');
                 doc.text(info.administradorSaliente, marginLeft, yPos);
+                if (info.cedulaSaliente) {
+                    yPos += 5;
+                    doc.text(`C.C./C.E. ${info.cedulaSaliente}`, marginLeft, yPos);
+                }
             }
 
             // Firma Persona que Entrega
