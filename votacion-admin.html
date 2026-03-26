@@ -1390,9 +1390,9 @@ window.imprimirResultados = function() {
             </tr>`;
           }).join('');
         if (!votantesRows) return '';
-        return `<details style="margin-top:12px;">
-          <summary style="cursor:pointer;font-weight:700;font-size:.85em;color:#555;padding:6px 0;">Ver detalle de votantes (${Object.keys(votos).length})</summary>
-          <table style="width:100%;border-collapse:collapse;font-size:.82em;margin-top:8px;">
+        return `<div style="margin-top:12px;">
+          <p style="font-weight:700;font-size:.85em;color:#555;margin-bottom:6px;border-top:1px solid #eee;padding-top:8px;">Detalle de votantes (${Object.keys(votos).length})</p>
+          <table style="width:100%;border-collapse:collapse;font-size:.82em;">
             <thead><tr style="background:#0056B8;color:white;">
               <th style="padding:5px 8px;text-align:left;">Apto</th>
               <th style="padding:5px 8px;text-align:left;">Nombre</th>
@@ -1401,7 +1401,7 @@ window.imprimirResultados = function() {
             </tr></thead>
             <tbody>${votantesRows}</tbody>
           </table>
-        </details>`;
+        </div>`;
       })()}
     </div>`;
   };
