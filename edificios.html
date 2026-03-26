@@ -186,6 +186,49 @@
     </div>
 </div>
 
+<!-- MODAL DOCUMENTOS -->
+<div class="modal" id="modalDocumentos">
+    <div class="modal-content" style="max-width:580px;">
+        <div class="modal-header">
+            <h2>📄 Documentos del Edificio</h2>
+            <button class="btn-close" onclick="cerrarModalDocumentos()">&times;</button>
+        </div>
+        <p style="color:#666;font-size:13px;margin-bottom:20px;">Pega el enlace de Google Drive u otra nube. Asegúrate de que el archivo sea compartido como "Cualquier persona con el enlace".</p>
+        <input type="hidden" id="docEdificioKey">
+
+        <div style="display:flex;flex-direction:column;gap:16px;">
+            <div style="background:#f0f4ff;padding:16px;border-radius:10px;border-left:4px solid #0056B8;">
+                <label style="font-weight:700;color:#0056B8;display:block;margin-bottom:8px;">📜 Reglamento de Propiedad Horizontal</label>
+                <div style="display:flex;gap:8px;">
+                    <input type="url" id="docReglamento" placeholder="https://drive.google.com/..." style="flex:1;padding:10px;border:2px solid #ddd;border-radius:8px;font-size:13px;">
+                    <button onclick="abrirDocLink('docReglamento')" style="background:#0056B8;color:white;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;">🔗 Abrir</button>
+                </div>
+            </div>
+
+            <div style="background:#f0fff4;padding:16px;border-radius:10px;border-left:4px solid #00B853;">
+                <label style="font-weight:700;color:#00B853;display:block;margin-bottom:8px;">🤝 Manual de Convivencia</label>
+                <div style="display:flex;gap:8px;">
+                    <input type="url" id="docManual" placeholder="https://drive.google.com/..." style="flex:1;padding:10px;border:2px solid #ddd;border-radius:8px;font-size:13px;">
+                    <button onclick="abrirDocLink('docManual')" style="background:#00B853;color:white;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;">🔗 Abrir</button>
+                </div>
+            </div>
+
+            <div style="background:#fff8e1;padding:16px;border-radius:10px;border-left:4px solid #f57f17;">
+                <label style="font-weight:700;color:#e65100;display:block;margin-bottom:8px;">🏛️ Representación Legal (Alcaldía)</label>
+                <div style="display:flex;gap:8px;">
+                    <input type="url" id="docRepresentacion" placeholder="https://drive.google.com/..." style="flex:1;padding:10px;border:2px solid #ddd;border-radius:8px;font-size:13px;">
+                    <button onclick="abrirDocLink('docRepresentacion')" style="background:#f57f17;color:white;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;">🔗 Abrir</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:24px;">
+            <button onclick="guardarDocumentos()" style="flex:1;background:linear-gradient(135deg,#0056B8,#00B853);color:white;border:none;padding:14px;border-radius:10px;font-size:1em;font-weight:700;cursor:pointer;">💾 Guardar Enlaces</button>
+            <button onclick="cerrarModalDocumentos()" style="background:#eee;color:#666;border:none;padding:14px 20px;border-radius:10px;font-size:1em;cursor:pointer;">Cancelar</button>
+        </div>
+    </div>
+</div>
+
 <!-- MODAL NUEVO / EDITAR EDIFICIO -->
 <div class="modal" id="modalEdificio">
     <div class="modal-content">
@@ -270,6 +313,10 @@
             <div class="form-group">
                 <label>💰 Valor Asegurado</label>
                 <input type="text" id="fPolizaValor" placeholder="Ej: $2.500.000.000">
+            </div>
+            <div class="form-group">
+                <label>🏛️ Vencimiento Representación Legal (Alcaldía)</label>
+                <input type="date" id="fRepresentacionVence">
             </div>
 
             <div class="section-divider divider-green form-full">🏦 Cuentas Bancarias</div>
@@ -422,6 +469,22 @@
             </div>`;
         }
 
+        // Representación legal
+        let reprInfo = '';
+        if (d.representacionVence) {
+            const hoy = new Date(); hoy.setHours(0,0,0,0);
+            const vence = new Date(d.representacionVence + 'T00:00:00');
+            const dias = Math.ceil((vence - hoy) / 86400000);
+            const color = dias < 0 ? '#c62828' : dias <= 30 ? '#e65100' : dias <= 90 ? '#f57f17' : '#2e7d32';
+            const aviso = dias < 0 ? '⚠️ VENCIDA' : dias <= 30 ? `⚠️ Vence en ${dias} días` : dias <= 90 ? `⏰ Vence en ${dias} días` : '';
+            reprInfo = `<div class="info-group">
+                <div class="info-label">🏛️ Rep. Legal Alcaldía</div>
+                <div class="info-value" style="color:${color};font-weight:600;">
+                    Vence: ${d.representacionVence} ${aviso ? `<br><span style="font-size:0.9em;">${aviso}</span>` : ''}
+                </div>
+            </div>`;
+        }
+
         // Cuentas bancarias
         let cuentasInfo = '';
         if (d.cuentasBancarias) {
@@ -441,6 +504,7 @@
                 </div>
                 <div class="card-actions">
                     <button class="btn-card btn-edit" onclick="abrirEditar('${key}')">✏️ Editar</button>
+                    <button class="btn-card" style="background:#7c3aed;color:white;" onclick="abrirDocumentos('${key}')">📄 Docs</button>
                     <button class="btn-card btn-del" onclick="eliminarEdificio('${key}','${(d.nombre||'').replace(/'/g,"\\'")}')">🗑️</button>
                 </div>
             </div>
@@ -461,6 +525,7 @@
             ${d.telefono ? `<div class="info-group"><div class="info-label">📞 Teléfono</div><div class="info-value"><a href="tel:${d.telefono}">${d.telefono}</a></div></div>` : ''}
             ${catastralInfo}
             ${polizaInfo}
+            ${reprInfo}
             ${cuentasInfo}
             ${sensibleHtml}
         </div>`;
@@ -496,9 +561,10 @@
         document.getElementById('fCatastral').value      = d.catastral || '';
         document.getElementById('fPolizaNo').value       = d.polizaNo || '';
         document.getElementById('fAseguradora').value    = d.aseguradora || '';
-        document.getElementById('fPolizaVence').value    = d.polizaVence || '';
-        document.getElementById('fPolizaValor').value    = d.polizaValor || '';
-        document.getElementById('fCuentasBancarias').value = d.cuentasBancarias || '';
+        document.getElementById('fPolizaVence').value         = d.polizaVence || '';
+        document.getElementById('fPolizaValor').value         = d.polizaValor || '';
+        document.getElementById('fRepresentacionVence').value = d.representacionVence || '';
+        document.getElementById('fCuentasBancarias').value    = d.cuentasBancarias || '';
         document.getElementById('fClavesCamaras').value  = d.clavesCamaras || '';
         document.getElementById('fNotas').value          = d.notas || '';
 
@@ -523,8 +589,9 @@
             catastral:       document.getElementById('fCatastral').value.trim(),
             polizaNo:        document.getElementById('fPolizaNo').value.trim(),
             aseguradora:     document.getElementById('fAseguradora').value.trim(),
-            polizaVence:     document.getElementById('fPolizaVence').value,
-            polizaValor:     document.getElementById('fPolizaValor').value.trim(),
+            polizaVence:          document.getElementById('fPolizaVence').value,
+            polizaValor:          document.getElementById('fPolizaValor').value.trim(),
+            representacionVence:  document.getElementById('fRepresentacionVence').value,
             cuentasBancarias:document.getElementById('fCuentasBancarias').value.trim(),
             clavesCamaras:   document.getElementById('fClavesCamaras').value.trim(),
             notas:           document.getElementById('fNotas').value.trim(),
@@ -563,7 +630,8 @@
     function limpiarForm() {
         ['fNombre','fDireccion','fEmail','fPassword','fRut','fTelefono',
          'fMatricula','fChip','fCatastral','fPolizaNo','fAseguradora',
-         'fPolizaVence','fPolizaValor','fCuentasBancarias','fClavesCamaras','fNotas'].forEach(id => {
+         'fPolizaVence','fPolizaValor','fRepresentacionVence',
+         'fCuentasBancarias','fClavesCamaras','fNotas'].forEach(id => {
             document.getElementById(id).value = '';
         });
         document.getElementById('fTipo').value  = 'EDIFICIO';
@@ -595,6 +663,47 @@
         document.getElementById('totalProveedores').textContent = snapProv.exists() ? Object.keys(snapProv.val()).length : 0;
         document.getElementById('totalCuentas').textContent = totalCuentas;
     }
+
+    // ══════════════════════════════════════════════════
+    // DOCUMENTOS
+    // ══════════════════════════════════════════════════
+    window.abrirDocumentos = async function(key) {
+        document.getElementById('docEdificioKey').value = key;
+        // Cargar links existentes
+        const snap = await get(ref(db, `edificios/${key}/documentos`));
+        const docs = snap.val() || {};
+        document.getElementById('docReglamento').value     = docs.reglamento || '';
+        document.getElementById('docManual').value         = docs.manual || '';
+        document.getElementById('docRepresentacion').value = docs.representacion || '';
+        document.getElementById('modalDocumentos').classList.add('active');
+    };
+
+    window.cerrarModalDocumentos = function() {
+        document.getElementById('modalDocumentos').classList.remove('active');
+    };
+
+    window.guardarDocumentos = async function() {
+        const key = document.getElementById('docEdificioKey').value;
+        if (!key) return;
+        const docs = {
+            reglamento:     document.getElementById('docReglamento').value.trim(),
+            manual:         document.getElementById('docManual').value.trim(),
+            representacion: document.getElementById('docRepresentacion').value.trim()
+        };
+        try {
+            await update(ref(db, `edificios/${key}/documentos`), docs);
+            alert('✅ Documentos guardados correctamente');
+            cerrarModalDocumentos();
+        } catch(err) {
+            alert('❌ Error: ' + err.message);
+        }
+    };
+
+    window.abrirDocLink = function(inputId) {
+        const url = document.getElementById(inputId).value.trim();
+        if (!url) { alert('⚠️ No hay enlace guardado para este documento'); return; }
+        window.open(url, '_blank');
+    };
 
     window.logout = () => signOut(auth).then(() => { window.location.href = 'index.html'; });
 

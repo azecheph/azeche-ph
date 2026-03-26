@@ -612,6 +612,14 @@
                     <div class="value" style="font-size: 1.2em; color: #667eea;">Nueva Herramienta</div>
                 </div>
             </div>
+
+            <!-- ALERTAS DE VENCIMIENTOS -->
+            <div id="alertas-vencimientos" style="margin-top:28px;">
+                <h3 style="font-size:1.3em;font-weight:700;color:#333;margin-bottom:14px;">⚠️ Alertas de Vencimientos</h3>
+                <div id="alertas-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;">
+                    <p id="alertas-cargando" style="color:#888;font-style:italic;">Cargando alertas...</p>
+                </div>
+            </div>
         </div>
 
         <!-- SECCIÓN DE ASAMBLEAS Y CONSEJOS -->
@@ -994,6 +1002,7 @@
                 
                 // Cargar contadores dinámicos
                 cargarContadores();
+                cargarAlertasVencimientos();
             }
         });
         
@@ -1045,6 +1054,58 @@
                     '$' + saldoTotal.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0});
             });
         }
+        // ALERTAS DE VENCIMIENTO DE PÓLIZA Y REPRESENTACIÓN
+        function cargarAlertasVencimientos() {
+            const edificiosRef = ref(db, 'edificios');
+            get(edificiosRef).then((snapshot) => {
+                const lista = document.getElementById('alertas-lista');
+                const cargando = document.getElementById('alertas-cargando');
+                if (cargando) cargando.remove();
+                if (!snapshot.exists()) {
+                    lista.innerHTML = '<p style="color:#888;font-style:italic;">No hay edificios registrados.</p>';
+                    return;
+                }
+                const hoy = new Date();
+                hoy.setHours(0,0,0,0);
+                const alertas = [];
+                snapshot.forEach((child) => {
+                    const ed = child.val();
+                    const nombre = ed.nombre || child.key;
+                    [
+                        { campo: 'polizaVence', label: 'Póliza de Seguros' },
+                        { campo: 'representacionVence', label: 'Representación Legal' }
+                    ].forEach(({ campo, label }) => {
+                        if (!ed[campo]) return;
+                        const fecha = new Date(ed[campo] + 'T00:00:00');
+                        const dias = Math.round((fecha - hoy) / 86400000);
+                        if (dias > 90) return; // solo mostrar si vence en 90 días o menos
+                        let color, bg, icono;
+                        if (dias < 0)       { color = '#c62828'; bg = '#ffebee'; icono = '🔴'; }
+                        else if (dias <= 30) { color = '#e65100'; bg = '#fff3e0'; icono = '🟠'; }
+                        else                { color = '#f57f17'; bg = '#fffde7'; icono = '🟡'; }
+                        const texto = dias < 0
+                            ? `VENCIDA hace ${Math.abs(dias)} día(s)`
+                            : dias === 0 ? 'Vence HOY'
+                            : `Vence en ${dias} día(s) — ${fecha.toLocaleDateString('es-CO')}`;
+                        alertas.push({ nombre, label, icono, color, bg, texto, dias });
+                    });
+                });
+                if (alertas.length === 0) {
+                    lista.innerHTML = '<p style="color:#2e7d32;font-weight:600;">✅ Sin vencimientos próximos en los próximos 90 días.</p>';
+                    return;
+                }
+                alertas.sort((a,b) => a.dias - b.dias);
+                lista.innerHTML = alertas.map(a => `
+                    <div style="background:${a.bg};border:2px solid ${a.color};border-radius:10px;padding:14px 18px;">
+                        <div style="font-size:1.1em;font-weight:700;color:${a.color};margin-bottom:4px;">${a.icono} ${a.nombre}</div>
+                        <div style="font-weight:600;color:#555;margin-bottom:3px;">${a.label}</div>
+                        <div style="color:${a.color};font-weight:600;">${a.texto}</div>
+                    </div>`).join('');
+            }).catch(err => {
+                console.error('Error cargando alertas:', err);
+            });
+        }
+
         // Cerrar sesión
         window.cerrarSesion = function() {
             signOut(auth).then(() => {
