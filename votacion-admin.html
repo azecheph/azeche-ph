@@ -168,12 +168,12 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
           <button class="btn-danger" onclick="limpiarAsistentes()">Limpiar</button>
         </h3>
 
-        <!-- ENLACE DE REGISTRO - VISIBLE -->
+        <!-- ENLACE UNICO PROPIETARIOS -->
         <div class="qr-section" id="seccionEnlaceRegistro">
-          <h4>Enlace de Auto-Registro</h4>
+          <h4>🔗 Enlace para Propietarios</h4>
           <input type="text" id="enlaceRegistroQuorum" value="Selecciona un edificio primero" readonly>
           <button onclick="copiarEnlaceRegistro()">Copiar Enlace</button>
-          <p>Comparte este enlace con los propietarios por Google Chat o WhatsApp</p>
+          <p>Un solo enlace para registro de asistencia + votaciones. Compártelo por WhatsApp o Google Chat.</p>
         </div>
 
         <div class="quorum-display">
@@ -217,12 +217,9 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 
     <!-- RIGHT COLUMN: Votacion -->
     <div>
-      <!-- Enlace de votacion -->
-      <div class="enlace-votacion-section" id="seccionEnlaceVotacion">
-        <h4>Enlace para Votar</h4>
-        <input type="text" id="enlaceVotacionPrincipal" value="Crea una votacion primero" readonly>
-        <button onclick="copiarEnlaceVotacion()">COPIAR ENLACE DE VOTACION</button>
-        <p>Comparte DURANTE la votacion</p>
+      <!-- Enlace de votacion (oculto - reemplazado por asamblea-propietario.html) -->
+      <div style="display:none" id="seccionEnlaceVotacion">
+        <input type="text" id="enlaceVotacionPrincipal" value="" readonly>
       </div>
 
       <!-- Votacion activa -->
@@ -438,10 +435,10 @@ if (edificioUrl) {
 
 function actualizarEnlaceRegistro() {
   const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-  const urlRegistro = baseUrl + 'registro-asamblea.html?edificio=' + edificioActual;
+  const urlPropietario = baseUrl + 'asamblea-propietario.html?edificio=' + edificioActual;
   const inputEnlace = document.getElementById('enlaceRegistroQuorum');
   if (inputEnlace) {
-    inputEnlace.value = urlRegistro;
+    inputEnlace.value = urlPropietario;
   }
 }
 
