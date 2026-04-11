@@ -133,6 +133,48 @@
             opacity: 0.6;
             cursor: not-allowed;
         }
+        .option.seleccionada {
+            border-color: #667eea;
+            background: #ede9ff;
+            transform: translateX(5px);
+        }
+        .confirmacion-box {
+            display: none;
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .confirmacion-box p {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .btn-confirmar {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .btn-cancelar-voto {
+            background: #e0e0e0;
+            color: #555;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            width: 100%;
+        }
         .option-info {
             flex: 1;
         }
@@ -517,10 +559,11 @@
                 const color = colores[index % colores.length];
                 const unidad = tipo === 'nominal' ? 'votos' : 'coef.';
                 const valorDisplay = tipo === 'nominal' ? data.valor : data.valor.toFixed(4);
-                
+
                 html += `
-                    <div class="option ${!esActiva ? 'disabled' : ''}" 
-                         onclick="${esActiva ? `votar('${key}')` : ''}">
+                    <div class="option ${!esActiva ? 'disabled' : ''}"
+                         id="opcion-${key}"
+                         onclick="${esActiva ? `seleccionarOpcion('${key}', '${data.label.replace(/'/g, "\\'")}')` : ''}">
                         <div class="option-info">
                             <div class="option-name">${data.label}</div>
                             <div class="progress-bar">
@@ -534,39 +577,71 @@
                     </div>
                 `;
             });
-            
+
+            html += `
+                <div class="confirmacion-box" id="confirmacionBox">
+                    <p id="textoConfirmacion">¿Confirmas tu voto?</p>
+                    <button class="btn-confirmar" onclick="confirmarVoto()">✅ Confirmar Voto</button>
+                    <button class="btn-cancelar-voto" onclick="cancelarSeleccion()">Cancelar</button>
+                </div>
+            `;
+
             document.getElementById('opcionesVotacion').innerHTML = html;
         }
 
-        window.votar = async function(opcion) {
+        let opcionSeleccionada = null;
+
+        window.seleccionarOpcion = function(key, label) {
             if (!votacionActual || votacionActual.estado !== 'activa') {
                 mostrarError('La votación no está activa');
                 return;
             }
-            
-            if (!confirm(`¿Confirmas tu voto: "${votacionActual.opciones?.[opcion]?.label || opcion}"?`)) {
+            opcionSeleccionada = key;
+            // Resaltar opción seleccionada
+            document.querySelectorAll('.option').forEach(el => el.classList.remove('seleccionada'));
+            const elOpcion = document.getElementById('opcion-' + key);
+            if (elOpcion) elOpcion.classList.add('seleccionada');
+            // Mostrar caja de confirmación
+            document.getElementById('textoConfirmacion').textContent = `¿Confirmas tu voto: "${label}"?`;
+            document.getElementById('confirmacionBox').style.display = 'block';
+        };
+
+        window.cancelarSeleccion = function() {
+            opcionSeleccionada = null;
+            document.querySelectorAll('.option').forEach(el => el.classList.remove('seleccionada'));
+            document.getElementById('confirmacionBox').style.display = 'none';
+        };
+
+        window.confirmarVoto = async function() {
+            if (!opcionSeleccionada || !votacionActual || votacionActual.estado !== 'activa') {
+                mostrarError('Selecciona una opción primero');
                 return;
             }
-            
+
+            const btnConfirmar = document.querySelector('.btn-confirmar');
+            btnConfirmar.disabled = true;
+            btnConfirmar.textContent = 'Guardando...';
+
             try {
                 const votoData = {
-                    opcion: opcion,
+                    opcion: opcionSeleccionada,
                     apartamento: propietarioSeleccionado.apto,
                     nombre: propietarioSeleccionado.nombre,
                     coeficiente: propietarioSeleccionado.coeficiente || 1,
                     timestamp: new Date().toISOString()
                 };
-                
+
                 await set(ref(db, `asambleas/${edificioActual}/votacion_activa/votos/${propietarioSeleccionado.key}`), votoData);
-                
-                // Mostrar éxito
+
                 document.getElementById('seccionVotacion').style.display = 'none';
                 document.getElementById('mensajeExito').style.display = 'block';
                 document.getElementById('subtitulo').textContent = 'Voto registrado';
-                
+
             } catch (error) {
                 console.error('Error al votar:', error);
                 mostrarError('❌ Error al registrar el voto: ' + error.message);
+                btnConfirmar.disabled = false;
+                btnConfirmar.textContent = '✅ Confirmar Voto';
             }
         };
 
