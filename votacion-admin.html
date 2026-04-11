@@ -423,6 +423,19 @@ document.getElementById('selectEdificio').addEventListener('change', async (e) =
   }
 });
 
+// Cargar edificio desde URL al iniciar
+const urlParamsInit = new URLSearchParams(window.location.search);
+const edificioUrl = urlParamsInit.get('edificio');
+if (edificioUrl) {
+  const selectEl = document.getElementById('selectEdificio');
+  if (selectEl.querySelector(`option[value="${edificioUrl}"]`)) {
+    selectEl.value = edificioUrl;
+    edificioActual = edificioUrl;
+    cargarDatos();
+    actualizarEnlaceRegistro();
+  }
+}
+
 function actualizarEnlaceRegistro() {
   const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
   const urlRegistro = baseUrl + 'registro-asamblea.html?edificio=' + edificioActual;
@@ -708,16 +721,18 @@ function mostrarVotacionActiva() {
 
     if (tipoActual === 'nominal') {
       Object.values(votos).forEach(voto => {
-        if (voto.voto === 'si') aFavor++;
-        else if (voto.voto === 'no') enContra++;
-        else abstencion++;
+        const opcionVoto = voto.opcion || voto.voto || '';
+        if (opcionVoto === 'si') aFavor++;
+        else if (opcionVoto === 'no') enContra++;
+        else if (opcionVoto === 'abstencion') abstencion++;
       });
     } else {
       Object.values(votos).forEach(voto => {
         const coef = parseFloat(voto.coeficiente || 0);
-        if (voto.voto === 'si') aFavor += coef;
-        else if (voto.voto === 'no') enContra += coef;
-        else abstencion += coef;
+        const opcionVoto = voto.opcion || voto.voto || '';
+        if (opcionVoto === 'si') aFavor += coef;
+        else if (opcionVoto === 'no') enContra += coef;
+        else if (opcionVoto === 'abstencion') abstencion += coef;
       });
     }
 
@@ -941,11 +956,12 @@ function mostrarHistorial() {
       // Legacy
       let aF = 0, eC = 0, ab = 0;
       Object.values(votos).forEach(voto => {
+        const opcionVoto = voto.opcion || voto.voto || '';
         if (tipo === 'nominal') {
-          if (voto.voto === 'si') aF++; else if (voto.voto === 'no') eC++; else ab++;
+          if (opcionVoto === 'si') aF++; else if (opcionVoto === 'no') eC++; else if (opcionVoto === 'abstencion') ab++;
         } else {
           const c = parseFloat(voto.coeficiente || 0);
-          if (voto.voto === 'si') aF += c; else if (voto.voto === 'no') eC += c; else ab += c;
+          if (opcionVoto === 'si') aF += c; else if (opcionVoto === 'no') eC += c; else if (opcionVoto === 'abstencion') ab += c;
         }
       });
       const totalP = aF + eC + ab;
