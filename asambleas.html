@@ -726,6 +726,77 @@
                     📝 Generador de Actas
                 </button>
             </div>
+
+            <!-- TORRES DE AMIN II -->
+            <div class="edificio-card">
+                <h3>
+                    🏢 Torres de Amin II
+                    <span class="badge agendar">POR AGENDAR</span>
+                </h3>
+                
+                <div class="fecha-asamblea">
+                    <span class="icon">📅</span>
+                    <div>
+                        <h4>Fecha programada</h4>
+                        <p id="fecha-torresamin2">Por definir</p>
+                    </div>
+                </div>
+                
+                <div class="estado-badge">
+                    <span>⏳</span>
+                    <span id="estado-torresamin2">Pendiente de fecha</span>
+                </div>
+                
+                <div class="documentos-section">
+                    <h4>📄 Documentos Preparatorios</h4>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📋</span>
+                            <span>Convocatoria (Plantilla)</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('torresamin2', 'convocatoria')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📝</span>
+                            <span>Acta (Plantilla)</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('torresamin2', 'acta')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📊</span>
+                            <span>Informe de Gestión 2025</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('torresamin2', 'informe')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📧</span>
+                            <span>Citación Formal</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('torresamin2', 'citacion')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                </div>
+                
+                <button class="btn-action btn-editar" onclick="abrirModal('torres-de-amin-2')">
+                    ✏️ Editar Fecha y Estado
+                </button>
+                <button class="btn-action btn-votacion" onclick="abrirVotacion('torresamin2')">
+                    🗳️ Sistema de Votación
+                </button>
+                <button class="btn-action btn-actas" onclick="abrirGeneradorActas()">
+                    📝 Generador de Actas
+                </button>
+            </div>
         </div>
         
         <!-- SECCIÓN DE TAREAS -->
@@ -748,6 +819,7 @@
                             <option value="avalon">Avalon</option>
                             <option value="convivienda-1">Convivienda I</option>
                             <option value="pinos-del-country">Pinos del Country</option>
+                            <option value="torres-de-amin-2">Torres de Amin II</option>
                         </select>
                     </div>
                 </div>
@@ -866,14 +938,16 @@
             'nepal-2': 'Nepal 2',
             'avalon': 'Avalon',
             'convivienda-1': 'Convivienda I',
-            'pinos-del-country': 'Pinos del Country'
+            'pinos-del-country': 'Pinos del Country',
+            'torres-de-amin-2': 'Torres de Amin II'
         };
 
         const idMap = {
             'nepal-2': 'nepal2',
             'avalon': 'avalon',
             'convivienda-1': 'convivienda',
-            'pinos-del-country': 'pinos'
+            'pinos-del-country': 'pinos',
+            'torres-de-amin-2': 'torresamin2'
         };
 
         let edificioActual = '';
@@ -1118,6 +1192,12 @@
                     'acta': 'ACTA_ASAMBLEA_PinosDelCountry_2026.docx',
                     'informe': 'INFORME_GESTION_PinosDelCountry_2025.docx',
                     'citacion': 'CITACION_FORMAL_PinosDelCountry_2026.docx'
+                },
+                'torresamin2': {
+                    'convocatoria': 'CONVOCATORIA_TorresDeAminII_2026.docx',
+                    'acta': 'ACTA_ASAMBLEA_TorresDeAminII_2026.docx',
+                    'informe': 'INFORME_GESTION_TorresDeAminII_2025.docx',
+                    'citacion': 'CITACION_FORMAL_TorresDeAminII_2026.docx'
                 }
             };
             
@@ -1130,7 +1210,8 @@
                 'nepal2': 'nepal-2',
                 'avalon': 'avalon',
                 'convivienda': 'convivienda-1',
-                'pinos': 'pinos-del-country'
+                'pinos': 'pinos-del-country',
+                'torresamin2': 'torres-de-amin-2'
             };
             window.location.href = `votacion-admin.html?edificio=${edificiosMap[edificio]}`;
         };

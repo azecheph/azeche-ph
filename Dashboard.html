@@ -894,6 +894,73 @@
                     </div>
 
                 </div>
+
+                <!-- TORRES DE AMIN II -->
+                <div class="edificio-asamblea-card">
+                    <h3>
+                        🏢 Torres de Amin II
+                        <span class="badge pendiente">POR AGENDAR</span>
+                    </h3>
+                    
+                    <div class="fecha-asamblea">
+                        <span class="icon">⏳</span>
+                        <div class="info">
+                            <h4>Estado</h4>
+                            <p>Pendiente de fecha</p>
+                        </div>
+                    </div>
+
+                    <div class="documentos-list">
+                        <h4>📄 Documentos Preparados</h4>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📋</span>
+                                <span>Convocatoria (Plantilla)</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('torresamin2', 'convocatoria')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📝</span>
+                                <span>Acta (Plantilla)</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('torresamin2', 'acta')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📊</span>
+                                <span>Informe de Gestión 2025</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('torresamin2', 'informe')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>✉️</span>
+                                <span>Citación Formal</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('torresamin2', 'citacion')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn-editar-asamblea" onclick="abrirModalEditarAsamblea('torres-de-amin-2')">✏️ Editar Fecha y Estado</button>
+                    <div class="action-buttons" style="display: flex; gap: 15px; margin-top: 25px;">
+                        <button class="btn-action btn-votar" onclick="abrirVotacion('torresamin2')" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #00B853 0%, #0056B8 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            ✅ Sistema de Votación
+                        </button>
+                        <button class="btn-action btn-actas" onclick="abrirGeneradorActas('torresamin2')" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            🎙️ Generador de Actas
+                        </button>
+                    </div>
+
+                </div>
             </div>
             
             <!-- SECCIÓN DE CONSEJOS MENSUALES -->
@@ -919,6 +986,7 @@
                                     <option value="avalon">Avalon</option>
                                     <option value="convivienda-1">Convivienda 1</option>
                                     <option value="pinos-del-country">Pinos del Country</option>
+                                    <option value="torres-de-amin-2">Torres de Amin II</option>
                                     <option value="todos">Todos los edificios</option>
                                 </select>
                             </div>
@@ -1365,6 +1433,12 @@
                 acta: 'ACTA_ASAMBLEA_PinosDelCountry_2026.docx',
                 informe: 'INFORME_GESTION_PinosDelCountry_2025.docx',
                 citacion: 'CITACION_FORMAL_PinosDelCountry_2026.docx'
+            },
+            torresamin2: {
+                convocatoria: 'CONVOCATORIA_TorresDeAminII_2026.docx',
+                acta: 'ACTA_ASAMBLEA_TorresDeAminII_2026.docx',
+                informe: 'INFORME_GESTION_TorresDeAminII_2025.docx',
+                citacion: 'CITACION_FORMAL_TorresDeAminII_2026.docx'
             }
         };
 
@@ -1382,7 +1456,8 @@
                 'nepal2': 'nepal-2',
                 'avalon': 'avalon',
                 'convivienda': 'convivienda-1',
-                'pinos': 'pinos-del-country'
+                'pinos': 'pinos-del-country',
+                'torresamin2': 'torres-de-amin-2'
             };
             window.location.href = `votacion-admin.html?edificio=${edificiosMap[edificio]}`;
         }
@@ -1399,7 +1474,8 @@
             'nepal-2': 'Nepal 2',
             'avalon': 'Avalon',
             'convivienda-1': 'Convivienda 1',
-            'pinos-del-country': 'Pinos del Country'
+            'pinos-del-country': 'Pinos del Country',
+            'torres-de-amin-2': 'Torres de Amin II'
         };
         
         // Abrir modal de edición
@@ -1464,74 +1540,7 @@
         };
 
 
-        // ===== FUNCIONES DE EDICIÓN DE ASAMBLEAS =====
-        let edificioActualEditar = '';
-        const nombresEdificios = {
-            'nepal-2': 'Nepal 2',
-            'avalon': 'Avalon',
-            'convivienda-1': 'Convivienda 1',
-            'pinos-del-country': 'Pinos del Country'
-        };
-
-        window.abrirModalEditarAsamblea = function(edificioId) {
-            edificioActualEditar = edificioId;
-            
-            // Cargar datos actuales de Firebase
-            const asambleaRef = ref(db, `asambleas/${edificioId}`);
-            get(asambleaRef).then((snapshot) => {
-                let fecha = '';
-                let estado = 'pendiente';
-                
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    fecha = data.fecha || '';
-                    estado = data.estado || 'pendiente';
-                }
-                
-                document.getElementById('modalTitulo').textContent = `✏️ Editar Asamblea - ${nombresEdificios[edificioId]}`;
-                document.getElementById('inputEdificioNombre').value = nombresEdificios[edificioId];
-                document.getElementById('inputFechaAsamblea').value = fecha;
-                document.getElementById('inputEstadoAsamblea').value = estado;
-                
-                document.getElementById('modalEditarAsamblea').classList.add('active');
-            }).catch((error) => {
-                console.error('Error al cargar asamblea:', error);
-                alert('Error al cargar datos de la asamblea');
-            });
-        };
-        
-        window.cerrarModalAsamblea = function() {
-            document.getElementById('modalEditarAsamblea').classList.remove('active');
-        };
-        
-        window.guardarCambiosAsamblea = async function(e) {
-            e.preventDefault();
-            
-            const fecha = document.getElementById('inputFechaAsamblea').value;
-            const estado = document.getElementById('inputEstadoAsamblea').value;
-            
-            if (!fecha) {
-                alert('Por favor ingrese una fecha');
-                return;
-            }
-            
-            try {
-                const asambleaRef = ref(db, `asambleas/${edificioActualEditar}`);
-                await update(asambleaRef, {
-                    fecha: fecha,
-                    estado: estado,
-                    edificio: nombresEdificios[edificioActualEditar],
-                    ultimaActualizacion: new Date().toISOString()
-                });
-                
-                alert('✅ Asamblea actualizada correctamente');
-                cerrarModalAsamblea();
-                location.reload(); // Recargar para ver cambios
-            } catch (error) {
-                console.error('Error al guardar:', error);
-                alert('❌ Error al guardar los cambios');
-            }
-        };
+        // (bloque duplicado eliminado - ver bloque principal arriba)
     </script>
 
     <!-- Modal Editar Asamblea -->
