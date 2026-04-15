@@ -175,6 +175,58 @@
             color: #0056B8;
         }
 
+        .stat-detail-list {
+            margin-top: 12px;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 10px;
+        }
+
+        .stat-detail-item {
+            font-size: 0.82em;
+            color: #555;
+            padding: 5px 0;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-detail-item .det-nombre {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stat-detail-badge {
+            font-size: 0.78em;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .badge-urgente  { background: #fdecea; color: #c62828; }
+        .badge-alta     { background: #fff3e0; color: #e65100; }
+        .badge-media    { background: #e3f2fd; color: #1565c0; }
+        .badge-baja     { background: #e8f5e9; color: #2e7d32; }
+        .badge-proxima  { background: #e8f5e9; color: #2e7d32; }
+        .badge-pendiente{ background: #fff3e0; color: #e65100; }
+        .stat-ver-mas {
+            font-size: 0.78em;
+            color: #0056B8;
+            text-align: right;
+            margin-top: 6px;
+            cursor: default;
+            opacity: 0.7;
+        }
+
         /* SECCIÓN DE ASAMBLEAS */
         .asambleas-section {
             display: none;
@@ -584,12 +636,21 @@
                 <div class="stat-card">
                     <div class="icon">🏢</div>
                     <h3>Edificios</h3>
-                    <div class="value">4</div>
+                    <div class="value">5</div>
+                    <div class="stat-detail-list">
+                        <div class="stat-detail-item"><span class="det-nombre">Nepal 2</span></div>
+                        <div class="stat-detail-item"><span class="det-nombre">Avalon</span></div>
+                        <div class="stat-detail-item"><span class="det-nombre">Convivienda 1</span></div>
+                        <div class="stat-detail-item"><span class="det-nombre">Pinos del Country</span></div>
+                        <div class="stat-detail-item"><span class="det-nombre">Torres de Amin II</span></div>
+                    </div>
                 </div>
                 <div class="stat-card">
                     <div class="icon">💰</div>
                     <h3>Facturas Pendientes</h3>
                     <div class="value" id="facturasPendientes">-</div>
+                    <div class="stat-detail-list" id="facturas-detail"></div>
+                    <div class="stat-ver-mas" id="facturas-ver-mas"></div>
                 </div>
                 <div class="stat-card">
                     <div class="icon">💵</div>
@@ -599,12 +660,15 @@
                 <div class="stat-card">
                     <div class="icon">🎯</div>
                     <h3>Próximas Asambleas</h3>
-                    <div class="value">2</div>
+                    <div class="value" id="proximasAsambleas">-</div>
+                    <div class="stat-detail-list" id="asambleas-detail"></div>
                 </div>
                 <div class="stat-card">
                     <div class="icon">✅</div>
                     <h3>Tareas Pendientes</h3>
-                    <div class="value">3</div>
+                    <div class="value" id="tareasPendientes">-</div>
+                    <div class="stat-detail-list" id="tareas-detail"></div>
+                    <div class="stat-ver-mas" id="tareas-ver-mas"></div>
                 </div>
                 <div class="stat-card" onclick="window.open('checklist-recepcion.html', '_blank')" style="cursor: pointer; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border: 2px solid #667eea;">
                     <div class="icon">📋</div>
@@ -1078,48 +1142,98 @@
         
         // CARGAR CONTADORES DINÁMICOS
         function cargarContadores() {
-            // Contar próximas asambleas
+            // Próximas asambleas
             const asambleasRef = ref(db, 'asambleas');
             onValue(asambleasRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    const asambleas = snapshot.val();
-                    const proximas = Object.values(asambleas).filter(a => {
-                        const fecha = new Date(a.fecha);
-                        return fecha > new Date() && a.estado !== 'realizada';
+                const detailEl = document.getElementById('asambleas-detail');
+                const countEl  = document.getElementById('proximasAsambleas');
+                const nombresMap = {
+                    'nepal-2': 'Nepal 2', 'avalon': 'Avalon',
+                    'convivienda-1': 'Convivienda 1', 'pinos-del-country': 'Pinos del Country',
+                    'torres-de-amin-2': 'Torres de Amin II'
+                };
+                if (!snapshot.exists()) { countEl.textContent = '0'; detailEl.innerHTML = ''; return; }
+                const asambleas = snapshot.val();
+                const proximas = Object.entries(asambleas)
+                    .map(([key, a]) => ({ key, ...a }))
+                    .filter(a => a.estado !== 'realizada')
+                    .sort((a, b) => {
+                        if (!a.fecha) return 1;
+                        if (!b.fecha) return -1;
+                        return new Date(a.fecha) - new Date(b.fecha);
                     });
-                    document.querySelector('#dashboard-section .stat-card:nth-child(4) .value').textContent = proximas.length;
-                }
+                countEl.textContent = proximas.length;
+                detailEl.innerHTML = proximas.map(a => {
+                    const nombre = nombresMap[a.key] || a.key;
+                    const fechaStr = a.fecha
+                        ? new Date(a.fecha + 'T00:00:00').toLocaleDateString('es-CO', { day:'numeric', month:'short' })
+                        : 'Sin fecha';
+                    const badgeClass = a.fecha ? 'badge-proxima' : 'badge-pendiente';
+                    const badgeText  = a.fecha ? fechaStr : 'Por agendar';
+                    return `<div class="stat-detail-item">
+                        <span class="det-nombre">🏢 ${nombre}</span>
+                        <span class="stat-detail-badge ${badgeClass}">${badgeText}</span>
+                    </div>`;
+                }).join('');
             });
-            
-            // Contar tareas pendientes
+
+            // Tareas pendientes
             const tareasRef = ref(db, 'tareas');
             onValue(tareasRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    const tareas = snapshot.val();
-                    const pendientes = Object.values(tareas).filter(t => t.estado === 'pendiente');
-                    document.querySelector('#dashboard-section .stat-card:nth-child(5) .value').textContent = pendientes.length;
-                }
+                const detailEl  = document.getElementById('tareas-detail');
+                const countEl   = document.getElementById('tareasPendientes');
+                const verMasEl  = document.getElementById('tareas-ver-mas');
+                if (!snapshot.exists()) { countEl.textContent = '0'; detailEl.innerHTML = ''; verMasEl.textContent = ''; return; }
+                const prioOrder = { urgente: 4, alta: 3, media: 2, baja: 1 };
+                const pendientes = Object.values(snapshot.val())
+                    .filter(t => t.estado === 'pendiente')
+                    .sort((a, b) => (prioOrder[b.prioridad] || 0) - (prioOrder[a.prioridad] || 0));
+                countEl.textContent = pendientes.length;
+                const mostrar = pendientes.slice(0, 4);
+                detailEl.innerHTML = mostrar.map(t => {
+                    const prio = t.prioridad || 'media';
+                    return `<div class="stat-detail-item">
+                        <span class="det-nombre">${t.titulo}</span>
+                        <span class="stat-detail-badge badge-${prio}">${prio}</span>
+                    </div>`;
+                }).join('');
+                verMasEl.textContent = pendientes.length > 4 ? `+ ${pendientes.length - 4} más` : '';
             });
-            
-            // Contar facturas pendientes y calcular saldo por pagar
+
+            // Facturas pendientes y saldo por pagar
             const cuentasRef = ref(db, 'cuentas_por_pagar');
             onValue(cuentasRef, (snapshot) => {
+                const detailEl = document.getElementById('facturas-detail');
+                const verMasEl = document.getElementById('facturas-ver-mas');
                 let facturasPendientes = 0;
                 let saldoTotal = 0;
-                
+                const lista = [];
+
                 if (snapshot.exists()) {
                     snapshot.forEach((child) => {
                         const cuenta = child.val();
                         if (cuenta.estado !== 'pagada' && cuenta.estado !== 'Pagada') {
                             facturasPendientes++;
-                            saldoTotal += parseFloat(cuenta.valorNeto || 0);
+                            const monto = parseFloat(cuenta.valorNeto || 0);
+                            saldoTotal += monto;
+                            lista.push({ proveedor: cuenta.proveedor || cuenta.nombre || 'Sin nombre', monto });
                         }
                     });
                 }
-                
+
                 document.getElementById('facturasPendientes').textContent = facturasPendientes;
-                document.getElementById('saldoPorPagar').textContent = 
-                    '$' + saldoTotal.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+                document.getElementById('saldoPorPagar').textContent =
+                    '$' + saldoTotal.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+                const mostrar = lista.slice(0, 4);
+                detailEl.innerHTML = mostrar.map(f => {
+                    const montoStr = '$' + f.monto.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                    return `<div class="stat-detail-item">
+                        <span class="det-nombre">${f.proveedor}</span>
+                        <span class="stat-detail-badge badge-alta">${montoStr}</span>
+                    </div>`;
+                }).join('');
+                verMasEl.textContent = lista.length > 4 ? `+ ${lista.length - 4} más` : '';
             });
         }
         // ALERTAS DE VENCIMIENTO DE PÓLIZA Y REPRESENTACIÓN
