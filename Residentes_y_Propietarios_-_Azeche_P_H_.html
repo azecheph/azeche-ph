@@ -591,17 +591,20 @@
 
         onValue(propRef, (snapshot) => {
             dataPropietarios = snapshot.val() || {};
+            console.log('📋 Claves en propietarios/:', Object.keys(dataPropietarios));
             renderizar();
         });
 
         onValue(resRef, (snapshot) => {
             dataResidentes = snapshot.val() || {};
+            console.log('🏠 Claves en residentes/:', Object.keys(dataResidentes));
             renderizar();
         });
 
         // Cambiar edificio
         window.cambiarEdificio = function() {
             edificioActual = document.getElementById('edificioSelect').value;
+            console.log('🏢 Edificio seleccionado:', edificioActual, '| Datos disponibles:', !!dataPropietarios[edificioActual]);
             renderizar();
         };
 
