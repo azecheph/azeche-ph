@@ -367,7 +367,7 @@
         { nombre:'Pinos del Country', edificioId:'pinos-del-country',  tipo:'EDIFICIO', icono:'🌲',  email:'pinosdelcountryedificio@gmail.com',  password:'pinos%2024*',       direccion:'CR 12 127 B - 23', rut:'830059667-8', telefono:'', matricula:'', chip:'', catastral:'', polizaNo:'', aseguradora:'', polizaVence:'', polizaValor:'', cuentasBancarias:'', clavesCamaras:'', notas:'' },
         { nombre:'Convivienda I',     edificioId:'convivienda-1',      tipo:'EDIFICIO', icono:'🏘️', email:'edificioconvivienda@gmail.com',       password:'Convivi#2024',      direccion:'CR 10a #138-71',   rut:'830112728-5', telefono:'', matricula:'', chip:'', catastral:'', polizaNo:'', aseguradora:'', polizaVence:'', polizaValor:'', cuentasBancarias:'', clavesCamaras:'', notas:'' },
         { nombre:'Avalon',            edificioId:'avalon',             tipo:'EDIFICIO', icono:'🏰',  email:'edificioavalonadm@gmail.com',        password:'admin.avalon&2025', direccion:'Calle 65 #9-07',   rut:'800245101-1', telefono:'', matricula:'', chip:'', catastral:'', polizaNo:'', aseguradora:'', polizaVence:'', polizaValor:'', cuentasBancarias:'', clavesCamaras:'', notas:'' },
-        { nombre:'Torres de Amin II', edificioId:'torres-de-amin-2',  tipo:'EDIFICIO', icono:'🏢',  email:'',                                  password:'',                  direccion:'',                 rut:'',            telefono:'', matricula:'', chip:'', catastral:'', polizaNo:'', aseguradora:'', polizaVence:'', polizaValor:'', cuentasBancarias:'', clavesCamaras:'', notas:'' }
+        { nombre:'Torres de Amin II', edificioId:'torre-amin-2',       tipo:'EDIFICIO', icono:'🏢',  email:'',                                  password:'',                  direccion:'',                 rut:'',            telefono:'', matricula:'', chip:'', catastral:'', polizaNo:'', aseguradora:'', polizaVence:'', polizaValor:'', cuentasBancarias:'', clavesCamaras:'', notas:'' }
     ];
 
     // Mapa de nombres conocidos a sus slugs (para migración de registros existentes)
@@ -377,7 +377,8 @@
         'Convivienda I':'convivienda-1', 'convivienda i':'convivienda-1',
         'Convivienda 1':'convivienda-1', 'convivienda 1':'convivienda-1',
         'Avalon':'avalon', 'avalon':'avalon',
-        'Torres de Amin II':'torres-de-amin-2', 'torres de amin ii':'torres-de-amin-2'
+        'Torres de Amin II':'torre-amin-2', 'torres de amin ii':'torre-amin-2',
+        'Tores de Anim II':'torre-amin-2',  'tores de anim ii':'torre-amin-2'
     };
 
     // Generar slug automático para edificios nuevos
@@ -404,7 +405,8 @@
                 await push(ref(db, 'edificios'), ed);
             }
         } else {
-            // Migración: agregar edificioId a registros que no lo tienen
+            // Migración: agregar edificioId a registros que no lo tienen, y corregir slugs incorrectos
+            const SLUGS_INCORRECTOS = { 'tores-de-anim-2': 'torre-amin-2', 'torres-de-amin-2': 'torre-amin-2' };
             const migraciones = [];
             snap.forEach(child => {
                 const ed = child.val();
@@ -412,6 +414,8 @@
                     const nombreNorm = (ed.nombre || '').trim();
                     const slug = SLUGS_CONOCIDOS[nombreNorm] || generarSlug(nombreNorm);
                     migraciones.push(update(ref(db, `edificios/${child.key}`), { edificioId: slug }));
+                } else if (SLUGS_INCORRECTOS[ed.edificioId]) {
+                    migraciones.push(update(ref(db, `edificios/${child.key}`), { edificioId: SLUGS_INCORRECTOS[ed.edificioId] }));
                 }
             });
             if (migraciones.length > 0) await Promise.all(migraciones);

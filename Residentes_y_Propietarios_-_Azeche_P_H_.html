@@ -550,7 +550,8 @@
         const _SLUGS_CONOCIDOS = {
             'Nepal 2':'nepal-2','Pinos del Country':'pinos-del-country',
             'Convivienda I':'convivienda-1','Convivienda 1':'convivienda-1',
-            'Avalon':'avalon','Torres de Amin II':'torres-de-amin-2'
+            'Avalon':'avalon',
+            'Torres de Amin II':'torre-amin-2','Tores de Anim II':'torre-amin-2'
         };
         function slugEdificio(nombre) {
             if (!nombre) return '';
@@ -565,6 +566,8 @@
         let tabActual = 'propietarios';
 
         // ─── EDIFICIOS DINÁMICOS ────────────────────────────────────────
+        // Correcciones de edificioId incorrecto guardado en Firebase
+        const _ID_FIXES = { 'tores-de-anim-2':'torre-amin-2', 'torres-de-amin-2':'torre-amin-2' };
         onValue(ref(db, 'edificios'), (snap) => {
             const sel = document.getElementById('edificioSelect');
             if (!sel) return;
@@ -573,7 +576,9 @@
             if (snap.exists()) snap.forEach(child => {
                 const ed = child.val();
                 const opt = document.createElement('option');
-                opt.value = ed.edificioId || slugEdificio(ed.nombre) || child.key;
+                let edId = ed.edificioId || slugEdificio(ed.nombre) || child.key;
+                edId = _ID_FIXES[edId] || edId;
+                opt.value = edId;
                 opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
                 sel.appendChild(opt);
             });

@@ -787,7 +787,7 @@
                     </div>
                 </div>
                 
-                <button class="btn-action btn-editar" onclick="abrirModal('torres-de-amin-2')">
+                <button class="btn-action btn-editar" onclick="abrirModal('torre-amin-2')">
                     ✏️ Editar Fecha y Estado
                 </button>
                 <button class="btn-action btn-votacion" onclick="abrirVotacion('torresamin2')">
@@ -927,7 +927,7 @@
                 cargarAsambleas();
                 cargarTareas();
                 // ─── EDIFICIOS DINÁMICOS ────────────────────────────────
-                const _SLUGS_A = {'Nepal 2':'nepal-2','Pinos del Country':'pinos-del-country','Convivienda I':'convivienda-1','Convivienda 1':'convivienda-1','Avalon':'avalon','Torres de Amin II':'torres-de-amin-2'};
+                const _SLUGS_A = {'Nepal 2':'nepal-2','Pinos del Country':'pinos-del-country','Convivienda I':'convivienda-1','Convivienda 1':'convivienda-1','Avalon':'avalon','Torres de Amin II':'torre-amin-2','Tores de Anim II':'torre-amin-2'};
                 const _slug = n => {if(!n)return'';if(_SLUGS_A[n])return _SLUGS_A[n];return n.replace(/\bIV\b/g,'4').replace(/\bIII\b/g,'3').replace(/\bII\b/g,'2').replace(/\bI\b/g,'1').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');};
                 onValue(ref(db, 'edificios'), (snap) => {
                     const sel = document.getElementById('edificioTarea');
@@ -937,7 +937,9 @@
                     if (snap.exists()) snap.forEach(child => {
                         const ed = child.val();
                         const opt = document.createElement('option');
-                        opt.value = ed.edificioId || _slug(ed.nombre) || child.key;
+                        const _idFix = {'tores-de-anim-2':'torre-amin-2','torres-de-amin-2':'torre-amin-2'};
+                        let _eid = ed.edificioId || _slug(ed.nombre) || child.key;
+                        opt.value = _idFix[_eid] || _eid;
                         opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
                         sel.appendChild(opt);
                     });
@@ -956,7 +958,8 @@
             'avalon': 'Avalon',
             'convivienda-1': 'Convivienda I',
             'pinos-del-country': 'Pinos del Country',
-            'torres-de-amin-2': 'Torres de Amin II'
+            'torres-de-amin-2': 'Torres de Amin II',
+            'torre-amin-2': 'Torres de Amin II'
         };
 
         const idMap = {
@@ -964,7 +967,8 @@
             'avalon': 'avalon',
             'convivienda-1': 'convivienda',
             'pinos-del-country': 'pinos',
-            'torres-de-amin-2': 'torresamin2'
+            'torres-de-amin-2': 'torresamin2',
+            'torre-amin-2': 'torresamin2'
         };
 
         let edificioActual = '';
@@ -1229,7 +1233,7 @@
                 'avalon': 'avalon',
                 'convivienda': 'convivienda-1',
                 'pinos': 'pinos-del-country',
-                'torresamin2': 'torres-de-amin-2'
+                'torresamin2': 'torre-amin-2'
             };
             window.location.href = `votacion-admin.html?edificio=${edificiosMap[edificio]}`;
         };
