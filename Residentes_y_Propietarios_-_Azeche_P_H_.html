@@ -435,6 +435,7 @@
                     <select id="edificioSelect" onchange="cambiarEdificio()">
                         <option value="">Seleccionar Edificio</option>
                     </select>
+                    <div id="_debug_info" style="display:none;background:#fffbe6;border:1px solid #f0c000;padding:8px 12px;margin-top:6px;border-radius:6px;font-size:12px;font-family:monospace;line-height:1.6;"></div>
                 </div>
                 <div class="search-box">
                     <input type="text" id="searchInput" placeholder="🔍 Buscar por nombre, apartamento..." oninput="renderizar()">
@@ -605,6 +606,17 @@
         window.cambiarEdificio = function() {
             edificioActual = document.getElementById('edificioSelect').value;
             console.log('🏢 Edificio seleccionado:', edificioActual, '| Datos disponibles:', !!dataPropietarios[edificioActual]);
+            // DEBUG VISUAL TEMPORAL
+            const dbg = document.getElementById('_debug_info');
+            if (dbg) {
+                const clavesProp = Object.keys(dataPropietarios);
+                const clavesRes = Object.keys(dataResidentes);
+                dbg.innerHTML = `<b>ID seleccionado:</b> "${edificioActual}"<br>
+                    <b>Claves propietarios/:</b> ${clavesProp.join(', ') || '(vacío)'}<br>
+                    <b>Claves residentes/:</b> ${clavesRes.join(', ') || '(vacío)'}<br>
+                    <b>Encontró datos:</b> ${!!dataPropietarios[edificioActual] ? '✅ SÍ' : '❌ NO'}`;
+                dbg.style.display = 'block';
+            }
             renderizar();
         };
 
