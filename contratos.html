@@ -355,7 +355,7 @@
             if (snap.exists()) snap.forEach(child => {
                 const ed = child.val();
                 const opt = document.createElement('option');
-                opt.value = ed.nombre || child.key; // contratos guarda nombre como valor
+                opt.value = ed.nombre || child.key; // contratos usa nombre como valor
                 opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
                 sel.appendChild(opt);
             });

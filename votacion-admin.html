@@ -350,6 +350,8 @@ let edificioActual = '';
 let asistentesData = {};
 
 // ─── EDIFICIOS DINÁMICOS ────────────────────────────────────────────
+const _SLUGS_V = {'Nepal 2':'nepal-2','Pinos del Country':'pinos-del-country','Convivienda I':'convivienda-1','Convivienda 1':'convivienda-1','Avalon':'avalon','Torres de Amin II':'torres-de-amin-2'};
+const _slugV = n => {if(!n)return'';if(_SLUGS_V[n])return _SLUGS_V[n];return n.replace(/\bIV\b/g,'4').replace(/\bIII\b/g,'3').replace(/\bII\b/g,'2').replace(/\bI\b/g,'1').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');};
 onValue(ref(db, 'edificios'), (snap) => {
     const sel = document.getElementById('selectEdificio');
     if (!sel) return;
@@ -358,7 +360,7 @@ onValue(ref(db, 'edificios'), (snap) => {
     if (snap.exists()) snap.forEach(child => {
         const ed = child.val();
         const opt = document.createElement('option');
-        opt.value = ed.edificioId || child.key;
+        opt.value = ed.edificioId || _slugV(ed.nombre) || child.key;
         opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
         sel.appendChild(opt);
     });

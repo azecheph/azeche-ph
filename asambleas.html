@@ -927,6 +927,8 @@
                 cargarAsambleas();
                 cargarTareas();
                 // ─── EDIFICIOS DINÁMICOS ────────────────────────────────
+                const _SLUGS_A = {'Nepal 2':'nepal-2','Pinos del Country':'pinos-del-country','Convivienda I':'convivienda-1','Convivienda 1':'convivienda-1','Avalon':'avalon','Torres de Amin II':'torres-de-amin-2'};
+                const _slug = n => {if(!n)return'';if(_SLUGS_A[n])return _SLUGS_A[n];return n.replace(/\bIV\b/g,'4').replace(/\bIII\b/g,'3').replace(/\bII\b/g,'2').replace(/\bI\b/g,'1').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');};
                 onValue(ref(db, 'edificios'), (snap) => {
                     const sel = document.getElementById('edificioTarea');
                     if (!sel) return;
@@ -935,11 +937,10 @@
                     if (snap.exists()) snap.forEach(child => {
                         const ed = child.val();
                         const opt = document.createElement('option');
-                        opt.value = ed.edificioId || child.key;
+                        opt.value = ed.edificioId || _slug(ed.nombre) || child.key;
                         opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
                         sel.appendChild(opt);
                     });
-                    // Opción "Todos los edificios"
                     const todos = document.createElement('option');
                     todos.value = 'todos';
                     todos.textContent = '🌐 Todos los edificios';
