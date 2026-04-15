@@ -149,11 +149,6 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
     <div>
       <select id="selectEdificio" style="padding:12px;border-radius:10px;border:2px solid #ddd;font-size:1em;">
         <option value="">Selecciona edificio</option>
-        <option value="nepal-2">Nepal 2</option>
-        <option value="avalon">Avalon</option>
-        <option value="convivienda-1">Convivienda 1</option>
-        <option value="pinos-del-country">Pinos del Country</option>
-        <option value="torres-de-amin-2">Torres de Amin II</option>
         <option value="prueba-asamblea">PRUEBA - Asamblea</option>
       </select>
     </div>
@@ -353,6 +348,28 @@ try {
 
 let edificioActual = '';
 let asistentesData = {};
+
+// ─── EDIFICIOS DINÁMICOS ────────────────────────────────────────────
+onValue(ref(db, 'edificios'), (snap) => {
+    const sel = document.getElementById('selectEdificio');
+    if (!sel) return;
+    const v = sel.value;
+    sel.innerHTML = '<option value="">Selecciona edificio</option>';
+    if (snap.exists()) snap.forEach(child => {
+        const ed = child.val();
+        const opt = document.createElement('option');
+        opt.value = ed.edificioId || child.key;
+        opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
+        sel.appendChild(opt);
+    });
+    // Mantener opción de prueba al final
+    const prueba = document.createElement('option');
+    prueba.value = 'prueba-asamblea';
+    prueba.textContent = 'PRUEBA - Asamblea';
+    sel.appendChild(prueba);
+    if (v) sel.value = v;
+});
+// ────────────────────────────────────────────────────────────────────
 let votacionActual = null;
 let datosEdificio = null;
 let todosPropietariosData = {};

@@ -618,11 +618,6 @@
             <div class="edificio-selector">
                 <select id="edificioSelect" onchange="cambiarEdificio()">
                     <option value="">Selecciona edificio</option>
-                    <option value="nepal-2">Nepal 2</option>
-                    <option value="avalon">Avalon</option>
-                    <option value="convivienda-1">Convivienda 1</option>
-                    <option value="pinos-del-country">Pinos del Country</option>
-                    <option value="torres-de-amin-2">Torres de Amin II</option>
                 </select>
                 <a href="#" id="btnDrive" class="btn-drive" target="_blank" style="display: none;">
                     📁 Ver Facturas Drive
@@ -1184,7 +1179,27 @@
         let edificioActual = '';
         let facturasTemp = [];
         let proveedoresDB = {}; // Base de datos de proveedores en memoria
-        
+
+        // ─── EDIFICIOS DINÁMICOS ───────────────────────────────────────
+        // Carga edificios desde Firebase y llena el <select>
+        onValue(ref(db, 'edificios'), (snap) => {
+            const sel = document.getElementById('edificioSelect');
+            const valorActual = sel.value;
+            sel.innerHTML = '<option value="">Selecciona edificio</option>';
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    const ed = child.val();
+                    const id = ed.edificioId || child.key;
+                    const opt = document.createElement('option');
+                    opt.value = id;
+                    opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
+                    sel.appendChild(opt);
+                });
+            }
+            if (valorActual) sel.value = valorActual;
+        });
+        // ──────────────────────────────────────────────────────────────
+
         // Cargar proveedores desde Firebase al iniciar
         const proveedoresRef = ref(db, 'proveedores');
         onValue(proveedoresRef, (snapshot) => {
@@ -2021,14 +2036,16 @@
         async function cargarResumen() {
             const container = document.getElementById('tarjetasEdificios');
             if (!container) return;
-            
-            const edificios = [
-                { id: 'nepal-2', nombre: 'Nepal 2', icono: '🏢' },
-                { id: 'avalon', nombre: 'Avalon', icono: '🏰' },
-                { id: 'convivienda-1', nombre: 'Convivienda I', icono: '🏘️' },
-                { id: 'pinos-del-country', nombre: 'Pinos del Country', icono: '🌲' },
-                { id: 'torres-de-amin-2', nombre: 'Torres de Amin II', icono: '🏢' }
-            ];
+
+            // Leer edificios dinámicamente desde Firebase
+            const edSnap = await get(ref(db, 'edificios'));
+            const edificios = [];
+            if (edSnap.exists()) {
+                edSnap.forEach(child => {
+                    const ed = child.val();
+                    edificios.push({ id: ed.edificioId || child.key, nombre: ed.nombre || child.key, icono: ed.icono || '🏢' });
+                });
+            }
             
             let html = '';
             for (const ed of edificios) {
@@ -2068,13 +2085,15 @@
             contenedor.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><h3>Cargando cuentas pendientes...</h3></div>';
             document.getElementById('modalPendientes').classList.add('active');
 
-            const todosEdificios = [
-                { id: 'nepal-2', nombre: 'Nepal 2', icono: '🏢' },
-                { id: 'avalon', nombre: 'Avalon', icono: '🏰' },
-                { id: 'convivienda-1', nombre: 'Convivienda I', icono: '🏘️' },
-                { id: 'pinos-del-country', nombre: 'Pinos del Country', icono: '🌲' },
-                { id: 'torres-de-amin-2', nombre: 'Torres de Amin II', icono: '🏢' }
-            ];
+            // Leer edificios dinámicamente desde Firebase
+            const edSnap2 = await get(ref(db, 'edificios'));
+            const todosEdificios = [];
+            if (edSnap2.exists()) {
+                edSnap2.forEach(child => {
+                    const ed = child.val();
+                    todosEdificios.push({ id: ed.edificioId || child.key, nombre: ed.nombre || child.key, icono: ed.icono || '🏢' });
+                });
+            }
 
             // Si hay edificio seleccionado, solo mostrar ese; si no, mostrar todos
             const edificios = edificioActual

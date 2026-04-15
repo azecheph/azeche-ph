@@ -434,11 +434,6 @@
                 <div class="select-edificio">
                     <select id="edificioSelect" onchange="cambiarEdificio()">
                         <option value="">Seleccionar Edificio</option>
-                        <option value="nepal-2">Nepal II</option>
-                        <option value="avalon">Avalon</option>
-                        <option value="convivienda-1">Convivienda 1</option>
-                        <option value="pinos-del-country">Pinos del Country</option>
-                        <option value="torres-de-amin-2">Torres de Amin II</option>
                     </select>
                 </div>
                 <div class="search-box">
@@ -552,6 +547,23 @@
 
         let edificioActual = '';
         let tabActual = 'propietarios';
+
+        // ─── EDIFICIOS DINÁMICOS ────────────────────────────────────────
+        onValue(ref(db, 'edificios'), (snap) => {
+            const sel = document.getElementById('edificioSelect');
+            if (!sel) return;
+            const v = sel.value;
+            sel.innerHTML = '<option value="">Seleccionar Edificio</option>';
+            if (snap.exists()) snap.forEach(child => {
+                const ed = child.val();
+                const opt = document.createElement('option');
+                opt.value = ed.edificioId || child.key;
+                opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
+                sel.appendChild(opt);
+            });
+            if (v) sel.value = v;
+        });
+        // ───────────────────────────────────────────────────────────────
         let filtroEstado = 'activo';
         let dataPropietarios = {};
         let dataResidentes = {};

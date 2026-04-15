@@ -636,14 +636,8 @@
                 <div class="stat-card">
                     <div class="icon">🏢</div>
                     <h3>Edificios</h3>
-                    <div class="value">5</div>
-                    <div class="stat-detail-list">
-                        <div class="stat-detail-item"><span class="det-nombre">Nepal 2</span></div>
-                        <div class="stat-detail-item"><span class="det-nombre">Avalon</span></div>
-                        <div class="stat-detail-item"><span class="det-nombre">Convivienda 1</span></div>
-                        <div class="stat-detail-item"><span class="det-nombre">Pinos del Country</span></div>
-                        <div class="stat-detail-item"><span class="det-nombre">Torres de Amin II</span></div>
-                    </div>
+                    <div class="value" id="totalEdificiosDash">-</div>
+                    <div class="stat-detail-list" id="edificios-dash-detail"></div>
                 </div>
                 <div class="stat-card">
                     <div class="icon">💰</div>
@@ -1046,12 +1040,7 @@
                                 <label style="display: block; margin-bottom: 5px; font-weight: 600;">Edificio *</label>
                                 <select id="edificioTarea" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
                                     <option value="">Seleccionar...</option>
-                                    <option value="nepal-2">Nepal 2</option>
-                                    <option value="avalon">Avalon</option>
-                                    <option value="convivienda-1">Convivienda 1</option>
-                                    <option value="pinos-del-country">Pinos del Country</option>
-                                    <option value="torres-de-amin-2">Torres de Amin II</option>
-                                    <option value="todos">Todos los edificios</option>
+                                    <option value="todos">🌐 Todos los edificios</option>
                                 </select>
                             </div>
                         </div>
@@ -1131,27 +1120,62 @@
             } else {
                 const userInfo = JSON.parse(localStorage.getItem('azecheUser'));
                 document.getElementById('nombreUsuario').textContent = userInfo?.nombre || user.email;
-                
+
                 // Cargar contadores dinámicos
                 cargarContadores();
                 cargarAlertasVencimientos();
+
+                // ─── EDIFICIOS DINÁMICOS (select de tareas) ─────────────
+                onValue(ref(db, 'edificios'), (snap) => {
+                    const sel = document.getElementById('edificioTarea');
+                    if (!sel) return;
+                    const v = sel.value;
+                    sel.innerHTML = '<option value="">Seleccionar...</option><option value="todos">🌐 Todos los edificios</option>';
+                    if (snap.exists()) {
+                        const todos = sel.querySelector('option[value="todos"]');
+                        snap.forEach(child => {
+                            const ed = child.val();
+                            const opt = document.createElement('option');
+                            opt.value = ed.edificioId || child.key;
+                            opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
+                            sel.insertBefore(opt, todos); // insertar antes de "Todos"
+                        });
+                    }
+                    if (v) sel.value = v;
+                });
+                // ─────────────────────────────────────────────────────────
             }
         });
         
 
         
+        // Mapa dinámico edificioId → nombre (actualizado por el listener de edificios)
+        let _edificiosNombres = {};
+
         // CARGAR CONTADORES DINÁMICOS
         function cargarContadores() {
+            // Tarjeta Edificios (dinámica) + mapa de nombres para otras tarjetas
+            onValue(ref(db, 'edificios'), (snap) => {
+                _edificiosNombres = {};
+                const total = snap.exists() ? Object.keys(snap.val()).length : 0;
+                document.getElementById('totalEdificiosDash').textContent = total;
+                const detailEl = document.getElementById('edificios-dash-detail');
+                detailEl.innerHTML = '';
+                if (snap.exists()) snap.forEach(child => {
+                    const ed = child.val();
+                    const slug = ed.edificioId || child.key;
+                    _edificiosNombres[slug] = ed.nombre || child.key;
+                    detailEl.innerHTML += `<div class="stat-detail-item"><span class="det-nombre">${ed.icono || '🏢'} ${ed.nombre || child.key}</span></div>`;
+                });
+            });
+
             // Próximas asambleas
             const asambleasRef = ref(db, 'asambleas');
             onValue(asambleasRef, (snapshot) => {
                 const detailEl = document.getElementById('asambleas-detail');
                 const countEl  = document.getElementById('proximasAsambleas');
-                const nombresMap = {
-                    'nepal-2': 'Nepal 2', 'avalon': 'Avalon',
-                    'convivienda-1': 'Convivienda 1', 'pinos-del-country': 'Pinos del Country',
-                    'torres-de-amin-2': 'Torres de Amin II'
-                };
+                // Usar mapa dinámico de edificios (llenado por la escucha de 'edificios')
+                const nombresMap = _edificiosNombres;
                 if (!snapshot.exists()) { countEl.textContent = '0'; detailEl.innerHTML = ''; return; }
                 const asambleas = snapshot.val();
                 const proximas = Object.entries(asambleas)

@@ -217,11 +217,6 @@
             <div class="edificio-selector">
                 <select id="edificioSelect" onchange="cambiarEdificio()">
                     <option value="">Selecciona edificio</option>
-                    <option value="nepal-2">Nepal 2</option>
-                    <option value="avalon">Avalon</option>
-                    <option value="convivienda-1">Convivienda I</option>
-                    <option value="pinos-del-country">Pinos del Country</option>
-                    <option value="torres-de-amin-2">Torres de Amin II</option>
                 </select>
                 <button class="btn-dash" onclick="location.href='Dashboard.html'">🏠 Dashboard</button>
             </div>
@@ -431,6 +426,23 @@
 
         let edificioActual = '';
         let carteraData = {};
+
+        // ─── EDIFICIOS DINÁMICOS ────────────────────────────────────────
+        onValue(ref(db, 'edificios'), (snap) => {
+            const sel = document.getElementById('edificioSelect');
+            if (!sel) return;
+            const v = sel.value;
+            sel.innerHTML = '<option value="">Selecciona edificio</option>';
+            if (snap.exists()) snap.forEach(child => {
+                const ed = child.val();
+                const opt = document.createElement('option');
+                opt.value = ed.edificioId || child.key;
+                opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
+                sel.appendChild(opt);
+            });
+            if (v) sel.value = v;
+        });
+        // ───────────────────────────────────────────────────────────────
         let sortCol = 8; // Por defecto ordenar por saldo final
         let sortAsc = false; // Mayor a menor
         let soloMorosos = false;

@@ -815,11 +815,6 @@
                         <label>Edificio *</label>
                         <select id="edificioTarea">
                             <option value="">Seleccionar...</option>
-                            <option value="nepal-2">Nepal 2</option>
-                            <option value="avalon">Avalon</option>
-                            <option value="convivienda-1">Convivienda I</option>
-                            <option value="pinos-del-country">Pinos del Country</option>
-                            <option value="torres-de-amin-2">Torres de Amin II</option>
                         </select>
                     </div>
                 </div>
@@ -931,6 +926,27 @@
             } else {
                 cargarAsambleas();
                 cargarTareas();
+                // ─── EDIFICIOS DINÁMICOS ────────────────────────────────
+                onValue(ref(db, 'edificios'), (snap) => {
+                    const sel = document.getElementById('edificioTarea');
+                    if (!sel) return;
+                    const v = sel.value;
+                    sel.innerHTML = '<option value="">Seleccionar...</option>';
+                    if (snap.exists()) snap.forEach(child => {
+                        const ed = child.val();
+                        const opt = document.createElement('option');
+                        opt.value = ed.edificioId || child.key;
+                        opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
+                        sel.appendChild(opt);
+                    });
+                    // Opción "Todos los edificios"
+                    const todos = document.createElement('option');
+                    todos.value = 'todos';
+                    todos.textContent = '🌐 Todos los edificios';
+                    sel.appendChild(todos);
+                    if (v) sel.value = v;
+                });
+                // ────────────────────────────────────────────────────────
             }
         });
 

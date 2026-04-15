@@ -245,11 +245,6 @@
                             <label>Edificio *</label>
                             <select id="edificio" required>
                                 <option value="">Seleccionar...</option>
-                                <option value="Nepal 2">Nepal 2</option>
-                                <option value="Avalon">Avalon</option>
-                                <option value="Convivienda 1">Convivienda 1</option>
-                                <option value="Pinos del Country">Pinos del Country</option>
-                                <option value="Torres de Amin II">Torres de Amin II</option>
                             </select>
                         </div>
                         
@@ -350,6 +345,23 @@
         let currentUser = null;
         let editandoId = null;
         let contratoFile = null;
+
+        // ─── EDIFICIOS DINÁMICOS ────────────────────────────────────────
+        onValue(ref(db, 'edificios'), (snap) => {
+            const sel = document.getElementById('edificio');
+            if (!sel) return;
+            const v = sel.value;
+            sel.innerHTML = '<option value="">Seleccionar...</option>';
+            if (snap.exists()) snap.forEach(child => {
+                const ed = child.val();
+                const opt = document.createElement('option');
+                opt.value = ed.nombre || child.key; // contratos guarda nombre como valor
+                opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
+                sel.appendChild(opt);
+            });
+            if (v) sel.value = v;
+        });
+        // ───────────────────────────────────────────────────────────────
 
         // Verificar autenticación
         onAuthStateChanged(auth, (user) => {
