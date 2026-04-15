@@ -1489,7 +1489,7 @@
                                             <span>🏢 ${tarea.edificio}</span>
                                             <span>📌 ${tarea.origen}</span>
                                             <span style="color: ${coloresPrioridad[tarea.prioridad]}; font-weight: 600;">⚡ ${tarea.prioridad.toUpperCase()}</span>
-                                            ${tarea.fechaLimite ? `<span>📅 ${new Date(tarea.fechaLimite).toLocaleDateString()}</span>` : ''}
+                                            ${tarea.fechaLimite ? `<span>📅 ${new Date(tarea.fechaLimite + 'T12:00:00').toLocaleDateString('es-CO')}</span>` : ''}
                                         </div>
                                         ${tarea.descripcion ? `<p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">${tarea.descripcion}</p>` : ''}
                                     </div>

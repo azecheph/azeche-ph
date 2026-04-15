@@ -982,7 +982,8 @@
                         const estadoElement = document.getElementById(`estado-${id}`);
                         
                         if (asamblea && asamblea.fecha) {
-                            const fecha = new Date(asamblea.fecha);
+                            // Agregar T12:00:00 para evitar desfase de zona horaria (UTC vs Colombia UTC-5)
+                            const fecha = new Date(asamblea.fecha + 'T12:00:00');
                             fechaElement.textContent = fecha.toLocaleDateString('es-ES', {
                                 year: 'numeric',
                                 month: 'long',
@@ -1044,7 +1045,7 @@
                             </div>
                             <div style="text-align: right;">
                                 <span class="prioridad-badge" style="background: ${prioridadColor[tarea.prioridad] || '#999'}">${tarea.prioridad}</span>
-                                ${tarea.fechaLimite ? `<p style="color: #999; font-size: 0.85em; margin-top: 8px;">📅 ${new Date(tarea.fechaLimite).toLocaleDateString('es-ES')}</p>` : ''}
+                                ${tarea.fechaLimite ? `<p style="color: #999; font-size: 0.85em; margin-top: 8px;">📅 ${new Date(tarea.fechaLimite + 'T12:00:00').toLocaleDateString('es-ES')}</p>` : ''}
                             </div>
                         </div>
                         <div class="tarea-footer">
