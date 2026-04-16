@@ -1019,7 +1019,75 @@
                     </div>
 
                 </div>
+
+                <!-- MILLENIUM 3 -->
+                <div class="edificio-asamblea-card">
+                    <h3>
+                        🏢 Millenium 3
+                        <span class="badge pendiente">POR AGENDAR</span>
+                    </h3>
+
+                    <div class="fecha-asamblea">
+                        <span class="icon">⏳</span>
+                        <div class="info">
+                            <h4>Estado</h4>
+                            <p id="fecha-millenium3">Por definir</p>
+                        </div>
+                    </div>
+
+                    <div class="documentos-list">
+                        <h4>📄 Documentos Preparados</h4>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📋</span>
+                                <span>Convocatoria (Plantilla)</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('millenium3', 'convocatoria')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📝</span>
+                                <span>Acta (Plantilla)</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('millenium3', 'acta')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📊</span>
+                                <span>Informe de Gestión 2025</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('millenium3', 'informe')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>✉️</span>
+                                <span>Citación Formal</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('millenium3', 'citacion')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn-editar-asamblea" onclick="abrirModalEditarAsamblea('millenium-3')">✏️ Editar Fecha y Estado</button>
+                    <div class="action-buttons" style="display: flex; gap: 15px; margin-top: 25px;">
+                        <button class="btn-action btn-votar" onclick="abrirVotacion('millenium3')" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #00B853 0%, #0056B8 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            ✅ Sistema de Votación
+                        </button>
+                        <button class="btn-action btn-actas" onclick="abrirGeneradorActas('millenium3')" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            🎙️ Generador de Actas
+                        </button>
+                    </div>
+
+                </div>
             </div>
+        </div>
             
             <!-- SECCIÓN DE CONSEJOS MENSUALES -->
             <h2 style="font-size: 2em; margin: 50px 0 30px 0; color: #333;">
@@ -1126,7 +1194,7 @@
                 cargarAlertasVencimientos();
 
                 // ─── EDIFICIOS DINÁMICOS (select de tareas) ─────────────
-                const _SLUGS_D = {'Nepal 2':'nepal-2','Pinos del Country':'pinos-del-country','Convivienda I':'convivienda-1','Convivienda 1':'convivienda-1','Avalon':'avalon','Torres de Amin II':'torre-amin-2','Tores de Anim II':'torre-amin-2'};
+                const _SLUGS_D = {'Nepal 2':'nepal-2','Pinos del Country':'pinos-del-country','Convivienda I':'convivienda-1','Convivienda 1':'convivienda-1','Avalon':'avalon','Torres de Amin II':'torre-amin-2','Tores de Anim II':'torre-amin-2','Millenium 3':'millenium-3'};
                 const _slugD = n => {if(!n)return'';if(_SLUGS_D[n])return _SLUGS_D[n];return n.replace(/\bIV\b/g,'4').replace(/\bIII\b/g,'3').replace(/\bII\b/g,'2').replace(/\bI\b/g,'1').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');};
                 onValue(ref(db, 'edificios'), (snap) => {
                     const sel = document.getElementById('edificioTarea');
@@ -1599,7 +1667,8 @@
                 'avalon': 'avalon',
                 'convivienda': 'convivienda-1',
                 'pinos': 'pinos-del-country',
-                'torresamin2': 'torre-amin-2'
+                'torresamin2': 'torre-amin-2',
+                'millenium3': 'millenium-3'
             };
             window.location.href = `votacion-admin.html?edificio=${edificiosMap[edificio]}`;
         }
@@ -1618,7 +1687,8 @@
             'convivienda-1': 'Convivienda 1',
             'pinos-del-country': 'Pinos del Country',
             'torres-de-amin-2': 'Torres de Amin II',
-            'torre-amin-2': 'Torres de Amin II'
+            'torre-amin-2': 'Torres de Amin II',
+            'millenium-3': 'Millenium 3'
         };
         
         // Abrir modal de edición

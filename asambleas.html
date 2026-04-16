@@ -797,6 +797,77 @@
                     📝 Generador de Actas
                 </button>
             </div>
+
+            <!-- MILLENIUM 3 -->
+            <div class="edificio-card">
+                <h3>
+                    🏢 Millenium 3
+                    <span class="badge agendar">POR AGENDAR</span>
+                </h3>
+
+                <div class="fecha-asamblea">
+                    <span class="icon">📅</span>
+                    <div>
+                        <h4>Fecha programada</h4>
+                        <p id="fecha-millenium3">Por definir</p>
+                    </div>
+                </div>
+
+                <div class="estado-badge">
+                    <span>⏳</span>
+                    <span id="estado-millenium3">Pendiente de fecha</span>
+                </div>
+
+                <div class="documentos-section">
+                    <h4>📄 Documentos Preparatorios</h4>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📋</span>
+                            <span>Convocatoria (Plantilla)</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('millenium3', 'convocatoria')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📝</span>
+                            <span>Acta (Plantilla)</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('millenium3', 'acta')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📊</span>
+                            <span>Informe de Gestión 2025</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('millenium3', 'informe')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-name">
+                            <span>📧</span>
+                            <span>Citación Formal</span>
+                        </div>
+                        <button class="btn-download" onclick="descargarDoc('millenium3', 'citacion')">
+                            ⬇️ Descargar
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn-action btn-editar" onclick="abrirModal('millenium-3')">
+                    ✏️ Editar Fecha y Estado
+                </button>
+                <button class="btn-action btn-votacion" onclick="abrirVotacion('millenium3')">
+                    🗳️ Sistema de Votación
+                </button>
+                <button class="btn-action btn-actas" onclick="abrirGeneradorActas()">
+                    📝 Generador de Actas
+                </button>
+            </div>
         </div>
         
         <!-- SECCIÓN DE TAREAS -->
@@ -927,7 +998,7 @@
                 cargarAsambleas();
                 cargarTareas();
                 // ─── EDIFICIOS DINÁMICOS ────────────────────────────────
-                const _SLUGS_A = {'Nepal 2':'nepal-2','Pinos del Country':'pinos-del-country','Convivienda I':'convivienda-1','Convivienda 1':'convivienda-1','Avalon':'avalon','Torres de Amin II':'torre-amin-2','Tores de Anim II':'torre-amin-2'};
+                const _SLUGS_A = {'Nepal 2':'nepal-2','Pinos del Country':'pinos-del-country','Convivienda I':'convivienda-1','Convivienda 1':'convivienda-1','Avalon':'avalon','Torres de Amin II':'torre-amin-2','Tores de Anim II':'torre-amin-2','Millenium 3':'millenium-3'};
                 const _slug = n => {if(!n)return'';if(_SLUGS_A[n])return _SLUGS_A[n];return n.replace(/\bIV\b/g,'4').replace(/\bIII\b/g,'3').replace(/\bII\b/g,'2').replace(/\bI\b/g,'1').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');};
                 onValue(ref(db, 'edificios'), (snap) => {
                     const sel = document.getElementById('edificioTarea');
@@ -959,7 +1030,8 @@
             'convivienda-1': 'Convivienda I',
             'pinos-del-country': 'Pinos del Country',
             'torres-de-amin-2': 'Torres de Amin II',
-            'torre-amin-2': 'Torres de Amin II'
+            'torre-amin-2': 'Torres de Amin II',
+            'millenium-3': 'Millenium 3'
         };
 
         const idMap = {
@@ -968,7 +1040,8 @@
             'convivienda-1': 'convivienda',
             'pinos-del-country': 'pinos',
             'torres-de-amin-2': 'torresamin2',
-            'torre-amin-2': 'torresamin2'
+            'torre-amin-2': 'torresamin2',
+            'millenium-3': 'millenium3'
         };
 
         let edificioActual = '';
@@ -1233,7 +1306,8 @@
                 'avalon': 'avalon',
                 'convivienda': 'convivienda-1',
                 'pinos': 'pinos-del-country',
-                'torresamin2': 'torre-amin-2'
+                'torresamin2': 'torre-amin-2',
+                'millenium3': 'millenium-3'
             };
             window.location.href = `votacion-admin.html?edificio=${edificiosMap[edificio]}`;
         };
