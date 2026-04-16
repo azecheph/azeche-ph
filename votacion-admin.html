@@ -608,7 +608,7 @@ function actualizarQuorum() {
     totalCoef += parseFloat(a.coeficiente || 0);
   });
 
-  document.getElementById('totalCoeficiente').textContent = (totalCoef * 100).toFixed(2) + '%';
+  document.getElementById('totalCoeficiente').textContent = Math.round(totalCoef * 100) + '%';
   const quorumPorcentaje = (totalCoef / 1.0) * 100;
   document.getElementById('quorumActual').textContent = Math.round(quorumPorcentaje) + '%';
 }
@@ -647,7 +647,7 @@ function mostrarAsistentes() {
       </div>
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
         ${votoBadge}
-        <span class="asistente-coef">${(parseFloat(asistente.coeficiente || 0) * 100).toFixed(2)}%</span>
+        <span class="asistente-coef">${Math.round(parseFloat(asistente.coeficiente || 0) * 100)}%</span>
         <button class="btn-delete-asistente" onclick="eliminarAsistente('${id}')">X</button>
       </div>
     `;
