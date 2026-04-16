@@ -308,8 +308,40 @@ if (!edificio) {
   document.getElementById('loadingProps').style.display = 'none';
 }
 
+// ---- COMBINAR APTO + GARAJE ----
+function esGaraje(apto) {
+  if (!apto) return false;
+  return /^g\d|garaje|garage|parq|dep/i.test(String(apto).trim());
+}
+function combinarPropietarios(data) {
+  const grupos = {};
+  Object.entries(data).forEach(([key, p]) => {
+    if (p.tipo === 'residente' || p.tipo === 'Residente') return;
+    const idKey = (p.documento || p.nombre || key).toString().trim().toLowerCase();
+    if (!grupos[idKey]) grupos[idKey] = { coefTotal: 0, primaryKey: null, primaryApto: null, nombre: p.nombre, allKeys: [] };
+    grupos[idKey].coefTotal += parseFloat(p.coeficiente || 0);
+    grupos[idKey].allKeys.push(key);
+    if (!esGaraje(p.apto) && !grupos[idKey].primaryKey) {
+      grupos[idKey].primaryKey = key;
+      grupos[idKey].primaryApto = p.apto;
+      grupos[idKey].nombre = p.nombre;
+    }
+  });
+  const combined = {};
+  const gKeys = new Set();
+  const k2c = {};
+  Object.values(grupos).forEach(g => {
+    if (!g.primaryKey) { g.primaryKey = g.allKeys[0]; g.primaryApto = data[g.primaryKey]?.apto; }
+    combined[g.primaryKey] = { nombre: g.nombre, apto: g.primaryApto, coeficiente: g.coefTotal };
+    g.allKeys.forEach(k => { k2c[k] = g.coefTotal; if (k !== g.primaryKey) gKeys.add(k); });
+  });
+  return { combined, gKeys, k2c };
+}
+
 // ---- ESTADO GLOBAL ----
 let todosPropietarios = {};
+let garageKeysProp = new Set();
+let coefCombinadoProp = {};
 let propAct = null;       // { key, apto, nombre, coeficiente }
 let representados = [];   // [{ key, apto, nombre, coeficiente }]
 let representaSi = false;
@@ -366,11 +398,12 @@ async function cargarPropietarios() {
       return;
     }
     todosPropietarios = snap.val();
+    const { combined, gKeys, k2c } = combinarPropietarios(todosPropietarios);
+    garageKeysProp = gKeys;
+    coefCombinadoProp = k2c;
     const lista = [];
-    Object.entries(todosPropietarios).forEach(([key, p]) => {
-      if (p.tipo === 'Propietario' || p.tipo === 'propietario' || !p.tipo) {
-        lista.push({ key, apto: p.apto, nombre: p.nombre || 'Propietario', coeficiente: parseFloat(p.coeficiente || 0) });
-      }
+    Object.entries(combined).forEach(([key, p]) => {
+      lista.push({ key, apto: p.apto, nombre: p.nombre || 'Propietario', coeficiente: p.coeficiente });
     });
     lista.sort((a, b) => (parseInt(a.apto) || 0) - (parseInt(b.apto) || 0));
 
@@ -412,7 +445,9 @@ function actualizarListaPoderes() {
   cont.innerHTML = '';
   Object.entries(todosPropietarios).forEach(([key, p]) => {
     if (key === propAct?.key) return;
+    if (garageKeysProp.has(key)) return;
     if (p.tipo !== 'Propietario' && p.tipo !== 'propietario' && p.tipo) return;
+    const coefMostrar = coefCombinadoProp[key] ?? parseFloat(p.coeficiente || 0);
     const sel = representados.some(r => r.key === key);
     const div = document.createElement('div');
     div.className = 'prop-check' + (sel ? ' sel' : '');
@@ -421,10 +456,10 @@ function actualizarListaPoderes() {
       <div class="prop-info">
         <div class="apto">Apto ${p.apto}</div>
         <div class="nombre">${p.nombre || 'Sin nombre'}</div>
-        <div class="coef">Coef: ${parseFloat(p.coeficiente || 0).toFixed(4)}</div>
+        <div class="coef">Coef: ${(coefMostrar * 100).toFixed(2)}%</div>
       </div>`;
     div.addEventListener('click', () => {
-      const dato = { key, apto: p.apto, nombre: p.nombre || 'Sin nombre', coeficiente: parseFloat(p.coeficiente || 0) };
+      const dato = { key, apto: p.apto, nombre: p.nombre || 'Sin nombre', coeficiente: coefMostrar };
       const idx = representados.findIndex(r => r.key === key);
       if (idx >= 0) {
         representados.splice(idx, 1);
