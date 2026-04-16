@@ -298,6 +298,8 @@
                 <label>📋 Descripción Catastral</label>
                 <textarea id="fCatastral" placeholder="Linderos, área privada, área común, otros datos catastrales..."></textarea>
             </div>
+            <div class="section-divider divider-blue form-full">🛡️ Póliza de Seguros</div>
+
             <div class="form-group">
                 <label>🛡️ No. Póliza de Seguro</label>
                 <input type="text" id="fPolizaNo" placeholder="Número de póliza">
@@ -307,12 +309,36 @@
                 <input type="text" id="fAseguradora" placeholder="Ej: Sura, Bolívar, Mapfre...">
             </div>
             <div class="form-group">
+                <label>📅 Inicio Vigencia</label>
+                <input type="date" id="fPolizaInicio">
+            </div>
+            <div class="form-group">
                 <label>📅 Vencimiento Póliza</label>
                 <input type="date" id="fPolizaVence">
             </div>
             <div class="form-group">
                 <label>💰 Valor Asegurado</label>
                 <input type="text" id="fPolizaValor" placeholder="Ej: $2.500.000.000">
+            </div>
+            <div class="form-group">
+                <label>💳 Tipo de Pago</label>
+                <select id="fPolizaTipoPago" onchange="togglePolizaPago()">
+                    <option value="">-- Sin registrar --</option>
+                    <option value="contado">De contado</option>
+                    <option value="financiado">Financiado (cuotas)</option>
+                </select>
+            </div>
+            <div class="form-group" id="rowPolizaCuotas" style="display:none;">
+                <label>🔢 No. Cuotas Total</label>
+                <input type="number" id="fPolizaCuotas" placeholder="Ej: 10" min="1">
+            </div>
+            <div class="form-group" id="rowPolizaCuotaValor" style="display:none;">
+                <label>💵 Valor por Cuota</label>
+                <input type="text" id="fPolizaCuotaValor" placeholder="Ej: $350.000">
+            </div>
+            <div class="form-group" id="rowPolizaCuotasPagadas" style="display:none;">
+                <label>✅ Cuotas Pagadas</label>
+                <input type="number" id="fPolizaCuotasPagadas" placeholder="Ej: 3" min="0">
             </div>
             <div class="form-group">
                 <label>🏛️ Vencimiento Representación Legal (Alcaldía)</label>
@@ -482,14 +508,43 @@
 
         // Póliza
         let polizaInfo = '';
-        if (d.polizaNo || d.aseguradora) {
+        if (d.polizaNo || d.aseguradora || d.polizaVence) {
+            // Vencimiento con color
+            let venceHtml = '';
+            if (d.polizaVence) {
+                const hoyP = new Date(); hoyP.setHours(0,0,0,0);
+                const venceP = new Date(d.polizaVence + 'T00:00:00');
+                const diasP = Math.ceil((venceP - hoyP) / 86400000);
+                const colP = diasP < 0 ? '#c62828' : diasP <= 30 ? '#e65100' : diasP <= 90 ? '#f57f17' : '#2e7d32';
+                const avisoP = diasP < 0 ? `⚠️ VENCIDA hace ${Math.abs(diasP)} días`
+                    : diasP === 0 ? '⚠️ Vence HOY'
+                    : diasP <= 30 ? `⚠️ Vence en ${diasP} días (${venceP.toLocaleDateString('es-CO')})`
+                    : diasP <= 90 ? `⏰ Vence en ${diasP} días (${venceP.toLocaleDateString('es-CO')})`
+                    : `✅ Vigente hasta ${venceP.toLocaleDateString('es-CO')}`;
+                venceHtml = `<br><span style="color:${colP};font-weight:600;">${avisoP}</span>`;
+            }
+            // Inicio vigencia
+            const inicioHtml = d.polizaInicio ? `<br><span style="color:#555;font-size:0.9em;">Inicio: ${d.polizaInicio}</span>` : '';
+            // Tipo de pago y cuotas
+            let pagoHtml = '';
+            if (d.polizaTipoPago === 'financiado' && d.polizaCuotas) {
+                const pagadas = parseInt(d.polizaCuotasPagadas) || 0;
+                const total = parseInt(d.polizaCuotas) || 0;
+                const resto = total - pagadas;
+                const pct = total > 0 ? Math.round(pagadas / total * 100) : 0;
+                pagoHtml = `<br><span style="color:#0056B8;font-weight:600;">💳 Financiado: ${pagadas}/${total} cuotas pagadas</span>`
+                    + (d.polizaCuotaValor ? `<br><span style="color:#555;font-size:0.9em;">Valor cuota: ${d.polizaCuotaValor} — Pendientes: ${resto}</span>` : `<br><span style="color:#555;font-size:0.9em;">Cuotas pendientes: ${resto}</span>`)
+                    + `<br><div style="background:#e0e0e0;border-radius:4px;height:8px;margin-top:5px;overflow:hidden;"><div style="background:#0056B8;height:100%;width:${pct}%;"></div></div>`;
+            } else if (d.polizaTipoPago === 'contado') {
+                pagoHtml = `<br><span style="color:#2e7d32;font-weight:600;">💵 Pagado de contado</span>`;
+            }
             polizaInfo = `<div class="info-group">
                 <div class="info-label">🛡️ Póliza de Seguro</div>
                 <div class="info-value">
                     ${d.aseguradora ? `<strong>${d.aseguradora}</strong>` : ''}
                     ${d.polizaNo ? ` — No. <strong>${d.polizaNo}</strong>` : ''}
-                    ${d.polizaVence ? `<br><span style="color:#e65100;">Vence: ${d.polizaVence}</span>` : ''}
-                    ${d.polizaValor ? `<br>Valor: ${d.polizaValor}` : ''}
+                    ${d.polizaValor ? `<br>Valor asegurado: ${d.polizaValor}` : ''}
+                    ${inicioHtml}${venceHtml}${pagoHtml}
                 </div>
             </div>`;
         }
@@ -597,16 +652,30 @@
         document.getElementById('fMatricula').value      = d.matricula || '';
         document.getElementById('fChip').value           = d.chip || '';
         document.getElementById('fCatastral').value      = d.catastral || '';
-        document.getElementById('fPolizaNo').value       = d.polizaNo || '';
-        document.getElementById('fAseguradora').value    = d.aseguradora || '';
-        document.getElementById('fPolizaVence').value         = d.polizaVence || '';
-        document.getElementById('fPolizaValor').value         = d.polizaValor || '';
+        document.getElementById('fPolizaNo').value             = d.polizaNo || '';
+        document.getElementById('fAseguradora').value          = d.aseguradora || '';
+        document.getElementById('fPolizaInicio').value         = d.polizaInicio || '';
+        document.getElementById('fPolizaVence').value          = d.polizaVence || '';
+        document.getElementById('fPolizaValor').value          = d.polizaValor || '';
+        document.getElementById('fPolizaTipoPago').value       = d.polizaTipoPago || '';
+        document.getElementById('fPolizaCuotas').value         = d.polizaCuotas || '';
+        document.getElementById('fPolizaCuotaValor').value     = d.polizaCuotaValor || '';
+        document.getElementById('fPolizaCuotasPagadas').value  = d.polizaCuotasPagadas || '';
+        togglePolizaPago();
         document.getElementById('fRepresentacionVence').value = d.representacionVence || '';
         document.getElementById('fCuentasBancarias').value    = d.cuentasBancarias || '';
         document.getElementById('fClavesCamaras').value  = d.clavesCamaras || '';
         document.getElementById('fNotas').value          = d.notas || '';
 
         document.getElementById('modalEdificio').classList.add('active');
+    };
+
+    window.togglePolizaPago = function() {
+        const tipo = document.getElementById('fPolizaTipoPago').value;
+        const show = tipo === 'financiado';
+        ['rowPolizaCuotas','rowPolizaCuotaValor','rowPolizaCuotasPagadas'].forEach(id => {
+            document.getElementById(id).style.display = show ? '' : 'none';
+        });
     };
 
     window.guardarEdificio = async function() {
@@ -625,10 +694,15 @@
             matricula:       document.getElementById('fMatricula').value.trim(),
             chip:            document.getElementById('fChip').value.trim(),
             catastral:       document.getElementById('fCatastral').value.trim(),
-            polizaNo:        document.getElementById('fPolizaNo').value.trim(),
-            aseguradora:     document.getElementById('fAseguradora').value.trim(),
-            polizaVence:          document.getElementById('fPolizaVence').value,
-            polizaValor:          document.getElementById('fPolizaValor').value.trim(),
+            polizaNo:           document.getElementById('fPolizaNo').value.trim(),
+            aseguradora:        document.getElementById('fAseguradora').value.trim(),
+            polizaInicio:       document.getElementById('fPolizaInicio').value,
+            polizaVence:        document.getElementById('fPolizaVence').value,
+            polizaValor:        document.getElementById('fPolizaValor').value.trim(),
+            polizaTipoPago:     document.getElementById('fPolizaTipoPago').value,
+            polizaCuotas:       document.getElementById('fPolizaCuotas').value || '',
+            polizaCuotaValor:   document.getElementById('fPolizaCuotaValor').value.trim(),
+            polizaCuotasPagadas:document.getElementById('fPolizaCuotasPagadas').value || '',
             representacionVence:  document.getElementById('fRepresentacionVence').value,
             cuentasBancarias:document.getElementById('fCuentasBancarias').value.trim(),
             clavesCamaras:   document.getElementById('fClavesCamaras').value.trim(),
@@ -672,12 +746,17 @@
     function limpiarForm() {
         ['fNombre','fDireccion','fEmail','fPassword','fRut','fTelefono',
          'fMatricula','fChip','fCatastral','fPolizaNo','fAseguradora',
-         'fPolizaVence','fPolizaValor','fRepresentacionVence',
-         'fCuentasBancarias','fClavesCamaras','fNotas'].forEach(id => {
+         'fPolizaInicio','fPolizaVence','fPolizaValor',
+         'fPolizaCuotas','fPolizaCuotaValor','fPolizaCuotasPagadas',
+         'fRepresentacionVence','fCuentasBancarias','fClavesCamaras','fNotas'].forEach(id => {
             document.getElementById(id).value = '';
         });
-        document.getElementById('fTipo').value  = 'EDIFICIO';
-        document.getElementById('fIcono').value = '🏢';
+        document.getElementById('fTipo').value          = 'EDIFICIO';
+        document.getElementById('fIcono').value         = '🏢';
+        document.getElementById('fPolizaTipoPago').value = '';
+        ['rowPolizaCuotas','rowPolizaCuotaValor','rowPolizaCuotasPagadas'].forEach(id => {
+            document.getElementById(id).style.display = 'none';
+        });
     }
 
     // Datos sensibles toggle

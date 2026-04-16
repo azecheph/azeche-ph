@@ -1365,7 +1365,19 @@
                             ? `VENCIDA hace ${Math.abs(dias)} día(s)`
                             : dias === 0 ? 'Vence HOY'
                             : `Vence en ${dias} día(s) — ${fecha.toLocaleDateString('es-CO')}`;
-                        alertas.push({ nombre, label, icono, color, bg, texto, dias });
+                        // Extra info para póliza: cuotas
+                        let extra = '';
+                        if (campo === 'polizaVence' && ed.polizaTipoPago === 'financiado' && ed.polizaCuotas) {
+                            const pag = parseInt(ed.polizaCuotasPagadas) || 0;
+                            const tot = parseInt(ed.polizaCuotas) || 0;
+                            const pct = tot > 0 ? Math.round(pag / tot * 100) : 0;
+                            extra = `<div style="margin-top:6px;color:#0056B8;font-size:0.9em;font-weight:600;">💳 Cuotas: ${pag}/${tot} pagadas`
+                                + (ed.polizaCuotaValor ? ` · ${ed.polizaCuotaValor} c/u` : '')
+                                + `</div><div style="background:#e0e0e0;border-radius:4px;height:6px;margin-top:4px;overflow:hidden;"><div style="background:#0056B8;height:100%;width:${pct}%;"></div></div>`;
+                        } else if (campo === 'polizaVence' && ed.polizaTipoPago === 'contado') {
+                            extra = `<div style="margin-top:4px;color:#2e7d32;font-size:0.9em;">💵 Pagada de contado</div>`;
+                        }
+                        alertas.push({ nombre, label, icono, color, bg, texto, dias, extra });
                     });
                 });
                 if (alertas.length === 0) {
@@ -1378,6 +1390,7 @@
                         <div style="font-size:1.1em;font-weight:700;color:${a.color};margin-bottom:4px;">${a.icono} ${a.nombre}</div>
                         <div style="font-weight:600;color:#555;margin-bottom:3px;">${a.label}</div>
                         <div style="color:${a.color};font-weight:600;">${a.texto}</div>
+                        ${a.extra || ''}
                     </div>`).join('');
             }).catch(err => {
                 console.error('Error cargando alertas:', err);
