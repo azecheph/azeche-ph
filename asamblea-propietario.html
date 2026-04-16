@@ -403,7 +403,9 @@ async function cargarPropietarios() {
     coefCombinadoProp = k2c;
     const lista = [];
     Object.entries(combined).forEach(([key, p]) => {
-      lista.push({ key, apto: p.apto, nombre: p.nombre || 'Propietario', coeficiente: p.coeficiente });
+      if (!esGaraje(p.apto)) {
+        lista.push({ key, apto: p.apto, nombre: p.nombre || 'Propietario', coeficiente: p.coeficiente });
+      }
     });
     lista.sort((a, b) => (parseInt(a.apto) || 0) - (parseInt(b.apto) || 0));
 

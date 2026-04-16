@@ -587,7 +587,8 @@ async function cargarDatos() {
       if (data) {
         todosPropietariosData = data;
         const { combined, gKeys, k2c } = combinarPropietarios(data);
-        propietariosCombinados = combined;
+        // Excluir entradas cuyo primario sigue siendo garaje (sin apto asociado)
+        propietariosCombinados = Object.fromEntries(Object.entries(combined).filter(([, p]) => !esGaraje(p.apto)));
         garageKeys = gKeys;
         keyToCoefCombinado = k2c;
         document.getElementById('totalApartamentos').textContent = Object.keys(propietariosCombinados).length;
