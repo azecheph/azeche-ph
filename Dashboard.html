@@ -1165,7 +1165,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
         import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        import { getDatabase, ref, onValue, push, set, update, remove } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+        import { getDatabase, ref, onValue, get, push, set, update, remove } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
@@ -1250,9 +1250,14 @@
                 const nombresMap = _edificiosNombres;
                 if (!snapshot.exists()) { countEl.textContent = '0'; detailEl.innerHTML = ''; return; }
                 const asambleas = snapshot.val();
+                const hoyAsm = new Date(); hoyAsm.setHours(0,0,0,0);
                 const proximas = Object.entries(asambleas)
                     .map(([key, a]) => ({ key, ...a }))
-                    .filter(a => a.estado !== 'realizada')
+                    .filter(a => {
+                        if (a.estado === 'realizada') return false;
+                        if (a.fecha && new Date(a.fecha + 'T12:00:00') < hoyAsm) return false;
+                        return true;
+                    })
                     .sort((a, b) => {
                         if (!a.fecha) return 1;
                         if (!b.fecha) return -1;
