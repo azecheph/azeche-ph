@@ -584,7 +584,7 @@
                 <div class="stat-card">
                     <div class="icon">🏢</div>
                     <h3>Edificios</h3>
-                    <div class="value">4</div>
+                    <div class="value" id="totalEdificios">-</div>
                 </div>
                 <div class="stat-card">
                     <div class="icon">💰</div>
@@ -599,12 +599,12 @@
                 <div class="stat-card">
                     <div class="icon">🎯</div>
                     <h3>Próximas Asambleas</h3>
-                    <div class="value">2</div>
+                    <div class="value" id="totalAsambleas">-</div>
                 </div>
                 <div class="stat-card">
                     <div class="icon">✅</div>
                     <h3>Tareas Pendientes</h3>
-                    <div class="value">3</div>
+                    <div class="value" id="totalTareas">-</div>
                 </div>
             </div>
 
@@ -613,6 +613,18 @@
                 <h3 style="font-size:1.3em;font-weight:700;color:#333;margin-bottom:14px;">💰 Cuentas por Pagar por Edificio</h3>
                 <div id="edificios-facturas-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
                     <p style="color:#888;font-style:italic;">Cargando...</p>
+                </div>
+            </div>
+
+            <!-- ASAMBLEAS Y TAREAS PENDIENTES -->
+            <div style="margin-top:28px;display:grid;grid-template-columns:1fr 1fr;gap:20px;" id="grid-agenda">
+                <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.08);">
+                    <h3 style="font-size:1.1em;font-weight:700;color:#333;margin-bottom:14px;">🎯 Próximas Asambleas</h3>
+                    <div id="lista-asambleas"><p style="color:#888;font-style:italic;">Cargando...</p></div>
+                </div>
+                <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.08);">
+                    <h3 style="font-size:1.1em;font-weight:700;color:#333;margin-bottom:14px;">✅ Tareas Pendientes</h3>
+                    <div id="lista-tareas"><p style="color:#888;font-style:italic;">Cargando...</p></div>
                 </div>
             </div>
 
@@ -979,7 +991,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
         import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        import { getDatabase, ref, onValue, push, set, update, remove } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+        import { getDatabase, ref, onValue, get, push, set, update, remove } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
@@ -1011,28 +1023,93 @@
         
 
         
+        const NOMBRES_EDIFICIOS = {
+            'nepal-2': 'Nepal 2',
+            'convivienda-1': 'Convivienda I',
+            'pinos-del-country': 'Pinos del Country',
+            'avalon': 'Avalon',
+            'torres-de-anim-2': 'Torres de Anim II',
+        };
+
         // CARGAR CONTADORES DINÁMICOS
         function cargarContadores() {
-            // Contar próximas asambleas
+            // Contar edificios
+            const edificiosRef = ref(db, 'edificios');
+            onValue(edificiosRef, (snapshot) => {
+                const total = snapshot.exists() ? Object.keys(snapshot.val()).length : 0;
+                document.getElementById('totalEdificios').textContent = total;
+            });
+
+            // Próximas asambleas con detalle por edificio
             const asambleasRef = ref(db, 'asambleas');
             onValue(asambleasRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    const asambleas = snapshot.val();
-                    const proximas = Object.values(asambleas).filter(a => {
-                        const fecha = new Date(a.fecha);
-                        return fecha > new Date() && a.estado !== 'realizada';
-                    });
-                    document.querySelector('#dashboard-section .stat-card:nth-child(4) .value').textContent = proximas.length;
+                const listaEl = document.getElementById('lista-asambleas');
+                if (!snapshot.exists()) {
+                    document.getElementById('totalAsambleas').textContent = '0';
+                    listaEl.innerHTML = '<p style="color:#888;font-style:italic;">Sin asambleas próximas.</p>';
+                    return;
+                }
+                const hoy = new Date(); hoy.setHours(0,0,0,0);
+                const items = [];
+                snapshot.forEach((child) => {
+                    const a = child.val();
+                    const edificioId = child.key;
+                    if (!a.fecha) return;
+                    const fecha = new Date(a.fecha + 'T00:00:00');
+                    if (fecha >= hoy && a.estado !== 'realizada') {
+                        const dias = Math.round((fecha - hoy) / 86400000);
+                        items.push({ edificioId, nombre: NOMBRES_EDIFICIOS[edificioId] || edificioId, fecha, dias, tipo: a.tipo || 'Asamblea' });
+                    }
+                });
+                items.sort((a, b) => a.dias - b.dias);
+                document.getElementById('totalAsambleas').textContent = items.length;
+                if (items.length === 0) {
+                    listaEl.innerHTML = '<p style="color:#2e7d32;font-weight:600;">✅ Sin asambleas próximas.</p>';
+                } else {
+                    listaEl.innerHTML = items.map(it => {
+                        const color = it.dias <= 7 ? '#e53935' : it.dias <= 30 ? '#e65100' : '#1976d2';
+                        const alerta = it.dias === 0 ? '¡HOY!' : it.dias === 1 ? 'Mañana' : `En ${it.dias} días`;
+                        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;margin-bottom:8px;border-left:4px solid ${color};background:#f8f9fa;border-radius:0 8px 8px 0;">
+                            <div>
+                                <div style="font-weight:700;color:#333;">🏢 ${it.nombre}</div>
+                                <div style="font-size:0.88em;color:#555;">${it.tipo} · ${it.fecha.toLocaleDateString('es-CO')}</div>
+                            </div>
+                            <div style="font-size:0.85em;font-weight:700;color:${color};white-space:nowrap;">${alerta}</div>
+                        </div>`;
+                    }).join('');
                 }
             });
-            
-            // Contar tareas pendientes
+
+            // Tareas pendientes con detalle
             const tareasRef = ref(db, 'tareas');
             onValue(tareasRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    const tareas = snapshot.val();
-                    const pendientes = Object.values(tareas).filter(t => t.estado === 'pendiente');
-                    document.querySelector('#dashboard-section .stat-card:nth-child(5) .value').textContent = pendientes.length;
+                const listaEl = document.getElementById('lista-tareas');
+                if (!snapshot.exists()) {
+                    document.getElementById('totalTareas').textContent = '0';
+                    listaEl.innerHTML = '<p style="color:#888;font-style:italic;">Sin tareas pendientes.</p>';
+                    return;
+                }
+                const pendientes = [];
+                snapshot.forEach((child) => {
+                    const t = child.val();
+                    if (t.estado === 'pendiente' || t.estado === 'en_progreso') {
+                        pendientes.push({ id: child.key, ...t });
+                    }
+                });
+                document.getElementById('totalTareas').textContent = pendientes.length;
+                if (pendientes.length === 0) {
+                    listaEl.innerHTML = '<p style="color:#2e7d32;font-weight:600;">✅ Sin tareas pendientes.</p>';
+                } else {
+                    listaEl.innerHTML = pendientes.map(t => {
+                        const edificioNombre = t.edificioId ? (NOMBRES_EDIFICIOS[t.edificioId] || t.edificioId) : (t.edificio || '');
+                        const prioridad = t.prioridad === 'alta' ? '#e53935' : t.prioridad === 'media' ? '#e65100' : '#1976d2';
+                        const badge = t.estado === 'en_progreso' ? '🔄 En progreso' : '⏳ Pendiente';
+                        return `<div style="padding:10px 12px;margin-bottom:8px;border-left:4px solid ${prioridad};background:#f8f9fa;border-radius:0 8px 8px 0;">
+                            <div style="font-weight:700;color:#333;">${t.titulo || t.descripcion || t.id}</div>
+                            ${edificioNombre ? `<div style="font-size:0.88em;color:#555;">🏢 ${edificioNombre}</div>` : ''}
+                            <div style="font-size:0.82em;color:${prioridad};font-weight:600;margin-top:2px;">${badge}</div>
+                        </div>`;
+                    }).join('');
                 }
             });
             
@@ -1061,13 +1138,6 @@
                     '$' + saldoTotal.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0});
 
                 // Desglose por edificio
-                const nombresEdif = {
-                    'nepal-2': '🏢 Nepal 2',
-                    'convivienda-1': '🏠 Convivienda I',
-                    'pinos-del-country': '🌲 Pinos del Country',
-                    'avalon': '✨ Avalon',
-                    'torres-de-anim-2': '🏗️ Torres de Anim II',
-                };
                 const resumenEdificios = {};
                 if (snapshot.exists()) {
                     snapshot.forEach((edificioSnap) => {
@@ -1095,7 +1165,7 @@
                         const border = tieneVencidas ? '#e53935' : '#1976d2';
                         const icono = tieneVencidas ? '🔴' : '🟡';
                         return `<div style="background:${bg};border:2px solid ${border};border-radius:12px;padding:16px;">
-                            <div style="font-weight:700;font-size:1.05em;margin-bottom:8px;">${icono} ${nombresEdif[eId] || eId}</div>
+                            <div style="font-weight:700;font-size:1.05em;margin-bottom:8px;">${icono} ${NOMBRES_EDIFICIOS[eId] || eId}</div>
                             <div style="color:#555;font-size:0.95em;">📄 ${r.pendientes} factura${r.pendientes>1?'s':''} pendiente${r.pendientes>1?'s':''}</div>
                             ${r.vencidas > 0 ? `<div style="color:#e53935;font-size:0.9em;font-weight:600;">⚠️ ${r.vencidas} vencida${r.vencidas>1?'s':''}</div>` : ''}
                             <div style="font-size:1.15em;font-weight:700;color:${border};margin-top:8px;">$${r.saldo.toLocaleString('es-CO',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
@@ -1168,12 +1238,7 @@
         
         // ===== EDICIÓN DE ASAMBLEAS =====
         let edificioActualEditar = '';
-        const nombresEdificios = {
-            'nepal-2': 'Nepal 2',
-            'avalon': 'Avalon',
-            'convivienda-1': 'Convivienda 1',
-            'pinos-del-country': 'Pinos del Country'
-        };
+        const nombresEdificios = NOMBRES_EDIFICIOS;
         
         // Abrir modal de edición
         window.abrirModalEditarAsamblea = function(edificioId) {
@@ -1446,12 +1511,7 @@
         
         // ===== EDICIÓN DE ASAMBLEAS =====
         let edificioActualEditar = '';
-        const nombresEdificios = {
-            'nepal-2': 'Nepal 2',
-            'avalon': 'Avalon',
-            'convivienda-1': 'Convivienda 1',
-            'pinos-del-country': 'Pinos del Country'
-        };
+        const nombresEdificios = NOMBRES_EDIFICIOS;
         
         // Abrir modal de edición
         window.abrirModalEditarAsamblea = function(edificioId) {
