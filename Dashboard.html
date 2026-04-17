@@ -613,6 +613,14 @@
                 </div>
             </div>
 
+            <!-- FACTURAS PENDIENTES POR EDIFICIO -->
+            <div id="facturas-por-edificio" style="margin-top:28px;">
+                <h3 style="font-size:1.3em;font-weight:700;color:#333;margin-bottom:14px;">💰 Cuentas por Pagar por Edificio</h3>
+                <div id="edificios-facturas-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
+                    <p style="color:#888;font-style:italic;">Cargando...</p>
+                </div>
+            </div>
+
             <!-- ALERTAS DE VENCIMIENTOS -->
             <div id="alertas-vencimientos" style="margin-top:28px;">
                 <h3 style="font-size:1.3em;font-weight:700;color:#333;margin-bottom:14px;">⚠️ Alertas de Vencimientos</h3>
@@ -1056,6 +1064,50 @@
                 document.getElementById('facturasPendientes').textContent = facturasPendientes;
                 document.getElementById('saldoPorPagar').textContent =
                     '$' + saldoTotal.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+
+                // Desglose por edificio
+                const nombresEdif = {
+                    'nepal-2': '🏢 Nepal 2',
+                    'convivienda-1': '🏠 Convivienda I',
+                    'pinos-del-country': '🌲 Pinos del Country',
+                    'avalon': '✨ Avalon',
+                    'torres-de-anim-2': '🏗️ Torres de Anim II',
+                };
+                const resumenEdificios = {};
+                if (snapshot.exists()) {
+                    snapshot.forEach((edificioSnap) => {
+                        const eId = edificioSnap.key;
+                        let pendientes = 0, saldo = 0, vencidas = 0;
+                        const hoy = new Date(); hoy.setHours(0,0,0,0);
+                        edificioSnap.forEach((facturaSnap) => {
+                            const c = facturaSnap.val();
+                            if (c.estado !== 'pagada' && c.estado !== 'Pagada') {
+                                pendientes++;
+                                saldo += parseFloat(c.valorNeto || c.restoAPagar || 0);
+                                if (c.fechaVencimiento && new Date(c.fechaVencimiento + 'T00:00:00') < hoy) vencidas++;
+                            }
+                        });
+                        if (pendientes > 0) resumenEdificios[eId] = { pendientes, saldo, vencidas };
+                    });
+                }
+                const lista = document.getElementById('edificios-facturas-lista');
+                if (Object.keys(resumenEdificios).length === 0) {
+                    lista.innerHTML = '<p style="color:#2e7d32;font-weight:600;">✅ Sin facturas pendientes</p>';
+                } else {
+                    lista.innerHTML = Object.entries(resumenEdificios).map(([eId, r]) => {
+                        const tieneVencidas = r.vencidas > 0;
+                        const bg = tieneVencidas ? '#fff5f5' : '#f8fbff';
+                        const border = tieneVencidas ? '#e53935' : '#1976d2';
+                        const icono = tieneVencidas ? '🔴' : '🟡';
+                        return `<div style="background:${bg};border:2px solid ${border};border-radius:12px;padding:16px;">
+                            <div style="font-weight:700;font-size:1.05em;margin-bottom:8px;">${icono} ${nombresEdif[eId] || eId}</div>
+                            <div style="color:#555;font-size:0.95em;">📄 ${r.pendientes} factura${r.pendientes>1?'s':''} pendiente${r.pendientes>1?'s':''}</div>
+                            ${r.vencidas > 0 ? `<div style="color:#e53935;font-size:0.9em;font-weight:600;">⚠️ ${r.vencidas} vencida${r.vencidas>1?'s':''}</div>` : ''}
+                            <div style="font-size:1.15em;font-weight:700;color:${border};margin-top:8px;">$${r.saldo.toLocaleString('es-CO',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
+                            <a href="cuentas-por-pagar.html" style="display:inline-block;margin-top:8px;font-size:0.85em;color:${border};text-decoration:none;">Ver facturas →</a>
+                        </div>`;
+                    }).join('');
+                }
             });
         }
         // ALERTAS DE VENCIMIENTO DE PÓLIZA Y REPRESENTACIÓN
