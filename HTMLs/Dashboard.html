@@ -1,0 +1,1681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Azeche P.H.</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo-box {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .logo-text {
+            font-size: 2.2em;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+        
+        .logo-blue { color: #0056B8; }
+        .logo-green { color: #00B853; }
+        
+        .logo-subtitle {
+            font-size: 0.35em;
+            font-weight: 400;
+            letter-spacing: 3px;
+            color: #666;
+            display: block;
+            margin-top: 2px;
+        }
+        
+        .welcome-text h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-text p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        
+        .btn-logout:hover {
+            background: white;
+            color: #0056B8;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* MENÚ DE NAVEGACIÓN */
+        .nav-menu {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .nav-btn {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 86, 184, 0.3);
+        }
+        
+        .nav-btn.active {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        }
+        
+        .nav-btn .icon {
+            font-size: 1.3em;
+        }
+
+        /* STATS CARDS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .stat-card .icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-card .value {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: #0056B8;
+        }
+
+        /* SECCIÓN DE ASAMBLEAS */
+        .asambleas-section {
+            display: none;
+        }
+        
+        .asambleas-section.active {
+            display: block;
+        }
+        
+        .edificios-asambleas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .edificio-asamblea-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border-top: 5px solid #0056B8;
+        }
+        
+        .edificio-asamblea-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .edificio-asamblea-card.proxima {
+            border-top-color: #00B853;
+            background: linear-gradient(135deg, rgba(0, 184, 83, 0.05) 0%, white 100%);
+        }
+        
+        .edificio-asamblea-card.urgente {
+            border-top-color: #FF6B6B;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.05) 0%, white 100%);
+        }
+        
+        .edificio-asamblea-card h3 {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .badge {
+            font-size: 0.5em;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .badge.proxima {
+            background: #00B853;
+            color: white;
+        }
+        
+        .badge.pendiente {
+            background: #FFA500;
+            color: white;
+        }
+        
+        .fecha-asamblea {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .fecha-asamblea .icon {
+            font-size: 2em;
+        }
+        
+        .fecha-asamblea .info h4 {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .fecha-asamblea .info p {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #0056B8;
+        }
+        
+        .documentos-list {
+            margin: 20px 0;
+        }
+        
+        .documentos-list h4 {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .doc-item {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .doc-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .doc-item .doc-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-download {
+            background: #0056B8;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        
+        .btn-download:hover {
+            background: #00B853;
+        }
+        
+        .acciones-asamblea {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-action {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-votar {
+            background: linear-gradient(135deg, #4CAF50 0%, #00B853 100%);
+            color: white;
+        }
+        
+        .btn-actas {
+            background: linear-gradient(135deg, #2196F3 0%, #0056B8 100%);
+            color: white;
+        }
+        
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            margin-top: 50px;
+        }
+
+        
+        /* MODAL EDITAR ASAMBLEA */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #0056B8;
+        }
+        
+        .modal-header h2 {
+            color: #0056B8;
+            font-size: 1.5em;
+        }
+        
+        .btn-close-modal {
+            background: none;
+            border: none;
+            font-size: 1.8em;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s;
+        }
+        
+        .btn-close-modal:hover {
+            color: #e74c3c;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1em;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #0056B8;
+        }
+        
+        .form-group input[readonly] {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        
+        .btn-modal-primary {
+            flex: 1;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-modal-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 86, 184, 0.3);
+        }
+        
+        .btn-modal-secondary {
+            flex: 1;
+            padding: 14px 20px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-modal-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-editar-asamblea {
+            background: #f39c12;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 15px;
+            width: 100%;
+        }
+        
+        .btn-editar-asamblea:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
+        }
+
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-box">
+                    <div class="logo-text">
+                        <span class="logo-blue">AZECHE</span><span class="logo-green">PH</span>
+                        <span class="logo-subtitle">SOLUCIONES ADMINISTRATIVAS</span>
+                    </div>
+                </div>
+                <div class="welcome-text">
+                    <h1>¡Bienvenida!</h1>
+                    <p id="nombreUsuario">Cargando...</p>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="cerrarSesion()">🚪 Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- MENÚ DE NAVEGACIÓN -->
+        <div class="nav-menu">
+            <button class="nav-btn active" onclick="mostrarSeccion('dashboard')">
+                <span class="icon">📊</span>
+                <span>Dashboard</span>
+            </button>
+            <button class="nav-btn" onclick="window.location.href='edificios.html'">
+                <span class="icon">🏢</span>
+                <span>Edificios</span>
+            </button>
+            <button class="nav-btn" onclick="window.location.href='cuentas-por-pagar.html'">
+                <span class="icon">💰</span>
+                <span>Cuentas por Pagar</span>
+            </button>
+            <button class="nav-btn" onclick="window.location.href='cuentas-por-cobrar.html'" style="background: linear-gradient(135deg, #e53935 0%, #c62828 100%);">
+                <span class="icon">📊</span>
+                <span>Cartera Morosos</span>
+            </button>
+            <button class="nav-btn" onclick="window.location.href='proveedores.html'">
+                <span class="icon">🤝</span>
+                <span>Proveedores</span>
+            </button>
+            <button class="nav-btn" onclick="window.location.href='contratos.html'">
+                <span class="icon">📄</span>
+                <span>Contratos</span>
+            </button>
+            <button class="nav-btn" onclick="window.location.href='Residentes_y_Propietarios_-_Azeche_P_H_.html'">
+                <span class="icon">👥</span>
+                <span>Residentes y Propietarios</span>
+            </button>
+            <button class="nav-btn" onclick="window.location.href='asambleas.html'">
+                <span class="icon">🎯</span>
+                <span>Asambleas</span>
+            </button>
+            <button class="nav-btn" onclick="window.open('checklist-recepcion.html', '_blank')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <span class="icon">📋</span>
+                <span>Checklist Recepción</span>
+            </button>
+            <button class="nav-btn" onclick="window.location.href='gestion-insumos.html'" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                <span class="icon">📦</span>
+                <span>Órdenes de Compra</span>
+            </button>
+        </div>
+
+        <!-- DASHBOARD PRINCIPAL -->
+        </div>
+        <div id="dashboard-section" class="dashboard-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="icon">🏢</div>
+                    <h3>Edificios</h3>
+                    <div class="value" id="totalEdificios">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">💰</div>
+                    <h3>Facturas Pendientes</h3>
+                    <div class="value" id="facturasPendientes">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">💵</div>
+                    <h3>Saldo por Pagar</h3>
+                    <div class="value" id="saldoPorPagar">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">🎯</div>
+                    <h3>Próximas Asambleas</h3>
+                    <div class="value" id="totalAsambleas">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">✅</div>
+                    <h3>Tareas Pendientes</h3>
+                    <div class="value" id="totalTareas">-</div>
+                </div>
+            </div>
+
+            <!-- FACTURAS PENDIENTES POR EDIFICIO -->
+            <div id="facturas-por-edificio" style="margin-top:28px;">
+                <h3 style="font-size:1.3em;font-weight:700;color:#333;margin-bottom:14px;">💰 Cuentas por Pagar por Edificio</h3>
+                <div id="edificios-facturas-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
+                    <p style="color:#888;font-style:italic;">Cargando...</p>
+                </div>
+            </div>
+
+            <!-- ASAMBLEAS Y TAREAS PENDIENTES -->
+            <div style="margin-top:28px;display:grid;grid-template-columns:1fr 1fr;gap:20px;" id="grid-agenda">
+                <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.08);">
+                    <h3 style="font-size:1.1em;font-weight:700;color:#333;margin-bottom:14px;">🎯 Próximas Asambleas</h3>
+                    <div id="lista-asambleas"><p style="color:#888;font-style:italic;">Cargando...</p></div>
+                </div>
+                <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.08);">
+                    <h3 style="font-size:1.1em;font-weight:700;color:#333;margin-bottom:14px;">✅ Tareas Pendientes</h3>
+                    <div id="lista-tareas"><p style="color:#888;font-style:italic;">Cargando...</p></div>
+                </div>
+            </div>
+
+            <!-- ALERTAS DE VENCIMIENTOS -->
+            <div id="alertas-vencimientos" style="margin-top:28px;">
+                <h3 style="font-size:1.3em;font-weight:700;color:#333;margin-bottom:14px;">⚠️ Alertas de Vencimientos</h3>
+                <div id="alertas-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;">
+                    <p id="alertas-cargando" style="color:#888;font-style:italic;">Cargando alertas...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE ASAMBLEAS Y CONSEJOS -->
+        <div id="asambleas-section" class="asambleas-section">
+            <h2 style="font-size: 2em; margin-bottom: 30px; color: #333;">
+                🎯 Gestión de Asambleas y Consejos
+            </h2>
+
+            <div class="edificios-asambleas-grid">
+                <!-- NEPAL 2 -->
+                <div class="edificio-asamblea-card urgente">
+                    <h3>
+                        🏢 Nepal 2
+                        <span class="badge proxima">PRÓXIMA</span>
+                    </h3>
+                    
+                    <div class="fecha-asamblea">
+                        <span class="icon">📅</span>
+                        <div class="info">
+                            <h4>Fecha programada</h4>
+                            <p>14 de Febrero, 2026</p>
+                        </div>
+                    </div>
+
+                    <div class="documentos-list">
+                        <h4>📄 Documentos Preparatorios</h4>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📋</span>
+                                <span>Convocatoria</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('nepal2', 'convocatoria')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📝</span>
+                                <span>Acta (Plantilla)</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('nepal2', 'acta')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📊</span>
+                                <span>Informe de Gestión 2025</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('nepal2', 'informe')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>✉️</span>
+                                <span>Citación Formal</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('nepal2', 'citacion')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn-editar-asamblea" onclick="abrirModalEditarAsamblea('nepal-2')">✏️ Editar Fecha y Estado</button>
+                    <div class="acciones-asamblea">
+                        <button class="btn-action btn-votar" onclick="abrirVotacion('nepal2')">
+                            ✅ Sistema de Votación
+                        </button>
+                        <button class="btn-action btn-actas" onclick="abrirGeneradorActas('nepal2')">
+                            🎙️ Generador de Actas
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AVALON -->
+                <div class="edificio-asamblea-card proxima">
+                    <h3>
+                        🏢 Avalon
+                        <span class="badge proxima">PRÓXIMA</span>
+                    </h3>
+                    
+                    <div class="fecha-asamblea">
+                        <span class="icon">📅</span>
+                        <div class="info">
+                            <h4>Fecha programada</h4>
+                            <p>28 de Febrero, 2026</p>
+                        </div>
+                    </div>
+
+                    <div class="documentos-list">
+                        <h4>📄 Documentos Preparatorios</h4>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📋</span>
+                                <span>Convocatoria</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('avalon', 'convocatoria')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📝</span>
+                                <span>Acta (Plantilla)</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('avalon', 'acta')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📊</span>
+                                <span>Informe de Gestión 2025</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('avalon', 'informe')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>✉️</span>
+                                <span>Citación Formal</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('avalon', 'citacion')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn-editar-asamblea" onclick="abrirModalEditarAsamblea('avalon')">✏️ Editar Fecha y Estado</button>
+                    <div class="acciones-asamblea">
+                        <button class="btn-action btn-votar" onclick="abrirVotacion('avalon')">
+                            ✅ Sistema de Votación
+                        </button>
+                        <button class="btn-action btn-actas" onclick="abrirGeneradorActas('avalon')">
+                            🎙️ Generador de Actas
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONVIVIENDA 1 -->
+                <div class="edificio-asamblea-card">
+                    <h3>
+                        🏢 Convivienda 1
+                        <span class="badge pendiente">POR AGENDAR</span>
+                    </h3>
+                    
+                    <div class="fecha-asamblea">
+                        <span class="icon">⏳</span>
+                        <div class="info">
+                            <h4>Estado</h4>
+                            <p>Pendiente de fecha</p>
+                        </div>
+                    </div>
+
+                    <div class="documentos-list">
+                        <h4>📄 Documentos Preparados</h4>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📋</span>
+                                <span>Convocatoria (Plantilla)</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('convivienda', 'convocatoria')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📝</span>
+                                <span>Acta (Plantilla)</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('convivienda', 'acta')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📊</span>
+                                <span>Informe de Gestión 2025</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('convivienda', 'informe')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>✉️</span>
+                                <span>Citación Formal</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('convivienda', 'citacion')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn-editar-asamblea" onclick="abrirModalEditarAsamblea('convivienda-1')">✏️ Editar Fecha y Estado</button>
+                    <div class="action-buttons" style="display: flex; gap: 15px; margin-top: 25px;">
+                        <button class="btn-action btn-votar" onclick="abrirVotacion('convivienda')" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #00B853 0%, #0056B8 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            ✅ Sistema de Votación
+                        </button>
+                        <button class="btn-action btn-actas" onclick="abrirGeneradorActas('convivienda')" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            🎙️ Generador de Actas
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- PINOS DEL COUNTRY -->
+                <div class="edificio-asamblea-card">
+                    <h3>
+                        🏢 Pinos del Country
+                        <span class="badge pendiente">POR AGENDAR</span>
+                    </h3>
+                    
+                    <div class="fecha-asamblea">
+                        <span class="icon">⏳</span>
+                        <div class="info">
+                            <h4>Estado</h4>
+                            <p>Pendiente de fecha</p>
+                        </div>
+                    </div>
+
+                    <div class="documentos-list">
+                        <h4>📄 Documentos Preparados</h4>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📋</span>
+                                <span>Convocatoria (Plantilla)</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('pinos', 'convocatoria')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📝</span>
+                                <span>Acta (Plantilla)</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('pinos', 'acta')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>📊</span>
+                                <span>Informe de Gestión 2025</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('pinos', 'informe')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                        <div class="doc-item">
+                            <div class="doc-name">
+                                <span>✉️</span>
+                                <span>Citación Formal</span>
+                            </div>
+                            <button class="btn-download" onclick="descargarDoc('pinos', 'citacion')">
+                                ⬇️ Descargar
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn-editar-asamblea" onclick="abrirModalEditarAsamblea('pinos-del-country')">✏️ Editar Fecha y Estado</button>
+                    <div class="action-buttons" style="display: flex; gap: 15px; margin-top: 25px;">
+                        <button class="btn-action btn-votar" onclick="abrirVotacion('pinos')" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #00B853 0%, #0056B8 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            ✅ Sistema de Votación
+                        </button>
+                        <button class="btn-action btn-actas" onclick="abrirGeneradorActas('pinos')" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            🎙️ Generador de Actas
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+            
+            <!-- SECCIÓN DE CONSEJOS MENSUALES -->
+            <h2 style="font-size: 2em; margin: 50px 0 30px 0; color: #333;">
+                📋 Consejos Mensuales y Tareas
+            </h2>
+            
+            <div style="display: grid; gap: 30px; margin-bottom: 50px;">
+                <!-- AGREGAR TAREA -->
+                <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                    <h3 style="margin-bottom: 20px; color: #333;">➕ Agregar Nueva Tarea</h3>
+                    <form id="formNuevaTarea" style="display: grid; gap: 15px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Título de la Tarea *</label>
+                                <input type="text" id="tituloTarea" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Edificio *</label>
+                                <select id="edificioTarea" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="nepal-2">Nepal 2</option>
+                                    <option value="avalon">Avalon</option>
+                                    <option value="convivienda-1">Convivienda 1</option>
+                                    <option value="pinos-del-country">Pinos del Country</option>
+                                    <option value="todos">Todos los edificios</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Origen *</label>
+                                <select id="origenTarea" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="asamblea">Asamblea</option>
+                                    <option value="consejo">Consejo Mensual</option>
+                                    <option value="administracion">Administración</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Prioridad *</label>
+                                <select id="prioridadTarea" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                                    <option value="media">Media</option>
+                                    <option value="alta">Alta</option>
+                                    <option value="urgente">Urgente</option>
+                                    <option value="baja">Baja</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Fecha Límite</label>
+                                <input type="date" id="fechaLimiteTarea" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                            </div>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Descripción</label>
+                            <textarea id="descripcionTarea" rows="3" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; resize: vertical;"></textarea>
+                        </div>
+                        <button type="submit" style="padding: 15px; background: linear-gradient(135deg, #0056B8 0%, #00B853 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 16px;">
+                            ✅ Crear Tarea
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- LISTA DE TAREAS -->
+                <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                    <h3 style="margin-bottom: 20px; color: #333;">📋 Tareas Activas</h3>
+                    <div id="listaTareas" style="display: grid; gap: 15px;">
+                        <p style="text-align: center; color: #999; padding: 30px;">Cargando tareas...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2026 Azeche P.H. - Sistema Administrativo Integral
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { getDatabase, ref, onValue, get, push, set, update, remove } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
+            authDomain: "azeche-ph.firebaseapp.com",
+            databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+            projectId: "azeche-ph",
+            storageBucket: "azeche-ph.firebasestorage.app",
+            messagingSenderId: "905337990521",
+            appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // Verificar autenticación
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+            } else {
+                const userInfo = JSON.parse(localStorage.getItem('azecheUser'));
+                document.getElementById('nombreUsuario').textContent = userInfo?.nombre || user.email;
+                
+                // Cargar contadores dinámicos
+                cargarContadores();
+                cargarAlertasVencimientos();
+            }
+        });
+        
+
+        
+        const NOMBRES_EDIFICIOS = {
+            'nepal-2': 'Nepal 2',
+            'convivienda-1': 'Convivienda I',
+            'pinos-del-country': 'Pinos del Country',
+            'avalon': 'Avalon',
+            'torres-de-anim-2': 'Torres de Anim II',
+        };
+
+        // CARGAR CONTADORES DINÁMICOS
+        function cargarContadores() {
+            // Contar edificios
+            const edificiosRef = ref(db, 'edificios');
+            onValue(edificiosRef, (snapshot) => {
+                const total = snapshot.exists() ? Object.keys(snapshot.val()).length : 0;
+                document.getElementById('totalEdificios').textContent = total;
+            });
+
+            // Próximas asambleas con detalle por edificio
+            const asambleasRef = ref(db, 'asambleas');
+            onValue(asambleasRef, (snapshot) => {
+                const listaEl = document.getElementById('lista-asambleas');
+                if (!snapshot.exists()) {
+                    document.getElementById('totalAsambleas').textContent = '0';
+                    listaEl.innerHTML = '<p style="color:#888;font-style:italic;">Sin asambleas próximas.</p>';
+                    return;
+                }
+                const hoy = new Date(); hoy.setHours(0,0,0,0);
+                const items = [];
+                snapshot.forEach((child) => {
+                    const a = child.val();
+                    const edificioId = child.key;
+                    if (!a.fecha) return;
+                    const fecha = new Date(a.fecha + 'T00:00:00');
+                    if (fecha >= hoy && a.estado !== 'realizada') {
+                        const dias = Math.round((fecha - hoy) / 86400000);
+                        items.push({ edificioId, nombre: NOMBRES_EDIFICIOS[edificioId] || edificioId, fecha, dias, tipo: a.tipo || 'Asamblea' });
+                    }
+                });
+                items.sort((a, b) => a.dias - b.dias);
+                document.getElementById('totalAsambleas').textContent = items.length;
+                if (items.length === 0) {
+                    listaEl.innerHTML = '<p style="color:#2e7d32;font-weight:600;">✅ Sin asambleas próximas.</p>';
+                } else {
+                    listaEl.innerHTML = items.map(it => {
+                        const color = it.dias <= 7 ? '#e53935' : it.dias <= 30 ? '#e65100' : '#1976d2';
+                        const alerta = it.dias === 0 ? '¡HOY!' : it.dias === 1 ? 'Mañana' : `En ${it.dias} días`;
+                        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;margin-bottom:8px;border-left:4px solid ${color};background:#f8f9fa;border-radius:0 8px 8px 0;">
+                            <div>
+                                <div style="font-weight:700;color:#333;">🏢 ${it.nombre}</div>
+                                <div style="font-size:0.88em;color:#555;">${it.tipo} · ${it.fecha.toLocaleDateString('es-CO')}</div>
+                            </div>
+                            <div style="font-size:0.85em;font-weight:700;color:${color};white-space:nowrap;">${alerta}</div>
+                        </div>`;
+                    }).join('');
+                }
+            });
+
+            // Tareas pendientes con detalle
+            const tareasRef = ref(db, 'tareas');
+            onValue(tareasRef, (snapshot) => {
+                const listaEl = document.getElementById('lista-tareas');
+                if (!snapshot.exists()) {
+                    document.getElementById('totalTareas').textContent = '0';
+                    listaEl.innerHTML = '<p style="color:#888;font-style:italic;">Sin tareas pendientes.</p>';
+                    return;
+                }
+                const pendientes = [];
+                snapshot.forEach((child) => {
+                    const t = child.val();
+                    if (t.estado === 'pendiente' || t.estado === 'en_progreso') {
+                        pendientes.push({ id: child.key, ...t });
+                    }
+                });
+                document.getElementById('totalTareas').textContent = pendientes.length;
+                if (pendientes.length === 0) {
+                    listaEl.innerHTML = '<p style="color:#2e7d32;font-weight:600;">✅ Sin tareas pendientes.</p>';
+                } else {
+                    listaEl.innerHTML = pendientes.map(t => {
+                        const edificioNombre = t.edificioId ? (NOMBRES_EDIFICIOS[t.edificioId] || t.edificioId) : (t.edificio || '');
+                        const prioridad = t.prioridad === 'alta' ? '#e53935' : t.prioridad === 'media' ? '#e65100' : '#1976d2';
+                        const badge = t.estado === 'en_progreso' ? '🔄 En progreso' : '⏳ Pendiente';
+                        return `<div style="padding:10px 12px;margin-bottom:8px;border-left:4px solid ${prioridad};background:#f8f9fa;border-radius:0 8px 8px 0;">
+                            <div style="font-weight:700;color:#333;">${t.titulo || t.descripcion || t.id}</div>
+                            ${edificioNombre ? `<div style="font-size:0.88em;color:#555;">🏢 ${edificioNombre}</div>` : ''}
+                            <div style="font-size:0.82em;color:${prioridad};font-weight:600;margin-top:2px;">${badge}</div>
+                        </div>`;
+                    }).join('');
+                }
+            });
+            
+            // Contar facturas pendientes y calcular saldo por pagar
+            const cuentasRef = ref(db, 'cuentas_por_pagar');
+            onValue(cuentasRef, (snapshot) => {
+                let facturasPendientes = 0;
+                let saldoTotal = 0;
+
+                if (snapshot.exists()) {
+                    // Nivel 1: edificios
+                    snapshot.forEach((edificioSnap) => {
+                        // Nivel 2: facturas individuales
+                        edificioSnap.forEach((facturaSnap) => {
+                            const cuenta = facturaSnap.val();
+                            if (cuenta.estado !== 'pagada' && cuenta.estado !== 'Pagada') {
+                                facturasPendientes++;
+                                saldoTotal += parseFloat(cuenta.valorNeto || cuenta.restoAPagar || 0);
+                            }
+                        });
+                    });
+                }
+
+                document.getElementById('facturasPendientes').textContent = facturasPendientes;
+                document.getElementById('saldoPorPagar').textContent =
+                    '$' + saldoTotal.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+
+                // Desglose por edificio
+                const resumenEdificios = {};
+                if (snapshot.exists()) {
+                    snapshot.forEach((edificioSnap) => {
+                        const eId = edificioSnap.key;
+                        let pendientes = 0, saldo = 0, vencidas = 0;
+                        const hoy = new Date(); hoy.setHours(0,0,0,0);
+                        edificioSnap.forEach((facturaSnap) => {
+                            const c = facturaSnap.val();
+                            if (c.estado !== 'pagada' && c.estado !== 'Pagada') {
+                                pendientes++;
+                                saldo += parseFloat(c.valorNeto || c.restoAPagar || 0);
+                                if (c.fechaVencimiento && new Date(c.fechaVencimiento + 'T00:00:00') < hoy) vencidas++;
+                            }
+                        });
+                        if (pendientes > 0) resumenEdificios[eId] = { pendientes, saldo, vencidas };
+                    });
+                }
+                const lista = document.getElementById('edificios-facturas-lista');
+                if (Object.keys(resumenEdificios).length === 0) {
+                    lista.innerHTML = '<p style="color:#2e7d32;font-weight:600;">✅ Sin facturas pendientes</p>';
+                } else {
+                    lista.innerHTML = Object.entries(resumenEdificios).map(([eId, r]) => {
+                        const tieneVencidas = r.vencidas > 0;
+                        const bg = tieneVencidas ? '#fff5f5' : '#f8fbff';
+                        const border = tieneVencidas ? '#e53935' : '#1976d2';
+                        const icono = tieneVencidas ? '🔴' : '🟡';
+                        return `<div style="background:${bg};border:2px solid ${border};border-radius:12px;padding:16px;">
+                            <div style="font-weight:700;font-size:1.05em;margin-bottom:8px;">${icono} ${NOMBRES_EDIFICIOS[eId] || eId}</div>
+                            <div style="color:#555;font-size:0.95em;">📄 ${r.pendientes} factura${r.pendientes>1?'s':''} pendiente${r.pendientes>1?'s':''}</div>
+                            ${r.vencidas > 0 ? `<div style="color:#e53935;font-size:0.9em;font-weight:600;">⚠️ ${r.vencidas} vencida${r.vencidas>1?'s':''}</div>` : ''}
+                            <div style="font-size:1.15em;font-weight:700;color:${border};margin-top:8px;">$${r.saldo.toLocaleString('es-CO',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
+                            <a href="cuentas-por-pagar.html" style="display:inline-block;margin-top:8px;font-size:0.85em;color:${border};text-decoration:none;">Ver facturas →</a>
+                        </div>`;
+                    }).join('');
+                }
+            });
+        }
+        // ALERTAS DE VENCIMIENTO DE PÓLIZA Y REPRESENTACIÓN
+        function cargarAlertasVencimientos() {
+            const edificiosRef = ref(db, 'edificios');
+            get(edificiosRef).then((snapshot) => {
+                const lista = document.getElementById('alertas-lista');
+                const cargando = document.getElementById('alertas-cargando');
+                if (cargando) cargando.remove();
+                if (!snapshot.exists()) {
+                    lista.innerHTML = '<p style="color:#888;font-style:italic;">No hay edificios registrados.</p>';
+                    return;
+                }
+                const hoy = new Date();
+                hoy.setHours(0,0,0,0);
+                const alertas = [];
+                snapshot.forEach((child) => {
+                    const ed = child.val();
+                    const nombre = ed.nombre || child.key;
+                    [
+                        { campo: 'polizaVence', label: 'Póliza de Seguros' },
+                        { campo: 'representacionVence', label: 'Representación Legal' }
+                    ].forEach(({ campo, label }) => {
+                        if (!ed[campo]) return;
+                        const fecha = new Date(ed[campo] + 'T00:00:00');
+                        const dias = Math.round((fecha - hoy) / 86400000);
+                        if (dias > 90) return; // solo mostrar si vence en 90 días o menos
+                        let color, bg, icono;
+                        if (dias < 0)       { color = '#c62828'; bg = '#ffebee'; icono = '🔴'; }
+                        else if (dias <= 30) { color = '#e65100'; bg = '#fff3e0'; icono = '🟠'; }
+                        else                { color = '#f57f17'; bg = '#fffde7'; icono = '🟡'; }
+                        const texto = dias < 0
+                            ? `VENCIDA hace ${Math.abs(dias)} día(s)`
+                            : dias === 0 ? 'Vence HOY'
+                            : `Vence en ${dias} día(s) — ${fecha.toLocaleDateString('es-CO')}`;
+                        alertas.push({ nombre, label, icono, color, bg, texto, dias });
+                    });
+                });
+                if (alertas.length === 0) {
+                    lista.innerHTML = '<p style="color:#2e7d32;font-weight:600;">✅ Sin vencimientos próximos en los próximos 90 días.</p>';
+                    return;
+                }
+                alertas.sort((a,b) => a.dias - b.dias);
+                lista.innerHTML = alertas.map(a => `
+                    <div style="background:${a.bg};border:2px solid ${a.color};border-radius:10px;padding:14px 18px;">
+                        <div style="font-size:1.1em;font-weight:700;color:${a.color};margin-bottom:4px;">${a.icono} ${a.nombre}</div>
+                        <div style="font-weight:600;color:#555;margin-bottom:3px;">${a.label}</div>
+                        <div style="color:${a.color};font-weight:600;">${a.texto}</div>
+                    </div>`).join('');
+            }).catch(err => {
+                console.error('Error cargando alertas:', err);
+            });
+        }
+
+        // Cerrar sesión
+        window.cerrarSesion = function() {
+            signOut(auth).then(() => {
+                localStorage.removeItem('azecheUser');
+                window.location.href = 'index.html';
+            });
+        };
+
+        
+        // ===== EDICIÓN DE ASAMBLEAS =====
+        let edificioActualEditar = '';
+        const nombresEdificios = NOMBRES_EDIFICIOS;
+        
+        // Abrir modal de edición
+        window.abrirModalEditarAsamblea = function(edificioId) {
+            edificioActualEditar = edificioId;
+            
+            // Cargar datos actuales de Firebase
+            const asambleaRef = ref(db, `asambleas/${edificioId}`);
+            get(asambleaRef).then((snapshot) => {
+                let fecha = '';
+                let estado = 'pendiente';
+                
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    fecha = data.fecha || '';
+                    estado = data.estado || 'pendiente';
+                }
+                
+                document.getElementById('modalTitulo').textContent = `✏️ Editar Asamblea - ${nombresEdificios[edificioId]}`;
+                document.getElementById('inputEdificioNombre').value = nombresEdificios[edificioId];
+                document.getElementById('inputFechaAsamblea').value = fecha;
+                document.getElementById('inputEstadoAsamblea').value = estado;
+                
+                document.getElementById('modalEditarAsamblea').classList.add('active');
+            }).catch((error) => {
+                console.error('Error al cargar asamblea:', error);
+                alert('Error al cargar datos de la asamblea');
+            });
+        };
+        
+        // Cerrar modal
+        window.cerrarModalAsamblea = function() {
+            document.getElementById('modalEditarAsamblea').classList.remove('active');
+        };
+        
+        // Guardar cambios
+        window.guardarCambiosAsamblea = async function(e) {
+            e.preventDefault();
+            
+            const fecha = document.getElementById('inputFechaAsamblea').value;
+            const estado = document.getElementById('inputEstadoAsamblea').value;
+            
+            try {
+                await set(ref(db, `asambleas/${edificioActualEditar}`), {
+                    fecha: fecha,
+                    estado: estado,
+                    ultimaActualizacion: new Date().toISOString()
+                });
+                
+                alert('✅ Asamblea actualizada correctamente');
+                cerrarModalAsamblea();
+                
+                // Recargar página para ver cambios
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error al guardar:', error);
+                alert('❌ Error al guardar los cambios: ' + error.message);
+            }
+        };
+
+    </script>
+
+    <script>
+        // NAVEGACIÓN
+        function mostrarSeccion(seccion) {
+            // Ocultar todas las secciones
+            document.getElementById('dashboard-section').style.display = 'none';
+            document.getElementById('asambleas-section').style.display = 'none';
+
+            // Remover clase active de todos los botones
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Mostrar sección seleccionada
+            if (seccion === 'dashboard') {
+                document.getElementById('dashboard-section').style.display = 'block';
+                document.querySelectorAll('.nav-btn')[0].classList.add('active');
+            } else if (seccion === 'asambleas') {
+                document.getElementById('asambleas-section').style.display = 'block';
+                document.querySelectorAll('.nav-btn')[5].classList.add('active');
+            }
+        }
+        
+        // GESTIÓN DE TAREAS
+        document.getElementById('formNuevaTarea').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const tarea = {
+                titulo: document.getElementById('tituloTarea').value,
+                edificio: document.getElementById('edificioTarea').value,
+                origen: document.getElementById('origenTarea').value,
+                prioridad: document.getElementById('prioridadTarea').value,
+                fechaLimite: document.getElementById('fechaLimiteTarea').value || null,
+                descripcion: document.getElementById('descripcionTarea').value || '',
+                estado: 'pendiente',
+                fechaCreacion: new Date().toISOString(),
+                creadoPor: JSON.parse(localStorage.getItem('azecheUser')).nombre
+            };
+            
+            try {
+                // Importar Firebase (ya está en el scope del módulo de arriba)
+                const { getDatabase, ref, push } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js');
+                const db = getDatabase();
+                
+                await push(ref(db, 'tareas'), tarea);
+                
+                alert('✅ Tarea creada exitosamente');
+                document.getElementById('formNuevaTarea').reset();
+                
+            } catch (error) {
+                alert('❌ Error al crear tarea: ' + error.message);
+            }
+        });
+        
+        // CARGAR Y MOSTRAR TAREAS
+        async function cargarTareas() {
+            try {
+                const { getDatabase, ref, onValue } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js');
+                const db = getDatabase();
+                const tareasRef = ref(db, 'tareas');
+                
+                onValue(tareasRef, (snapshot) => {
+                    const listaTareas = document.getElementById('listaTareas');
+                    listaTareas.innerHTML = '';
+                    
+                    if (!snapshot.exists()) {
+                        listaTareas.innerHTML = '<p style="text-align: center; color: #999; padding: 30px;">No hay tareas registradas</p>';
+                        return;
+                    }
+                    
+                    const tareas = [];
+                    snapshot.forEach((child) => {
+                        tareas.push({ id: child.key, ...child.val() });
+                    });
+                    
+                    // Ordenar por prioridad y fecha
+                    const prioridades = { urgente: 4, alta: 3, media: 2, baja: 1 };
+                    tareas.sort((a, b) => {
+                        if (a.estado !== b.estado) return a.estado === 'pendiente' ? -1 : 1;
+                        return prioridades[b.prioridad] - prioridades[a.prioridad];
+                    });
+                    
+                    tareas.forEach(tarea => {
+                        const coloresPrioridad = {
+                            urgente: '#f44336',
+                            alta: '#ff9800',
+                            media: '#2196f3',
+                            baja: '#4caf50'
+                        };
+                        
+                        const tareaHTML = `
+                            <div style="border-left: 4px solid ${coloresPrioridad[tarea.prioridad]}; padding: 15px; background: #f9f9f9; border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                                    <div style="flex: 1;">
+                                        <h4 style="margin: 0 0 5px 0; color: #333;">${tarea.titulo}</h4>
+                                        <div style="display: flex; gap: 10px; flex-wrap: wrap; font-size: 13px; color: #666;">
+                                            <span>🏢 ${tarea.edificio}</span>
+                                            <span>📌 ${tarea.origen}</span>
+                                            <span style="color: ${coloresPrioridad[tarea.prioridad]}; font-weight: 600;">⚡ ${tarea.prioridad.toUpperCase()}</span>
+                                            ${tarea.fechaLimite ? `<span>📅 ${new Date(tarea.fechaLimite).toLocaleDateString()}</span>` : ''}
+                                        </div>
+                                        ${tarea.descripcion ? `<p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">${tarea.descripcion}</p>` : ''}
+                                    </div>
+                                    <div style="display: flex; gap: 10px;">
+                                        ${tarea.estado === 'pendiente' ? 
+                                            `<button onclick="completarTarea('${tarea.id}')" style="padding: 8px 15px; background: #4caf50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 13px;">
+                                                ✅ Completar
+                                            </button>` : 
+                                            `<span style="padding: 8px 15px; background: #4caf50; color: white; border-radius: 5px; font-size: 13px;">✓ Completada</span>`
+                                        }
+                                        <button onclick="eliminarTarea('${tarea.id}')" style="padding: 8px 15px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 13px;">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        listaTareas.innerHTML += tareaHTML;
+                    });
+                });
+            } catch (error) {
+                console.error('Error cargando tareas:', error);
+            }
+        }
+        
+        window.completarTarea = async function(id) {
+            if (!confirm('¿Marcar esta tarea como completada?')) return;
+            
+            try {
+                const { getDatabase, ref, update } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js');
+                const db = getDatabase();
+                await update(ref(db, `tareas/${id}`), { 
+                    estado: 'completada',
+                    fechaCompletada: new Date().toISOString()
+                });
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        };
+        
+        window.eliminarTarea = async function(id) {
+            if (!confirm('¿Eliminar esta tarea permanentemente?')) return;
+            
+            try {
+                const { getDatabase, ref, remove } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js');
+                const db = getDatabase();
+                await remove(ref(db, `tareas/${id}`));
+                alert('✅ Tarea eliminada');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        };
+        
+        // Cargar tareas al cargar la página
+        setTimeout(cargarTareas, 1000);
+
+        // MAPPING DE DOCUMENTOS
+        const documentosMap = {
+            nepal2: {
+                convocatoria: 'CONVOCATORIA_Nepal2_2026.docx',
+                acta: 'ACTA_ASAMBLEA_Nepal2_2026.docx',
+                informe: 'INFORME_GESTION_Nepal2_2025.docx',
+                citacion: 'CITACION_FORMAL_Nepal2_2026.docx'
+            },
+            avalon: {
+                convocatoria: 'CONVOCATORIA_Avalon_2026.docx',
+                acta: 'ACTA_ASAMBLEA_Avalon_2026.docx',
+                informe: 'INFORME_GESTION_Avalon_2025.docx',
+                citacion: 'CITACION_FORMAL_Avalon_2026.docx'
+            },
+            convivienda: {
+                convocatoria: 'CONVOCATORIA_Convivienda1_2026.docx',
+                acta: 'ACTA_ASAMBLEA_Convivienda1_2026.docx',
+                informe: 'INFORME_GESTION_Convivienda1_2025.docx',
+                citacion: 'CITACION_FORMAL_Convivienda1_2026.docx'
+            },
+            pinos: {
+                convocatoria: 'CONVOCATORIA_PinosDelCountry_2026.docx',
+                acta: 'ACTA_ASAMBLEA_PinosDelCountry_2026.docx',
+                informe: 'INFORME_GESTION_PinosDelCountry_2025.docx',
+                citacion: 'CITACION_FORMAL_PinosDelCountry_2026.docx'
+            }
+        };
+
+        // DESCARGAR DOCUMENTOS
+        function descargarDoc(edificio, tipo) {
+            const nombreArchivo = documentosMap[edificio][tipo];
+            alert(`📥 Descargando: ${nombreArchivo}\n\nNota: Los documentos se descargarán desde tu carpeta de Documentos cuando estén subidos a GitHub Pages.`);
+            // Aquí irá el link real cuando subas a GitHub
+            // window.open(`./documentos/${nombreArchivo}`, '_blank');
+        }
+
+        // ABRIR SISTEMA DE VOTACIÓN
+        function abrirVotacion(edificio) {
+            const edificiosMap = {
+                'nepal2': 'nepal-2',
+                'avalon': 'avalon',
+                'convivienda': 'convivienda-1',
+                'pinos': 'pinos-del-country'
+            };
+            window.location.href = `votacion-admin.html?edificio=${edificiosMap[edificio]}`;
+        }
+
+        // ABRIR GENERADOR DE ACTAS
+        function abrirGeneradorActas(edificio) {
+            window.open('generador-actas-v2.html', '_blank');
+        }
+
+        
+        // ===== EDICIÓN DE ASAMBLEAS =====
+        let edificioActualEditar = '';
+        const nombresEdificios = NOMBRES_EDIFICIOS;
+        
+        // Abrir modal de edición
+        window.abrirModalEditarAsamblea = function(edificioId) {
+            edificioActualEditar = edificioId;
+            
+            // Cargar datos actuales de Firebase
+            const asambleaRef = ref(db, `asambleas/${edificioId}`);
+            get(asambleaRef).then((snapshot) => {
+                let fecha = '';
+                let estado = 'pendiente';
+                
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    fecha = data.fecha || '';
+                    estado = data.estado || 'pendiente';
+                }
+                
+                document.getElementById('modalTitulo').textContent = `✏️ Editar Asamblea - ${nombresEdificios[edificioId]}`;
+                document.getElementById('inputEdificioNombre').value = nombresEdificios[edificioId];
+                document.getElementById('inputFechaAsamblea').value = fecha;
+                document.getElementById('inputEstadoAsamblea').value = estado;
+                
+                document.getElementById('modalEditarAsamblea').classList.add('active');
+            }).catch((error) => {
+                console.error('Error al cargar asamblea:', error);
+                alert('Error al cargar datos de la asamblea');
+            });
+        };
+        
+        // Cerrar modal
+        window.cerrarModalAsamblea = function() {
+            document.getElementById('modalEditarAsamblea').classList.remove('active');
+        };
+        
+        // Guardar cambios
+        window.guardarCambiosAsamblea = async function(e) {
+            e.preventDefault();
+            
+            const fecha = document.getElementById('inputFechaAsamblea').value;
+            const estado = document.getElementById('inputEstadoAsamblea').value;
+            
+            try {
+                await set(ref(db, `asambleas/${edificioActualEditar}`), {
+                    fecha: fecha,
+                    estado: estado,
+                    ultimaActualizacion: new Date().toISOString()
+                });
+                
+                alert('✅ Asamblea actualizada correctamente');
+                cerrarModalAsamblea();
+                
+                // Recargar página para ver cambios
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error al guardar:', error);
+                alert('❌ Error al guardar los cambios: ' + error.message);
+            }
+        };
+
+
+        // ===== FUNCIONES DE EDICIÓN DE ASAMBLEAS =====
+        let edificioActualEditar = '';
+        const nombresEdificios = {
+            'nepal-2': 'Nepal 2',
+            'avalon': 'Avalon',
+            'convivienda-1': 'Convivienda 1',
+            'pinos-del-country': 'Pinos del Country'
+        };
+
+        window.abrirModalEditarAsamblea = function(edificioId) {
+            edificioActualEditar = edificioId;
+            
+            // Cargar datos actuales de Firebase
+            const asambleaRef = ref(db, `asambleas/${edificioId}`);
+            get(asambleaRef).then((snapshot) => {
+                let fecha = '';
+                let estado = 'pendiente';
+                
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    fecha = data.fecha || '';
+                    estado = data.estado || 'pendiente';
+                }
+                
+                document.getElementById('modalTitulo').textContent = `✏️ Editar Asamblea - ${nombresEdificios[edificioId]}`;
+                document.getElementById('inputEdificioNombre').value = nombresEdificios[edificioId];
+                document.getElementById('inputFechaAsamblea').value = fecha;
+                document.getElementById('inputEstadoAsamblea').value = estado;
+                
+                document.getElementById('modalEditarAsamblea').classList.add('active');
+            }).catch((error) => {
+                console.error('Error al cargar asamblea:', error);
+                alert('Error al cargar datos de la asamblea');
+            });
+        };
+        
+        window.cerrarModalAsamblea = function() {
+            document.getElementById('modalEditarAsamblea').classList.remove('active');
+        };
+        
+        window.guardarCambiosAsamblea = async function(e) {
+            e.preventDefault();
+            
+            const fecha = document.getElementById('inputFechaAsamblea').value;
+            const estado = document.getElementById('inputEstadoAsamblea').value;
+            
+            if (!fecha) {
+                alert('Por favor ingrese una fecha');
+                return;
+            }
+            
+            try {
+                const asambleaRef = ref(db, `asambleas/${edificioActualEditar}`);
+                await update(asambleaRef, {
+                    fecha: fecha,
+                    estado: estado,
+                    edificio: nombresEdificios[edificioActualEditar],
+                    ultimaActualizacion: new Date().toISOString()
+                });
+                
+                alert('✅ Asamblea actualizada correctamente');
+                cerrarModalAsamblea();
+                location.reload(); // Recargar para ver cambios
+            } catch (error) {
+                console.error('Error al guardar:', error);
+                alert('❌ Error al guardar los cambios');
+            }
+        };
+    </script>
+
+    <!-- Modal Editar Asamblea -->
+    <div id="modalEditarAsamblea" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitulo">✏️ Editar Asamblea</h2>
+                <button class="btn-close-modal" onclick="cerrarModalAsamblea()">✕</button>
+            </div>
+            <form id="formEditarAsamblea" onsubmit="guardarCambiosAsamblea(event)">
+                <div class="form-group">
+                    <label>🏢 Edificio</label>
+                    <input type="text" id="inputEdificioNombre" readonly>
+                </div>
+                <div class="form-group">
+                    <label>📅 Fecha de la Asamblea</label>
+                    <input type="date" id="inputFechaAsamblea" required>
+                </div>
+                <div class="form-group">
+                    <label>📊 Estado</label>
+                    <select id="inputEstadoAsamblea" required>
+                        <option value="proxima">Próxima</option>
+                        <option value="pendiente">Pendiente de fecha</option>
+                        <option value="realizada">Realizada</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-modal-primary">💾 Guardar Cambios</button>
+                    <button type="button" class="btn-modal-secondary" onclick="cerrarModalAsamblea()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
