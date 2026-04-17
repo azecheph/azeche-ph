@@ -175,58 +175,6 @@
             color: #0056B8;
         }
 
-        .stat-detail-list {
-            margin-top: 12px;
-            border-top: 1px solid #f0f0f0;
-            padding-top: 10px;
-        }
-
-        .stat-detail-item {
-            font-size: 0.82em;
-            color: #555;
-            padding: 5px 0;
-            border-bottom: 1px solid #f5f5f5;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .stat-detail-item:last-child {
-            border-bottom: none;
-        }
-
-        .stat-detail-item .det-nombre {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .stat-detail-badge {
-            font-size: 0.78em;
-            padding: 2px 7px;
-            border-radius: 10px;
-            font-weight: 700;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .badge-urgente  { background: #fdecea; color: #c62828; }
-        .badge-alta     { background: #fff3e0; color: #e65100; }
-        .badge-media    { background: #e3f2fd; color: #1565c0; }
-        .badge-baja     { background: #e8f5e9; color: #2e7d32; }
-        .badge-proxima  { background: #e8f5e9; color: #2e7d32; }
-        .badge-pendiente{ background: #fff3e0; color: #e65100; }
-        .stat-ver-mas {
-            font-size: 0.78em;
-            color: #0056B8;
-            text-align: right;
-            margin-top: 6px;
-            cursor: default;
-            opacity: 0.7;
-        }
-
         /* SECCIÓN DE ASAMBLEAS */
         .asambleas-section {
             display: none;
@@ -636,15 +584,12 @@
                 <div class="stat-card">
                     <div class="icon">🏢</div>
                     <h3>Edificios</h3>
-                    <div class="value" id="totalEdificiosDash">-</div>
-                    <div class="stat-detail-list" id="edificios-dash-detail"></div>
+                    <div class="value">4</div>
                 </div>
                 <div class="stat-card">
                     <div class="icon">💰</div>
                     <h3>Facturas Pendientes</h3>
                     <div class="value" id="facturasPendientes">-</div>
-                    <div class="stat-detail-list" id="facturas-detail"></div>
-                    <div class="stat-ver-mas" id="facturas-ver-mas"></div>
                 </div>
                 <div class="stat-card">
                     <div class="icon">💵</div>
@@ -654,15 +599,12 @@
                 <div class="stat-card">
                     <div class="icon">🎯</div>
                     <h3>Próximas Asambleas</h3>
-                    <div class="value" id="proximasAsambleas">-</div>
-                    <div class="stat-detail-list" id="asambleas-detail"></div>
+                    <div class="value">2</div>
                 </div>
                 <div class="stat-card">
                     <div class="icon">✅</div>
                     <h3>Tareas Pendientes</h3>
-                    <div class="value" id="tareasPendientes">-</div>
-                    <div class="stat-detail-list" id="tareas-detail"></div>
-                    <div class="stat-ver-mas" id="tareas-ver-mas"></div>
+                    <div class="value">3</div>
                 </div>
                 <div class="stat-card" onclick="window.open('checklist-recepcion.html', '_blank')" style="cursor: pointer; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border: 2px solid #667eea;">
                     <div class="icon">📋</div>
@@ -952,142 +894,7 @@
                     </div>
 
                 </div>
-
-                <!-- TORRES DE AMIN II -->
-                <div class="edificio-asamblea-card">
-                    <h3>
-                        🏢 Torres de Amin II
-                        <span class="badge pendiente">POR AGENDAR</span>
-                    </h3>
-                    
-                    <div class="fecha-asamblea">
-                        <span class="icon">⏳</span>
-                        <div class="info">
-                            <h4>Estado</h4>
-                            <p>Pendiente de fecha</p>
-                        </div>
-                    </div>
-
-                    <div class="documentos-list">
-                        <h4>📄 Documentos Preparados</h4>
-                        <div class="doc-item">
-                            <div class="doc-name">
-                                <span>📋</span>
-                                <span>Convocatoria (Plantilla)</span>
-                            </div>
-                            <button class="btn-download" onclick="descargarDoc('torresamin2', 'convocatoria')">
-                                ⬇️ Descargar
-                            </button>
-                        </div>
-                        <div class="doc-item">
-                            <div class="doc-name">
-                                <span>📝</span>
-                                <span>Acta (Plantilla)</span>
-                            </div>
-                            <button class="btn-download" onclick="descargarDoc('torresamin2', 'acta')">
-                                ⬇️ Descargar
-                            </button>
-                        </div>
-                        <div class="doc-item">
-                            <div class="doc-name">
-                                <span>📊</span>
-                                <span>Informe de Gestión 2025</span>
-                            </div>
-                            <button class="btn-download" onclick="descargarDoc('torresamin2', 'informe')">
-                                ⬇️ Descargar
-                            </button>
-                        </div>
-                        <div class="doc-item">
-                            <div class="doc-name">
-                                <span>✉️</span>
-                                <span>Citación Formal</span>
-                            </div>
-                            <button class="btn-download" onclick="descargarDoc('torresamin2', 'citacion')">
-                                ⬇️ Descargar
-                            </button>
-                        </div>
-                    </div>
-
-                    <button class="btn-editar-asamblea" onclick="abrirModalEditarAsamblea('torre-amin-2')">✏️ Editar Fecha y Estado</button>
-                    <div class="action-buttons" style="display: flex; gap: 15px; margin-top: 25px;">
-                        <button class="btn-action btn-votar" onclick="abrirVotacion('torresamin2')" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #00B853 0%, #0056B8 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
-                            ✅ Sistema de Votación
-                        </button>
-                        <button class="btn-action btn-actas" onclick="abrirGeneradorActas('torresamin2')" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
-                            🎙️ Generador de Actas
-                        </button>
-                    </div>
-
-                </div>
-
-                <!-- MILLENIUM 3 -->
-                <div class="edificio-asamblea-card">
-                    <h3>
-                        🏢 Millenium 3
-                        <span class="badge pendiente">POR AGENDAR</span>
-                    </h3>
-
-                    <div class="fecha-asamblea">
-                        <span class="icon">⏳</span>
-                        <div class="info">
-                            <h4>Estado</h4>
-                            <p id="fecha-millenium3">Por definir</p>
-                        </div>
-                    </div>
-
-                    <div class="documentos-list">
-                        <h4>📄 Documentos Preparados</h4>
-                        <div class="doc-item">
-                            <div class="doc-name">
-                                <span>📋</span>
-                                <span>Convocatoria (Plantilla)</span>
-                            </div>
-                            <button class="btn-download" onclick="descargarDoc('millenium3', 'convocatoria')">
-                                ⬇️ Descargar
-                            </button>
-                        </div>
-                        <div class="doc-item">
-                            <div class="doc-name">
-                                <span>📝</span>
-                                <span>Acta (Plantilla)</span>
-                            </div>
-                            <button class="btn-download" onclick="descargarDoc('millenium3', 'acta')">
-                                ⬇️ Descargar
-                            </button>
-                        </div>
-                        <div class="doc-item">
-                            <div class="doc-name">
-                                <span>📊</span>
-                                <span>Informe de Gestión 2025</span>
-                            </div>
-                            <button class="btn-download" onclick="descargarDoc('millenium3', 'informe')">
-                                ⬇️ Descargar
-                            </button>
-                        </div>
-                        <div class="doc-item">
-                            <div class="doc-name">
-                                <span>✉️</span>
-                                <span>Citación Formal</span>
-                            </div>
-                            <button class="btn-download" onclick="descargarDoc('millenium3', 'citacion')">
-                                ⬇️ Descargar
-                            </button>
-                        </div>
-                    </div>
-
-                    <button class="btn-editar-asamblea" onclick="abrirModalEditarAsamblea('millenium-3')">✏️ Editar Fecha y Estado</button>
-                    <div class="action-buttons" style="display: flex; gap: 15px; margin-top: 25px;">
-                        <button class="btn-action btn-votar" onclick="abrirVotacion('millenium3')" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #00B853 0%, #0056B8 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
-                            ✅ Sistema de Votación
-                        </button>
-                        <button class="btn-action btn-actas" onclick="abrirGeneradorActas('millenium3')" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
-                            🎙️ Generador de Actas
-                        </button>
-                    </div>
-
-                </div>
             </div>
-        </div>
             
             <!-- SECCIÓN DE CONSEJOS MENSUALES -->
             <h2 style="font-size: 2em; margin: 50px 0 30px 0; color: #333;">
@@ -1108,7 +915,11 @@
                                 <label style="display: block; margin-bottom: 5px; font-weight: 600;">Edificio *</label>
                                 <select id="edificioTarea" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
                                     <option value="">Seleccionar...</option>
-                                    <option value="todos">🌐 Todos los edificios</option>
+                                    <option value="nepal-2">Nepal 2</option>
+                                    <option value="avalon">Avalon</option>
+                                    <option value="convivienda-1">Convivienda 1</option>
+                                    <option value="pinos-del-country">Pinos del Country</option>
+                                    <option value="todos">Todos los edificios</option>
                                 </select>
                             </div>
                         </div>
@@ -1165,7 +976,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
         import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        import { getDatabase, ref, onValue, get, push, set, update, remove } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+        import { getDatabase, ref, onValue, push, set, update, remove } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
@@ -1188,153 +999,63 @@
             } else {
                 const userInfo = JSON.parse(localStorage.getItem('azecheUser'));
                 document.getElementById('nombreUsuario').textContent = userInfo?.nombre || user.email;
-
+                
                 // Cargar contadores dinámicos
                 cargarContadores();
                 cargarAlertasVencimientos();
-
-                // ─── EDIFICIOS DINÁMICOS (select de tareas) ─────────────
-                const _SLUGS_D = {'Nepal 2':'nepal-2','Pinos del Country':'pinos-del-country','Convivienda I':'convivienda-1','Convivienda 1':'convivienda-1','Avalon':'avalon','Torres de Amin II':'torre-amin-2','Tores de Anim II':'torre-amin-2','Millenium 3':'millenium-3'};
-                const _slugD = n => {if(!n)return'';if(_SLUGS_D[n])return _SLUGS_D[n];return n.replace(/\bIV\b/g,'4').replace(/\bIII\b/g,'3').replace(/\bII\b/g,'2').replace(/\bI\b/g,'1').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');};
-                onValue(ref(db, 'edificios'), (snap) => {
-                    const sel = document.getElementById('edificioTarea');
-                    if (!sel) return;
-                    const v = sel.value;
-                    sel.innerHTML = '<option value="">Seleccionar...</option><option value="todos">🌐 Todos los edificios</option>';
-                    if (snap.exists()) {
-                        const todos = sel.querySelector('option[value="todos"]');
-                        snap.forEach(child => {
-                            const ed = child.val();
-                            const opt = document.createElement('option');
-                            const _dFix = {'tores-de-anim-2':'torre-amin-2','torres-de-amin-2':'torre-amin-2'};
-                            let _did = ed.edificioId || _slugD(ed.nombre) || child.key;
-                            opt.value = _dFix[_did] || _did;
-                            opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
-                            sel.insertBefore(opt, todos);
-                        });
-                    }
-                    if (v) sel.value = v;
-                });
-                // ─────────────────────────────────────────────────────────
             }
         });
         
 
         
-        // Mapa dinámico edificioId → nombre (actualizado por el listener de edificios)
-        let _edificiosNombres = {};
-
         // CARGAR CONTADORES DINÁMICOS
         function cargarContadores() {
-            // Tarjeta Edificios (dinámica) + mapa de nombres para otras tarjetas
-            onValue(ref(db, 'edificios'), (snap) => {
-                _edificiosNombres = {};
-                const total = snap.exists() ? Object.keys(snap.val()).length : 0;
-                document.getElementById('totalEdificiosDash').textContent = total;
-                const detailEl = document.getElementById('edificios-dash-detail');
-                detailEl.innerHTML = '';
-                if (snap.exists()) snap.forEach(child => {
-                    const ed = child.val();
-                    const slug = ed.edificioId || child.key;
-                    _edificiosNombres[slug] = ed.nombre || child.key;
-                    detailEl.innerHTML += `<div class="stat-detail-item"><span class="det-nombre">${ed.icono || '🏢'} ${ed.nombre || child.key}</span></div>`;
-                });
-            });
-
-            // Próximas asambleas
+            // Contar próximas asambleas
             const asambleasRef = ref(db, 'asambleas');
             onValue(asambleasRef, (snapshot) => {
-                const detailEl = document.getElementById('asambleas-detail');
-                const countEl  = document.getElementById('proximasAsambleas');
-                // Usar mapa dinámico de edificios (llenado por la escucha de 'edificios')
-                const nombresMap = _edificiosNombres;
-                if (!snapshot.exists()) { countEl.textContent = '0'; detailEl.innerHTML = ''; return; }
-                const asambleas = snapshot.val();
-                const hoyAsm = new Date(); hoyAsm.setHours(0,0,0,0);
-                const proximas = Object.entries(asambleas)
-                    .map(([key, a]) => ({ key, ...a }))
-                    .filter(a => {
-                        if (a.estado === 'realizada') return false;
-                        if (a.fecha && new Date(a.fecha + 'T12:00:00') < hoyAsm) return false;
-                        return true;
-                    })
-                    .sort((a, b) => {
-                        if (!a.fecha) return 1;
-                        if (!b.fecha) return -1;
-                        return new Date(a.fecha) - new Date(b.fecha);
+                if (snapshot.exists()) {
+                    const asambleas = snapshot.val();
+                    const proximas = Object.values(asambleas).filter(a => {
+                        const fecha = new Date(a.fecha);
+                        return fecha > new Date() && a.estado !== 'realizada';
                     });
-                countEl.textContent = proximas.length;
-                detailEl.innerHTML = proximas.map(a => {
-                    const nombre = nombresMap[a.key] || a.key;
-                    const fechaStr = a.fecha
-                        ? new Date(a.fecha + 'T00:00:00').toLocaleDateString('es-CO', { day:'numeric', month:'short' })
-                        : 'Sin fecha';
-                    const badgeClass = a.fecha ? 'badge-proxima' : 'badge-pendiente';
-                    const badgeText  = a.fecha ? fechaStr : 'Por agendar';
-                    return `<div class="stat-detail-item">
-                        <span class="det-nombre">🏢 ${nombre}</span>
-                        <span class="stat-detail-badge ${badgeClass}">${badgeText}</span>
-                    </div>`;
-                }).join('');
+                    document.querySelector('#dashboard-section .stat-card:nth-child(4) .value').textContent = proximas.length;
+                }
             });
-
-            // Tareas pendientes
+            
+            // Contar tareas pendientes
             const tareasRef = ref(db, 'tareas');
             onValue(tareasRef, (snapshot) => {
-                const detailEl  = document.getElementById('tareas-detail');
-                const countEl   = document.getElementById('tareasPendientes');
-                const verMasEl  = document.getElementById('tareas-ver-mas');
-                if (!snapshot.exists()) { countEl.textContent = '0'; detailEl.innerHTML = ''; verMasEl.textContent = ''; return; }
-                const prioOrder = { urgente: 4, alta: 3, media: 2, baja: 1 };
-                const pendientes = Object.values(snapshot.val())
-                    .filter(t => t.estado === 'pendiente')
-                    .sort((a, b) => (prioOrder[b.prioridad] || 0) - (prioOrder[a.prioridad] || 0));
-                countEl.textContent = pendientes.length;
-                const mostrar = pendientes.slice(0, 4);
-                detailEl.innerHTML = mostrar.map(t => {
-                    const prio = t.prioridad || 'media';
-                    return `<div class="stat-detail-item">
-                        <span class="det-nombre">${t.titulo}</span>
-                        <span class="stat-detail-badge badge-${prio}">${prio}</span>
-                    </div>`;
-                }).join('');
-                verMasEl.textContent = pendientes.length > 4 ? `+ ${pendientes.length - 4} más` : '';
+                if (snapshot.exists()) {
+                    const tareas = snapshot.val();
+                    const pendientes = Object.values(tareas).filter(t => t.estado === 'pendiente');
+                    document.querySelector('#dashboard-section .stat-card:nth-child(5) .value').textContent = pendientes.length;
+                }
             });
-
-            // Facturas pendientes y saldo por pagar
+            
+            // Contar facturas pendientes y calcular saldo por pagar
             const cuentasRef = ref(db, 'cuentas_por_pagar');
             onValue(cuentasRef, (snapshot) => {
-                const detailEl = document.getElementById('facturas-detail');
-                const verMasEl = document.getElementById('facturas-ver-mas');
                 let facturasPendientes = 0;
                 let saldoTotal = 0;
-                const lista = [];
 
                 if (snapshot.exists()) {
-                    snapshot.forEach((child) => {
-                        const cuenta = child.val();
-                        if (cuenta.estado !== 'pagada' && cuenta.estado !== 'Pagada') {
-                            facturasPendientes++;
-                            const monto = parseFloat(cuenta.valorNeto || 0);
-                            saldoTotal += monto;
-                            lista.push({ proveedor: cuenta.proveedor || cuenta.nombre || 'Sin nombre', monto });
-                        }
+                    // Nivel 1: edificios
+                    snapshot.forEach((edificioSnap) => {
+                        // Nivel 2: facturas individuales
+                        edificioSnap.forEach((facturaSnap) => {
+                            const cuenta = facturaSnap.val();
+                            if (cuenta.estado !== 'pagada' && cuenta.estado !== 'Pagada') {
+                                facturasPendientes++;
+                                saldoTotal += parseFloat(cuenta.valorNeto || cuenta.restoAPagar || 0);
+                            }
+                        });
                     });
                 }
 
                 document.getElementById('facturasPendientes').textContent = facturasPendientes;
                 document.getElementById('saldoPorPagar').textContent =
-                    '$' + saldoTotal.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-
-                const mostrar = lista.slice(0, 4);
-                detailEl.innerHTML = mostrar.map(f => {
-                    const montoStr = '$' + f.monto.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-                    return `<div class="stat-detail-item">
-                        <span class="det-nombre">${f.proveedor}</span>
-                        <span class="stat-detail-badge badge-alta">${montoStr}</span>
-                    </div>`;
-                }).join('');
-                verMasEl.textContent = lista.length > 4 ? `+ ${lista.length - 4} más` : '';
+                    '$' + saldoTotal.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0});
             });
         }
         // ALERTAS DE VENCIMIENTO DE PÓLIZA Y REPRESENTACIÓN
@@ -1370,19 +1091,7 @@
                             ? `VENCIDA hace ${Math.abs(dias)} día(s)`
                             : dias === 0 ? 'Vence HOY'
                             : `Vence en ${dias} día(s) — ${fecha.toLocaleDateString('es-CO')}`;
-                        // Extra info para póliza: cuotas
-                        let extra = '';
-                        if (campo === 'polizaVence' && ed.polizaTipoPago === 'financiado' && ed.polizaCuotas) {
-                            const pag = parseInt(ed.polizaCuotasPagadas) || 0;
-                            const tot = parseInt(ed.polizaCuotas) || 0;
-                            const pct = tot > 0 ? Math.round(pag / tot * 100) : 0;
-                            extra = `<div style="margin-top:6px;color:#0056B8;font-size:0.9em;font-weight:600;">💳 Cuotas: ${pag}/${tot} pagadas`
-                                + (ed.polizaCuotaValor ? ` · ${ed.polizaCuotaValor} c/u` : '')
-                                + `</div><div style="background:#e0e0e0;border-radius:4px;height:6px;margin-top:4px;overflow:hidden;"><div style="background:#0056B8;height:100%;width:${pct}%;"></div></div>`;
-                        } else if (campo === 'polizaVence' && ed.polizaTipoPago === 'contado') {
-                            extra = `<div style="margin-top:4px;color:#2e7d32;font-size:0.9em;">💵 Pagada de contado</div>`;
-                        }
-                        alertas.push({ nombre, label, icono, color, bg, texto, dias, extra });
+                        alertas.push({ nombre, label, icono, color, bg, texto, dias });
                     });
                 });
                 if (alertas.length === 0) {
@@ -1395,7 +1104,6 @@
                         <div style="font-size:1.1em;font-weight:700;color:${a.color};margin-bottom:4px;">${a.icono} ${a.nombre}</div>
                         <div style="font-weight:600;color:#555;margin-bottom:3px;">${a.label}</div>
                         <div style="color:${a.color};font-weight:600;">${a.texto}</div>
-                        ${a.extra || ''}
                     </div>`).join('');
             }).catch(err => {
                 console.error('Error cargando alertas:', err);
@@ -1579,7 +1287,7 @@
                                             <span>🏢 ${tarea.edificio}</span>
                                             <span>📌 ${tarea.origen}</span>
                                             <span style="color: ${coloresPrioridad[tarea.prioridad]}; font-weight: 600;">⚡ ${tarea.prioridad.toUpperCase()}</span>
-                                            ${tarea.fechaLimite ? `<span>📅 ${new Date(tarea.fechaLimite + 'T12:00:00').toLocaleDateString('es-CO')}</span>` : ''}
+                                            ${tarea.fechaLimite ? `<span>📅 ${new Date(tarea.fechaLimite).toLocaleDateString()}</span>` : ''}
                                         </div>
                                         ${tarea.descripcion ? `<p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">${tarea.descripcion}</p>` : ''}
                                     </div>
@@ -1661,12 +1369,6 @@
                 acta: 'ACTA_ASAMBLEA_PinosDelCountry_2026.docx',
                 informe: 'INFORME_GESTION_PinosDelCountry_2025.docx',
                 citacion: 'CITACION_FORMAL_PinosDelCountry_2026.docx'
-            },
-            torresamin2: {
-                convocatoria: 'CONVOCATORIA_TorresDeAminII_2026.docx',
-                acta: 'ACTA_ASAMBLEA_TorresDeAminII_2026.docx',
-                informe: 'INFORME_GESTION_TorresDeAminII_2025.docx',
-                citacion: 'CITACION_FORMAL_TorresDeAminII_2026.docx'
             }
         };
 
@@ -1684,9 +1386,7 @@
                 'nepal2': 'nepal-2',
                 'avalon': 'avalon',
                 'convivienda': 'convivienda-1',
-                'pinos': 'pinos-del-country',
-                'torresamin2': 'torre-amin-2',
-                'millenium3': 'millenium-3'
+                'pinos': 'pinos-del-country'
             };
             window.location.href = `votacion-admin.html?edificio=${edificiosMap[edificio]}`;
         }
@@ -1703,10 +1403,7 @@
             'nepal-2': 'Nepal 2',
             'avalon': 'Avalon',
             'convivienda-1': 'Convivienda 1',
-            'pinos-del-country': 'Pinos del Country',
-            'torres-de-amin-2': 'Torres de Amin II',
-            'torre-amin-2': 'Torres de Amin II',
-            'millenium-3': 'Millenium 3'
+            'pinos-del-country': 'Pinos del Country'
         };
         
         // Abrir modal de edición
@@ -1771,7 +1468,74 @@
         };
 
 
-        // (bloque duplicado eliminado - ver bloque principal arriba)
+        // ===== FUNCIONES DE EDICIÓN DE ASAMBLEAS =====
+        let edificioActualEditar = '';
+        const nombresEdificios = {
+            'nepal-2': 'Nepal 2',
+            'avalon': 'Avalon',
+            'convivienda-1': 'Convivienda 1',
+            'pinos-del-country': 'Pinos del Country'
+        };
+
+        window.abrirModalEditarAsamblea = function(edificioId) {
+            edificioActualEditar = edificioId;
+            
+            // Cargar datos actuales de Firebase
+            const asambleaRef = ref(db, `asambleas/${edificioId}`);
+            get(asambleaRef).then((snapshot) => {
+                let fecha = '';
+                let estado = 'pendiente';
+                
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    fecha = data.fecha || '';
+                    estado = data.estado || 'pendiente';
+                }
+                
+                document.getElementById('modalTitulo').textContent = `✏️ Editar Asamblea - ${nombresEdificios[edificioId]}`;
+                document.getElementById('inputEdificioNombre').value = nombresEdificios[edificioId];
+                document.getElementById('inputFechaAsamblea').value = fecha;
+                document.getElementById('inputEstadoAsamblea').value = estado;
+                
+                document.getElementById('modalEditarAsamblea').classList.add('active');
+            }).catch((error) => {
+                console.error('Error al cargar asamblea:', error);
+                alert('Error al cargar datos de la asamblea');
+            });
+        };
+        
+        window.cerrarModalAsamblea = function() {
+            document.getElementById('modalEditarAsamblea').classList.remove('active');
+        };
+        
+        window.guardarCambiosAsamblea = async function(e) {
+            e.preventDefault();
+            
+            const fecha = document.getElementById('inputFechaAsamblea').value;
+            const estado = document.getElementById('inputEstadoAsamblea').value;
+            
+            if (!fecha) {
+                alert('Por favor ingrese una fecha');
+                return;
+            }
+            
+            try {
+                const asambleaRef = ref(db, `asambleas/${edificioActualEditar}`);
+                await update(asambleaRef, {
+                    fecha: fecha,
+                    estado: estado,
+                    edificio: nombresEdificios[edificioActualEditar],
+                    ultimaActualizacion: new Date().toISOString()
+                });
+                
+                alert('✅ Asamblea actualizada correctamente');
+                cerrarModalAsamblea();
+                location.reload(); // Recargar para ver cambios
+            } catch (error) {
+                console.error('Error al guardar:', error);
+                alert('❌ Error al guardar los cambios');
+            }
+        };
     </script>
 
     <!-- Modal Editar Asamblea -->
