@@ -139,6 +139,36 @@
     </div>
 </div>
 
+<!-- ENVIAR SOLICITUD POR WHATSAPP -->
+<div style="max-width:1200px;margin:22px auto 0;padding:0 20px;">
+    <div style="background:white;border-radius:14px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,.08);">
+        <h2 style="font-size:1em;font-weight:700;color:#333;margin-bottom:16px;">📲 Enviar enlace de solicitud por WhatsApp</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;" id="waBtns"></div>
+    </div>
+</div>
+
+<script>
+(function(){
+    const BASE = 'https://azecheph.github.io/azeche-ph/solicitud-insumos.html';
+    const edificios = [
+        { nombre: 'Nepal 2',          param: 'Nepal 2' },
+        { nombre: 'Convivienda I',     param: 'Convivienda I' },
+        { nombre: 'Pinos del Country', param: 'Pinos del Country' },
+        { nombre: 'Avalon',            param: 'Avalon' },
+        { nombre: 'Torres de Anim II', param: 'Torres de Anim II' },
+    ];
+    const cont = document.getElementById('waBtns');
+    edificios.forEach(e => {
+        const link = BASE + '?edificio=' + encodeURIComponent(e.param);
+        const msg = encodeURIComponent('Hola 👋 Por favor diligencia la solicitud de insumos del edificio ' + e.nombre + ' en el siguiente enlace:\n' + link);
+        cont.innerHTML += `<a href="https://wa.me/?text=${msg}" target="_blank"
+            style="display:flex;align-items:center;gap:8px;background:#25D366;color:white;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:.88em;font-weight:600;justify-content:center;">
+            <span>🏢</span> ${e.nombre}
+        </a>`;
+    });
+})();
+</script>
+
 <!-- TOOLBAR -->
 <div class="toolbar">
     <div class="filter-bar">
