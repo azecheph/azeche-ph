@@ -1885,28 +1885,42 @@
                 alert('❌ Selecciona un edificio primero');
                 return;
             }
-            
+
+            const filtroMes = document.getElementById('filtroMes').value;
+            if (!filtroMes) {
+                alert('❌ Selecciona un mes para generar el Excel');
+                return;
+            }
+
             try {
                 // Leer cuentas de Firebase
                 const cuentasRef = ref(db, `cuentas_por_pagar/${edificioActual}`);
                 const snapshot = await new Promise((resolve) => {
                     onValue(cuentasRef, resolve, { onlyOnce: true });
                 });
-                
+
                 if (!snapshot.exists()) {
                     alert('❌ No hay cuentas registradas para este edificio');
                     return;
                 }
-                
-                // Convertir a array
+
+                // Convertir a array filtrando por mes seleccionado
                 const cuentas = [];
                 snapshot.forEach((childSnapshot) => {
-                    cuentas.push({
-                        id: childSnapshot.key,
-                        ...childSnapshot.val()
-                    });
+                    const c = { id: childSnapshot.key, ...childSnapshot.val() };
+                    const mesCuenta = c.fechaRecepcion ? c.fechaRecepcion.substring(5, 7) : '';
+                    if (mesCuenta === filtroMes) {
+                        cuentas.push(c);
+                    }
                 });
-                
+
+                if (cuentas.length === 0) {
+                    const nombresMes = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                                        'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+                    alert(`❌ No hay cuentas para ${nombresMes[parseInt(filtroMes)]}`);
+                    return;
+                }
+
                 // Crear datos para Excel
                 const datosExcel = cuentas.map(c => ({
                     'Proveedor': c.proveedor || '',
@@ -1964,9 +1978,12 @@
                 XLSX.utils.book_append_sheet(wb, ws, 'Cuentas por Pagar');
                 
                 // Descargar
-                const nombreArchivo = `Cuentas_Por_Pagar_${edificioActual}_${new Date().toISOString().split('T')[0]}.xlsx`;
+                const nombresMes = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                                    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+                const año = new Date().getFullYear();
+                const nombreArchivo = `Cuentas_Por_Pagar_${edificioActual}_${nombresMes[parseInt(filtroMes)]}_${año}.xlsx`;
                 XLSX.writeFile(wb, nombreArchivo);
-                
+
                 alert(`✅ Excel descargado exitosamente!\n\n📊 ${cuentas.length} cuentas exportadas\n📁 Archivo: ${nombreArchivo}`);
                 
             } catch (error) {
