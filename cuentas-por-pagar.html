@@ -929,6 +929,7 @@
             </div>
             <form id="formEditar">
                 <input type="hidden" id="editarId">
+                <input type="hidden" id="editarEstadoActual">
                 <div class="form-group">
                     <label>Proveedor *</label>
                     <input type="text" id="editarProveedor" required>
@@ -1783,6 +1784,7 @@
                 
                 // Llenar formulario de edición
                 document.getElementById('editarId').value = id;
+                document.getElementById('editarEstadoActual').value = cuenta.estado || 'Pendiente';
                 document.getElementById('editarProveedor').value = cuenta.proveedor || '';
                 document.getElementById('editarTipoId').value = cuenta.tipoId || 'NIT';
                 document.getElementById('editarNumeroId').value = cuenta.numeroId || '';
@@ -1845,6 +1847,8 @@
             
             try {
                 const metodoPagoVal = document.getElementById('editarMetodoPago').value || '';
+                const estadoActual = document.getElementById('editarEstadoActual').value || 'Pendiente';
+                const estadoFinal = metodoPagoVal === 'Factura Domiciliada' ? 'Cancelada' : estadoActual;
                 const datosActualizados = {
                     proveedor: proveedor,
                     tipoId: document.getElementById('editarTipoId').value,
@@ -1865,7 +1869,7 @@
                     restoAPagar: parseFloat(document.getElementById('editarRestoAPagar').value) || parseFloat(document.getElementById('editarValorNeto').value),
                     fechaRecepcion: document.getElementById('editarFechaRecepcion').value || null,
                     fechaVencimiento: document.getElementById('editarFechaVencimiento').value || null,
-                    ...(metodoPagoVal === 'Factura Domiciliada' && { estado: 'Cancelada' }),
+                    estado: estadoFinal,
                     metodoPago: metodoPagoVal,
                     categoriaGasto: document.getElementById('editarCategoriaGasto').value || '',
                     prioridad: document.getElementById('editarPrioridad').value || 'Media',
