@@ -1873,7 +1873,10 @@
                 };
                 
                 const cuentaRef = ref(db, `cuentas_por_pagar/${edificioActual}/${id}`);
-                await update(cuentaRef, datosActualizados);
+                const datosLimpios = Object.fromEntries(
+                    Object.entries(datosActualizados).filter(([_, v]) => v !== undefined)
+                );
+                await update(cuentaRef, datosLimpios);
                 
                 alert('✅ Cuenta actualizada exitosamente');
                 cerrarModal('modalEditar');
