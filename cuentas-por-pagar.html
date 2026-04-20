@@ -879,6 +879,7 @@
                             <option value="Cheque">Cheque</option>
                             <option value="Efectivo">Efectivo</option>
                             <option value="Consignación">Consignación</option>
+                            <option value="Factura Domiciliada">Factura Domiciliada</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -1052,6 +1053,7 @@
                             <option value="Cheque">Cheque</option>
                             <option value="Efectivo">Efectivo</option>
                             <option value="Consignación">Consignación</option>
+                            <option value="Factura Domiciliada">Factura Domiciliada</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -1718,7 +1720,7 @@
                 fechaRecepcion: document.getElementById('fechaRecepcion').value || null,
                 fechaVencimiento: document.getElementById('fechaVencimiento').value || null,
                 fechaPago: null,
-                estado: 'Pendiente',
+                estado: document.getElementById('metodoPago').value === 'Factura Domiciliada' ? 'Cancelada' : 'Pendiente',
                 metodoPago: document.getElementById('metodoPago').value || '',
                 categoriaGasto: document.getElementById('categoriaGasto').value || '',
                 prioridad: document.getElementById('prioridad').value || 'Media',
@@ -1862,6 +1864,7 @@
                     restoAPagar: parseFloat(document.getElementById('editarRestoAPagar').value) || parseFloat(document.getElementById('editarValorNeto').value),
                     fechaRecepcion: document.getElementById('editarFechaRecepcion').value || null,
                     fechaVencimiento: document.getElementById('editarFechaVencimiento').value || null,
+                    estado: document.getElementById('editarMetodoPago').value === 'Factura Domiciliada' ? 'Cancelada' : undefined,
                     metodoPago: document.getElementById('editarMetodoPago').value || '',
                     categoriaGasto: document.getElementById('editarCategoriaGasto').value || '',
                     prioridad: document.getElementById('editarPrioridad').value || 'Media',
