@@ -1737,6 +1737,7 @@
                 alert('✅ Cuenta agregada exitosamente\n\nPuedes agregar los datos faltantes editándola después.');
                 cerrarModal('modalManual');
                 document.getElementById('formManual').reset();
+                limpiarFiltros();
             } catch (error) {
                 alert('❌ Error al guardar: ' + error.message);
                 console.error('Error:', error);
