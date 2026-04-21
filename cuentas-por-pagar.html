@@ -1732,8 +1732,11 @@
             
             try {
                 const cuentasRef = ref(db, `cuentas_por_pagar/${edificioActual}`);
-                await push(cuentasRef, nuevaCuenta);
-                
+                const cuentaLimpia = Object.fromEntries(
+                    Object.entries(nuevaCuenta).filter(([_, v]) => v !== null && v !== undefined)
+                );
+                await push(cuentasRef, cuentaLimpia);
+
                 alert('✅ Cuenta agregada exitosamente\n\nPuedes agregar los datos faltantes editándola después.');
                 cerrarModal('modalManual');
                 document.getElementById('formManual').reset();
