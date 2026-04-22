@@ -1713,11 +1713,11 @@
                 aiu: parseFloat(document.getElementById('aiu').value) || 0,
                 iva: parseFloat(document.getElementById('iva').value) || 0,
                 retencion: parseFloat(document.getElementById('retencion').value) || 0,
-                valorNeto: parseFloat(document.getElementById('valorNeto').value) || parseFloat(valorBruto),
+                valorNeto: parseFloat(document.getElementById('valorNeto').value) || parseFloat(valorBruto) || 0,
                 saldoPendienteAnterior: parseFloat(document.getElementById('saldoPendienteAnterior').value) || 0,
                 anticipo: parseFloat(document.getElementById('anticipo').value) || 0,
                 fechaAnticipo: document.getElementById('fechaAnticipo').value || null,
-                restoAPagar: parseFloat(document.getElementById('restoAPagar').value) || parseFloat(document.getElementById('valorNeto').value),
+                restoAPagar: parseFloat(document.getElementById('restoAPagar').value) || parseFloat(document.getElementById('valorNeto').value) || parseFloat(valorBruto) || 0,
                 fechaRecepcion: document.getElementById('fechaRecepcion').value || null,
                 fechaVencimiento: document.getElementById('fechaVencimiento').value || null,
                 fechaPago: null,
@@ -1733,7 +1733,7 @@
             try {
                 const cuentasRef = ref(db, `cuentas_por_pagar/${edificioActual}`);
                 const cuentaLimpia = Object.fromEntries(
-                    Object.entries(nuevaCuenta).filter(([_, v]) => v !== null && v !== undefined)
+                    Object.entries(nuevaCuenta).filter(([_, v]) => v !== null && v !== undefined && !Number.isNaN(v))
                 );
                 await push(cuentasRef, cuentaLimpia);
 
