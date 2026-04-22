@@ -1469,7 +1469,7 @@
             const saldoColor = saldoActual <= 0 ? '#00B853' : '#e53935';
 
             return `
-                <tr data-proveedor="${(cuenta.proveedor || '').toLowerCase()}" data-fecha="${cuenta.fechaVencimiento || ''}">
+                <tr data-proveedor="${(cuenta.proveedor || '').toLowerCase()}" data-fecha="${cuenta.fechaRecepcion || ''}">
                     <td>${cuenta.proveedor || ''}</td>
                     <td>${cuenta.tipoId || ''}</td>
                     <td>${cuenta.numeroId || ''}</td>
