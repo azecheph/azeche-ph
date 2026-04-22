@@ -1721,7 +1721,7 @@
                 fechaRecepcion: document.getElementById('fechaRecepcion').value || null,
                 fechaVencimiento: document.getElementById('fechaVencimiento').value || null,
                 fechaPago: null,
-                estado: document.getElementById('metodoPago').value === 'Factura Domiciliada' ? 'Cancelada' : 'Pendiente',
+                estado: document.getElementById('metodoPago').value === 'Factura Domiciliada' ? 'Pagada' : 'Pendiente',
                 metodoPago: document.getElementById('metodoPago').value || '',
                 categoriaGasto: document.getElementById('categoriaGasto').value || '',
                 prioridad: document.getElementById('prioridad').value || 'Media',
@@ -1852,7 +1852,7 @@
             try {
                 const metodoPagoVal = document.getElementById('editarMetodoPago').value || '';
                 const estadoActual = document.getElementById('editarEstadoActual').value || 'Pendiente';
-                const estadoFinal = metodoPagoVal === 'Factura Domiciliada' ? 'Cancelada' : estadoActual;
+                const estadoFinal = metodoPagoVal === 'Factura Domiciliada' ? 'Pagada' : estadoActual;
                 const datosActualizados = {
                     proveedor: proveedor,
                     tipoId: document.getElementById('editarTipoId').value,
