@@ -575,6 +575,10 @@
                 <span class="icon">📦</span>
                 <span>Órdenes de Compra</span>
             </button>
+            <button class="nav-btn" id="btnCuentasJefa" onclick="window.location.href='cuentas-cobro-jefa.html'" style="display:none; background: linear-gradient(135deg, #6a0dad 0%, #9c27b0 100%);">
+                <span class="icon">👑</span>
+                <span>Cuentas de Cobro</span>
+            </button>
         </div>
 
         <!-- DASHBOARD PRINCIPAL -->
@@ -1014,7 +1018,13 @@
             } else {
                 const userInfo = JSON.parse(localStorage.getItem('azecheUser'));
                 document.getElementById('nombreUsuario').textContent = userInfo?.nombre || user.email;
-                
+
+                // Mostrar botón Cuentas de Cobro solo para admin y creadora
+                if (userInfo?.rol === 'administrador' || userInfo?.rol === 'creadora') {
+                    const btnJefa = document.getElementById('btnCuentasJefa');
+                    if (btnJefa) btnJefa.style.display = '';
+                }
+
                 // Cargar contadores dinámicos
                 cargarContadores();
                 cargarAlertasVencimientos();

@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuentas de Cobro — Azeche P.H.</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white; padding: 22px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .header-content {
+            max-width: 1300px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 15px;
+        }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .logo-box { background: white; padding: 8px 18px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.15); }
+        .logo-text { font-size: 1.7em; font-weight: 900; letter-spacing: -1px; }
+        .logo-blue { color: #0056B8; }
+        .logo-green { color: #00B853; }
+        .logo-sub { font-size: 0.27em; font-weight: 400; letter-spacing: 3px; color: #666; display: block; }
+        .header-title h1 { font-size: 1.4em; font-weight: 700; }
+        .header-title p { opacity: 0.85; font-size: 0.88em; margin-top: 2px; }
+        .header-btns { display: flex; gap: 10px; }
+        .btn-back {
+            background: rgba(255,255,255,0.15); color: white;
+            border: 2px solid rgba(255,255,255,0.6); padding: 9px 20px;
+            border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9em; transition: all 0.3s;
+        }
+        .btn-back:hover { background: white; color: #0056B8; }
+
+        /* CONTAINER */
+        .container { max-width: 1300px; margin: 0 auto; padding: 28px 20px; }
+
+        /* STATS */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 18px; margin-bottom: 25px;
+        }
+        .stat-card {
+            background: white; padding: 22px 20px; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07); border-left: 5px solid #0056B8;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-card.verde   { border-left-color: #00B853; }
+        .stat-card.naranja { border-left-color: #ff9800; }
+        .stat-card.rojo    { border-left-color: #e53935; }
+        .stat-icon  { font-size: 1.8em; margin-bottom: 8px; }
+        .stat-label { color: #888; font-size: 0.78em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: 600; }
+        .stat-value { font-size: 1.9em; font-weight: 900; color: #0056B8; }
+        .stat-card.verde   .stat-value { color: #00B853; }
+        .stat-card.naranja .stat-value { color: #ff9800; }
+        .stat-card.rojo    .stat-value { color: #e53935; }
+
+        /* BARRA */
+        .acciones-bar {
+            background: white; padding: 18px 22px; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07); margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+        }
+        .acciones-bar h2 { color: #0056B8; font-size: 1.15em; }
+        .btn-nueva {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white; border: none; padding: 12px 24px; border-radius: 8px;
+            font-size: 0.95em; font-weight: 700; cursor: pointer; transition: all 0.3s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .btn-nueva:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,86,184,0.3); }
+
+        /* FILTROS AÑO */
+        .filtro-anio {
+            display: flex; gap: 8px; align-items: center;
+        }
+        .filtro-anio label { font-size: 0.85em; color: #666; font-weight: 600; }
+        .filtro-anio select {
+            padding: 7px 12px; border: 2px solid #e0e0e0; border-radius: 8px;
+            font-size: 0.9em; cursor: pointer;
+        }
+        .filtro-anio select:focus { outline: none; border-color: #0056B8; }
+
+        /* TABLA */
+        .tabla-container {
+            background: white; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07); overflow: hidden;
+        }
+        .tabla-header {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white; padding: 16px 22px; font-size: 1em; font-weight: 700;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            background: #f4f6f9; padding: 12px 16px; text-align: left;
+            font-size: 0.78em; text-transform: uppercase; letter-spacing: 0.8px;
+            color: #666; font-weight: 700;
+        }
+        td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; font-size: 0.93em; color: #333; }
+        tr:hover td { background: #f8fbff; }
+        tr:last-child td { border-bottom: none; }
+        .empty-row td { text-align: center; padding: 50px; color: #aaa; font-style: italic; }
+
+        .badge {
+            display: inline-block; padding: 3px 11px; border-radius: 20px;
+            font-size: 0.78em; font-weight: 700;
+        }
+        .badge-pendiente { background: #fff3e0; color: #e65100; }
+        .badge-cobrada   { background: #e8f5e9; color: #2e7d32; }
+
+        .btn-tabla {
+            border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;
+            font-size: 0.8em; font-weight: 600; transition: all 0.2s; margin-right: 4px;
+        }
+        .btn-ver           { background: #e8f0ff; color: #0056B8; }
+        .btn-ver:hover     { background: #0056B8; color: white; }
+        .btn-pdf           { background: #ffebee; color: #e53935; }
+        .btn-pdf:hover     { background: #e53935; color: white; }
+        .btn-cobrada-accion           { background: #e8f5e9; color: #2e7d32; }
+        .btn-cobrada-accion:hover     { background: #2e7d32; color: white; }
+
+        /* MODALES */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.65);
+            z-index: 1000; justify-content: center; align-items: flex-start;
+            padding: 20px; overflow-y: auto;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 16px;
+            max-width: 560px; width: 100%; margin: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 22px; padding-bottom: 14px; border-bottom: 3px solid #0056B8;
+        }
+        .modal-header h2 { color: #0056B8; font-size: 1.25em; }
+        .btn-close-modal { background: none; border: none; font-size: 1.8em; cursor: pointer; color: #aaa; line-height: 1; }
+        .btn-close-modal:hover { color: #e53935; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: #444; font-size: 0.9em; }
+        .form-group input,
+        .form-group select {
+            width: 100%; padding: 11px 13px; border: 2px solid #e0e0e0;
+            border-radius: 8px; font-size: 0.97em; font-family: inherit; transition: border 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus { outline: none; border-color: #0056B8; }
+        .form-group input[readonly] { background: #f5f5f5; color: #666; }
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        .form-info {
+            background: #e8f0ff; padding: 12px 15px; border-radius: 8px;
+            border-left: 4px solid #0056B8; margin-bottom: 18px;
+            font-size: 0.88em; color: #333; line-height: 1.7;
+        }
+        .form-info strong { color: #0056B8; }
+
+        .btn-generar {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white; border: none; border-radius: 8px;
+            font-size: 1em; font-weight: 700; cursor: pointer; transition: all 0.3s; margin-top: 4px;
+        }
+        .btn-generar:hover { opacity: 0.9; transform: translateY(-2px); }
+        .btn-generar:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        /* MODAL PREVIEW */
+        .modal-preview { max-width: 700px; }
+
+        /* DOCUMENTO */
+        .documento-cc {
+            background: white;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 13.5px; line-height: 1.65; color: #111;
+        }
+        .doc-cabecera {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            padding: 28px 35px 18px; border-bottom: 3px solid #0056B8;
+        }
+        .doc-logo { width: 175px; flex-shrink: 0; }
+        .doc-logo img { width: 100%; object-fit: contain; display: block; }
+        .doc-cabecera-info { text-align: right; font-size: 13px; line-height: 1.9; color: #333; }
+        .doc-num-label { font-size: 14.5px; font-weight: bold; color: #0056B8; margin-top: 4px; }
+
+        .doc-body { padding: 28px 35px 35px; }
+        .doc-edificio-bloque { text-align: center; margin-bottom: 22px; }
+        .doc-edificio-bloque .ed-nombre { font-size: 15px; font-weight: bold; text-transform: uppercase; margin-bottom: 3px; }
+        .doc-edificio-bloque .ed-nit { font-size: 13.5px; color: #444; }
+        .doc-debe { text-align: center; font-size: 14px; font-weight: bold; color: #555; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .doc-jefa-bloque { text-align: center; margin-bottom: 28px; }
+        .doc-jefa-bloque .jefa-nombre { font-size: 16px; font-weight: bold; color: #0056B8; margin-bottom: 2px; }
+        .doc-jefa-bloque .jefa-nit { font-size: 13.5px; color: #444; }
+        .doc-separador { border: none; border-top: 1px solid #e0e0e0; margin: 0 0 22px 0; }
+        .doc-linea { margin-bottom: 14px; font-size: 13.5px; text-align: justify; }
+        .doc-linea-valor { font-weight: bold; }
+        .doc-banco-bloque {
+            background: #f0f6ff; border-left: 4px solid #0056B8;
+            padding: 12px 15px; border-radius: 0 6px 6px 0; margin: 18px 0 28px;
+            font-size: 13px; color: #333;
+        }
+        .doc-atentamente { font-size: 13.5px; margin-bottom: 8px; color: #333; }
+        .doc-firma-bloque { margin-top: 4px; }
+        .doc-firma-img { width: 180px; display: block; mix-blend-mode: multiply; margin-bottom: 2px; }
+        .doc-firma-nombre { font-size: 13.5px; color: #111; line-height: 1.6; }
+
+        /* BOTONES DEL DOC */
+        .doc-acciones {
+            display: flex; gap: 10px; padding: 18px 22px;
+            background: #f8f9fa; border-top: 1px solid #e8e8e8;
+            border-radius: 0 0 16px 16px;
+        }
+        .btn-doc {
+            flex: 1; padding: 13px; border: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.92em; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-doc:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-doc-pdf     { background: linear-gradient(135deg, #e53935, #c62828); color: white; }
+        .btn-doc-guardar { background: linear-gradient(135deg, #0056B8, #00B853); color: white; }
+        .btn-doc-cerrar  { background: #e0e0e0; color: #555; flex: 0.6; }
+        .btn-doc-pdf:hover, .btn-doc-guardar:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-doc-cerrar:hover { background: #ccc; }
+
+        /* TOAST */
+        .toast {
+            position: fixed; bottom: 30px; right: 30px; z-index: 9999;
+            background: #333; color: white; padding: 14px 22px; border-radius: 10px;
+            font-size: 0.95em; font-weight: 600; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transform: translateY(100px); opacity: 0; transition: all 0.4s;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.exito  { background: #2e7d32; }
+        .toast.error  { background: #c62828; }
+
+        @media (max-width: 680px) {
+            .form-grid-2 { grid-template-columns: 1fr; }
+            .doc-cabecera { flex-direction: column; gap: 12px; }
+            .doc-cabecera-info { text-align: left; }
+            .doc-cabecera, .doc-body { padding-left: 20px; padding-right: 20px; }
+        }
+
+        @media print {
+            .header, .container, .doc-acciones, .modal-header { display: none !important; }
+            .modal { position: static; background: none; padding: 0; }
+            .modal-content { box-shadow: none; border-radius: 0; max-width: 100%; margin: 0; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-content">
+        <div class="logo-section">
+            <div class="logo-box">
+                <div class="logo-text">
+                    <span class="logo-blue">AZECHE</span><span class="logo-green">PH</span>
+                    <span class="logo-sub">SOLUCIONES ADMINISTRATIVAS</span>
+                </div>
+            </div>
+            <div class="header-title">
+                <h1>Cuentas de Cobro — Gloria Azcárate</h1>
+                <p>Honorarios profesionales de administración</p>
+            </div>
+        </div>
+        <div class="header-btns">
+            <button type="button" class="btn-back" onclick="window.location.href='Dashboard.html'">🏠 Dashboard</button>
+            <button type="button" class="btn-back" onclick="cerrarSesion()">🚪 Salir</button>
+        </div>
+    </div>
+</div>
+
+<!-- CONTAINER -->
+<div class="container">
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📄</div>
+            <div class="stat-label">Total Emitidas <span id="statAnio">2026</span></div>
+            <div class="stat-value" id="statTotal">—</div>
+        </div>
+        <div class="stat-card verde">
+            <div class="stat-icon">✅</div>
+            <div class="stat-label">Total Cobrado</div>
+            <div class="stat-value" id="statCobrado">—</div>
+        </div>
+        <div class="stat-card naranja">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-label">Pendiente de Cobro</div>
+            <div class="stat-value" id="statPendiente">—</div>
+        </div>
+        <div class="stat-card rojo">
+            <div class="stat-icon">🔢</div>
+            <div class="stat-label">Próximo Consecutivo</div>
+            <div class="stat-value" id="statConsecutivo">—</div>
+        </div>
+    </div>
+
+    <div class="acciones-bar">
+        <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+            <h2>📋 Historial de Cuentas de Cobro</h2>
+            <div class="filtro-anio">
+                <label>Año:</label>
+                <select id="filtroAnio" onchange="filtrarPorAnio()">
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
+            </div>
+        </div>
+        <button type="button" class="btn-nueva" onclick="abrirModalNueva()">
+            ➕ Nueva Cuenta de Cobro
+        </button>
+    </div>
+
+    <div class="tabla-container">
+        <div class="tabla-header">📄 Cuentas de Cobro</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Fecha</th>
+                    <th>Edificio</th>
+                    <th>Concepto</th>
+                    <th>Valor</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tablaCuerpo">
+                <tr class="empty-row"><td colspan="7">Cargando...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+<!-- MODAL: NUEVA CUENTA -->
+<div class="modal" id="modalNueva">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>➕ Nueva Cuenta de Cobro</h2>
+            <button type="button" class="btn-close-modal" onclick="cerrarModal('modalNueva')">×</button>
+        </div>
+
+        <div class="form-info">
+            <strong>Consecutivo global:</strong> <span id="infoConsecutivo">cargando...</span><br>
+            <strong>Acreedora:</strong> Gloria M. Azcárate E. — Nit. 38.854.830-1<br>
+            <strong>Cuenta:</strong> AV Villas — Ahorros 035-05650-6
+        </div>
+
+        <div class="form-group">
+            <label>🏢 Edificio *</label>
+            <select id="selectEdificio" onchange="cargarDatosEdificio()">
+                <option value="">— Seleccione edificio —</option>
+                <option value="nepal2">Nepal 2</option>
+                <option value="convivienda">Convivienda I</option>
+                <option value="pinos">Pinos del Country</option>
+                <option value="avalon">Avalon</option>
+                <option value="torres">Torres de Anim II</option>
+            </select>
+        </div>
+
+        <div class="form-grid-2">
+            <div class="form-group">
+                <label>Nombre del Edificio</label>
+                <input type="text" id="nombreEdificio" readonly placeholder="Auto-completa">
+            </div>
+            <div class="form-group">
+                <label>NIT del Edificio</label>
+                <input type="text" id="nitEdificio" readonly placeholder="Auto-completa">
+            </div>
+        </div>
+
+        <div class="form-grid-2">
+            <div class="form-group">
+                <label>📅 Mes *</label>
+                <select id="mesCuenta">
+                    <option value="enero">Enero</option>
+                    <option value="febrero">Febrero</option>
+                    <option value="marzo">Marzo</option>
+                    <option value="abril">Abril</option>
+                    <option value="mayo">Mayo</option>
+                    <option value="junio">Junio</option>
+                    <option value="julio">Julio</option>
+                    <option value="agosto">Agosto</option>
+                    <option value="septiembre">Septiembre</option>
+                    <option value="octubre">Octubre</option>
+                    <option value="noviembre">Noviembre</option>
+                    <option value="diciembre">Diciembre</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>📆 Año *</label>
+                <input type="number" id="anioCuenta" value="2026" min="2024" max="2030">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>💰 Valor en pesos (COP) *</label>
+            <input type="number" id="valorCuenta" placeholder="Ej: 1355010" min="1">
+        </div>
+
+        <button type="button" class="btn-generar" id="btnGenerar" onclick="generarDocumento()">
+            📄 Generar Vista Previa
+        </button>
+    </div>
+</div>
+
+
+<!-- MODAL: VISTA PREVIA -->
+<div class="modal" id="modalPreview">
+    <div class="modal-content modal-preview" style="padding:0; overflow:hidden;">
+        <div class="modal-header" style="padding:18px 24px 14px; margin:0; border-radius:16px 16px 0 0;">
+            <h2>📄 Vista Previa — Cuenta de Cobro</h2>
+            <button type="button" class="btn-close-modal" onclick="cerrarModal('modalPreview')">×</button>
+        </div>
+
+        <div class="documento-cc" id="documentoCC">
+            <div class="doc-cabecera">
+                <div class="doc-logo">
+                    <img src="Logo/1.png" alt="Azeche PH">
+                </div>
+                <div class="doc-cabecera-info">
+                    <div id="docFecha"></div>
+                    <div class="doc-num-label" id="docNumero"></div>
+                </div>
+            </div>
+
+            <div class="doc-body">
+                <div class="doc-edificio-bloque">
+                    <div class="ed-nombre" id="docNombreEdificio"></div>
+                    <div class="ed-nit" id="docNitEdificio"></div>
+                </div>
+
+                <div class="doc-debe">DEBE A:</div>
+
+                <div class="doc-jefa-bloque">
+                    <div class="jefa-nombre">GLORIA M AZCARATE E.</div>
+                    <div class="jefa-nit">Nit. No. 38.854.830-1</div>
+                </div>
+
+                <hr class="doc-separador">
+
+                <div class="doc-linea">
+                    La suma de: <span class="doc-linea-valor" id="docMonto"></span>
+                </div>
+
+                <div class="doc-linea">
+                    Por Concepto de: <span class="doc-linea-valor" id="docConcepto"></span>
+                </div>
+
+                <div class="doc-banco-bloque">
+                    Favor consignar en la Cuenta de Ahorros No. <strong>035-05650-6</strong> del Banco <strong>AV Villas</strong>
+                </div>
+
+                <div class="doc-atentamente">Atentamente,</div>
+
+                <div class="doc-firma-bloque">
+                    <img class="doc-firma-img" src="Logo/firma-gloria.png" alt=""
+                        onerror="this.style.display='none'">
+                    <div class="doc-firma-nombre">
+                        Gloria M. Azcárate E.<br>
+                        Nit. No. 38.854.830-1
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="doc-acciones">
+            <button type="button" class="btn-doc btn-doc-pdf" id="btnPDF" onclick="descargarPDF(this)">
+                📥 Descargar PDF
+            </button>
+            <button type="button" class="btn-doc btn-doc-guardar" id="btnGuardar" onclick="guardarEnFirebase(this)">
+                ☁️ Guardar en Sistema
+            </button>
+            <button type="button" class="btn-doc btn-doc-cerrar" onclick="cerrarModal('modalPreview')">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getDatabase, ref, onValue, get, set, push, update, runTransaction } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
+        authDomain: "azeche-ph.firebaseapp.com",
+        databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+        projectId: "azeche-ph",
+        storageBucket: "azeche-ph.firebasestorage.app",
+        messagingSenderId: "905337990521",
+        appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getDatabase(app);
+
+    // ── DATOS EDIFICIOS
+    const EDIFICIOS = {
+        nepal2:      { nombre: 'EDIFICIO NEPAL 2',            nit: 'NIT: 830-142.380-4' },
+        convivienda: { nombre: 'EDIFICIO CONVIVIENDA I',      nit: 'NIT: 830-112.728-5' },
+        pinos:       { nombre: 'EDIFICIO PINOS DEL COUNTRY',  nit: 'NIT: 830-059.667-8' },
+        avalon:      { nombre: 'EDIFICIO AVALON',             nit: 'NIT: 800-245.101-1' },
+        torres:      { nombre: 'EDIFICIO TORRES DE ANIM II',  nit: 'NIT: 900-563.807-7' }
+    };
+
+    const MESES_NUM = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO',
+                       'JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+
+    // Estado global
+    let consecutivoActual = 16;
+    let datosPendientes = null; // datos del doc antes de guardar
+    let anioFiltro = 2026;
+
+    // ── AUTENTICACIÓN
+    onAuthStateChanged(auth, (user) => {
+        if (!user) { window.location.href = 'index.html'; return; }
+        const info = JSON.parse(localStorage.getItem('azecheUser') || '{}');
+        if (info.rol !== 'administrador' && info.rol !== 'creadora') {
+            window.location.href = 'Dashboard.html';
+            return;
+        }
+        inicializar();
+    });
+
+    function inicializar() {
+        cargarConsecutivo();
+        cargarHistorial();
+        // Seleccionar mes actual por defecto
+        const mesActual = new Date().getMonth();
+        document.getElementById('mesCuenta').selectedIndex = mesActual;
+    }
+
+    // ── CONSECUTIVO
+    function cargarConsecutivo() {
+        const consRef = ref(db, 'cuentas_cobro_jefa/consecutivo');
+        onValue(consRef, (snap) => {
+            consecutivoActual = snap.exists() ? snap.val() : 16;
+            const anioCorto = String(new Date().getFullYear()).slice(-2);
+            const numMostrar = String(consecutivoActual + 1).padStart(3, '0') + '-' + anioCorto;
+            document.getElementById('infoConsecutivo').textContent = numMostrar;
+            document.getElementById('statConsecutivo').textContent = numMostrar;
+        });
+    }
+
+    // ── HISTORIAL
+    function cargarHistorial() {
+        anioFiltro = parseInt(document.getElementById('filtroAnio').value);
+        document.getElementById('statAnio').textContent = anioFiltro;
+
+        const histRef = ref(db, 'cuentas_cobro_jefa/historial');
+        onValue(histRef, (snap) => {
+            const tbody = document.getElementById('tablaCuerpo');
+            if (!snap.exists()) {
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No hay cuentas registradas aún.</td></tr>';
+                actualizarStats([]);
+                return;
+            }
+
+            const todas = [];
+            snap.forEach(child => todas.push({ key: child.key, ...child.val() }));
+
+            // Filtrar por año y ordenar descendente
+            const filtradas = todas
+                .filter(c => c.anio == anioFiltro)
+                .sort((a, b) => b.consecutivo - a.consecutivo);
+
+            actualizarStats(filtradas);
+
+            if (filtradas.length === 0) {
+                tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No hay cuentas en ${anioFiltro}.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtradas.map(c => `
+                <tr>
+                    <td><strong>${c.numero}</strong></td>
+                    <td>${c.fechaCorta || '—'}</td>
+                    <td>${c.edificioNombre}</td>
+                    <td>${c.concepto}</td>
+                    <td><strong>${formatearPesos(c.valor)}</strong></td>
+                    <td><span class="badge badge-${c.estado}">${c.estado === 'cobrada' ? 'Cobrada' : 'Pendiente'}</span></td>
+                    <td>
+                        <button type="button" class="btn-tabla btn-ver"
+                            onclick="window.verCuenta('${c.key}')">👁️ Ver</button>
+                        <button type="button" class="btn-tabla btn-pdf"
+                            onclick="window.verCuenta('${c.key}', true)">📥 PDF</button>
+                        ${c.estado === 'pendiente' ? `
+                        <button type="button" class="btn-tabla btn-cobrada-accion"
+                            onclick="window.marcarCobrada('${c.key}')">✅ Cobrada</button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        });
+    }
+
+    function actualizarStats(cuentas) {
+        const total     = cuentas.length;
+        const cobrado   = cuentas.filter(c => c.estado === 'cobrada').reduce((s, c) => s + c.valor, 0);
+        const pendiente = cuentas.filter(c => c.estado === 'pendiente').reduce((s, c) => s + c.valor, 0);
+        document.getElementById('statTotal').textContent    = total;
+        document.getElementById('statCobrado').textContent  = total ? formatearMillones(cobrado) : '$0';
+        document.getElementById('statPendiente').textContent= total ? formatearMillones(pendiente) : '$0';
+    }
+
+    // ── MODAL NUEVA
+    window.abrirModalNueva = function() {
+        document.getElementById('modalNueva').classList.add('active');
+    };
+
+    window.cerrarModal = function(id) {
+        document.getElementById(id).classList.remove('active');
+        if (id === 'modalPreview') {
+            datosPendientes = null;
+            document.getElementById('btnGuardar').disabled = false;
+            document.getElementById('btnGuardar').textContent = '☁️ Guardar en Sistema';
+        }
+    };
+
+    window.cargarDatosEdificio = function() {
+        const sel = document.getElementById('selectEdificio').value;
+        document.getElementById('nombreEdificio').value = sel ? EDIFICIOS[sel].nombre : '';
+        document.getElementById('nitEdificio').value    = sel ? EDIFICIOS[sel].nit.replace('NIT: ','') : '';
+    };
+
+    window.generarDocumento = function() {
+        const edKey = document.getElementById('selectEdificio').value;
+        const mes   = document.getElementById('mesCuenta').value;
+        const anio  = parseInt(document.getElementById('anioCuenta').value);
+        const valor = parseInt(document.getElementById('valorCuenta').value);
+
+        if (!edKey)             { mostrarToast('Selecciona un edificio', 'error'); return; }
+        if (!valor || valor <= 0){ mostrarToast('Ingresa el valor de la cuenta', 'error'); return; }
+
+        const ed = EDIFICIOS[edKey];
+        const anioCorto = String(anio).slice(-2);
+        const numConsec = consecutivoActual + 1;
+        const numero = String(numConsec).padStart(3, '0') + '-' + anioCorto;
+
+        const hoy = new Date();
+        const fechaDoc   = hoy.getDate() + ' DE ' + MESES_NUM[hoy.getMonth()] + ' DE ' + hoy.getFullYear();
+        const fechaCorta = hoy.getDate() + ' ' + MESES_NUM[hoy.getMonth()].substring(0,3) + ' ' + hoy.getFullYear();
+        const concepto   = 'ADMINISTRACION correspondiente al mes de ' + mes + ' de ' + anio;
+
+        // Llenar documento
+        document.getElementById('docFecha').textContent   = fechaDoc;
+        document.getElementById('docNumero').textContent  = 'CUENTA DE COBRO No. ' + numero;
+        document.getElementById('docNombreEdificio').textContent = ed.nombre;
+        document.getElementById('docNitEdificio').textContent    = ed.nit;
+        document.getElementById('docMonto').textContent   = numeroALetras(valor) + ' (' + formatearPesos(valor) + ').';
+        document.getElementById('docConcepto').textContent = concepto + '.';
+
+        // Guardar datos para Firebase
+        datosPendientes = {
+            consecutivo: numConsec,
+            numero, anio, mes,
+            edificioKey: edKey,
+            edificioNombre: ed.nombre,
+            nit: ed.nit,
+            valor,
+            concepto,
+            fechaDoc,
+            fechaCorta,
+            fechaCreacion: new Date().toISOString(),
+            estado: 'pendiente'
+        };
+
+        // Habilitar botón guardar
+        document.getElementById('btnGuardar').disabled = false;
+        document.getElementById('btnGuardar').textContent = '☁️ Guardar en Sistema';
+
+        cerrarModal('modalNueva');
+        document.getElementById('modalPreview').classList.add('active');
+    };
+
+    // ── VER CUENTA EXISTENTE
+    window.verCuenta = async function(key, descargar = false) {
+        const snap = await get(ref(db, 'cuentas_cobro_jefa/historial/' + key));
+        if (!snap.exists()) return;
+        const c = snap.val();
+
+        document.getElementById('docFecha').textContent   = c.fechaDoc;
+        document.getElementById('docNumero').textContent  = 'CUENTA DE COBRO No. ' + c.numero;
+        document.getElementById('docNombreEdificio').textContent = c.edificioNombre;
+        document.getElementById('docNitEdificio').textContent    = c.nit;
+        document.getElementById('docMonto').textContent   = numeroALetras(c.valor) + ' (' + formatearPesos(c.valor) + ').';
+        document.getElementById('docConcepto').textContent = c.concepto + '.';
+
+        // Ya está guardado: deshabilitar botón guardar
+        datosPendientes = null;
+        document.getElementById('btnGuardar').disabled = true;
+        document.getElementById('btnGuardar').textContent = '✅ Ya guardada';
+
+        document.getElementById('modalPreview').classList.add('active');
+
+        if (descargar) {
+            setTimeout(() => descargarPDF(document.getElementById('btnPDF')), 600);
+        }
+    };
+
+    // ── GUARDAR EN FIREBASE
+    window.guardarEnFirebase = async function(btn) {
+        if (!datosPendientes) return;
+        btn.disabled = true;
+        btn.textContent = '⏳ Guardando...';
+
+        try {
+            // Incrementar consecutivo con transacción
+            await runTransaction(ref(db, 'cuentas_cobro_jefa/consecutivo'), (current) => {
+                return (current || 16) + 1;
+            });
+
+            // Guardar la cuenta
+            await push(ref(db, 'cuentas_cobro_jefa/historial'), datosPendientes);
+
+            mostrarToast('✅ Cuenta guardada correctamente', 'exito');
+            btn.textContent = '✅ Guardada';
+            datosPendientes = null;
+
+            // Descargar PDF automáticamente
+            setTimeout(() => descargarPDF(document.getElementById('btnPDF')), 500);
+
+        } catch (e) {
+            console.error(e);
+            btn.disabled = false;
+            btn.textContent = '☁️ Guardar en Sistema';
+            mostrarToast('Error al guardar. Intenta de nuevo.', 'error');
+        }
+    };
+
+    // ── MARCAR COMO COBRADA
+    window.marcarCobrada = async function(key) {
+        if (!confirm('¿Marcar esta cuenta como cobrada?')) return;
+        await update(ref(db, 'cuentas_cobro_jefa/historial/' + key), { estado: 'cobrada' });
+        mostrarToast('✅ Cuenta marcada como cobrada', 'exito');
+    };
+
+    // ── FILTRO AÑO
+    window.filtrarPorAnio = function() { cargarHistorial(); };
+
+    // ── CERRAR SESIÓN
+    window.cerrarSesion = function() {
+        signOut(auth).then(() => {
+            localStorage.removeItem('azecheUser');
+            window.location.href = 'index.html';
+        });
+    };
+
+    // ── DESCARGAR PDF
+    window.descargarPDF = async function(btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Generando...';
+        btn.disabled = true;
+        try {
+            const doc = document.getElementById('documentoCC');
+            const canvas = await html2canvas(doc, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'letter');
+            const w = pdf.internal.pageSize.getWidth();
+            const h = (canvas.height * w) / canvas.width;
+            pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, w, h);
+            const num = document.getElementById('docNumero').textContent.replace('CUENTA DE COBRO No. ', '');
+            pdf.save('cuenta-cobro-' + num + '.pdf');
+        } catch (e) {
+            mostrarToast('Error generando PDF', 'error');
+        }
+        btn.textContent = orig;
+        btn.disabled = false;
+    };
+
+    // ── CLICK FUERA DEL MODAL
+    window.addEventListener('click', (e) => {
+        ['modalNueva', 'modalPreview'].forEach(id => {
+            if (e.target === document.getElementById(id))
+                window.cerrarModal(id);
+        });
+    });
+
+    // ── UTILIDADES
+    function formatearPesos(n) {
+        return '$' + parseInt(n).toLocaleString('es-CO');
+    }
+    function formatearMillones(n) {
+        if (n >= 1000000) return '$' + (n / 1000000).toFixed(1).replace('.', ',') + 'M';
+        if (n >= 1000)    return '$' + (n / 1000).toFixed(0) + 'K';
+        return formatearPesos(n);
+    }
+
+    function numeroALetras(num) {
+        const UN  = ['','UN','DOS','TRES','CUATRO','CINCO','SEIS','SIETE','OCHO','NUEVE',
+                     'DIEZ','ONCE','DOCE','TRECE','CATORCE','QUINCE','DIECISEIS',
+                     'DIECISIETE','DIECIOCHO','DIECINUEVE'];
+        const DEC = ['','DIEZ','VEINTE','TREINTA','CUARENTA','CINCUENTA',
+                     'SESENTA','SETENTA','OCHENTA','NOVENTA'];
+        const CEN = ['','CIEN','DOSCIENTOS','TRESCIENTOS','CUATROCIENTOS','QUINIENTOS',
+                     'SEISCIENTOS','SETECIENTOS','OCHOCIENTOS','NOVECIENTOS'];
+
+        function menorMil(n) {
+            if (n === 0) return '';
+            if (n === 100) return 'CIEN';
+            let r = '', c = Math.floor(n / 100), resto = n % 100;
+            if (c > 0) r += CEN[c] + (resto > 0 ? ' ' : '');
+            if (resto > 0) {
+                if (resto < 20) { r += UN[resto]; }
+                else {
+                    const d = Math.floor(resto / 10), u = resto % 10;
+                    if (u === 0) r += DEC[d];
+                    else if (d === 2) r += 'VEINTI' + UN[u];
+                    else r += DEC[d] + ' Y ' + UN[u];
+                }
+            }
+            return r;
+        }
+
+        num = Math.floor(num);
+        if (num === 0) return 'CERO PESOS M/CTE';
+        const mill  = Math.floor(num / 1000000);
+        const miles = Math.floor((num % 1000000) / 1000);
+        const resto = num % 1000;
+        let t = '';
+        if (mill  > 0) t += (mill  === 1 ? 'UN MILLON' : menorMil(mill)  + ' MILLONES') + (miles > 0 || resto > 0 ? ' ' : '');
+        if (miles > 0) t += (miles === 1 ? 'MIL'       : menorMil(miles) + ' MIL')       + (resto > 0 ? ' ' : '');
+        if (resto > 0) t += menorMil(resto);
+        return t + ' PESOS M/CTE';
+    }
+
+    function mostrarToast(msg, tipo = '') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast show ' + tipo;
+        setTimeout(() => { t.className = 'toast'; }, 3500);
+    }
+</script>
+
+</body>
+</html>
