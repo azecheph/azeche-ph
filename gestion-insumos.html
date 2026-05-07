@@ -68,6 +68,18 @@
         .btn-pdf{background:#7c3aed;color:white;}
         .btn-wa{background:#25D366;color:white;}
         .btn-action:disabled{opacity:.4;cursor:not-allowed;}
+        .btn-edit{background:#6366f1;color:white;}
+
+        /* EDITAR FORM */
+        .form-group{margin-bottom:12px;}
+        .form-group label{display:block;font-size:.72em;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:4px;}
+        .form-input{width:100%;padding:9px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:.88em;font-family:inherit;color:#333;transition:border-color .2s;}
+        .form-input:focus{outline:none;border-color:#0056B8;}
+        textarea.form-input{resize:vertical;min-height:70px;}
+        .prod-edit-row{display:grid;grid-template-columns:1fr auto 70px;align-items:center;gap:10px;background:#f8f9fa;border-radius:8px;padding:9px 12px;margin-bottom:7px;}
+        .prod-edit-name{font-size:.84em;font-weight:600;color:#333;}
+        .qty-input{width:100%;padding:6px 8px;border:2px solid #e0e0e0;border-radius:6px;font-size:.88em;text-align:center;}
+        .qty-input:focus{outline:none;border-color:#0056B8;}
 
         /* ESTADO vacío */
         .empty-state{max-width:1200px;margin:40px auto;padding:0 20px;text-align:center;color:#aaa;}
@@ -195,6 +207,24 @@
     </div>
 </div>
 
+<!-- MODAL EDITAR -->
+<div class="modal" id="modalEditar">
+    <div class="mbox" style="max-width:760px;">
+        <div class="mhdr" style="background:linear-gradient(135deg,#6366f1,#4f46e5);">
+            <div>
+                <h2>✏️ Editar Solicitud</h2>
+                <div class="folio-badge" id="eEditFolio"></div>
+            </div>
+            <button class="btn-x" onclick="cerrarEditar()">✕</button>
+        </div>
+        <div class="mscroll" id="mEditScroll"></div>
+        <div class="mfooter">
+            <button class="btn-maction" style="background:#10b981;color:white;" onclick="guardarEdicion()">💾 Guardar Cambios</button>
+            <button class="btn-maction" style="background:#e5e7eb;color:#333;" onclick="cerrarEditar()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
 <!-- MODAL DETALLE -->
 <div class="modal" id="modalDetalle">
     <div class="mbox">
@@ -262,6 +292,10 @@ window._update = async (key, estado) => {
         estado,
         fechaGestion: new Date().toISOString()
     });
+};
+
+window._updateFields = async (key, data) => {
+    await update(ref(db, 'solicitudes_insumos/' + key), data);
 };
 </script>
 
@@ -331,6 +365,7 @@ function cardHTML(s){
         </div>
         <div class="sol-card-actions">
             <button class="btn-action btn-ver" onclick="verDetalle('${s.key}')">👁 Ver</button>
+            <button class="btn-action btn-edit" onclick="editarSolicitud('${s.key}')">✏️ Editar</button>
             ${pend?`<button class="btn-action btn-apr" onclick="cambiarEstado('${s.key}','Aprobado')">✅ Aprobar</button>`:''}
             ${pend?`<button class="btn-action btn-rec" onclick="cambiarEstado('${s.key}','Rechazado')">❌ Rechazar</button>`:''}
             ${s.estado==='Aprobado'?`<button class="btn-action btn-pdf" onclick="generarPDF('${s.key}')">🖨️ PDF</button>`:''}
@@ -408,6 +443,7 @@ window.verDetalle = (key) => {
         ${pend?`<button class="btn-maction btn-rec" onclick="cambiarEstado('${key}','Rechazado')">❌ Rechazar</button>`:''}
         ${s.estado==='Aprobado'?`<button class="btn-maction btn-pdf" onclick="generarPDF('${key}')">🖨️ Generar PDF</button>`:''}
         ${s.estado==='Aprobado'?`<button class="btn-maction btn-wa" onclick="enviarWA('${key}')">📱 Enviar por WhatsApp</button>`:''}
+        <button class="btn-maction btn-edit" onclick="cerrar();editarSolicitud('${key}')">✏️ Editar</button>
         <button class="btn-maction" style="background:#e5e7eb;color:#333;" onclick="cerrar()">Cerrar</button>
     `;
 
@@ -564,6 +600,86 @@ window.enviarWA = (key) => {
     if(s.observaciones) msg += `\n\n📝 ${s.observaciones}`;
     msg += `\n\n_Favor confirmar recepción y disponibilidad._`;
     window.open('https://wa.me/?text='+encodeURIComponent(msg), '_blank');
+};
+
+/* ─── EDITAR ─── */
+let _editKey = null;
+
+window.editarSolicitud = (key) => {
+    const s = (window._all||[]).find(s=>s.key===key);
+    if(!s) return;
+    _editKey = key;
+    document.getElementById('eEditFolio').textContent = s.folio || '';
+
+    const cons = s.conserjeria||[], cafe = s.cafeteria||[];
+    const prodRows = (prods, tipo) => prods.map((p,i)=>`
+        <div class="prod-edit-row">
+            <div class="prod-edit-name">${p.emoji||'📦'} ${p.nombre}</div>
+            <span style="font-size:.75em;color:#888;">${p.unidad}</span>
+            <input class="qty-input" type="number" min="0" id="qty_${tipo}_${i}" value="${p.cantidad}">
+        </div>`).join('');
+
+    document.getElementById('mEditScroll').innerHTML = `
+        <div class="msec">
+            <div class="msec-title">Información General</div>
+            <div class="info-grid">
+                <div class="form-group"><label>Edificio</label><input class="form-input" id="e_edificio" value="${(s.edificio||'').replace(/"/g,'&quot;')}"></div>
+                <div class="form-group"><label>Mes</label><input class="form-input" id="e_mes" value="${(s.mes||'').replace(/"/g,'&quot;')}"></div>
+                <div class="form-group"><label>Fecha</label><input class="form-input" type="date" id="e_fecha" value="${s.fecha||''}"></div>
+                <div class="form-group"><label>Solicitante</label><input class="form-input" id="e_solicitante" value="${(s.solicitante||'').replace(/"/g,'&quot;')}"></div>
+                <div class="form-group"><label>Cargo</label><input class="form-input" id="e_cargo" value="${(s.cargo||'').replace(/"/g,'&quot;')}"></div>
+                <div class="form-group"><label>Estado</label>
+                    <select class="form-input" id="e_estado">
+                        <option value="Pendiente"${s.estado==='Pendiente'?' selected':''}>Pendiente</option>
+                        <option value="Aprobado"${s.estado==='Aprobado'?' selected':''}>Aprobado</option>
+                        <option value="Rechazado"${s.estado==='Rechazado'?' selected':''}>Rechazado</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group"><label>Observaciones</label>
+                <textarea class="form-input" id="e_obs">${s.observaciones||''}</textarea>
+            </div>
+        </div>
+        ${cons.length?`<div class="msec"><div class="msec-title">🧹 Conserjería — Cantidades</div>${prodRows(cons,'cons')}</div>`:''}
+        ${cafe.length?`<div class="msec"><div class="msec-title">☕ Cafetería — Cantidades</div>${prodRows(cafe,'cafe')}</div>`:''}
+    `;
+    document.getElementById('modalEditar').classList.add('active');
+};
+
+window.cerrarEditar = () => {
+    document.getElementById('modalEditar').classList.remove('active');
+    _editKey = null;
+};
+
+window.guardarEdicion = async () => {
+    if(!_editKey) return;
+    const s = (window._all||[]).find(s=>s.key===_editKey);
+    if(!s) return;
+    const cons = (s.conserjeria||[]).map((p,i)=>{
+        const inp = document.getElementById(`qty_cons_${i}`);
+        return {...p, cantidad: inp ? Number(inp.value) : p.cantidad};
+    });
+    const cafe = (s.cafeteria||[]).map((p,i)=>{
+        const inp = document.getElementById(`qty_cafe_${i}`);
+        return {...p, cantidad: inp ? Number(inp.value) : p.cantidad};
+    });
+    const data = {
+        edificio:    document.getElementById('e_edificio').value.trim(),
+        mes:         document.getElementById('e_mes').value.trim(),
+        fecha:       document.getElementById('e_fecha').value,
+        solicitante: document.getElementById('e_solicitante').value.trim(),
+        cargo:       document.getElementById('e_cargo').value.trim(),
+        estado:      document.getElementById('e_estado').value,
+        observaciones: document.getElementById('e_obs').value.trim(),
+        conserjeria: cons,
+        cafeteria:   cafe,
+        fechaEdicion: new Date().toISOString(),
+    };
+    try {
+        await window._updateFields(_editKey, data);
+        toast('✅ Solicitud actualizada correctamente');
+        cerrarEditar();
+    } catch(e){ toast('❌ Error al guardar: '+e.message); }
 };
 
 /* Toast */
