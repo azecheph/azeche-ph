@@ -429,7 +429,7 @@
         <div class="documento-cc" id="documentoCC">
             <div class="doc-cabecera">
                 <div class="doc-logo">
-                    <img src="Logo/1.png" alt="Azeche PH">
+                    <img src="../../Logo/1.png" alt="Azeche PH">
                 </div>
                 <div class="doc-cabecera-info">
                     <div id="docFecha"></div>
@@ -467,7 +467,7 @@
                 <div class="doc-atentamente">Atentamente,</div>
 
                 <div class="doc-firma-bloque">
-                    <img class="doc-firma-img" src="Logo/firma-gloria.png" alt=""
+                    <img class="doc-firma-img" src="../../Logo/firma-gloria.png" alt=""
                         onerror="this.style.display='none'">
                     <div class="doc-firma-nombre">
                         Gloria M. Azcárate E.<br>
@@ -498,7 +498,7 @@
 <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getDatabase, ref, onValue, get, set, push, update, runTransaction } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    import { getDatabase, ref, onValue, get, push, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
     const firebaseConfig = {
         apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
@@ -530,6 +530,7 @@
     let consecutivoActual = 16;
     let datosPendientes = null; // datos del doc antes de guardar
     let anioFiltro = 2026;
+    let _unsubHistorial = null; // referencia al listener del historial para evitar duplicados
 
     // ── AUTENTICACIÓN
     onAuthStateChanged(auth, (user) => {
@@ -567,8 +568,11 @@
         anioFiltro = parseInt(document.getElementById('filtroAnio').value);
         document.getElementById('statAnio').textContent = anioFiltro;
 
+        // Desconectar listener anterior para evitar duplicados
+        if (_unsubHistorial) { _unsubHistorial(); _unsubHistorial = null; }
+
         const histRef = ref(db, 'cuentas_cobro_jefa/historial');
-        onValue(histRef, (snap) => {
+        _unsubHistorial = onValue(histRef, (snap) => {
             const tbody = document.getElementById('tablaCuerpo');
             if (!snap.exists()) {
                 tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No hay cuentas registradas aún.</td></tr>';
@@ -724,13 +728,22 @@
         btn.textContent = '⏳ Guardando...';
 
         try {
-            // Incrementar consecutivo con transacción
-            await runTransaction(ref(db, 'cuentas_cobro_jefa/consecutivo'), (current) => {
-                return (current || 16) + 1;
-            });
+            // Leer consecutivo actual (sin interferir con onValue)
+            const consSnap = await get(ref(db, 'cuentas_cobro_jefa/consecutivo'));
+            const consActual = consSnap.exists() ? consSnap.val() : 16;
+            const nuevoConsec = consActual + 1;
 
-            // Guardar la cuenta
-            await push(ref(db, 'cuentas_cobro_jefa/historial'), datosPendientes);
+            // Actualizar número en datosPendientes con el consecutivo real
+            const anioCorto = String(new Date().getFullYear()).slice(-2);
+            datosPendientes.consecutivo = nuevoConsec;
+            datosPendientes.numero = String(nuevoConsec).padStart(3, '0') + '-' + anioCorto;
+
+            // Guardar consecutivo + cuenta atómicamente
+            const nuevaRef = push(ref(db, 'cuentas_cobro_jefa/historial'));
+            const updates = {};
+            updates['cuentas_cobro_jefa/consecutivo'] = nuevoConsec;
+            updates['cuentas_cobro_jefa/historial/' + nuevaRef.key] = datosPendientes;
+            await update(ref(db), updates);
 
             mostrarToast('✅ Cuenta guardada correctamente', 'exito');
             btn.textContent = '✅ Guardada';
@@ -743,7 +756,7 @@
             console.error(e);
             btn.disabled = false;
             btn.textContent = '☁️ Guardar en Sistema';
-            mostrarToast('Error al guardar. Intenta de nuevo.', 'error');
+            mostrarToast('❌ Error: ' + e.message, 'error');
         }
     };
 
