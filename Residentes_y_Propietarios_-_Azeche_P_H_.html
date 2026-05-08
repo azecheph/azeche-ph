@@ -434,6 +434,11 @@
                 <div class="select-edificio">
                     <select id="edificioSelect" onchange="cambiarEdificio()">
                         <option value="">Seleccionar Edificio</option>
+                        <option value="nepal-2">Nepal II</option>
+                        <option value="avalon">Avalon</option>
+                        <option value="convivienda-1">Convivienda 1</option>
+                        <option value="pinos-del-country">Pinos del Country</option>
+                        <option value="torre-amin-2">Torre Amin II</option>
                     </select>
                 </div>
                 <div class="search-box">
@@ -509,6 +514,10 @@
                     <input type="text" id="inputMatriculaApto" placeholder="Ej: 50N-20-0001234">
                 </div>
                 <div class="form-group">
+                    <label>🅿️ Número de Parqueadero <span style="color:#999;font-weight:400;">(cuando aplique)</span></label>
+                    <input type="text" id="inputParqueadero" placeholder="Ej: P-12, 305, Piso 2 - 08">
+                </div>
+                <div class="form-group">
                     <label>🚗 Matrícula Catastral — Garaje <span style="color:#999;font-weight:400;">(cuando aplique)</span></label>
                     <input type="text" id="inputMatriculaGaraje" placeholder="Ej: 50N-20-0001235">
                 </div>
@@ -545,46 +554,8 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Helper: convierte nombre de edificio a slug (fallback si edificioId no está en Firebase)
-        const _SLUGS_CONOCIDOS = {
-            'Nepal 2':'nepal-2','Pinos del Country':'pinos-del-country',
-            'Convivienda I':'convivienda-1','Convivienda 1':'convivienda-1',
-            'Avalon':'avalon',
-            'Torres de Amin II':'torre-amin-2','Tores de Anim II':'torre-amin-2',
-            'Millenium 3':'millenium-3'
-        };
-        function slugEdificio(nombre) {
-            if (!nombre) return '';
-            if (_SLUGS_CONOCIDOS[nombre]) return _SLUGS_CONOCIDOS[nombre];
-            return nombre
-                .replace(/\bIV\b/g,'4').replace(/\bIII\b/g,'3').replace(/\bII\b/g,'2').replace(/\bI\b/g,'1')
-                .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-                .trim().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-        }
-
         let edificioActual = '';
         let tabActual = 'propietarios';
-
-        // ─── EDIFICIOS DINÁMICOS ────────────────────────────────────────
-        // Correcciones de edificioId incorrecto guardado en Firebase
-        const _ID_FIXES = { 'tores-de-anim-2':'torre-amin-2', 'torres-de-amin-2':'torre-amin-2' };
-        onValue(ref(db, 'edificios'), (snap) => {
-            const sel = document.getElementById('edificioSelect');
-            if (!sel) return;
-            const v = sel.value;
-            sel.innerHTML = '<option value="">Seleccionar Edificio</option>';
-            if (snap.exists()) snap.forEach(child => {
-                const ed = child.val();
-                const opt = document.createElement('option');
-                let edId = ed.edificioId || slugEdificio(ed.nombre) || child.key;
-                edId = _ID_FIXES[edId] || edId;
-                opt.value = edId;
-                opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
-                sel.appendChild(opt);
-            });
-            if (v) sel.value = v;
-        });
-        // ───────────────────────────────────────────────────────────────
         let filtroEstado = 'activo';
         let dataPropietarios = {};
         let dataResidentes = {};
@@ -764,6 +735,12 @@
                             <span class="info-value">${persona.documento}</span>
                         </div>
                         ` : ''}
+                        ${persona.parqueadero ? `
+                        <div class="info-item">
+                            <span class="info-label">🅿️ Parqueadero:</span>
+                            <span class="info-value">${persona.parqueadero}</span>
+                        </div>
+                        ` : ''}
                         ${(persona.matriculaApto || persona.matriculaGaraje || persona.matriculaDeposito) ? `
                         <div class="info-item" style="flex-direction:column; align-items:flex-start; gap:4px; background:#f0f4ff; padding:8px 10px; border-radius:8px; margin-top:4px;">
                             <span class="info-label" style="margin-bottom:4px;">🏷️ Matrículas catastrales:</span>
@@ -829,6 +806,7 @@
             document.getElementById('inputDocumento').value = data.documento || '';
             document.getElementById('inputCoeficiente').value = data.coeficiente || '';
             document.getElementById('inputMatriculaApto').value = data.matriculaApto || '';
+            document.getElementById('inputParqueadero').value = data.parqueadero || '';
             document.getElementById('inputMatriculaGaraje').value = data.matriculaGaraje || '';
             document.getElementById('inputMatriculaDeposito').value = data.matriculaDeposito || '';
             document.getElementById('inputObservaciones').value = data.observaciones || '';
@@ -851,6 +829,7 @@
                 email: document.getElementById('inputEmail').value,
                 documento: document.getElementById('inputDocumento').value,
                 matriculaApto: document.getElementById('inputMatriculaApto').value,
+                parqueadero: document.getElementById('inputParqueadero').value,
                 matriculaGaraje: document.getElementById('inputMatriculaGaraje').value,
                 matriculaDeposito: document.getElementById('inputMatriculaDeposito').value,
                 observaciones: document.getElementById('inputObservaciones').value,
