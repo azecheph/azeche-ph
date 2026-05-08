@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asambleas - Azeche P.H.</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -433,6 +434,37 @@
             cursor: pointer;
             font-size: 0.9em;
         }
+
+        .consejos-section{background:white;padding:40px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.2);margin-top:40px;}
+        .ctabs{display:flex;gap:4px;background:#f0f2f5;border-radius:12px;padding:4px;margin-bottom:20px;width:fit-content;}
+        .ctab{padding:9px 22px;border:none;border-radius:9px;cursor:pointer;font-weight:600;font-size:.9em;background:transparent;color:#666;transition:all .2s;}
+        .ctab.active{background:white;color:#0056B8;box-shadow:0 2px 8px rgba(0,0,0,.1);}
+        .filtro-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+        .filtro-row select{padding:9px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:.9em;background:white;cursor:pointer;}
+        .filtro-row select:focus{outline:none;border-color:#0056B8;}
+        .consejo-card{border:2px solid #e8ecf5;border-radius:14px;padding:20px;margin-bottom:14px;transition:all .2s;}
+        .consejo-card:hover{border-color:#0056B8;box-shadow:0 4px 16px rgba(0,86,184,.12);}
+        .cc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
+        .tarea-item{display:flex;align-items:flex-start;gap:12px;background:#f8f9fa;border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+        .tarea-item.done{opacity:.55;}
+        .modal-grande{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;align-items:center;justify-content:center;padding:14px;}
+        .mbox-grande{background:white;border-radius:18px;width:100%;max-width:700px;max-height:94vh;display:flex;flex-direction:column;overflow:hidden;}
+        .mhdr-g{background:linear-gradient(135deg,#0056B8,#00B853);color:white;padding:22px 26px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+        .mbody-g{flex:1;overflow-y:auto;padding:24px 26px;}
+        .mfooter-g{padding:16px 26px;background:#f8f9fa;border-top:1px solid #eee;display:flex;gap:10px;flex-wrap:wrap;}
+        .fg2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:4px;}
+        .fg2 .full{grid-column:1/-1;}
+        .fg2 label{display:block;font-size:.76em;font-weight:700;color:#555;margin-bottom:5px;text-transform:uppercase;}
+        .fg2 input,.fg2 select,.fg2 textarea{width:100%;padding:10px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:.92em;font-family:inherit;color:#333;}
+        .fg2 input:focus,.fg2 select:focus,.fg2 textarea:focus{outline:none;border-color:#0056B8;}
+        .fg2 textarea{resize:vertical;min-height:80px;}
+        .btn-mg{flex:1;padding:11px;border:none;border-radius:9px;cursor:pointer;font-size:.9em;font-weight:700;min-width:110px;}
+        .btn-mg:hover{opacity:.87;}
+        .btn-mg.guardar{background:#10b981;color:white;}
+        .btn-mg.cancelar{background:#e5e7eb;color:#333;}
+        .ctoast{position:fixed;bottom:24px;right:24px;background:#333;color:white;padding:12px 22px;border-radius:10px;font-size:.88em;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;}
+        .ctoast.show{opacity:1;}
+        @media(max-width:580px){.fg2{grid-template-columns:1fr;}.fg2 .full{grid-column:1;}}
     </style>
 </head>
 <body>
@@ -870,70 +902,114 @@
             </div>
         </div>
         
-        <!-- SECCIÓN DE TAREAS -->
-        <div class="tareas-section">
-            <h2>📋 Consejos Mensuales y Tareas</h2>
-            
-            <div class="nueva-tarea-form">
-                <h3>➕ Agregar Nueva Tarea</h3>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Título de la Tarea *</label>
-                        <input type="text" id="tituloTarea" placeholder="Ej: Revisión de instalaciones eléctricas">
-                    </div>
-                    <div class="form-group">
-                        <label>Edificio *</label>
-                        <select id="edificioTarea">
-                            <option value="">Seleccionar...</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-row-3">
-                    <div class="form-group">
-                        <label>Origen *</label>
-                        <select id="origenTarea">
-                            <option value="">Seleccionar...</option>
-                            <option value="Consejo">Consejo</option>
-                            <option value="Asamblea">Asamblea</option>
-                            <option value="Administración">Administración</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Prioridad *</label>
-                        <select id="prioridadTarea">
-                            <option value="Media">Media</option>
-                            <option value="Alta">Alta</option>
-                            <option value="Baja">Baja</option>
-                            <option value="Urgente">Urgente</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Fecha Límite</label>
-                        <input type="date" id="fechaTarea">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Descripción</label>
-                    <textarea id="descripcionTarea" rows="3" placeholder="Detalles de la tarea..."></textarea>
-                </div>
-                
-                <button class="btn-crear" onclick="crearTarea()">
-                    ✅ Crear Tarea
-                </button>
+        <!-- SECCIÓN DE CONSEJOS DE ADMINISTRACIÓN -->
+        <div class="consejos-section">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+                <h2 style="margin:0;">🏛️ Consejos de Administración</h2>
+                <button class="btn-crear" onclick="abrirNuevoConsejo()" style="margin:0;">➕ Nuevo Consejo</button>
             </div>
-            
-            <div>
-                <h3 style="color: #333; margin-bottom: 20px;">📋 Tareas Activas</h3>
-                <div id="listaTareas">
-                    <p style="text-align: center; color: #999; padding: 40px;">Cargando tareas...</p>
-                </div>
+
+            <div class="filtro-row">
+                <select id="filtroEdificio" onchange="renderConsejos()">
+                    <option value="">Todos los edificios</option>
+                    <option value="Nepal 2">Nepal 2</option>
+                    <option value="Avalon">Avalon</option>
+                    <option value="Convivienda I">Convivienda I</option>
+                    <option value="Pinos del Country">Pinos del Country</option>
+                </select>
+                <select id="filtroMes" onchange="renderConsejos()">
+                    <option value="">Todos los meses</option>
+                    <option value="01">Enero</option>
+                    <option value="02">Febrero</option>
+                    <option value="03">Marzo</option>
+                    <option value="04">Abril</option>
+                    <option value="05">Mayo</option>
+                    <option value="06">Junio</option>
+                    <option value="07">Julio</option>
+                    <option value="08">Agosto</option>
+                    <option value="09">Septiembre</option>
+                    <option value="10">Octubre</option>
+                    <option value="11">Noviembre</option>
+                    <option value="12">Diciembre</option>
+                </select>
             </div>
+
+            <div class="ctabs">
+                <button class="ctab active" id="tab-pendientes" onclick="cambiarTab('pendientes')">⏳ Pendientes</button>
+                <button class="ctab" id="tab-realizados" onclick="cambiarTab('realizados')">✅ Realizados</button>
+                <button class="ctab" id="tab-tareas" onclick="cambiarTab('tareas')">📋 Tareas Derivadas</button>
+            </div>
+
+            <div id="listaConsejos">
+                <p style="text-align:center;color:#999;padding:40px;">Cargando consejos...</p>
+            </div>
+        </div>
         </div>
     </div>
     
+    <!-- TOAST -->
+    <div class="ctoast" id="ctoast"></div>
+
+    <!-- MODAL NUEVO CONSEJO -->
+    <div id="modalNuevoConsejo" class="modal-grande" style="display:none;">
+        <div class="mbox-grande">
+            <div class="mhdr-g">
+                <span id="mncTitulo">📅 Nuevo Consejo de Administración</span>
+                <button onclick="cerrarNuevoConsejo()" style="background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;line-height:1;">×</button>
+            </div>
+            <div class="mbody-g">
+                <div class="fg2">
+                    <div class="form-group">
+                        <label>Edificio *</label>
+                        <select id="ncEdificio">
+                            <option value="">Seleccionar...</option>
+                            <option value="Nepal 2">Nepal 2</option>
+                            <option value="Avalon">Avalon</option>
+                            <option value="Convivienda I">Convivienda I</option>
+                            <option value="Pinos del Country">Pinos del Country</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha del Consejo *</label>
+                        <input type="date" id="ncFecha">
+                    </div>
+                </div>
+                <div class="fg2">
+                    <div class="form-group">
+                        <label>Hora</label>
+                        <input type="time" id="ncHora" value="10:00">
+                    </div>
+                    <div class="form-group">
+                        <label>Lugar</label>
+                        <input type="text" id="ncLugar" placeholder="Ej: Salón comunal">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Temas del Consejo</label>
+                    <textarea id="ncTemas" rows="3" placeholder="Ej: Revisión de cuentas, mantenimiento ascensor, seguridad..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Acta / Resumen del Consejo</label>
+                    <textarea id="ncActa" rows="5" placeholder="Escribe aquí el resumen de lo tratado en el consejo..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Tareas Derivadas (una por línea)</label>
+                    <textarea id="ncTareas" rows="4" placeholder="Revisar instalación eléctrica&#10;Cotizar pintura fachada&#10;Enviar circular a propietarios"></textarea>
+                </div>
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:normal;">
+                        <input type="checkbox" id="ncCalendar" style="width:18px;height:18px;">
+                        <span>📅 Crear evento en Google Calendar</span>
+                    </label>
+                </div>
+            </div>
+            <div class="mfooter-g">
+                <button class="btn-mg cancelar" onclick="cerrarNuevoConsejo()">Cancelar</button>
+                <button class="btn-mg guardar" onclick="guardarConsejo()">💾 Guardar Consejo</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL EDITAR -->
     <div id="modal" class="modal">
         <div class="modal-content">
@@ -996,7 +1072,7 @@
                 window.location.href = 'index.html';
             } else {
                 cargarAsambleas();
-                cargarTareas();
+                cargarConsejos();
                 // ─── EDIFICIOS DINÁMICOS ────────────────────────────────
                 const _SLUGS_A = {'Nepal 2':'nepal-2','Pinos del Country':'pinos-del-country','Convivienda I':'convivienda-1','Convivienda 1':'convivienda-1','Avalon':'avalon','Torres de Amin II':'torre-amin-2','Tores de Anim II':'torre-amin-2','Millenium 3':'millenium-3'};
                 const _slug = n => {if(!n)return'';if(_SLUGS_A[n])return _SLUGS_A[n];return n.replace(/\bIV\b/g,'4').replace(/\bIII\b/g,'3').replace(/\bII\b/g,'2').replace(/\bI\b/g,'1').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');};
@@ -1083,134 +1159,248 @@
             });
         }
 
-        // Cargar tareas
-        function cargarTareas() {
-            const tareasRef = ref(db, 'tareas');
-            onValue(tareasRef, (snapshot) => {
-                const container = document.getElementById('listaTareas');
-                
-                if (!snapshot.exists()) {
-                    container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No hay tareas activas</p>';
-                    return;
+        // ===== CONSEJOS DE ADMINISTRACIÓN =====
+        let _consejos = [];
+        let _tabActual = 'pendientes';
+        let _editConsejo = null;
+
+        function cargarConsejos() {
+            const cRef = ref(db, 'consejos');
+            onValue(cRef, (snap) => {
+                _consejos = [];
+                if (snap.exists()) {
+                    snap.forEach(c => _consejos.push({ id: c.key, ...c.val() }));
                 }
-                
-                const tareas = [];
-                snapshot.forEach((child) => {
-                    tareas.push({ id: child.key, ...child.val() });
-                });
-                
-                const pendientes = tareas.filter(t => t.estado === 'pendiente');
-                
-                if (pendientes.length === 0) {
-                    container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No hay tareas pendientes</p>';
-                    return;
-                }
-                
-                const prioridadColor = {
-                    'Urgente': '#dc3545',
-                    'Alta': '#fd7e14',
-                    'Media': '#ffc107',
-                    'Baja': '#20c997'
-                };
-                
-                container.innerHTML = pendientes.map(tarea => `
-                    <div class="tarea-card" style="border-left: 5px solid ${prioridadColor[tarea.prioridad] || '#999'}">
-                        <div class="tarea-header">
-                            <div class="tarea-title">
-                                <h4>${tarea.titulo}</h4>
-                                <p class="tarea-meta">🏢 ${nombres[tarea.edificio] || tarea.edificio}</p>
-                                <p class="tarea-desc">${tarea.descripcion || ''}</p>
-                            </div>
-                            <div style="text-align: right;">
-                                <span class="prioridad-badge" style="background: ${prioridadColor[tarea.prioridad] || '#999'}">${tarea.prioridad}</span>
-                                ${tarea.fechaLimite ? `<p style="color: #999; font-size: 0.85em; margin-top: 8px;">📅 ${new Date(tarea.fechaLimite + 'T12:00:00').toLocaleDateString('es-ES')}</p>` : ''}
-                            </div>
-                        </div>
-                        <div class="tarea-footer">
-                            <span class="tarea-origen">Origen: ${tarea.origen}</span>
-                            <button class="btn-completar" onclick="completarTarea('${tarea.id}')">✅ Completar</button>
-                            <button class="btn-eliminar" onclick="eliminarTarea('${tarea.id}')">🗑️ Eliminar</button>
-                        </div>
-                    </div>
-                `).join('');
+                renderConsejos();
             });
         }
 
-        // Crear tarea
-        window.crearTarea = async function() {
-            const titulo = document.getElementById('tituloTarea').value;
-            const edificio = document.getElementById('edificioTarea').value;
-            const origen = document.getElementById('origenTarea').value;
-            const prioridad = document.getElementById('prioridadTarea').value;
-            const fechaLimite = document.getElementById('fechaTarea').value;
-            const descripcion = document.getElementById('descripcionTarea').value;
-            
-            if (!titulo || !edificio || !origen) {
-                alert('⚠️ Por favor completa los campos obligatorios');
+        window.renderConsejos = function() {
+            const filtEd = document.getElementById('filtroEdificio')?.value || '';
+            const filtMes = document.getElementById('filtroMes')?.value || '';
+            const container = document.getElementById('listaConsejos');
+
+            let lista = [..._consejos];
+            if (filtEd) lista = lista.filter(c => c.edificio === filtEd);
+            if (filtMes) lista = lista.filter(c => c.fecha && c.fecha.substring(5, 7) === filtMes);
+
+            if (_tabActual === 'tareas') {
+                renderTareasDerivadas(lista, container);
                 return;
             }
-            
-            try {
-                const tareasRef = ref(db, 'tareas');
-                const nuevaTareaRef = push(tareasRef);
-                
-                await set(nuevaTareaRef, {
-                    titulo,
-                    edificio,
-                    origen,
-                    prioridad,
-                    fechaLimite,
-                    descripcion,
-                    estado: 'pendiente',
-                    fechaCreacion: new Date().toISOString()
+
+            const estado = _tabActual === 'pendientes' ? 'pendiente' : 'realizado';
+            lista = lista.filter(c => (c.estado || 'pendiente') === estado);
+            lista.sort((a, b) => (a.fecha || '') > (b.fecha || '') ? 1 : -1);
+
+            if (lista.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">No hay consejos ' + (estado === 'pendiente' ? 'pendientes' : 'realizados') + '</p>';
+                return;
+            }
+
+            container.innerHTML = lista.map(c => {
+                const tareas = c.tareas ? c.tareas.split('\n').filter(t => t.trim()) : [];
+                const completadas = tareas.filter((_, i) => c.tareasCheck && c.tareasCheck[i]);
+                return '<div class="consejo-card">' +
+                    '<div class="cc-top">' +
+                        '<div>' +
+                            '<strong>🏢 ' + c.edificio + '</strong>' +
+                            '<span style="color:#666;margin-left:12px;">📅 ' + (c.fecha ? new Date(c.fecha + 'T12:00:00').toLocaleDateString('es-ES', {year:'numeric',month:'long',day:'numeric'}) : 'Sin fecha') + '</span>' +
+                            (c.hora ? '<span style="color:#666;margin-left:8px;">🕐 ' + c.hora + '</span>' : '') +
+                            (c.lugar ? '<span style="color:#666;margin-left:8px;">📍 ' + c.lugar + '</span>' : '') +
+                        '</div>' +
+                        '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+                            (c.estado !== 'realizado' ? '<button onclick="marcarRealizado('' + c.id + '')" style="background:#28a745;color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:.85em;">✅ Realizado</button>' : '') +
+                            '<button onclick="editarConsejo('' + c.id + '')" style="background:#1976d2;color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:.85em;">✏️ Editar</button>' +
+                            '<button onclick="eliminarConsejo('' + c.id + '')" style="background:#dc3545;color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:.85em;">🗑️</button>' +
+                        '</div>' +
+                    '</div>' +
+                    (c.temas ? '<div style="margin:8px 0;color:#555;"><strong>Temas:</strong> ' + c.temas + '</div>' : '') +
+                    (c.acta ? '<div style="margin:8px 0;background:#f9f9f9;padding:10px;border-radius:6px;color:#444;white-space:pre-wrap;"><strong>📝 Acta:</strong><br>' + c.acta + '</div>' : '') +
+                    (tareas.length > 0 ?
+                        '<div style="margin-top:10px;"><strong>📋 Tareas (' + completadas.length + '/' + tareas.length + '):</strong>' +
+                        '<ul style="margin:6px 0 0 0;padding-left:0;list-style:none;">' +
+                        tareas.map((t, i) =>
+                            '<li style="display:flex;align-items:center;gap:8px;padding:4px 0;">' +
+                            '<input type="checkbox" ' + (c.tareasCheck && c.tareasCheck[i] ? 'checked' : '') + ' onchange="toggleTarea('' + c.id + '', ' + i + ', this.checked)" style="width:16px;height:16px;cursor:pointer;">' +
+                            '<span style="' + (c.tareasCheck && c.tareasCheck[i] ? 'text-decoration:line-through;color:#aaa;' : '') + '">' + t.trim() + '</span>' +
+                            '</li>'
+                        ).join('') +
+                        '</ul></div>'
+                    : '') +
+                '</div>';
+            }).join('');
+        };
+
+        function renderTareasDerivadas(lista, container) {
+            const todasTareas = [];
+            lista.forEach(c => {
+                if (!c.tareas) return;
+                const ts = c.tareas.split('\n').filter(t => t.trim());
+                ts.forEach((t, i) => {
+                    todasTareas.push({ texto: t.trim(), edificio: c.edificio, fecha: c.fecha, consId: c.id, idx: i, done: c.tareasCheck && c.tareasCheck[i] });
                 });
-                
-                alert('✅ Tarea creada correctamente');
-                
-                // Limpiar
-                document.getElementById('tituloTarea').value = '';
-                document.getElementById('edificioTarea').value = '';
-                document.getElementById('origenTarea').value = '';
-                document.getElementById('prioridadTarea').value = 'Media';
-                document.getElementById('fechaTarea').value = '';
-                document.getElementById('descripcionTarea').value = '';
-            } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error al crear la tarea');
+            });
+
+            const pendientes = todasTareas.filter(t => !t.done);
+            const completadas = todasTareas.filter(t => t.done);
+
+            if (todasTareas.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">No hay tareas derivadas</p>';
+                return;
             }
+
+            let html = '';
+            if (pendientes.length > 0) {
+                html += '<h4 style="color:#333;margin:0 0 10px;">⏳ Pendientes (' + pendientes.length + ')</h4>';
+                html += pendientes.map(t =>
+                    '<div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #eee;border-radius:8px;padding:10px 14px;margin-bottom:8px;">' +
+                    '<input type="checkbox" onchange="toggleTarea('' + t.consId + '', ' + t.idx + ', this.checked)" style="width:18px;height:18px;cursor:pointer;">' +
+                    '<div><div style="font-weight:500;">' + t.texto + '</div>' +
+                    '<div style="font-size:.82em;color:#888;">🏢 ' + t.edificio + ' · 📅 ' + (t.fecha || 'Sin fecha') + '</div></div>' +
+                    '</div>'
+                ).join('');
+            }
+            if (completadas.length > 0) {
+                html += '<h4 style="color:#888;margin:16px 0 10px;">✅ Completadas (' + completadas.length + ')</h4>';
+                html += completadas.map(t =>
+                    '<div style="display:flex;align-items:center;gap:10px;background:#f8f8f8;border:1px solid #eee;border-radius:8px;padding:10px 14px;margin-bottom:8px;opacity:.7;">' +
+                    '<input type="checkbox" checked onchange="toggleTarea('' + t.consId + '', ' + t.idx + ', this.checked)" style="width:18px;height:18px;cursor:pointer;">' +
+                    '<div><div style="font-weight:500;text-decoration:line-through;color:#888;">' + t.texto + '</div>' +
+                    '<div style="font-size:.82em;color:#aaa;">🏢 ' + t.edificio + ' · 📅 ' + (t.fecha || 'Sin fecha') + '</div></div>' +
+                    '</div>'
+                ).join('');
+            }
+            container.innerHTML = html;
+        }
+
+        window.cambiarTab = function(tab) {
+            _tabActual = tab;
+            document.querySelectorAll('.ctab').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            renderConsejos();
         };
 
-        // Completar tarea
-        window.completarTarea = async function(tareaId) {
-            if (!confirm('¿Marcar esta tarea como completada?')) return;
-            
+        window.abrirNuevoConsejo = function() {
+            _editConsejo = null;
+            document.getElementById('mncTitulo').textContent = '📅 Nuevo Consejo de Administración';
+            document.getElementById('ncEdificio').value = '';
+            document.getElementById('ncFecha').value = '';
+            document.getElementById('ncHora').value = '10:00';
+            document.getElementById('ncLugar').value = '';
+            document.getElementById('ncTemas').value = '';
+            document.getElementById('ncActa').value = '';
+            document.getElementById('ncTareas').value = '';
+            document.getElementById('ncCalendar').checked = false;
+            document.getElementById('modalNuevoConsejo').style.display = 'flex';
+        };
+
+        window.editarConsejo = function(id) {
+            const c = _consejos.find(x => x.id === id);
+            if (!c) return;
+            _editConsejo = id;
+            document.getElementById('mncTitulo').textContent = '✏️ Editar Consejo';
+            document.getElementById('ncEdificio').value = c.edificio || '';
+            document.getElementById('ncFecha').value = c.fecha || '';
+            document.getElementById('ncHora').value = c.hora || '10:00';
+            document.getElementById('ncLugar').value = c.lugar || '';
+            document.getElementById('ncTemas').value = c.temas || '';
+            document.getElementById('ncActa').value = c.acta || '';
+            document.getElementById('ncTareas').value = c.tareas || '';
+            document.getElementById('ncCalendar').checked = false;
+            document.getElementById('modalNuevoConsejo').style.display = 'flex';
+        };
+
+        window.cerrarNuevoConsejo = function() {
+            document.getElementById('modalNuevoConsejo').style.display = 'none';
+        };
+
+        window.guardarConsejo = async function() {
+            const edificio = document.getElementById('ncEdificio').value;
+            const fecha = document.getElementById('ncFecha').value;
+            if (!edificio || !fecha) { mostrarToast('⚠️ Edificio y fecha son obligatorios', 'error'); return; }
+
+            const data = {
+                edificio,
+                fecha,
+                hora: document.getElementById('ncHora').value,
+                lugar: document.getElementById('ncLugar').value,
+                temas: document.getElementById('ncTemas').value,
+                acta: document.getElementById('ncActa').value,
+                tareas: document.getElementById('ncTareas').value,
+                estado: _editConsejo ? (_consejos.find(x => x.id === _editConsejo)?.estado || 'pendiente') : 'pendiente',
+                updatedAt: new Date().toISOString()
+            };
+
             try {
-                const tareaRef = ref(db, `tareas/${tareaId}`);
-                await update(tareaRef, {
-                    estado: 'completada',
-                    fechaCompletado: new Date().toISOString()
-                });
-                alert('✅ Tarea completada');
-            } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error');
+                if (_editConsejo) {
+                    await update(ref(db, 'consejos/' + _editConsejo), data);
+                } else {
+                    data.createdAt = new Date().toISOString();
+                    await push(ref(db, 'consejos'), data);
+                }
+
+                if (document.getElementById('ncCalendar').checked) {
+                    enviarACalendar(data);
+                }
+
+                cerrarNuevoConsejo();
+                mostrarToast('✅ Consejo guardado correctamente', 'success');
+            } catch (e) {
+                console.error(e);
+                mostrarToast('❌ Error al guardar', 'error');
             }
         };
 
-        // Eliminar tarea
-        window.eliminarTarea = async function(tareaId) {
-            if (!confirm('¿Eliminar esta tarea permanentemente?')) return;
-            
+        window.marcarRealizado = async function(id) {
+            if (!confirm('¿Marcar este consejo como realizado?')) return;
             try {
-                const tareaRef = ref(db, `tareas/${tareaId}`);
-                await set(tareaRef, null);
-                alert('✅ Tarea eliminada');
-            } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error');
-            }
+                await update(ref(db, 'consejos/' + id), { estado: 'realizado' });
+                mostrarToast('✅ Consejo marcado como realizado', 'success');
+            } catch (e) { mostrarToast('❌ Error', 'error'); }
         };
 
+        window.eliminarConsejo = async function(id) {
+            if (!confirm('¿Eliminar este consejo permanentemente?')) return;
+            try {
+                await set(ref(db, 'consejos/' + id), null);
+                mostrarToast('✅ Consejo eliminado', 'success');
+            } catch (e) { mostrarToast('❌ Error', 'error'); }
+        };
+
+        window.toggleTarea = async function(consId, idx, checked) {
+            const c = _consejos.find(x => x.id === consId);
+            if (!c) return;
+            const checks = c.tareasCheck ? { ...c.tareasCheck } : {};
+            checks[idx] = checked;
+            try {
+                await update(ref(db, 'consejos/' + consId), { tareasCheck: checks });
+            } catch (e) { console.error(e); }
+        };
+
+        function enviarACalendar(data) {
+            const hora = data.hora || '10:00';
+            const horaFin = String(parseInt(hora.split(':')[0]) + 1).padStart(2, '0') + ':00';
+            const inicio = (data.fecha + 'T' + hora + ':00').replace(/[-:]/g, '');
+            const fin = (data.fecha + 'T' + horaFin + ':00').replace(/[-:]/g, '');
+            const titulo = encodeURIComponent('Consejo ' + data.edificio);
+            const detalles = encodeURIComponent((data.temas || '') + (data.acta ? '
+
+Acta: ' + data.acta : ''));
+            const lugar = encodeURIComponent(data.lugar || '');
+            window.open('https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + titulo + '&dates=' + inicio + '/' + fin + '&details=' + detalles + '&location=' + lugar, '_blank');
+        }
+
+        function mostrarToast(msg, tipo) {
+            const t = document.getElementById('ctoast');
+            if (!t) return;
+            t.textContent = msg;
+            t.className = 'ctoast show' + (tipo ? ' ' + tipo : '');
+            clearTimeout(t._to);
+            t._to = setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        
         // Abrir modal
         window.abrirModal = async function(edificioId) {
             edificioActual = edificioId;
