@@ -16,724 +16,575 @@
 
         .header {
             background: white;
-            padding: 24px 30px;
+            padding: 22px 30px;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 12px;
         }
-
-        .header h1 { color: #667eea; font-size: 1.8em; }
-
+        .header h1 { color: #667eea; font-size: 1.7em; }
         .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-
-        .btn-back {
-            background: #667eea;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            text-decoration: none;
-            font-size: .9em;
-        }
+        .btn-back { background: #667eea; color: white; padding: 9px 18px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; text-decoration: none; font-size: .88em; }
         .btn-back:hover { background: #5568d3; }
-
-        .btn-nuevo {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: .9em;
-        }
+        .btn-nuevo { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 10px 22px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: .92em; }
         .btn-nuevo:hover { opacity: .88; }
 
         .container { max-width: 1100px; margin: 0 auto; }
 
-        /* FILTROS + TABS */
+        /* TOOLBAR */
         .toolbar {
             background: white;
             border-radius: 16px;
-            padding: 18px 24px;
-            margin-bottom: 20px;
+            padding: 16px 22px;
+            margin-bottom: 18px;
             box-shadow: 0 8px 24px rgba(0,0,0,.15);
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
         }
-
-        .toolbar select {
-            padding: 8px 14px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: .9em;
-            background: white;
-            cursor: pointer;
-            color: #333;
-        }
+        .toolbar select { padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: .88em; background: white; cursor: pointer; color: #333; }
         .toolbar select:focus { outline: none; border-color: #667eea; }
-
-        .ctabs {
-            display: flex;
-            gap: 4px;
-            background: #f0f2f5;
-            border-radius: 12px;
-            padding: 4px;
-            margin-left: auto;
-        }
-
-        .ctab {
-            padding: 8px 20px;
-            border: none;
-            border-radius: 9px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: .85em;
-            background: transparent;
-            color: #666;
-            transition: all .2s;
-            white-space: nowrap;
-        }
+        .ctabs { display: flex; gap: 4px; background: #f0f2f5; border-radius: 12px; padding: 4px; margin-left: auto; }
+        .ctab { padding: 7px 18px; border: none; border-radius: 9px; cursor: pointer; font-weight: 600; font-size: .84em; background: transparent; color: #666; transition: all .2s; white-space: nowrap; }
         .ctab.active { background: white; color: #667eea; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
 
-        /* CARDS */
-        .lista { display: flex; flex-direction: column; gap: 16px; }
+        /* LISTA */
+        .lista { display: flex; flex-direction: column; gap: 14px; }
 
+        /* CARD */
         .consejo-card {
             background: white;
             border-radius: 16px;
-            padding: 22px 24px;
+            padding: 20px 24px;
             box-shadow: 0 4px 16px rgba(0,0,0,.1);
             border-left: 5px solid #667eea;
-            transition: all .2s;
+            transition: box-shadow .2s;
         }
-        .consejo-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.15); }
-        .consejo-card.realizado { border-left-color: #10b981; opacity: .85; }
+        .consejo-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,.15); }
+        .consejo-card.realizado { border-left-color: #10b981; }
+        .consejo-card.proximo { border-left-color: #f59e0b; }
 
-        .card-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 14px;
-        }
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+        .card-left h3 { font-size: 1.05em; color: #1e293b; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+        .badge-proximo { background: #fef3c7; color: #92400e; font-size: .72em; font-weight: 700; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; }
+        .badge-realizado { background: #d1fae5; color: #065f46; font-size: .72em; font-weight: 700; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; }
 
-        .card-info { flex: 1; }
-        .card-info h3 { font-size: 1.05em; color: #333; margin-bottom: 6px; }
-        .card-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: .85em; color: #666; }
-        .card-meta span { display: flex; align-items: center; gap: 4px; }
+        .card-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: .84em; color: #64748b; }
+        .card-meta span { display: flex; align-items: center; gap: 3px; }
 
-        .card-btns { display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start; }
+        .card-btns { display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start; flex-shrink: 0; }
 
-        .btn-sm {
-            padding: 5px 12px;
-            border: none;
-            border-radius: 7px;
-            cursor: pointer;
-            font-size: .82em;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-        .btn-gcal { background: #4285f4; color: white; }
-        .btn-gcal:hover { background: #3367d6; }
-        .btn-edit { background: #667eea; color: white; }
-        .btn-edit:hover { background: #5568d3; }
-        .btn-done { background: #10b981; color: white; }
-        .btn-done:hover { background: #059669; }
-        .btn-del { background: #fee2e2; color: #dc2626; }
-        .btn-del:hover { background: #fecaca; }
+        .btn-sm { padding: 6px 12px; border: none; border-radius: 8px; cursor: pointer; font-size: .8em; font-weight: 600; white-space: nowrap; }
+        .btn-acta  { background: #7c3aed; color: white; }
+        .btn-acta:hover  { background: #6d28d9; }
+        .btn-gcal  { background: #4285f4; color: white; }
+        .btn-gcal:hover  { background: #3367d6; }
+        .btn-edit  { background: #e0e7ff; color: #3730a3; }
+        .btn-edit:hover  { background: #c7d2fe; }
+        .btn-del   { background: #fee2e2; color: #dc2626; }
+        .btn-del:hover   { background: #fecaca; }
 
-        .card-section { margin-top: 12px; }
-        .card-section-label { font-size: .78em; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; }
+        /* Temas */
+        .temas-box { font-size: .87em; color: #475569; margin-top: 6px; }
+        .temas-box strong { color: #334155; }
 
-        .acta-box {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 12px 14px;
-            font-size: .88em;
-            color: #444;
-            white-space: pre-wrap;
-            line-height: 1.5;
-        }
+        /* Acta */
+        .acta-box { background: #f8fafc; border-radius: 10px; padding: 12px 14px; font-size: .86em; color: #334155; white-space: pre-wrap; line-height: 1.55; margin-top: 10px; border: 1px solid #e2e8f0; }
+        .section-label { font-size: .74em; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; margin-top: 12px; }
 
-        /* TAREAS CHECKLIST */
-        .tareas-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
-        .tarea-li {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 7px 10px;
-            border-radius: 8px;
-            background: #f8f9fa;
-            font-size: .88em;
-        }
-        .tarea-li input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: #10b981; flex-shrink: 0; }
-        .tarea-li.done span { text-decoration: line-through; color: #aaa; }
-        .tarea-progress { font-size: .8em; color: #888; margin-bottom: 8px; }
+        /* Tareas checklist */
+        .tareas-list { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+        .tarea-li { display: flex; align-items: center; gap: 9px; padding: 6px 10px; border-radius: 7px; background: #f1f5f9; font-size: .86em; }
+        .tarea-li input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; accent-color: #10b981; flex-shrink: 0; }
+        .tarea-li.done span { text-decoration: line-through; color: #94a3b8; }
+        .tarea-progress { font-size: .78em; color: #94a3b8; margin-top: 4px; }
 
-        /* VISTA TAREAS DERIVADAS */
-        .tareas-view-card {
-            background: white;
-            border-radius: 12px;
-            padding: 14px 18px;
-            box-shadow: 0 2px 10px rgba(0,0,0,.08);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .tareas-view-card input[type=checkbox] { width: 18px; height: 18px; cursor: pointer; accent-color: #10b981; flex-shrink: 0; }
-        .tareas-view-card .tv-text { flex: 1; }
-        .tareas-view-card .tv-main { font-weight: 500; color: #333; font-size: .9em; }
-        .tareas-view-card .tv-meta { font-size: .78em; color: #888; margin-top: 2px; }
-        .tareas-view-card.done .tv-main { text-decoration: line-through; color: #aaa; }
+        /* Vista tareas derivadas */
+        .tv-card { background: white; border-radius: 12px; padding: 12px 16px; box-shadow: 0 2px 8px rgba(0,0,0,.07); display: flex; align-items: center; gap: 12px; }
+        .tv-card input[type=checkbox] { width: 17px; height: 17px; cursor: pointer; accent-color: #10b981; flex-shrink: 0; }
+        .tv-main { font-weight: 500; color: #1e293b; font-size: .88em; }
+        .tv-meta { font-size: .76em; color: #94a3b8; margin-top: 2px; }
+        .tv-card.done .tv-main { text-decoration: line-through; color: #94a3b8; }
 
-        /* EMPTY STATE */
-        .empty { text-align: center; padding: 60px 20px; color: #999; background: white; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,.08); }
-        .empty p { font-size: 1.1em; margin-top: 10px; }
+        /* Empty */
+        .empty { text-align: center; padding: 60px 20px; color: #94a3b8; background: white; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+        .empty .empty-icon { font-size: 3em; margin-bottom: 10px; }
+        .empty p { font-size: 1em; }
 
-        /* MODAL */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,.6);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
+        /* MODALES */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 2000; align-items: center; justify-content: center; padding: 16px; }
         .modal-overlay.open { display: flex; }
-
-        .modal-box {
-            background: white;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 680px;
-            max-height: 94vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,.4);
-        }
-
-        .modal-hdr {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 20px 26px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        .modal-hdr h2 { font-size: 1.1em; }
-        .btn-close-modal {
-            background: rgba(255,255,255,.2);
-            border: none;
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.2em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .btn-close-modal:hover { background: rgba(255,255,255,.35); }
-
-        .modal-body { flex: 1; overflow-y: auto; padding: 24px 26px; }
+        .modal-box { background: white; border-radius: 20px; width: 100%; max-width: 620px; max-height: 93vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+        .modal-hdr { color: white; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .modal-hdr.agendar { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .modal-hdr.acta    { background: linear-gradient(135deg, #7c3aed, #4f46e5); }
+        .modal-hdr h2 { font-size: 1em; }
+        .btn-x { background: rgba(255,255,255,.2); border: none; color: white; width: 30px; height: 30px; border-radius: 7px; cursor: pointer; font-size: 1.1em; display: flex; align-items: center; justify-content: center; }
+        .btn-x:hover { background: rgba(255,255,255,.35); }
+        .modal-body { flex: 1; overflow-y: auto; padding: 22px 24px; }
+        .modal-footer { padding: 14px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
+        .btn-modal { flex: 1; padding: 10px; border: none; border-radius: 9px; cursor: pointer; font-weight: 700; font-size: .88em; }
+        .btn-modal.save   { background: #10b981; color: white; }
+        .btn-modal.purple { background: #7c3aed; color: white; }
+        .btn-modal.cancel { background: #e2e8f0; color: #475569; }
+        .btn-modal:hover { opacity: .87; }
 
         .fg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-        @media (max-width: 540px) { .fg2 { grid-template-columns: 1fr; } }
-
+        @media (max-width: 500px) { .fg2 { grid-template-columns: 1fr; } }
         .fg1 { margin-bottom: 14px; }
-
-        .fg2 .form-group, .fg1.form-group { }
-
-        .form-group label {
-            display: block;
-            font-size: .78em;
-            font-weight: 700;
-            color: #555;
-            text-transform: uppercase;
-            letter-spacing: .3px;
-            margin-bottom: 6px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: .92em;
-            font-family: inherit;
-            color: #333;
-            transition: border-color .2s;
-        }
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus { outline: none; border-color: #667eea; }
+        .form-group label { display: block; font-size: .75em; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .3px; margin-bottom: 5px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 9px 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: .9em; font-family: inherit; color: #1e293b; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #667eea; }
         .form-group textarea { resize: vertical; min-height: 80px; }
-
-        .modal-footer {
-            padding: 16px 26px;
-            background: #f8f9fa;
-            border-top: 1px solid #eee;
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-modal {
-            flex: 1;
-            padding: 11px;
-            border: none;
-            border-radius: 9px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: .9em;
-        }
-        .btn-modal:hover { opacity: .87; }
-        .btn-modal.save { background: #10b981; color: white; }
-        .btn-modal.cancel { background: #e5e7eb; color: #333; }
+        .modal-sep { font-size: .75em; font-weight: 700; color: #667eea; text-transform: uppercase; letter-spacing: .4px; border-bottom: 2px solid #ede9fe; padding-bottom: 5px; margin: 16px 0 12px; }
+        .hint { font-size: .78em; color: #94a3b8; margin-top: 4px; }
 
         /* TOAST */
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: #333;
-            color: white;
-            padding: 12px 22px;
-            border-radius: 10px;
-            font-size: .88em;
-            font-weight: 600;
-            z-index: 9999;
-            opacity: 0;
-            transition: opacity .3s;
-            pointer-events: none;
-        }
+        .toast { position: fixed; bottom: 22px; right: 22px; background: #1e293b; color: white; padding: 11px 20px; border-radius: 10px; font-size: .86em; font-weight: 600; z-index: 9999; opacity: 0; transition: opacity .3s; pointer-events: none; }
         .toast.show { opacity: 1; }
         .toast.success { background: #10b981; }
-        .toast.error { background: #dc2626; }
-
-        /* SECCIÓN SEPARADORA */
-        .section-sep {
-            font-size: .78em;
-            font-weight: 700;
-            color: #667eea;
-            text-transform: uppercase;
-            letter-spacing: .4px;
-            border-bottom: 2px solid #ede9fe;
-            padding-bottom: 6px;
-            margin: 18px 0 12px;
-        }
+        .toast.error   { background: #dc2626; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🏛️ Consejos de Administración</h1>
-            <div class="header-actions">
-                <a href="asambleas.html" class="btn-back">← Asambleas</a>
-                <a href="Dashboard.html" class="btn-back">🏠 Dashboard</a>
-                <button class="btn-nuevo" onclick="abrirModal()">➕ Nuevo Consejo</button>
-            </div>
-        </div>
-
-        <div class="toolbar">
-            <select id="filtroEdificio" onchange="renderConsejos()">
-                <option value="">🏢 Todos los edificios</option>
-                <option value="Nepal 2">Nepal 2</option>
-                <option value="Avalon">Avalon</option>
-                <option value="Convivienda I">Convivienda I</option>
-                <option value="Pinos del Country">Pinos del Country</option>
-            </select>
-            <select id="filtroMes" onchange="renderConsejos()">
-                <option value="">📅 Todos los meses</option>
-                <option value="01">Enero</option>
-                <option value="02">Febrero</option>
-                <option value="03">Marzo</option>
-                <option value="04">Abril</option>
-                <option value="05">Mayo</option>
-                <option value="06">Junio</option>
-                <option value="07">Julio</option>
-                <option value="08">Agosto</option>
-                <option value="09">Septiembre</option>
-                <option value="10">Octubre</option>
-                <option value="11">Noviembre</option>
-                <option value="12">Diciembre</option>
-            </select>
-            <div class="ctabs">
-                <button class="ctab active" id="tab-pendientes" onclick="cambiarTab('pendientes')">⏳ Pendientes</button>
-                <button class="ctab" id="tab-realizados" onclick="cambiarTab('realizados')">✅ Realizados</button>
-                <button class="ctab" id="tab-tareas" onclick="cambiarTab('tareas')">📋 Tareas</button>
-            </div>
-        </div>
-
-        <div id="listaConsejos" class="lista">
-            <div class="empty"><span style="font-size:2.5em;">🏛️</span><p>Cargando consejos...</p></div>
+<div class="container">
+    <div class="header">
+        <h1>🏛️ Consejos de Administración</h1>
+        <div class="header-actions">
+            <a href="asambleas.html" class="btn-back">← Asambleas</a>
+            <a href="Dashboard.html" class="btn-back">🏠 Dashboard</a>
+            <button class="btn-nuevo" onclick="abrirAgendar()">📅 Agendar Consejo</button>
         </div>
     </div>
 
-    <!-- TOAST -->
-    <div class="toast" id="toast"></div>
-
-    <!-- MODAL -->
-    <div id="modalConsejos" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-hdr">
-                <h2 id="modalTitulo">📅 Nuevo Consejo</h2>
-                <button class="btn-close-modal" onclick="cerrarModal()">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="fg2">
-                    <div class="form-group">
-                        <label>Edificio *</label>
-                        <select id="ncEdificio">
-                            <option value="">Seleccionar...</option>
-                            <option value="Nepal 2">Nepal 2</option>
-                            <option value="Avalon">Avalon</option>
-                            <option value="Convivienda I">Convivienda I</option>
-                            <option value="Pinos del Country">Pinos del Country</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Fecha *</label>
-                        <input type="date" id="ncFecha">
-                    </div>
-                </div>
-                <div class="fg2">
-                    <div class="form-group">
-                        <label>Hora</label>
-                        <input type="time" id="ncHora" value="10:00">
-                    </div>
-                    <div class="form-group">
-                        <label>Lugar</label>
-                        <input type="text" id="ncLugar" placeholder="Ej: Salón comunal">
-                    </div>
-                </div>
-
-                <div class="section-sep">📋 Contenido del consejo</div>
-
-                <div class="fg1 form-group">
-                    <label>Temas a tratar</label>
-                    <textarea id="ncTemas" rows="2" placeholder="Ej: Revisión de cuentas, mantenimiento ascensor, seguridad..."></textarea>
-                </div>
-                <div class="fg1 form-group">
-                    <label>Acta / Resumen</label>
-                    <textarea id="ncActa" rows="4" placeholder="Resumen de lo tratado en el consejo..."></textarea>
-                </div>
-
-                <div class="section-sep">✅ Tareas derivadas</div>
-
-                <div class="fg1 form-group">
-                    <label>Tareas (una por línea)</label>
-                    <textarea id="ncTareas" rows="4" placeholder="Revisar instalación eléctrica&#10;Cotizar pintura fachada&#10;Enviar circular a propietarios"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-modal cancel" onclick="cerrarModal()">Cancelar</button>
-                <button class="btn-modal save" onclick="guardarConsejo()">💾 Guardar Consejo</button>
-            </div>
+    <div class="toolbar">
+        <select id="filtroEdificio" title="Filtrar por edificio" onchange="render()">
+            <option value="">🏢 Todos los edificios</option>
+            <option value="Nepal 2">Nepal 2</option>
+            <option value="Avalon">Avalon</option>
+            <option value="Convivienda I">Convivienda I</option>
+            <option value="Pinos del Country">Pinos del Country</option>
+        </select>
+        <select id="filtroMes" title="Filtrar por mes" onchange="render()">
+            <option value="">📅 Todos los meses</option>
+            <option value="01">Enero</option>
+            <option value="02">Febrero</option>
+            <option value="03">Marzo</option>
+            <option value="04">Abril</option>
+            <option value="05">Mayo</option>
+            <option value="06">Junio</option>
+            <option value="07">Julio</option>
+            <option value="08">Agosto</option>
+            <option value="09">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
+        </select>
+        <div class="ctabs">
+            <button type="button" class="ctab active" id="tab-proximos"  onclick="cambiarTab('proximos')">📅 Próximos</button>
+            <button type="button" class="ctab"        id="tab-realizados" onclick="cambiarTab('realizados')">✅ Realizados</button>
+            <button type="button" class="ctab"        id="tab-tareas"     onclick="cambiarTab('tareas')">📋 Tareas</button>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        import { getDatabase, ref, onValue, update, push, set } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+    <div id="listaConsejos" class="lista">
+        <div class="empty"><div class="empty-icon">🏛️</div><p>Cargando consejos...</p></div>
+    </div>
+</div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBw0UU5yVfx4YQfW23ONSKp1DJlcJFM2TE",
-            authDomain: "azeche-ph.firebaseapp.com",
-            databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
-            projectId: "azeche-ph",
-            storageBucket: "azeche-ph.firebasestorage.app",
-            messagingSenderId: "905337990521",
-            appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
-        };
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
+<!-- MODAL 1: AGENDAR CONSEJO -->
+<div id="modalAgendar" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-hdr agendar">
+            <h2 id="titleAgendar">📅 Agendar Consejo de Administración</h2>
+            <button type="button" class="btn-x" onclick="cerrarAgendar()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="fg2">
+                <div class="form-group">
+                    <label>Edificio *</label>
+                    <select id="aEdificio">
+                        <option value="">Seleccionar...</option>
+                        <option value="Nepal 2">Nepal 2</option>
+                        <option value="Avalon">Avalon</option>
+                        <option value="Convivienda I">Convivienda I</option>
+                        <option value="Pinos del Country">Pinos del Country</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha *</label>
+                    <input type="date" id="aFecha">
+                </div>
+            </div>
+            <div class="fg2">
+                <div class="form-group">
+                    <label>Hora</label>
+                    <input type="time" id="aHora" value="10:00">
+                </div>
+                <div class="form-group">
+                    <label>Lugar</label>
+                    <input type="text" id="aLugar" placeholder="Ej: Salón comunal">
+                </div>
+            </div>
+            <div class="fg1 form-group">
+                <label>Temas a tratar</label>
+                <textarea id="aTemas" rows="3" placeholder="Ej: Revisión de cuentas, mantenimiento ascensor, seguridad..."></textarea>
+                <p class="hint">Estos temas aparecerán en el evento de Google Calendar.</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-modal cancel" onclick="cerrarAgendar()">Cancelar</button>
+            <button type="button" class="btn-modal save"   onclick="guardarAgenda()">📅 Agendar</button>
+        </div>
+    </div>
+</div>
 
-        onAuthStateChanged(auth, () => {
-            cargarConsejos();
+<!-- MODAL 2: REGISTRAR ACTA -->
+<div id="modalActa" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-hdr acta">
+            <h2 id="titleActa">📝 Registrar Acta del Consejo</h2>
+            <button type="button" class="btn-x" onclick="cerrarActa()">×</button>
+        </div>
+        <div class="modal-body">
+            <div id="actaConsejoBadge" style="background:#ede9fe;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:.88em;color:#5b21b6;"></div>
+
+            <div class="modal-sep">📝 Acta / Resumen del consejo</div>
+            <div class="fg1 form-group">
+                <label>Resumen de lo tratado</label>
+                <textarea id="actaTexto" rows="5" placeholder="Describe los puntos tratados, decisiones tomadas, acuerdos..."></textarea>
+            </div>
+
+            <div class="modal-sep">✅ Tareas derivadas</div>
+            <div class="fg1 form-group">
+                <label>Tareas (una por línea)</label>
+                <textarea id="actaTareas" rows="4" placeholder="Revisar instalación eléctrica&#10;Cotizar pintura fachada&#10;Enviar circular a propietarios"></textarea>
+                <p class="hint">Cada línea se convierte en una tarea con checklist.</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-modal cancel" onclick="cerrarActa()">Cancelar</button>
+            <button type="button" class="btn-modal purple" onclick="guardarActa()">💾 Guardar Acta</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    import { getDatabase, ref, onValue, update, push, set } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBw0UU5yVfx4YQfW23ONSKp1DJlcJFM2TE",
+        authDomain: "azeche-ph.firebaseapp.com",
+        databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+        projectId: "azeche-ph",
+        storageBucket: "azeche-ph.firebasestorage.app",
+        messagingSenderId: "905337990521",
+        appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, () => cargar());
+
+    let _consejos = [];
+    let _tab = 'proximos';
+    let _editAgendaId = null;
+    let _actaId = null;
+
+    function cargar() {
+        onValue(ref(db, 'consejos'), snap => {
+            _consejos = [];
+            if (snap.exists()) snap.forEach(c => _consejos.push({ id: c.key, ...c.val() }));
+            render();
         });
+    }
 
-        // Estado
-        let _consejos = [];
-        let _tabActual = 'pendientes';
-        let _editId = null;
+    function render() {
+        const filtEd  = document.getElementById('filtroEdificio').value;
+        const filtMes = document.getElementById('filtroMes').value;
+        let lista = [..._consejos];
+        if (filtEd)  lista = lista.filter(c => c.edificio === filtEd);
+        if (filtMes) lista = lista.filter(c => c.fecha && c.fecha.slice(5, 7) === filtMes);
 
-        // Cargar
-        function cargarConsejos() {
-            onValue(ref(db, 'consejos'), snap => {
-                _consejos = [];
-                if (snap.exists()) snap.forEach(c => _consejos.push({ id: c.key, ...c.val() }));
-                renderConsejos();
-            });
+        if (_tab === 'tareas') { renderTareas(lista); return; }
+
+        const esProximo = _tab === 'proximos';
+        lista = lista.filter(c => esProximo ? (c.estado || 'pendiente') === 'pendiente' : c.estado === 'realizado');
+        lista.sort((a, b) => (a.fecha || '') > (b.fecha || '') ? (esProximo ? 1 : -1) : (esProximo ? -1 : 1));
+
+        const el = document.getElementById('listaConsejos');
+        if (!lista.length) {
+            el.innerHTML = '<div class="empty"><div class="empty-icon">' + (esProximo ? '📅' : '✅') + '</div><p>No hay consejos ' + (esProximo ? 'próximos agendados' : 'realizados') + '</p></div>';
+            return;
         }
+        el.innerHTML = lista.map(c => buildCard(c, esProximo)).join('');
+    }
 
-        // Render principal
-        function renderConsejos() {
-            const filtEd = document.getElementById('filtroEdificio').value;
-            const filtMes = document.getElementById('filtroMes').value;
-            let lista = [..._consejos];
-            if (filtEd) lista = lista.filter(c => c.edificio === filtEd);
-            if (filtMes) lista = lista.filter(c => c.fecha && c.fecha.slice(5, 7) === filtMes);
+    function buildCard(c, esProximo) {
+        const fecha = c.fecha ? new Date(c.fecha + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Sin fecha';
+        const badge = esProximo
+            ? '<span class="badge-proximo">⏳ Próximo</span>'
+            : '<span class="badge-realizado">✅ Realizado</span>';
 
-            if (_tabActual === 'tareas') { renderTareas(lista); return; }
+        const tareas = c.tareas ? c.tareas.split('\n').filter(t => t.trim()) : [];
+        const checks = c.tareasCheck || {};
+        const done   = tareas.filter((_, i) => checks[i]).length;
 
-            const estado = _tabActual === 'pendientes' ? 'pendiente' : 'realizado';
-            lista = lista.filter(c => (c.estado || 'pendiente') === estado);
-            lista.sort((a, b) => (a.fecha || '') > (b.fecha || '') ? 1 : -1);
+        return '<div class="consejo-card ' + (esProximo ? 'proximo' : 'realizado') + '">' +
 
-            const container = document.getElementById('listaConsejos');
-
-            if (lista.length === 0) {
-                container.innerHTML = '<div class="empty"><span style="font-size:2.5em;">' + (estado === 'pendiente' ? '📅' : '✅') + '</span><p>No hay consejos ' + (estado === 'pendiente' ? 'pendientes' : 'realizados') + '</p></div>';
-                return;
-            }
-
-            container.innerHTML = lista.map(c => buildCard(c)).join('');
-        }
-
-        function buildCard(c) {
-            const tareas = c.tareas ? c.tareas.split('\n').filter(t => t.trim()) : [];
-            const checks = c.tareasCheck || {};
-            const done = tareas.filter((_, i) => checks[i]).length;
-            const fechaStr = c.fecha ? new Date(c.fecha + 'T12:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Sin fecha';
-
-            return '<div class="consejo-card' + (c.estado === 'realizado' ? ' realizado' : '') + '">' +
-                '<div class="card-top">' +
-                    '<div class="card-info">' +
-                        '<h3>🏢 ' + c.edificio + '</h3>' +
-                        '<div class="card-meta">' +
-                            '<span>📅 ' + fechaStr + '</span>' +
-                            (c.hora ? '<span>🕐 ' + c.hora + '</span>' : '') +
-                            (c.lugar ? '<span>📍 ' + c.lugar + '</span>' : '') +
-                            (c.estado === 'realizado' ? '<span style="color:#10b981;font-weight:700;">✅ Realizado</span>' : '') +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="card-btns">' +
-                        '<button class="btn-sm btn-gcal" onclick="abrirCalendar(\'' + c.id + '\')">📅 Google Calendar</button>' +
-                        (c.estado !== 'realizado' ? '<button class="btn-sm btn-done" onclick="marcarRealizado(\'' + c.id + '\')">✅ Realizado</button>' : '') +
-                        '<button class="btn-sm btn-edit" onclick="editarConsejo(\'' + c.id + '\')">✏️</button>' +
-                        '<button class="btn-sm btn-del" onclick="eliminarConsejo(\'' + c.id + '\')">🗑️</button>' +
+            // Top row
+            '<div class="card-top">' +
+                '<div class="card-left">' +
+                    '<h3>🏢 ' + c.edificio + ' ' + badge + '</h3>' +
+                    '<div class="card-meta">' +
+                        '<span>📅 ' + fecha + '</span>' +
+                        (c.hora   ? '<span>🕐 ' + c.hora   + '</span>' : '') +
+                        (c.lugar  ? '<span>📍 ' + c.lugar  + '</span>' : '') +
                     '</div>' +
                 '</div>' +
-                (c.temas ? '<div class="card-section"><div class="card-section-label">Temas</div><div style="font-size:.88em;color:#555;">' + c.temas + '</div></div>' : '') +
-                (c.acta ? '<div class="card-section"><div class="card-section-label">Acta</div><div class="acta-box">' + c.acta + '</div></div>' : '') +
-                (tareas.length > 0 ?
-                    '<div class="card-section">' +
-                        '<div class="card-section-label">Tareas (' + done + '/' + tareas.length + ')</div>' +
-                        '<div class="tarea-progress">' + done + ' de ' + tareas.length + ' completadas</div>' +
-                        '<ul class="tareas-list">' +
-                            tareas.map((t, i) =>
-                                '<li class="tarea-li' + (checks[i] ? ' done' : '') + '">' +
-                                '<input type="checkbox"' + (checks[i] ? ' checked' : '') + ' onchange="toggleTarea(\'' + c.id + '\',' + i + ',this.checked)">' +
-                                '<span>' + t.trim() + '</span>' +
-                                '</li>'
-                            ).join('') +
-                        '</ul>' +
-                    '</div>'
+                '<div class="card-btns">' +
+                    '<button class="btn-sm btn-gcal" onclick="abrirCalendar(\'' + c.id + '\')">📅 Calendar</button>' +
+                    (esProximo
+                        ? '<button class="btn-sm btn-acta" onclick="abrirActa(\'' + c.id + '\')">📝 Registrar Acta</button>'
+                        : '') +
+                    '<button class="btn-sm btn-edit" onclick="abrirEditar(\'' + c.id + '\')">✏️</button>' +
+                    '<button class="btn-sm btn-del"  onclick="eliminar(\'' + c.id + '\')">🗑️</button>' +
+                '</div>' +
+            '</div>' +
+
+            // Temas
+            (c.temas ? '<div class="temas-box"><strong>Temas:</strong> ' + c.temas + '</div>' : '') +
+
+            // Acta (solo si tiene)
+            (c.acta ? '<div class="section-label">Acta</div><div class="acta-box">' + c.acta + '</div>' : '') +
+
+            // Tareas checklist (solo si tiene)
+            (tareas.length
+                ? '<div class="section-label">Tareas (' + done + '/' + tareas.length + ')</div>' +
+                  '<p class="tarea-progress">' + done + ' de ' + tareas.length + ' completadas</p>' +
+                  '<ul class="tareas-list">' +
+                  tareas.map((t, i) =>
+                      '<li class="tarea-li' + (checks[i] ? ' done' : '') + '">' +
+                      '<input type="checkbox"' + (checks[i] ? ' checked' : '') + ' onchange="toggleTarea(\'' + c.id + '\',' + i + ',this.checked)">' +
+                      '<span>' + t.trim() + '</span></li>'
+                  ).join('') +
+                  '</ul>'
                 : '') +
-            '</div>';
-        }
 
-        function renderTareas(lista) {
-            const todas = [];
-            lista.forEach(c => {
-                if (!c.tareas) return;
-                c.tareas.split('\n').filter(t => t.trim()).forEach((t, i) => {
-                    todas.push({ texto: t.trim(), edificio: c.edificio, fecha: c.fecha, consId: c.id, idx: i, done: c.tareasCheck && c.tareasCheck[i] });
-                });
+        '</div>';
+    }
+
+    function renderTareas(lista) {
+        const todas = [];
+        lista.forEach(c => {
+            if (!c.tareas) return;
+            c.tareas.split('\n').filter(t => t.trim()).forEach((t, i) => {
+                todas.push({ texto: t.trim(), edificio: c.edificio, fecha: c.fecha, consId: c.id, idx: i, done: c.tareasCheck && c.tareasCheck[i] });
             });
-
-            const pendientes = todas.filter(t => !t.done);
-            const completadas = todas.filter(t => t.done);
-            const container = document.getElementById('listaConsejos');
-
-            if (todas.length === 0) {
-                container.innerHTML = '<div class="empty"><span style="font-size:2.5em;">📋</span><p>No hay tareas derivadas</p></div>';
-                return;
-            }
-
-            let html = '';
-            if (pendientes.length) {
-                html += '<p style="font-weight:700;color:#333;margin-bottom:10px;">⏳ Pendientes (' + pendientes.length + ')</p>';
-                html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">' +
-                    pendientes.map(t =>
-                        '<div class="tareas-view-card">' +
-                        '<input type="checkbox" onchange="toggleTarea(\'' + t.consId + '\',' + t.idx + ',this.checked)">' +
-                        '<div class="tv-text"><div class="tv-main">' + t.texto + '</div><div class="tv-meta">🏢 ' + t.edificio + ' · 📅 ' + (t.fecha || 'Sin fecha') + '</div></div>' +
-                        '</div>'
-                    ).join('') + '</div>';
-            }
-            if (completadas.length) {
-                html += '<p style="font-weight:700;color:#888;margin-bottom:10px;">✅ Completadas (' + completadas.length + ')</p>';
-                html += '<div style="display:flex;flex-direction:column;gap:8px;opacity:.7;">' +
-                    completadas.map(t =>
-                        '<div class="tareas-view-card done">' +
-                        '<input type="checkbox" checked onchange="toggleTarea(\'' + t.consId + '\',' + t.idx + ',this.checked)">' +
-                        '<div class="tv-text"><div class="tv-main">' + t.texto + '</div><div class="tv-meta">🏢 ' + t.edificio + ' · 📅 ' + (t.fecha || 'Sin fecha') + '</div></div>' +
-                        '</div>'
-                    ).join('') + '</div>';
-            }
-            container.innerHTML = html;
-        }
-
-        // Tabs y filtros
-        window.cambiarTab = function(tab) {
-            _tabActual = tab;
-            document.querySelectorAll('.ctab').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + tab).classList.add('active');
-            renderConsejos();
-        };
-        window.renderConsejos = renderConsejos;
-
-        // Modal
-        window.abrirModal = function() {
-            _editId = null;
-            document.getElementById('modalTitulo').textContent = '📅 Nuevo Consejo';
-            document.getElementById('ncEdificio').value = '';
-            document.getElementById('ncFecha').value = '';
-            document.getElementById('ncHora').value = '10:00';
-            document.getElementById('ncLugar').value = '';
-            document.getElementById('ncTemas').value = '';
-            document.getElementById('ncActa').value = '';
-            document.getElementById('ncTareas').value = '';
-            document.getElementById('modalConsejos').classList.add('open');
-        };
-
-        window.editarConsejo = function(id) {
-            const c = _consejos.find(x => x.id === id);
-            if (!c) return;
-            _editId = id;
-            document.getElementById('modalTitulo').textContent = '✏️ Editar Consejo';
-            document.getElementById('ncEdificio').value = c.edificio || '';
-            document.getElementById('ncFecha').value = c.fecha || '';
-            document.getElementById('ncHora').value = c.hora || '10:00';
-            document.getElementById('ncLugar').value = c.lugar || '';
-            document.getElementById('ncTemas').value = c.temas || '';
-            document.getElementById('ncActa').value = c.acta || '';
-            document.getElementById('ncTareas').value = c.tareas || '';
-            document.getElementById('modalConsejos').classList.add('open');
-        };
-
-        window.cerrarModal = function() {
-            document.getElementById('modalConsejos').classList.remove('open');
-        };
-
-        window.guardarConsejo = async function() {
-            const edificio = document.getElementById('ncEdificio').value;
-            const fecha = document.getElementById('ncFecha').value;
-            if (!edificio || !fecha) { toast('⚠️ Edificio y fecha son obligatorios', 'error'); return; }
-
-            const data = {
-                edificio,
-                fecha,
-                hora: document.getElementById('ncHora').value,
-                lugar: document.getElementById('ncLugar').value,
-                temas: document.getElementById('ncTemas').value,
-                acta: document.getElementById('ncActa').value,
-                tareas: document.getElementById('ncTareas').value,
-                updatedAt: new Date().toISOString()
-            };
-
-            try {
-                if (_editId) {
-                    data.estado = _consejos.find(x => x.id === _editId)?.estado || 'pendiente';
-                    await update(ref(db, 'consejos/' + _editId), data);
-                } else {
-                    data.estado = 'pendiente';
-                    data.createdAt = new Date().toISOString();
-                    await push(ref(db, 'consejos'), data);
-                }
-                cerrarModal();
-                toast('✅ Consejo guardado', 'success');
-            } catch (e) {
-                console.error(e);
-                toast('❌ Error al guardar', 'error');
-            }
-        };
-
-        window.marcarRealizado = async function(id) {
-            if (!confirm('¿Marcar este consejo como realizado?')) return;
-            try {
-                await update(ref(db, 'consejos/' + id), { estado: 'realizado' });
-                toast('✅ Consejo realizado', 'success');
-            } catch (e) { toast('❌ Error', 'error'); }
-        };
-
-        window.eliminarConsejo = async function(id) {
-            if (!confirm('¿Eliminar este consejo permanentemente?')) return;
-            try {
-                await set(ref(db, 'consejos/' + id), null);
-                toast('🗑️ Consejo eliminado', 'success');
-            } catch (e) { toast('❌ Error', 'error'); }
-        };
-
-        window.toggleTarea = async function(consId, idx, checked) {
-            const c = _consejos.find(x => x.id === consId);
-            if (!c) return;
-            const checks = c.tareasCheck ? Object.assign({}, c.tareasCheck) : {};
-            checks[idx] = checked;
-            try {
-                await update(ref(db, 'consejos/' + consId), { tareasCheck: checks });
-            } catch (e) { console.error(e); }
-        };
-
-        // Google Calendar — abre el evento prellenado en nueva pestaña
-        window.abrirCalendar = function(id) {
-            const c = _consejos.find(x => x.id === id);
-            if (!c) return;
-            const hora = c.hora || '10:00';
-            const h = parseInt(hora.split(':')[0]);
-            const horaFin = String(h + 1).padStart(2, '0') + ':00';
-            const inicio = (c.fecha + 'T' + hora + ':00').replace(/[-:]/g, '');
-            const fin = (c.fecha + 'T' + horaFin + ':00').replace(/[-:]/g, '');
-            const titulo = encodeURIComponent('Consejo Administración - ' + c.edificio);
-            const detalles = encodeURIComponent(
-                (c.temas ? 'Temas: ' + c.temas + '\n\n' : '') +
-                (c.acta ? 'Acta: ' + c.acta : '')
-            );
-            const lugar = encodeURIComponent(c.lugar || '');
-            window.open(
-                'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + titulo +
-                '&dates=' + inicio + '/' + fin +
-                '&details=' + detalles +
-                '&location=' + lugar,
-                '_blank'
-            );
-        };
-
-        // Toast
-        function toast(msg, tipo) {
-            const el = document.getElementById('toast');
-            el.textContent = msg;
-            el.className = 'toast show' + (tipo ? ' ' + tipo : '');
-            clearTimeout(el._t);
-            el._t = setTimeout(() => el.classList.remove('show'), 3000);
-        }
-
-        // Cerrar modal con Escape
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') cerrarModal();
         });
-    </script>
+        const pendientes  = todas.filter(t => !t.done);
+        const completadas = todas.filter(t =>  t.done);
+        const el = document.getElementById('listaConsejos');
+
+        if (!todas.length) {
+            el.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>No hay tareas derivadas</p></div>';
+            return;
+        }
+
+        let html = '';
+        if (pendientes.length) {
+            html += '<p style="font-weight:700;color:#334155;margin-bottom:8px;">⏳ Pendientes (' + pendientes.length + ')</p>';
+            html += '<div style="display:flex;flex-direction:column;gap:7px;margin-bottom:20px;">' +
+                pendientes.map(t =>
+                    '<div class="tv-card">' +
+                    '<input type="checkbox" onchange="toggleTarea(\'' + t.consId + '\',' + t.idx + ',this.checked)">' +
+                    '<div><div class="tv-main">' + t.texto + '</div><div class="tv-meta">🏢 ' + t.edificio + ' · 📅 ' + (t.fecha || '—') + '</div></div>' +
+                    '</div>'
+                ).join('') + '</div>';
+        }
+        if (completadas.length) {
+            html += '<p style="font-weight:700;color:#94a3b8;margin-bottom:8px;">✅ Completadas (' + completadas.length + ')</p>';
+            html += '<div style="display:flex;flex-direction:column;gap:7px;opacity:.65;">' +
+                completadas.map(t =>
+                    '<div class="tv-card done">' +
+                    '<input type="checkbox" checked onchange="toggleTarea(\'' + t.consId + '\',' + t.idx + ',this.checked)">' +
+                    '<div><div class="tv-main">' + t.texto + '</div><div class="tv-meta">🏢 ' + t.edificio + ' · 📅 ' + (t.fecha || '—') + '</div></div>' +
+                    '</div>'
+                ).join('') + '</div>';
+        }
+        el.innerHTML = html;
+    }
+
+    // ── Tabs y filtros ──
+    window.cambiarTab = function(tab) {
+        _tab = tab;
+        document.querySelectorAll('.ctab').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        render();
+    };
+    window.render = render;
+
+    // ── Modal AGENDAR ──
+    window.abrirAgendar = function() {
+        _editAgendaId = null;
+        document.getElementById('titleAgendar').textContent = '📅 Agendar Consejo de Administración';
+        document.getElementById('aEdificio').value = '';
+        document.getElementById('aFecha').value    = '';
+        document.getElementById('aHora').value     = '10:00';
+        document.getElementById('aLugar').value    = '';
+        document.getElementById('aTemas').value    = '';
+        document.getElementById('modalAgendar').classList.add('open');
+    };
+
+    window.abrirEditar = function(id) {
+        const c = _consejos.find(x => x.id === id);
+        if (!c) return;
+        _editAgendaId = id;
+        document.getElementById('titleAgendar').textContent = '✏️ Editar Consejo';
+        document.getElementById('aEdificio').value = c.edificio || '';
+        document.getElementById('aFecha').value    = c.fecha    || '';
+        document.getElementById('aHora').value     = c.hora     || '10:00';
+        document.getElementById('aLugar').value    = c.lugar    || '';
+        document.getElementById('aTemas').value    = c.temas    || '';
+        document.getElementById('modalAgendar').classList.add('open');
+    };
+
+    window.cerrarAgendar = function() {
+        document.getElementById('modalAgendar').classList.remove('open');
+    };
+
+    window.guardarAgenda = async function() {
+        const edificio = document.getElementById('aEdificio').value;
+        const fecha    = document.getElementById('aFecha').value;
+        if (!edificio || !fecha) { toast('⚠️ Edificio y fecha son obligatorios', 'error'); return; }
+
+        const data = {
+            edificio,
+            fecha,
+            hora:  document.getElementById('aHora').value,
+            lugar: document.getElementById('aLugar').value,
+            temas: document.getElementById('aTemas').value,
+            updatedAt: new Date().toISOString()
+        };
+
+        try {
+            if (_editAgendaId) {
+                await update(ref(db, 'consejos/' + _editAgendaId), data);
+            } else {
+                data.estado     = 'pendiente';
+                data.createdAt  = new Date().toISOString();
+                await push(ref(db, 'consejos'), data);
+            }
+            cerrarAgendar();
+            toast('✅ Consejo agendado', 'success');
+        } catch (e) {
+            console.error(e);
+            toast('❌ Error al guardar', 'error');
+        }
+    };
+
+    // ── Modal ACTA ──
+    window.abrirActa = function(id) {
+        const c = _consejos.find(x => x.id === id);
+        if (!c) return;
+        _actaId = id;
+        document.getElementById('titleActa').textContent = '📝 Acta — ' + c.edificio;
+        document.getElementById('actaConsejoBadge').innerHTML =
+            '🏢 <strong>' + c.edificio + '</strong> · 📅 ' +
+            (c.fecha ? new Date(c.fecha + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : c.fecha) +
+            (c.hora ? ' · 🕐 ' + c.hora : '') +
+            (c.temas ? '<br><span style="margin-top:4px;display:block;color:#7c3aed;">Temas: ' + c.temas + '</span>' : '');
+        document.getElementById('actaTexto').value  = c.acta   || '';
+        document.getElementById('actaTareas').value = c.tareas || '';
+        document.getElementById('modalActa').classList.add('open');
+    };
+
+    window.cerrarActa = function() {
+        document.getElementById('modalActa').classList.remove('open');
+    };
+
+    window.guardarActa = async function() {
+        if (!_actaId) return;
+        const acta   = document.getElementById('actaTexto').value;
+        const tareas = document.getElementById('actaTareas').value;
+        try {
+            await update(ref(db, 'consejos/' + _actaId), {
+                acta,
+                tareas,
+                estado: 'realizado',
+                actaFecha: new Date().toISOString()
+            });
+            cerrarActa();
+            toast('✅ Acta registrada. Consejo marcado como realizado.', 'success');
+        } catch (e) {
+            console.error(e);
+            toast('❌ Error al guardar acta', 'error');
+        }
+    };
+
+    // ── Google Calendar ──
+    window.abrirCalendar = function(id) {
+        const c = _consejos.find(x => x.id === id);
+        if (!c || !c.fecha) { toast('⚠️ El consejo no tiene fecha', 'error'); return; }
+        const hora    = c.hora || '10:00';
+        const horaFin = String(parseInt(hora.split(':')[0]) + 1).padStart(2, '0') + ':00';
+        const inicio  = (c.fecha + 'T' + hora + ':00').replace(/[-:]/g, '');
+        const fin     = (c.fecha + 'T' + horaFin + ':00').replace(/[-:]/g, '');
+        const titulo  = encodeURIComponent('Consejo Administración — ' + c.edificio);
+        const detalle = encodeURIComponent((c.temas ? 'Temas: ' + c.temas : '') + (c.acta ? '\n\nActa: ' + c.acta : ''));
+        const lugar   = encodeURIComponent(c.lugar || '');
+        window.open(
+            'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+            '&text=' + titulo + '&dates=' + inicio + '/' + fin +
+            '&details=' + detalle + '&location=' + lugar,
+            '_blank'
+        );
+    };
+
+    // ── Eliminar ──
+    window.eliminar = async function(id) {
+        if (!confirm('¿Eliminar este consejo permanentemente?')) return;
+        try {
+            await set(ref(db, 'consejos/' + id), null);
+            toast('🗑️ Consejo eliminado', 'success');
+        } catch (e) { toast('❌ Error', 'error'); }
+    };
+
+    // ── Toggle tarea ──
+    window.toggleTarea = async function(consId, idx, checked) {
+        const c = _consejos.find(x => x.id === consId);
+        if (!c) return;
+        const checks = Object.assign({}, c.tareasCheck || {});
+        checks[idx] = checked;
+        try {
+            await update(ref(db, 'consejos/' + consId), { tareasCheck: checks });
+        } catch (e) { console.error(e); }
+    };
+
+    // ── Toast ──
+    function toast(msg, tipo) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast show' + (tipo ? ' ' + tipo : '');
+        clearTimeout(el._t);
+        el._t = setTimeout(() => el.classList.remove('show'), 3500);
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { cerrarAgendar(); cerrarActa(); }
+    });
+</script>
 </body>
 </html>
