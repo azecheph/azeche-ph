@@ -608,7 +608,9 @@
                 return;
             }
 
-            tbody.innerHTML = filtradas.map(c => `
+            tbody.innerHTML = filtradas.map(c => {
+                try {
+                    return `
                 <tr>
                     <td><strong>${c.numero || '—'}</strong></td>
                     <td>${c.fechaCorta || '—'}</td>
@@ -627,8 +629,11 @@
                         <button type="button" class="btn-tabla btn-eliminar"
                             onclick="window.eliminarCuenta('${c.key}', '${c.numero || ''}')">🗑️</button>
                     </td>
-                </tr>
-            `).join('');
+                </tr>`;
+                } catch(e) {
+                    return `<tr><td colspan="7" style="color:#999;font-size:.85em;">⚠️ Entrada con datos incompletos — ${c.key}</td></tr>`;
+                }
+            }).join('');
         });
     }
 
