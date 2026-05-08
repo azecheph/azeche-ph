@@ -584,8 +584,8 @@
                 return;
             }
 
-            const todas = [];
-            snap.forEach(child => todas.push({ key: child.key, ...child.val() }));
+            const rawVal = snap.val();
+            const todas = Object.entries(rawVal).map(([key, data]) => ({ key, ...(data || {}) }));
 
             // Sincronizar consecutivo real desde los datos
             const maxConsec = Math.max(0, ...todas.map(c => c.consecutivo || 0));
