@@ -124,6 +124,8 @@
         .btn-pdf:hover     { background: #e53935; color: white; }
         .btn-cobrada-accion           { background: #e8f5e9; color: #2e7d32; }
         .btn-cobrada-accion:hover     { background: #2e7d32; color: white; }
+        .btn-eliminar                 { background: #fce4ec; color: #c62828; }
+        .btn-eliminar:hover           { background: #c62828; color: white; }
 
         /* MODALES */
         .modal {
@@ -311,6 +313,7 @@
             <div class="filtro-anio">
                 <label>Año:</label>
                 <select id="filtroAnio" onchange="filtrarPorAnio()">
+                    <option value="todos">Todos los años</option>
                     <option value="2026">2026</option>
                     <option value="2025">2025</option>
                     <option value="2024">2024</option>
@@ -498,7 +501,7 @@
 <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getDatabase, ref, onValue, get, push, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    import { getDatabase, ref, onValue, get, push, update, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
     const firebaseConfig = {
         apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
@@ -565,8 +568,9 @@
 
     // ── HISTORIAL
     function cargarHistorial() {
-        anioFiltro = parseInt(document.getElementById('filtroAnio').value);
-        document.getElementById('statAnio').textContent = anioFiltro;
+        const filtroVal = document.getElementById('filtroAnio').value;
+        anioFiltro = filtroVal === 'todos' ? 'todos' : parseInt(filtroVal);
+        document.getElementById('statAnio').textContent = filtroVal === 'todos' ? 'Todos' : anioFiltro;
 
         // Desconectar listener anterior para evitar duplicados
         if (_unsubHistorial) { _unsubHistorial(); _unsubHistorial = null; }
@@ -583,10 +587,19 @@
             const todas = [];
             snap.forEach(child => todas.push({ key: child.key, ...child.val() }));
 
+            // Sincronizar consecutivo real desde los datos
+            const maxConsec = Math.max(0, ...todas.map(c => c.consecutivo || 0));
+            if (maxConsec > consecutivoActual) {
+                consecutivoActual = maxConsec;
+                const anioCorto = String(new Date().getFullYear()).slice(-2);
+                const numMostrar = String(consecutivoActual + 1).padStart(3, '0') + '-' + anioCorto;
+                document.getElementById('infoConsecutivo').textContent = numMostrar;
+                document.getElementById('statConsecutivo').textContent = numMostrar;
+            }
+
             // Filtrar por año y ordenar descendente
-            const filtradas = todas
-                .filter(c => c.anio == anioFiltro)
-                .sort((a, b) => b.consecutivo - a.consecutivo);
+            const filtradas = (anioFiltro === 'todos' ? todas : todas.filter(c => c.anio == anioFiltro))
+                .sort((a, b) => (b.consecutivo || 0) - (a.consecutivo || 0));
 
             actualizarStats(filtradas);
 
@@ -611,6 +624,8 @@
                         ${c.estado === 'pendiente' ? `
                         <button type="button" class="btn-tabla btn-cobrada-accion"
                             onclick="window.marcarCobrada('${c.key}')">✅ Cobrada</button>` : ''}
+                        <button type="button" class="btn-tabla btn-eliminar"
+                            onclick="window.eliminarCuenta('${c.key}', '${c.numero || ''}')">🗑️</button>
                     </td>
                 </tr>
             `).join('');
@@ -766,6 +781,18 @@
         if (!confirm('¿Marcar esta cuenta como cobrada?')) return;
         await update(ref(db, 'cuentas_cobro_jefa/historial/' + key), { estado: 'cobrada' });
         mostrarToast('✅ Cuenta marcada como cobrada', 'exito');
+    };
+
+    // ── ELIMINAR CUENTA
+    window.eliminarCuenta = async function(key, numero) {
+        const label = numero ? `la cuenta ${numero}` : 'esta cuenta';
+        if (!confirm(`¿Eliminar ${label}? Esta acción no se puede deshacer.`)) return;
+        try {
+            await remove(ref(db, 'cuentas_cobro_jefa/historial/' + key));
+            mostrarToast('🗑️ Cuenta eliminada', 'exito');
+        } catch (e) {
+            mostrarToast('❌ Error al eliminar: ' + e.message, 'error');
+        }
     };
 
     // ── FILTRO AÑO
