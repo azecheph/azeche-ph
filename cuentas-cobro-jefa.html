@@ -610,12 +610,12 @@
 
             tbody.innerHTML = filtradas.map(c => `
                 <tr>
-                    <td><strong>${c.numero}</strong></td>
+                    <td><strong>${c.numero || '—'}</strong></td>
                     <td>${c.fechaCorta || '—'}</td>
-                    <td>${c.edificioNombre}</td>
-                    <td>${c.concepto}</td>
-                    <td><strong>${formatearPesos(c.valor)}</strong></td>
-                    <td><span class="badge badge-${c.estado}">${c.estado === 'cobrada' ? 'Cobrada' : 'Pendiente'}</span></td>
+                    <td>${c.edificioNombre || '—'}</td>
+                    <td>${c.concepto || '—'}</td>
+                    <td><strong>${formatearPesos(c.valor || 0)}</strong></td>
+                    <td><span class="badge badge-${c.estado || 'pendiente'}">${c.estado === 'cobrada' ? 'Cobrada' : 'Pendiente'}</span></td>
                     <td>
                         <button type="button" class="btn-tabla btn-ver"
                             onclick="window.verCuenta('${c.key}')">👁️ Ver</button>
@@ -634,8 +634,8 @@
 
     function actualizarStats(cuentas) {
         const total     = cuentas.length;
-        const cobrado   = cuentas.filter(c => c.estado === 'cobrada').reduce((s, c) => s + c.valor, 0);
-        const pendiente = cuentas.filter(c => c.estado === 'pendiente').reduce((s, c) => s + c.valor, 0);
+        const cobrado   = cuentas.filter(c => c.estado === 'cobrada').reduce((s, c) => s + (c.valor || 0), 0);
+        const pendiente = cuentas.filter(c => c.estado === 'pendiente').reduce((s, c) => s + (c.valor || 0), 0);
         document.getElementById('statTotal').textContent    = total;
         document.getElementById('statCobrado').textContent  = total ? formatearMillones(cobrado) : '$0';
         document.getElementById('statPendiente').textContent= total ? formatearMillones(pendiente) : '$0';
