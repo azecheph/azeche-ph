@@ -533,7 +533,7 @@
     let consecutivoActual = 16;
     let datosPendientes = null; // datos del doc antes de guardar
     let anioFiltro = 2026;
-    let _unsubHistorial = null; // referencia al listener del historial para evitar duplicados
+    let _unsubHistorial = null; // ya no se usa (migrado a get), se mantiene por compatibilidad
 
     // ── AUTENTICACIÓN
     onAuthStateChanged(auth, (user) => {
@@ -567,17 +567,17 @@
     }
 
     // ── HISTORIAL
-    function cargarHistorial() {
+    async function cargarHistorial() {
         const filtroVal = document.getElementById('filtroAnio').value;
         anioFiltro = filtroVal === 'todos' ? 'todos' : parseInt(filtroVal);
         document.getElementById('statAnio').textContent = filtroVal === 'todos' ? 'Todos' : anioFiltro;
 
-        // Desconectar listener anterior para evitar duplicados
-        if (_unsubHistorial) { _unsubHistorial(); _unsubHistorial = null; }
+        const tbody = document.getElementById('tablaCuerpo');
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="7">⏳ Cargando...</td></tr>';
 
-        const histRef = ref(db, 'cuentas_cobro_jefa/historial');
-        _unsubHistorial = onValue(histRef, (snap) => {
-            const tbody = document.getElementById('tablaCuerpo');
+        try {
+        const snap = await get(ref(db, 'cuentas_cobro_jefa/historial'));
+
             if (!snap.exists()) {
                 tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No hay cuentas registradas aún.</td></tr>';
                 actualizarStats([]);
@@ -634,7 +634,9 @@
                     return `<tr><td colspan="7" style="color:#999;font-size:.85em;">⚠️ Entrada con datos incompletos — ${c.key}</td></tr>`;
                 }
             }).join('');
-        });
+        } catch(err) {
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="7">❌ Error cargando datos: ${err.message}</td></tr>`;
+        }
     }
 
     function actualizarStats(cuentas) {
