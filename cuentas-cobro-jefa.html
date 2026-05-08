@@ -747,10 +747,11 @@
 
             mostrarToast('✅ Cuenta guardada correctamente', 'exito');
             btn.textContent = '✅ Guardada';
-            datosPendientes = null;
 
-            // Descargar PDF automáticamente
-            setTimeout(() => descargarPDF(document.getElementById('btnPDF')), 500);
+            // Descargar PDF y luego cerrar modal para mostrar tabla actualizada
+            await descargarPDF(document.getElementById('btnPDF'));
+            datosPendientes = null;
+            document.getElementById('modalPreview').classList.remove('active');
 
         } catch (e) {
             console.error(e);
