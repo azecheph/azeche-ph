@@ -81,6 +81,29 @@
         .qty-input{width:100%;padding:6px 8px;border:2px solid #e0e0e0;border-radius:6px;font-size:.88em;text-align:center;}
         .qty-input:focus{outline:none;border-color:#0056B8;}
 
+        /* SELECTOR DE PRODUCTOS (edición) */
+        .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:9px;}
+        .pcard{border:2px solid #e8ecf5;border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .2s;background:white;}
+        .pcard:hover{border-color:#0056B8;box-shadow:0 3px 12px rgba(0,86,184,.15);}
+        .pcard.sel{border-color:#0056B8;background:#f0f4ff;}
+        .pcard.sel.v{border-color:#00B853;background:#e6f9ed;}
+        .pcard .em{font-size:1.7em;margin-bottom:5px;}
+        .pcard .pn{font-size:.75em;font-weight:600;color:#333;line-height:1.3;margin-bottom:7px;min-height:30px;}
+        .pcard .cq{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:3px;}
+        .pcard .cq button{width:24px;height:24px;border:2px solid #ddd;border-radius:5px;background:white;font-size:.95em;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+        .pcard.sel .cq button{border-color:#0056B8;color:#0056B8;}
+        .pcard.sel.v .cq button{border-color:#00B853;color:#00B853;}
+        .pcard .cq button:hover{background:#0056B8;color:white;border-color:#0056B8;}
+        .pcard.sel.v .cq button:hover{background:#00B853;border-color:#00B853;}
+        .pcard .cq .qn{min-width:20px;text-align:center;font-weight:700;font-size:.88em;color:#0056B8;}
+        .pcard.sel.v .cq .qn{color:#00B853;}
+        .custom-wrap{background:#fffbf0;border:2px dashed #ffc107;border-radius:10px;padding:13px 15px;margin-top:10px;}
+        .custom-wrap p{font-size:.8em;font-weight:700;color:#856404;margin-bottom:7px;}
+        .custom-row{display:flex;gap:7px;flex-wrap:wrap;}
+        .custom-row input,.custom-row select{padding:8px 10px;border:1px solid #ddd;border-radius:7px;font-size:.86em;background:white;flex:1;min-width:110px;}
+        .custom-row button{padding:8px 14px;background:#ffc107;color:#333;border:none;border-radius:7px;font-weight:700;cursor:pointer;font-size:.86em;white-space:nowrap;}
+        .btn-ok{padding:11px 26px;background:linear-gradient(135deg,#0056B8,#00B853);color:white;border:none;border-radius:10px;font-size:.97em;font-weight:700;cursor:pointer;}
+
         /* ESTADO vacío */
         .empty-state{max-width:1200px;margin:40px auto;padding:0 20px;text-align:center;color:#aaa;}
         .empty-state .em{font-size:3.5em;margin-bottom:12px;}
@@ -204,6 +227,41 @@
     <div class="loading" style="grid-column:1/-1;">
         <div class="spinner"></div>
         <p>Cargando solicitudes...</p>
+    </div>
+</div>
+
+<!-- MODAL SELECTOR EDICIÓN -->
+<div class="modal" id="modalEditSel">
+    <div class="mbox">
+        <div class="mhdr">
+            <h2 id="eSelTitle">Seleccionar Productos</h2>
+            <button class="btn-x" onclick="document.getElementById('modalEditSel').classList.remove('active')">✕</button>
+        </div>
+        <div style="padding:12px 18px;border-bottom:1px solid #eee;flex-shrink:0;">
+            <input type="text" id="eBuscar" placeholder="🔍 Buscar producto..." oninput="_renderSelEdit()"
+                style="width:100%;padding:9px 13px;border:2px solid #e0e0e0;border-radius:8px;font-size:.92em;font-family:inherit;">
+        </div>
+        <div class="mscroll">
+            <div class="pgrid" id="eSelGrid"></div>
+            <div class="custom-wrap">
+                <p>➕ Producto personalizado</p>
+                <div class="custom-row">
+                    <input type="text" id="eCNombre" placeholder="Nombre del producto...">
+                    <input type="number" id="eCCant" min="1" value="1" style="max-width:75px;">
+                    <select id="eCUnidad">
+                        <option>Unidad</option><option>Par</option><option>Caja</option>
+                        <option>Paquete</option><option>Bolsa</option><option>Galón</option>
+                        <option>Litro</option><option>Kilo</option><option>500g</option>
+                        <option>Rollo</option><option>Docena</option>
+                    </select>
+                    <button onclick="_esCustom()">+ Agregar</button>
+                </div>
+            </div>
+        </div>
+        <div class="mfooter">
+            <span style="font-weight:700;color:#0056B8;font-size:.87em;" id="eSelCnt">0 seleccionados</span>
+            <button class="btn-ok" onclick="_esConfirmar()">✅ Confirmar</button>
+        </div>
     </div>
 </div>
 
@@ -603,22 +661,60 @@ window.enviarWA = (key) => {
 };
 
 /* ─── EDITAR ─── */
+const CATS_ED = {
+    conserjeria:[
+        {e:'💨',n:'Galón Ambientador Tutty',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Talco',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Fuego',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Lavanda',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Cereza',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Ocean',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Canela',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Coco-Limón',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Roxana',u:'Galón'},
+        {e:'💨',n:'Galón Ambientador Floral',u:'Galón'},
+        {e:'🧴',n:'Galón Jabón Lavaplatos',u:'Galón'},
+        {e:'🧴',n:'Galón Jabón Líquido para Aseo',u:'Galón'},
+        {e:'🧴',n:'Galón Blanqueador',u:'Galón'},
+        {e:'🧴',n:'Galón Desengrasante',u:'Galón'},
+        {e:'🧴',n:'Galón Varsol',u:'Galón'},
+        {e:'🧴',n:'Galón Vinagre',u:'Galón'},
+        {e:'🧴',n:'Galón Desengrasante Oxigenado',u:'Galón'},
+        {e:'🧴',n:'Galón Eliminador de Olores',u:'Galón'},
+        {e:'🧴',n:'Galón Creolina',u:'Galón'},
+        {e:'🗑️',n:'Bolsas de Basura 80 cm x 60 cm',u:'Paquete'},
+        {e:'🗑️',n:'Bolsas de Basura Extra Jumbo 100 cm x 70 cm',u:'Paquete'},
+        {e:'🧼',n:'Jabón de Manos',u:'Unidad'},
+        {e:'🧻',n:'Toallas de Manos',u:'Rollo'},
+        {e:'🪣',n:'Traperos',u:'Unidad'},
+        {e:'🧹',n:'Escobas',u:'Unidad'},
+        {e:'🧻',n:'Papel Higiénico',u:'Paquete'},
+        {e:'🪟',n:'Limpia Vidrios en Spray',u:'Unidad'},
+        {e:'💨',n:'Spray Ambientador',u:'Unidad'},
+        {e:'✨',n:'Lustramuebles',u:'Unidad'},
+        {e:'🧽',n:'Esponjillas',u:'Paquete'},
+        {e:'🧼',n:'Jabón Rey',u:'Unidad'},
+        {e:'🧼',n:'Jabón en Polvo',u:'Unidad'},
+        {e:'🧤',n:'Guantes',u:'Par'},
+    ],
+    cafeteria:[
+        {e:'☕',n:'Café',u:'500g'},
+        {e:'🍬',n:'Panela',u:'Kilo'},
+        {e:'🍬',n:'Azúcar',u:'Kilo'},
+    ]
+};
+
 let _editKey = null;
+let _editCons = [], _editCafe = [];
+let _editCat = 'conserjeria', _editTmp = {};
 
 window.editarSolicitud = (key) => {
     const s = (window._all||[]).find(s=>s.key===key);
     if(!s) return;
     _editKey = key;
+    _editCons = JSON.parse(JSON.stringify(s.conserjeria||[]));
+    _editCafe = JSON.parse(JSON.stringify(s.cafeteria||[]));
     document.getElementById('eEditFolio').textContent = s.folio || '';
-
-    const cons = s.conserjeria||[], cafe = s.cafeteria||[];
-    const prodRows = (prods, tipo) => prods.map((p,i)=>`
-        <div class="prod-edit-row">
-            <div class="prod-edit-name">${p.emoji||'📦'} ${p.nombre}</div>
-            <span style="font-size:.75em;color:#888;">${p.unidad}</span>
-            <input class="qty-input" type="number" min="0" id="qty_${tipo}_${i}" value="${p.cantidad}">
-        </div>`).join('');
-
     document.getElementById('mEditScroll').innerHTML = `
         <div class="msec">
             <div class="msec-title">Información General</div>
@@ -640,40 +736,137 @@ window.editarSolicitud = (key) => {
                 <textarea class="form-input" id="e_obs">${s.observaciones||''}</textarea>
             </div>
         </div>
-        ${cons.length?`<div class="msec"><div class="msec-title">🧹 Conserjería — Cantidades</div>${prodRows(cons,'cons')}</div>`:''}
-        ${cafe.length?`<div class="msec"><div class="msec-title">☕ Cafetería — Cantidades</div>${prodRows(cafe,'cafe')}</div>`:''}
+        <div class="msec" id="editProdsSection"></div>
     `;
+    _renderEditProds();
     document.getElementById('modalEditar').classList.add('active');
+};
+
+function _renderEditProds() {
+    const sec = document.getElementById('editProdsSection');
+    if(!sec) return;
+    const total = _editCons.length + _editCafe.length;
+    const fila = (p, tipo, i) => `
+        <div class="prod-edit-row">
+            <div class="prod-edit-name">${p.emoji||'📦'} ${p.nombre}
+                <small style="display:block;color:#888;font-weight:400;font-size:.8em;">${tipo==='cons'?'🧹 Conserjería':'☕ Cafetería'}</small>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;">
+                <button onclick="_eqty('${tipo}',${i},-1)" style="width:26px;height:26px;border:2px solid #0056B8;border-radius:6px;background:white;color:#0056B8;font-weight:700;cursor:pointer;line-height:1;">−</button>
+                <span id="eqty_${tipo}_${i}" style="min-width:24px;text-align:center;font-weight:700;color:#0056B8;">${p.cantidad}</span>
+                <button onclick="_eqty('${tipo}',${i},1)" style="width:26px;height:26px;border:2px solid #0056B8;border-radius:6px;background:white;color:#0056B8;font-weight:700;cursor:pointer;line-height:1;">+</button>
+            </div>
+            <span style="font-size:.75em;color:#888;">${p.unidad}</span>
+            <button onclick="_edel('${tipo}',${i})" style="background:none;border:none;color:#dc3545;font-size:1.2em;cursor:pointer;padding:2px 6px;border-radius:4px;">✕</button>
+        </div>`;
+    sec.innerHTML = `
+        <div class="msec-title">🛒 Productos
+            <span style="background:#0056B8;color:white;border-radius:10px;padding:2px 9px;font-size:.73em;margin-left:6px;">${total}</span>
+        </div>
+        <button onclick="_abrirSelEdit('conserjeria')" style="width:100%;padding:11px;background:linear-gradient(135deg,#0056B8,#1a7fe0);color:white;border:none;border-radius:10px;font-size:.88em;font-weight:700;cursor:pointer;margin-bottom:8px;">🧹 Agregar Conserjería</button>
+        <button onclick="_abrirSelEdit('cafeteria')" style="width:100%;padding:11px;background:linear-gradient(135deg,#00843d,#00B853);color:white;border:none;border-radius:10px;font-size:.88em;font-weight:700;cursor:pointer;margin-bottom:12px;">☕ Agregar Cafetería</button>
+        ${total===0
+            ? '<div style="text-align:center;color:#bbb;padding:14px;font-size:.88em;">Sin productos. Usa los botones para agregar.</div>'
+            : [..._editCons.map((p,i)=>fila(p,'cons',i)), ..._editCafe.map((p,i)=>fila(p,'cafe',i))].join('')
+        }
+    `;
+}
+
+window._eqty = (tipo, idx, d) => {
+    const arr = tipo==='cons' ? _editCons : _editCafe;
+    arr[idx].cantidad = Math.max(1, (arr[idx].cantidad||1) + d);
+    const span = document.getElementById(`eqty_${tipo}_${idx}`);
+    if(span) span.textContent = arr[idx].cantidad;
+};
+
+window._edel = (tipo, idx) => {
+    if(tipo==='cons') _editCons.splice(idx,1);
+    else _editCafe.splice(idx,1);
+    _renderEditProds();
+};
+
+window._abrirSelEdit = (c) => {
+    _editCat = c;
+    _editTmp = {};
+    const arr = c==='conserjeria' ? _editCons : _editCafe;
+    arr.forEach(p=>{ _editTmp[p.nombre]={cantidad:p.cantidad,unidad:p.unidad}; });
+    document.getElementById('eSelTitle').textContent = c==='conserjeria'?'🧹 Conserjería':'☕ Cafetería';
+    document.getElementById('eBuscar').value='';
+    _renderSelEdit();
+    document.getElementById('modalEditSel').classList.add('active');
+};
+
+window._renderSelEdit = () => {
+    const q = (document.getElementById('eBuscar').value||'').toLowerCase();
+    const ev = _editCat==='cafeteria';
+    const ps = CATS_ED[_editCat].filter(p=>p.n.toLowerCase().includes(q));
+    document.getElementById('eSelGrid').innerHTML = ps.map(p=>{
+        const t = _editTmp[p.n]||{cantidad:0,unidad:p.u};
+        const qty=t.cantidad, sel=qty>0;
+        const pn=p.n.replace(/'/g,"\\'");
+        return `<div class="pcard ${sel?'sel':''} ${sel&&ev?'v':''}">
+            <div class="em">${p.e}</div>
+            <div class="pn">${p.n}</div>
+            <div class="cq">
+                <button onclick="_esCq('${pn}','${p.u}',-1)" ${qty===0?'disabled':''}>−</button>
+                <span class="qn">${qty}</span>
+                <button onclick="_esCq('${pn}','${p.u}',1)">+</button>
+            </div>
+        </div>`;
+    }).join('');
+    const n=Object.values(_editTmp).filter(v=>v.cantidad>0).length;
+    document.getElementById('eSelCnt').textContent=n+' seleccionado'+(n!==1?'s':'');
+};
+
+window._esCq = (n,u,d) => {
+    if(!_editTmp[n]) _editTmp[n]={cantidad:0,unidad:u};
+    _editTmp[n].cantidad=Math.max(0,(_editTmp[n].cantidad||0)+d);
+    if(_editTmp[n].cantidad===0) delete _editTmp[n];
+    _renderSelEdit();
+};
+
+window._esCustom = () => {
+    const n=document.getElementById('eCNombre').value.trim();
+    const c=parseInt(document.getElementById('eCCant').value)||1;
+    const u=document.getElementById('eCUnidad').value;
+    if(!n){alert('Escribe el nombre del producto');return;}
+    _editTmp[n]={cantidad:c,unidad:u};
+    document.getElementById('eCNombre').value='';
+    document.getElementById('eCCant').value='1';
+    _renderSelEdit();
+    alert(`✅ "${n}" agregado`);
+};
+
+window._esConfirmar = () => {
+    const em={}; CATS_ED[_editCat].forEach(p=>em[p.n]=p.e);
+    const nuevos=Object.entries(_editTmp)
+        .filter(([,t])=>t.cantidad>0)
+        .map(([n,t])=>({cat:_editCat,nombre:n,emoji:em[n]||'📦',cantidad:t.cantidad,unidad:t.unidad}));
+    if(_editCat==='conserjeria') _editCons=nuevos;
+    else _editCafe=nuevos;
+    document.getElementById('modalEditSel').classList.remove('active');
+    _renderEditProds();
 };
 
 window.cerrarEditar = () => {
     document.getElementById('modalEditar').classList.remove('active');
-    _editKey = null;
+    document.getElementById('modalEditSel').classList.remove('active');
+    _editKey=null;
 };
 
 window.guardarEdicion = async () => {
     if(!_editKey) return;
-    const s = (window._all||[]).find(s=>s.key===_editKey);
-    if(!s) return;
-    const cons = (s.conserjeria||[]).map((p,i)=>{
-        const inp = document.getElementById(`qty_cons_${i}`);
-        return {...p, cantidad: inp ? Number(inp.value) : p.cantidad};
-    });
-    const cafe = (s.cafeteria||[]).map((p,i)=>{
-        const inp = document.getElementById(`qty_cafe_${i}`);
-        return {...p, cantidad: inp ? Number(inp.value) : p.cantidad};
-    });
     const data = {
-        edificio:    document.getElementById('e_edificio').value.trim(),
-        mes:         document.getElementById('e_mes').value.trim(),
-        fecha:       document.getElementById('e_fecha').value,
-        solicitante: document.getElementById('e_solicitante').value.trim(),
-        cargo:       document.getElementById('e_cargo').value.trim(),
-        estado:      document.getElementById('e_estado').value,
+        edificio:      document.getElementById('e_edificio').value.trim(),
+        mes:           document.getElementById('e_mes').value.trim(),
+        fecha:         document.getElementById('e_fecha').value,
+        solicitante:   document.getElementById('e_solicitante').value.trim(),
+        cargo:         document.getElementById('e_cargo').value.trim(),
+        estado:        document.getElementById('e_estado').value,
         observaciones: document.getElementById('e_obs').value.trim(),
-        conserjeria: cons,
-        cafeteria:   cafe,
-        fechaEdicion: new Date().toISOString(),
+        conserjeria:   _editCons,
+        cafeteria:     _editCafe,
+        fechaEdicion:  new Date().toISOString(),
     };
     try {
         await window._updateFields(_editKey, data);
