@@ -494,6 +494,20 @@
         let currentUser = null;
         let editandoId = null;
 
+        // Precargar logo para PDF
+        let logoBase64 = null;
+        (() => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                const c = document.createElement('canvas');
+                c.width = img.naturalWidth; c.height = img.naturalHeight;
+                c.getContext('2d').drawImage(img, 0, 0);
+                logoBase64 = c.toDataURL('image/png');
+            };
+            img.src = './logo-azeche.png';
+        })();
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
@@ -719,26 +733,44 @@
             let yPos = 0;
 
             function addHeader() {
-                // Barra azul
+                // Barra azul completa
                 doc.setFillColor(0, 86, 184);
-                doc.rect(0, 0, pageWidth, 18, 'F');
-                // Logo blanco
-                doc.setFillColor(255, 255, 255);
-                doc.rect(marginL, 2, 30, 14, 'F');
-                doc.setFontSize(11); doc.setFont(undefined, 'bold');
-                doc.setTextColor(0, 86, 184);  doc.text('Azeche', marginL + 1, 10);
-                doc.setTextColor(0, 184, 83);   doc.text('P.H.',   marginL + 1, 16);
+                doc.setDrawColor(0, 86, 184);
+                doc.rect(0, 0, pageWidth, 22, 'FD');
+
+                // Logo
+                if (logoBase64) {
+                    doc.addImage(logoBase64, 'PNG', marginL, 2, 38, 18);
+                } else {
+                    doc.setFillColor(255, 255, 255);
+                    doc.setDrawColor(255, 255, 255);
+                    doc.rect(marginL, 2, 38, 18, 'FD');
+                    doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+                    doc.setTextColor(0, 86, 184);
+                    doc.text('AZECHE', marginL + 1, 11);
+                    doc.setTextColor(0, 184, 83);
+                    doc.text('PH', marginL + 24, 11);
+                    doc.setFont('helvetica', 'normal'); doc.setFontSize(5);
+                    doc.setTextColor(80, 80, 80);
+                    doc.text('SOLUCIONES ADMINISTRATIVAS', marginL + 1, 17);
+                }
+
                 // Título
                 doc.setTextColor(255, 255, 255);
-                doc.setFontSize(14); doc.setFont(undefined, 'bold');
-                doc.text('LISTA DE PROVEEDORES', pageWidth / 2 + 10, 10, { align: 'center' });
-                doc.setFontSize(8); doc.setFont(undefined, 'normal');
-                doc.text(`Generado: ${new Date().toLocaleDateString('es-CO')}  — Azeche P.H.`, pageWidth / 2 + 10, 15, { align: 'center' });
-                yPos = 24;
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(14);
+                doc.text('LISTA DE PROVEEDORES', pageWidth / 2 + 15, 13, { align: 'center' });
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.text(`Generado: ${new Date().toLocaleDateString('es-CO')}  — Azeche P.H.`, pageWidth / 2 + 15, 19, { align: 'center' });
+
+                yPos = 28;
             }
 
             function addFooter(pageNum, totalPages) {
-                doc.setFontSize(7); doc.setTextColor(150, 150, 150);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(7);
+                doc.setTextColor(150, 150, 150);
                 doc.text(`Azeche P.H. | Lista de Proveedores`, marginL, pageHeight - 6);
                 doc.text(`Página ${pageNum} de ${totalPages}`, pageWidth - marginL, pageHeight - 6, { align: 'right' });
             }
@@ -771,12 +803,20 @@
             const rowH = 12;
 
             function drawTableHeader() {
+                // Primero dibuja TODOS los rectángulos azules
                 let xc = marginL;
                 cols.forEach((col, i) => {
                     doc.setFillColor(0, 86, 184);
-                    doc.rect(xc, yPos, colW[i], 9, 'F');
+                    doc.setDrawColor(0, 86, 184);
+                    doc.rect(xc, yPos, colW[i], 9, 'FD');
+                    xc += colW[i];
+                });
+                // Luego dibuja TODO el texto encima
+                xc = marginL;
+                cols.forEach((col, i) => {
                     doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(7);
                     doc.text(col, xc + 2, yPos + 6);
                     xc += colW[i];
                 });
