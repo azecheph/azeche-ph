@@ -411,6 +411,11 @@
                             <label>Correo Electrónico</label>
                             <input type="email" id="correo" placeholder="Ej: proveedor@ejemplo.com">
                         </div>
+
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Descripción / Servicio que presta</label>
+                            <textarea id="descripcion" rows="2" placeholder="Ej: Mantenimiento de ascensores, fumigación, jardinería..." style="resize:vertical;padding:10px;border:2px solid #ddd;border-radius:8px;font-size:0.95em;font-family:inherit;width:100%;"></textarea>
+                        </div>
                     </div>
 
                     <!-- CUENTAS DE PAGO (múltiples) -->
@@ -573,6 +578,7 @@
                 telefonoEmergencia: document.getElementById('telefonoEmergencia').value,
                 direccion:          document.getElementById('direccion').value,
                 correo:             document.getElementById('correo').value,
+                descripcion:        document.getElementById('descripcion').value,
                 cuentasPago:        cuentasPago,
                 // Mantener primer cuenta en campos legacy para compatibilidad
                 banco:              cuentasPago[0]?.banco || '',
@@ -628,7 +634,10 @@
 
                     const row = tbody.insertRow();
                     row.innerHTML = `
-                        <td><strong>${p.nombre}</strong><br><small style="color:#666;">${p.tipoIdentificacion || ''} ${p.noIdentificacion || ''}</small></td>
+                        <td>
+                            <strong>${p.nombre}</strong>
+                            <small class="proveedor-desc" style="display:block;color:#0056B8;font-style:italic;font-size:0.8em;">${p.descripcion || ''}</small>
+                        </td>
                         <td>${p.tipoIdentificacion || '-'} ${p.noIdentificacion || '-'}</td>
                         <td>${cuentasHtml}</td>
                         <td>${p.telefono || '-'}</td>
@@ -673,6 +682,7 @@
                 document.getElementById('telefonoEmergencia').value= p.telefonoEmergencia || '';
                 document.getElementById('direccion').value         = p.direccion || '';
                 document.getElementById('correo').value            = p.correo || '';
+                document.getElementById('descripcion').value       = p.descripcion || '';
 
                 // Cargar cuentas de pago
                 const container = document.getElementById('cuentasPagoList');
@@ -738,15 +748,15 @@
             document.querySelectorAll('#tbodyProveedores tr').forEach(tr => {
                 const celdas = tr.querySelectorAll('td');
                 if (celdas.length < 8) return;
-                // Extraer texto limpio de cada celda
                 const nombre    = celdas[0]?.querySelector('strong')?.textContent?.trim() || '-';
+                const desc      = celdas[0]?.querySelector('.proveedor-desc')?.textContent?.trim() || '';
                 const id_fiscal = celdas[1]?.textContent?.trim() || '-';
                 const tel       = celdas[3]?.textContent?.trim() || '-';
                 const whatsapp  = celdas[4]?.textContent?.trim() || '-';
                 const telAlt    = celdas[5]?.textContent?.trim() || '-';
                 const emergencia= celdas[6]?.textContent?.trim() || '-';
                 const correo    = celdas[7]?.textContent?.trim() || '-';
-                filas.push([nombre, id_fiscal, tel, whatsapp, telAlt, emergencia, correo]);
+                filas.push({ nombre, desc, id_fiscal, tel, whatsapp, telAlt, emergencia, correo });
             });
 
             if (filas.length === 0) {
@@ -756,22 +766,21 @@
 
             addHeader();
 
-            // Encabezado de tabla
-            const cols = ['Proveedor', 'Identificación', 'Tel. Principal', 'WhatsApp', 'Tel. Alterno', 'Emergencias', 'Correo'];
-            const colW = [52, 34, 30, 30, 30, 30, 50];
-            const rowH = 7;
+            const cols = ['Proveedor / Descripción', 'Identificación', 'Tel. Principal', 'WhatsApp', 'Tel. Alterno', 'Emergencias', 'Correo'];
+            const colW = [60, 34, 28, 28, 28, 28, 50];
+            const rowH = 12;
 
             function drawTableHeader() {
                 let xc = marginL;
                 cols.forEach((col, i) => {
                     doc.setFillColor(0, 86, 184);
-                    doc.rect(xc, yPos, colW[i], 8, 'F');
+                    doc.rect(xc, yPos, colW[i], 9, 'F');
                     doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(7.5); doc.setFont(undefined, 'bold');
-                    doc.text(col, xc + 2, yPos + 5.5);
+                    doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+                    doc.text(col, xc + 2, yPos + 6);
                     xc += colW[i];
                 });
-                yPos += 9;
+                yPos += 10;
             }
 
             drawTableHeader();
@@ -785,23 +794,39 @@
                     addHeader();
                     drawTableHeader();
                 }
+                const r = idx % 2 === 0 ? 245 : 255;
+                const g = idx % 2 === 0 ? 248 : 255;
+                const b = idx % 2 === 0 ? 252 : 255;
                 // Fondo alternado
-                doc.setFillColor(idx % 2 === 0 ? 247 : 255, idx % 2 === 0 ? 249 : 255, idx % 2 === 0 ? 252 : 255);
+                doc.setFillColor(r, g, b);
                 let xc = marginL;
                 colW.forEach(w => { doc.rect(xc, yPos, w, rowH, 'F'); xc += w; });
                 // Bordes
                 doc.setDrawColor(220, 220, 220);
                 xc = marginL;
                 colW.forEach(w => { doc.rect(xc, yPos, w, rowH); xc += w; });
-                // Texto
-                doc.setTextColor(30, 30, 30);
-                doc.setFontSize(7); doc.setFont(undefined, 'normal');
+
+                // Columna 0: nombre (negrita) + descripción (pequeña, gris)
                 xc = marginL;
-                fila.forEach((txt, ci) => {
-                    const truncated = doc.splitTextToSize(txt, colW[ci] - 3)[0] || '';
-                    doc.text(truncated, xc + 2, yPos + 4.8);
-                    xc += colW[ci];
+                doc.setTextColor(20, 20, 20);
+                doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+                doc.text(doc.splitTextToSize(fila.nombre, colW[0] - 3)[0] || '', xc + 2, yPos + 5);
+                if (fila.desc) {
+                    doc.setFontSize(5.5); doc.setFont('helvetica', 'italic');
+                    doc.setTextColor(80, 80, 80);
+                    doc.text(doc.splitTextToSize(fila.desc, colW[0] - 3)[0] || '', xc + 2, yPos + 9.5);
+                }
+                xc += colW[0];
+
+                // Resto de columnas
+                const datos = [fila.id_fiscal, fila.tel, fila.whatsapp, fila.telAlt, fila.emergencia, fila.correo];
+                datos.forEach((txt, ci) => {
+                    doc.setTextColor(30, 30, 30);
+                    doc.setFontSize(6.5); doc.setFont('helvetica', 'normal');
+                    doc.text(doc.splitTextToSize(txt, colW[ci + 1] - 3)[0] || '', xc + 2, yPos + 6.5);
+                    xc += colW[ci + 1];
                 });
+
                 yPos += rowH;
             });
 
