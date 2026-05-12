@@ -170,14 +170,24 @@
         }
 
         th {
-            padding: 15px;
+            padding: 9px 10px;
             text-align: left;
             font-weight: 600;
+            white-space: nowrap;
+            font-size: 0.88em;
         }
 
         td {
-            padding: 15px;
+            padding: 8px 10px;
             border-bottom: 1px solid #eee;
+            font-size: 0.87em;
+        }
+
+        td.desc-col {
+            max-width: 160px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         tbody tr:hover {
@@ -637,7 +647,7 @@
                     row.innerHTML = `
                         <td><strong>${p.nombre}</strong><br><small style="color:#666;">${p.tipoIdentificacion || ''} ${p.noIdentificacion || ''}</small></td>
                         <td>${p.tipoIdentificacion || '-'} ${p.noIdentificacion || '-'}</td>
-                        <td style="max-width:200px; color:#555; font-size:0.88em;" title="${(p.descripcion || '').replace(/"/g,'&quot;')}">${p.descripcion ? (p.descripcion.length > 60 ? p.descripcion.substring(0,60) + '…' : p.descripcion) : '<span style="color:#bbb;">Sin descripción</span>'}</td>
+                        <td class="desc-col" title="${(p.descripcion || '').replace(/"/g,'&quot;')}">${p.descripcion || '<span style="color:#bbb;">-</span>'}</td>
                         <td>${cuentasHtml}</td>
                         <td>${p.telefono || '-'}</td>
                         <td>${p.whatsapp || '-'}</td>
