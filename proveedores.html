@@ -411,6 +411,11 @@
                             <label>Correo Electrónico</label>
                             <input type="email" id="correo" placeholder="Ej: proveedor@ejemplo.com">
                         </div>
+
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>📝 Descripción / Servicio que presta</label>
+                            <textarea id="descripcion" rows="2" placeholder="Ej: Empresa de aseo y mantenimiento de áreas comunes..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:14px; resize:vertical;"></textarea>
+                        </div>
                     </div>
 
                     <!-- CUENTAS DE PAGO (múltiples) -->
@@ -434,6 +439,7 @@
                         <tr>
                             <th>Proveedor</th>
                             <th>Identificación</th>
+                            <th>📝 Descripción</th>
                             <th>💳 Cuentas</th>
                             <th>Tel. Principal</th>
                             <th>WhatsApp</th>
@@ -445,7 +451,7 @@
                     </thead>
                     <tbody id="tbodyProveedores">
                         <tr>
-                            <td colspan="9" style="text-align: center; padding: 50px; color: #999;">
+                            <td colspan="10" style="text-align: center; padding: 50px; color: #999;">
                                 Cargando proveedores...
                             </td>
                         </tr>
@@ -567,6 +573,7 @@
                 nombre:             document.getElementById('nombre').value,
                 tipoIdentificacion: document.getElementById('tipoIdentificacion').value,
                 noIdentificacion:   document.getElementById('noIdentificacion').value,
+                descripcion:        document.getElementById('descripcion').value.trim(),
                 telefono:           document.getElementById('telefono').value,
                 whatsapp:           document.getElementById('whatsapp').value,
                 telefonoAlt:        document.getElementById('telefonoAlt').value,
@@ -604,7 +611,7 @@
                 tbody.innerHTML = '';
 
                 if (!snapshot.exists()) {
-                    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:50px;color:#999;">No hay proveedores registrados</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:50px;color:#999;">No hay proveedores registrados</td></tr>';
                     return;
                 }
 
@@ -630,6 +637,7 @@
                     row.innerHTML = `
                         <td><strong>${p.nombre}</strong><br><small style="color:#666;">${p.tipoIdentificacion || ''} ${p.noIdentificacion || ''}</small></td>
                         <td>${p.tipoIdentificacion || '-'} ${p.noIdentificacion || '-'}</td>
+                        <td style="max-width:200px; color:#555; font-size:0.88em;" title="${(p.descripcion || '').replace(/"/g,'&quot;')}">${p.descripcion ? (p.descripcion.length > 60 ? p.descripcion.substring(0,60) + '…' : p.descripcion) : '<span style="color:#bbb;">Sin descripción</span>'}</td>
                         <td>${cuentasHtml}</td>
                         <td>${p.telefono || '-'}</td>
                         <td>${p.whatsapp || '-'}</td>
@@ -667,6 +675,7 @@
                 document.getElementById('nombre').value            = p.nombre || '';
                 document.getElementById('tipoIdentificacion').value= p.tipoIdentificacion || '';
                 document.getElementById('noIdentificacion').value  = p.noIdentificacion || '';
+                document.getElementById('descripcion').value       = p.descripcion || '';
                 document.getElementById('telefono').value          = p.telefono || '';
                 document.getElementById('whatsapp').value          = p.whatsapp || '';
                 document.getElementById('telefonoAlt').value       = p.telefonoAlt || '';
@@ -737,16 +746,17 @@
             const filas = [];
             document.querySelectorAll('#tbodyProveedores tr').forEach(tr => {
                 const celdas = tr.querySelectorAll('td');
-                if (celdas.length < 8) return;
+                if (celdas.length < 9) return;
                 // Extraer texto limpio de cada celda
-                const nombre    = celdas[0]?.querySelector('strong')?.textContent?.trim() || '-';
-                const id_fiscal = celdas[1]?.textContent?.trim() || '-';
-                const tel       = celdas[3]?.textContent?.trim() || '-';
-                const whatsapp  = celdas[4]?.textContent?.trim() || '-';
-                const telAlt    = celdas[5]?.textContent?.trim() || '-';
-                const emergencia= celdas[6]?.textContent?.trim() || '-';
-                const correo    = celdas[7]?.textContent?.trim() || '-';
-                filas.push([nombre, id_fiscal, tel, whatsapp, telAlt, emergencia, correo]);
+                const nombre      = celdas[0]?.querySelector('strong')?.textContent?.trim() || '-';
+                const id_fiscal   = celdas[1]?.textContent?.trim() || '-';
+                const descripcion = celdas[2]?.textContent?.trim().replace('Sin descripción','') || '';
+                const tel         = celdas[4]?.textContent?.trim() || '-';
+                const whatsapp    = celdas[5]?.textContent?.trim() || '-';
+                const telAlt      = celdas[6]?.textContent?.trim() || '-';
+                const emergencia  = celdas[7]?.textContent?.trim() || '-';
+                const correo      = celdas[8]?.textContent?.trim() || '-';
+                filas.push([nombre, descripcion, id_fiscal, tel, whatsapp, telAlt, emergencia, correo]);
             });
 
             if (filas.length === 0) {
@@ -757,8 +767,8 @@
             addHeader();
 
             // Encabezado de tabla
-            const cols = ['Proveedor', 'Identificación', 'Tel. Principal', 'WhatsApp', 'Tel. Alterno', 'Emergencias', 'Correo'];
-            const colW = [52, 34, 30, 30, 30, 30, 50];
+            const cols = ['Proveedor', 'Descripción', 'Identificación', 'Tel. Principal', 'WhatsApp', 'Tel. Alterno', 'Emergencias', 'Correo'];
+            const colW = [44, 58, 30, 28, 28, 26, 26, 42];
             const rowH = 7;
 
             function drawTableHeader() {
