@@ -298,7 +298,8 @@ const params = new URLSearchParams(window.location.search);
 const edificio = params.get('edificio') || '';
 const nombresEdificios = {
   'nepal-2': 'NEPAL 2', 'avalon': 'AVALON',
-  'convivienda-1': 'CONVIVIENDA 1', 'pinos-del-country': 'PINOS DEL COUNTRY'
+  'convivienda-1': 'CONVIVIENDA 1', 'pinos-del-country': 'PINOS DEL COUNTRY',
+  'torre-amin-2': 'TORRES DE AMIN II'
 };
 const nombreEdificio = nombresEdificios[edificio] || edificio.toUpperCase();
 document.getElementById('edificioBadge').textContent = nombreEdificio || 'Sin edificio';
