@@ -631,7 +631,8 @@
                     <option value="avalon">Avalon</option>
                     <option value="convivienda-1">Convivienda 1</option>
                     <option value="pinos-del-country">Pinos del Country</option>
-                    <option value="torre-amin-2">Torres de Amin II</option>
+                    <option value="torres-de-anim-2">Torres de Amin II</option>
+                    <option value="millenium-3">Millenium 3</option>
                 </select>
                 <a href="#" id="btnDrive" class="btn-drive" target="_blank" style="display: none;">
                     📁 Ver Facturas Drive
@@ -1355,7 +1356,8 @@
             'avalon': 'https://drive.google.com/drive/folders/1x_vnC5l8Q50KxdQfsvIHx1wy8s8Gjrlk',
             'convivienda-1': 'https://drive.google.com/drive/folders/1mEeVfXj74AoSkeCb2uSB00QIblwSdD1W',
             'pinos-del-country': 'https://drive.google.com/drive/folders/1QYPuq6w1fHNSl5aq1fD2R7hDJjScJAtu',
-            'torre-amin-2': ''
+            'torres-de-anim-2': '',
+            'millenium-3': ''
         };
         
         window.cambiarEdificio = function() {
@@ -2135,9 +2137,10 @@
                 { id: 'avalon', nombre: 'Avalon', icono: '🏰' },
                 { id: 'convivienda-1', nombre: 'Convivienda I', icono: '🏘️' },
                 { id: 'pinos-del-country', nombre: 'Pinos del Country', icono: '🌲' },
-                { id: 'torre-amin-2', nombre: 'Torres de Amin II', icono: '🏗️' }
+                { id: 'torres-de-anim-2', nombre: 'Torres de Amin II', icono: '🏗️' },
+                { id: 'millenium-3', nombre: 'Millenium 3', icono: '🏢' }
             ];
-            
+
             let html = '';
             for (const ed of edificios) {
                 const snap = await get(ref(db, `cuentas_por_pagar/${ed.id}`));
@@ -2184,7 +2187,8 @@
                 { id: 'avalon', nombre: 'Avalon', icono: '🏰' },
                 { id: 'convivienda-1', nombre: 'Convivienda I', icono: '🏘️' },
                 { id: 'pinos-del-country', nombre: 'Pinos del Country', icono: '🌲' },
-                { id: 'torre-amin-2', nombre: 'Torres de Amin II', icono: '🏗️' }
+                { id: 'torres-de-anim-2', nombre: 'Torres de Amin II', icono: '🏗️' },
+                { id: 'millenium-3', nombre: 'Millenium 3', icono: '🏢' }
             ];
 
             // Si hay edificio seleccionado, solo mostrar ese; si no, mostrar todos
