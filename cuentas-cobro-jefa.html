@@ -829,7 +829,7 @@
             const h = (canvas.height * w) / canvas.width;
             pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, w, h);
             const num = document.getElementById('docNumero').textContent.replace('CUENTA DE COBRO No. ', '');
-            pdf.save('cuenta-cobro-' + num + '.pdf');
+            pdf.save('GAZ-cuenta-cobro-' + num + '.pdf');
         } catch (e) {
             mostrarToast('Error generando PDF', 'error');
         }
