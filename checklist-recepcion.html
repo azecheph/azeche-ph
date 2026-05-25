@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -470,6 +470,8 @@
     </style>
 </head>
 <body>
+    <img id="logoPDF" src="logo-azeche.png" crossorigin="anonymous" style="display:none;" onload="precargarLogo()">
+
     <div class="container">
         <a href="Dashboard.html" class="back-link">
             ← Volver al Dashboard Azeche PH
@@ -598,6 +600,19 @@
     </div>
 
     <script>
+        let logoB64 = null;
+
+        function precargarLogo() {
+            try {
+                const img = document.getElementById('logoPDF');
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                canvas.getContext('2d').drawImage(img, 0, 0);
+                logoB64 = canvas.toDataURL('image/png');
+            } catch(e) { logoB64 = null; }
+        }
+
         // Datos del checklist
         const checklistData = {
             "documentacion": {
@@ -989,22 +1004,23 @@
             doc.setFillColor(0, 86, 184);
             doc.rect(0, 0, pageWidth, 44, 'F');
 
-            // Recuadro blanco para el logo Azeche PH
+            // Logo en el encabezado
             doc.setFillColor(255, 255, 255);
             doc.rect(10, 5, 38, 34, 'F');
-            // "Azeche" en azul
-            doc.setFontSize(13);
-            doc.setFont(undefined, 'bold');
-            doc.setTextColor(0, 86, 184);
-            doc.text('Azeche', 12, 19);
-            // "P.H." en verde
-            doc.setTextColor(0, 184, 83);
-            doc.text('P.H.', 12, 29);
-            // Subtítulo pequeño
-            doc.setFontSize(5.5);
-            doc.setFont(undefined, 'normal');
-            doc.setTextColor(120, 120, 120);
-            doc.text('PROPIEDAD HORIZONTAL', 12, 35);
+            if (logoB64) {
+                doc.addImage(logoB64, 'PNG', 11, 6, 36, 32);
+            } else {
+                doc.setFontSize(13);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(0, 86, 184);
+                doc.text('Azeche', 12, 19);
+                doc.setTextColor(0, 184, 83);
+                doc.text('P.H.', 12, 29);
+                doc.setFontSize(5.5);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(120, 120, 120);
+                doc.text('PROPIEDAD HORIZONTAL', 12, 35);
+            }
 
             // Títulos centrados en la barra azul
             doc.setTextColor(255, 255, 255);
