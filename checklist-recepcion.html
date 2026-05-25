@@ -429,6 +429,44 @@
             background: rgba(255,255,255,0.3);
             transform: translateX(-5px);
         }
+
+        /* ── Historial ── */
+        .historial-section {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .historial-section h2 { color: #2d3748; font-size: 1.2em; margin-bottom: 15px; }
+        .historial-empty { text-align: center; color: #a0aec0; padding: 20px; font-style: italic; }
+        .historial-tabla { width: 100%; border-collapse: collapse; }
+        .historial-tabla th {
+            background: #f7f8fc; padding: 10px 12px; text-align: left;
+            font-size: 0.85em; color: #718096; border-bottom: 2px solid #e2e8f0;
+        }
+        .historial-tabla td {
+            padding: 12px; border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9em; vertical-align: middle;
+        }
+        .historial-tabla tr:hover td { background: #f7f8fc; }
+        .badge-progreso {
+            display: inline-block; padding: 3px 10px;
+            border-radius: 20px; font-size: 0.8em; font-weight: 600;
+        }
+        .badge-completo { background: #c6f6d5; color: #276749; }
+        .badge-parcial  { background: #fefcbf; color: #744210; }
+        .badge-inicio   { background: #fed7d7; color: #9b2c2c; }
+        .btn-sm {
+            padding: 5px 10px; font-size: 0.8em; border: none;
+            border-radius: 6px; cursor: pointer; margin-right: 4px;
+        }
+        .btn-sm-pdf { background: #667eea; color: white; }
+        .btn-sm-pdf:hover { background: #5a67d8; }
+        .btn-sm-del { background: #fed7d7; color: #9b2c2c; }
+        .btn-sm-del:hover { background: #fc8181; color: white; }
+        .btn-sm-ver { background: #e2e8f0; color: #4a5568; }
+        .btn-sm-ver:hover { background: #cbd5e0; }
     </style>
 </head>
 <body>
@@ -470,6 +508,13 @@
                     <div class="stat-value" id="progressPercentage">0%</div>
                     <div class="stat-label">Progreso</div>
                 </div>
+            </div>
+        </div>
+
+        <div class="historial-section">
+            <h2>📁 Historial de Recepciones Guardadas</h2>
+            <div id="historialContainer">
+                <p class="historial-empty">No hay recepciones guardadas aún. Completa un checklist y usa "Finalizar y Guardar" para registrarlo aquí.</p>
             </div>
         </div>
 
@@ -537,6 +582,12 @@
             </button>
             <button class="btn btn-success" onclick="generarPDF()">
                 📄 Generar PDF Profesional
+            </button>
+            <button class="btn" onclick="finalizarYGuardar()" style="background:#38b2ac;color:white;padding:14px 28px;border:none;border-radius:10px;font-size:1em;font-weight:600;cursor:pointer;">
+                ✅ Finalizar y Guardar en Historial
+            </button>
+            <button class="btn" onclick="nuevoChecklist()" style="background:#ed8936;color:white;padding:14px 28px;border:none;border-radius:10px;font-size:1em;font-weight:600;cursor:pointer;">
+                🆕 Nuevo Checklist
             </button>
         </div>
     </div>
@@ -674,6 +725,7 @@
             updateProgress();
             setDefaultDate();
             startAutoSave();
+            mostrarHistorial();
         }
 
         function setDefaultDate() {
@@ -902,9 +954,9 @@
             showNotification('✅ Checklist descargado correctamente', 'success');
         }
 
-        function generarPDF() {
-            const data = collectFormData();
-            
+        function generarPDF(datosOverride) {
+            const data = datosOverride || collectFormData();
+
             // Validar campos obligatorios
             if (!data.informacionGeneral.nombreEdificio || !data.informacionGeneral.direccion || !data.informacionGeneral.administradorEntrante) {
                 showNotification('❌ Por favor completa los campos obligatorios (Nombre del Edificio, Dirección, Administrador Entrante)', 'error');
@@ -1263,6 +1315,111 @@
             setTimeout(() => {
                 notification.style.display = 'none';
             }, 4000);
+        }
+
+        // ── Historial de recepciones ──
+
+        function mostrarHistorial() {
+            const historial = JSON.parse(localStorage.getItem('checklistHistorial') || '[]');
+            const container = document.getElementById('historialContainer');
+            if (historial.length === 0) {
+                container.innerHTML = '<p class="historial-empty">No hay recepciones guardadas aún. Completa un checklist y usa "Finalizar y Guardar" para registrarlo aquí.</p>';
+                return;
+            }
+            const totalItems = Object.values(checklistData).reduce((sum, s) => sum + s.items.length, 0);
+            let html = `<table class="historial-tabla"><thead><tr>
+                <th>Edificio</th><th>Fecha Recepción</th><th>Progreso</th><th>Guardado</th><th>Acciones</th>
+            </tr></thead><tbody>`;
+            historial.forEach((entry, i) => {
+                const done = Object.values(entry.checklist || {}).filter(x => x.checked).length;
+                const pct = totalItems > 0 ? Math.round((done / totalItems) * 100) : 0;
+                const cls = pct === 100 ? 'badge-completo' : pct > 0 ? 'badge-parcial' : 'badge-inicio';
+                const guardado = entry.savedAt ? new Date(entry.savedAt).toLocaleDateString('es-CO') : '-';
+                html += `<tr>
+                    <td><strong>${entry.informacionGeneral?.nombreEdificio || 'Sin nombre'}</strong></td>
+                    <td>${entry.informacionGeneral?.fechaRecepcion || '-'}</td>
+                    <td><span class="badge-progreso ${cls}">${done}/${totalItems} — ${pct}%</span></td>
+                    <td>${guardado}</td>
+                    <td>
+                        <button class="btn-sm btn-sm-pdf" onclick="generarPDFDesdeHistorial(${i})">PDF</button>
+                        <button class="btn-sm btn-sm-ver" onclick="cargarDesdeHistorial(${i})">Ver/Editar</button>
+                        <button class="btn-sm btn-sm-del" onclick="eliminarDeHistorial(${i})">Eliminar</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function finalizarYGuardar() {
+            const data = collectFormData();
+            if (!data.informacionGeneral.nombreEdificio || !data.informacionGeneral.fechaRecepcion) {
+                showNotification('❌ Completa al menos el nombre del edificio y la fecha', 'error');
+                return;
+            }
+            const historial = JSON.parse(localStorage.getItem('checklistHistorial') || '[]');
+            historial.unshift({ ...data, savedAt: new Date().toISOString() });
+            localStorage.setItem('checklistHistorial', JSON.stringify(historial));
+            localStorage.removeItem('checklistRecepcion');
+            mostrarHistorial();
+            showNotification('✅ Recepción guardada en historial correctamente', 'success');
+            if (confirm('Recepción guardada. ¿Iniciar un nuevo checklist en blanco?')) {
+                limpiarFormulario();
+            }
+        }
+
+        function nuevoChecklist() {
+            if (!confirm('¿Iniciar un nuevo checklist? El borrador actual no guardado en historial se perderá.')) return;
+            localStorage.removeItem('checklistRecepcion');
+            limpiarFormulario();
+        }
+
+        function limpiarFormulario() {
+            ['nombreEdificio','direccion','horaRecepcion','administradorSaliente','cedulaSaliente',
+             'administradorEntrante','cedulaEntrante','personaEntregaNombre','personaEntregaCedula',
+             'testigos','observacionesGenerales'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            Object.keys(checklistData).forEach(sectionKey => {
+                checklistData[sectionKey].items.forEach(item => {
+                    const cb = document.getElementById(`check-${item.id}`);
+                    const nt = document.getElementById(`notes-${item.id}`);
+                    const el = document.getElementById(`item-${item.id}`);
+                    if (cb) cb.checked = false;
+                    if (nt) nt.value = '';
+                    if (el) el.classList.remove('checked');
+                });
+            });
+            setDefaultDate();
+            updateProgress();
+            showNotification('🆕 Nuevo checklist listo', 'success');
+        }
+
+        function cargarDesdeHistorial(index) {
+            if (!confirm('¿Cargar este registro? El borrador actual se perderá.')) return;
+            const historial = JSON.parse(localStorage.getItem('checklistHistorial') || '[]');
+            const entry = historial[index];
+            if (!entry) return;
+            restoreFormData(entry);
+            showNotification('📂 Registro cargado correctamente', 'success');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function eliminarDeHistorial(index) {
+            if (!confirm('¿Eliminar esta recepción del historial? Esta acción no se puede deshacer.')) return;
+            const historial = JSON.parse(localStorage.getItem('checklistHistorial') || '[]');
+            historial.splice(index, 1);
+            localStorage.setItem('checklistHistorial', JSON.stringify(historial));
+            mostrarHistorial();
+            showNotification('🗑️ Registro eliminado del historial', 'success');
+        }
+
+        function generarPDFDesdeHistorial(index) {
+            const historial = JSON.parse(localStorage.getItem('checklistHistorial') || '[]');
+            const entry = historial[index];
+            if (!entry) return;
+            generarPDF(entry);
         }
 
         // Guardar antes de cerrar
