@@ -360,7 +360,7 @@
     const auth = getAuth(app);
     const db   = getDatabase(app);
 
-    let esAdmin      = false;   // administrador → CRUD completo
+    let esAdmin      = false;   // creadora (Carla) → CRUD completo | administrador → solo lectura
     let userNombre   = '';
     let todasNovedades = [];    // cache local para filtrar sin re-fetch
     let edificiosMap   = {};    // { key: { nombre, icono } }
@@ -378,7 +378,7 @@
             return;
         }
 
-        esAdmin = (rol === 'administrador');
+        esAdmin = (rol === 'creadora');
 
         if (esAdmin) {
             document.getElementById('btnNueva').style.display = '';
