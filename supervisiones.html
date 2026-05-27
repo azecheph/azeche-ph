@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supervisiones - Azeche P.H.</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { font-size: 1.8em; display: flex; align-items: center; gap: 12px; }
+        .header-sub { font-size: 0.85em; opacity: 0.85; margin-top: 4px; }
+
+        .btn-nav {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 9px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            margin-left: 8px;
+        }
+        .btn-nav:hover { background: white; color: #0056B8; transform: translateY(-2px); }
+
+        /* ── Content ── */
+        .content { padding: 30px; }
+
+        /* ── Barra de acciones ── */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 11px 26px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,86,184,0.4); }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { transform: translateY(-2px); }
+
+        /* ── Filtros ── */
+        .filtros {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filtros select, .filtros input {
+            padding: 9px 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9em;
+            transition: border-color 0.3s;
+            cursor: pointer;
+        }
+        .filtros select:focus, .filtros input:focus {
+            outline: none;
+            border-color: #0056B8;
+        }
+
+        /* ── Resumen por edificio ── */
+        .resumen-titulo {
+            font-size: 1em;
+            font-weight: 700;
+            color: #333;
+            margin: 24px 0 12px;
+        }
+        .resumen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+        .resumen-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-align: center;
+        }
+        .resumen-card:hover { border-color: #0056B8; transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,86,184,0.15); }
+        .resumen-card.activo { border-color: #0056B8; background: #e8f0fb; }
+        .resumen-card .edificio-nombre { font-size: 0.85em; font-weight: 700; color: #333; margin-bottom: 8px; }
+        .resumen-card .badges { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+        .mini-badge {
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+        }
+        .mini-badge.pendiente { background: #fff3cd; color: #856404; }
+        .mini-badge.resuelta  { background: #d1e7dd; color: #0a5830; }
+        .mini-badge.cero      { background: #e9ecef; color: #6c757d; }
+
+        /* ── Tabla ── */
+        .table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: linear-gradient(135deg, #0056B8 0%, #00B853 100%); color: white; }
+        th { padding: 14px 15px; text-align: left; font-weight: 600; font-size: 0.9em; white-space: nowrap; }
+        tbody tr { border-bottom: 1px solid #eee; transition: background 0.2s; }
+        tbody tr:hover { background: #f8f9fa; }
+        td { padding: 13px 15px; font-size: 0.9em; vertical-align: middle; }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82em;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .badge-pendiente { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+        .badge-resuelta  { background: #d1e7dd; color: #0a5830; border: 1px solid #198754; }
+
+        .btn-small {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.82em;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .btn-resolver  { background: #198754; color: white; }
+        .btn-resolver:hover  { background: #146c43; transform: translateY(-1px); }
+        .btn-reabrir   { background: #ffc107; color: #000; }
+        .btn-reabrir:hover   { background: #e0a800; transform: translateY(-1px); }
+
+        .desc-cell { max-width: 320px; word-break: break-word; }
+        .empty-row td { text-align: center; padding: 50px; color: #999; font-size: 0.95em; }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            width: 100%;
+            max-width: 520px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .modal h2 { color: #0056B8; margin-bottom: 24px; font-size: 1.3em; }
+        .form-group { display: flex; flex-direction: column; margin-bottom: 18px; }
+        .form-group label { font-weight: 600; margin-bottom: 7px; color: #333; font-size: 0.9em; }
+        .form-group select,
+        .form-group input,
+        .form-group textarea {
+            padding: 11px 13px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        .form-group select:focus,
+        .form-group input:focus,
+        .form-group textarea:focus { outline: none; border-color: #0056B8; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .modal-btns { display: flex; gap: 12px; margin-top: 8px; justify-content: flex-end; }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: #198754;
+            color: white;
+            padding: 13px 22px;
+            border-radius: 10px;
+            font-weight: 600;
+            z-index: 2000;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { background: #dc3545; }
+
+        /* ── Vista solo lectura banner ── */
+        .readonly-banner {
+            background: #e8f4fd;
+            border: 1px solid #bee3f8;
+            border-radius: 10px;
+            padding: 10px 18px;
+            color: #2b6cb0;
+            font-size: 0.88em;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>🔍 Supervisiones</h1>
+            <div class="header-sub" id="headerSub">Registro de novedades por edificio</div>
+        </div>
+        <div>
+            <button class="btn-nav" onclick="location.href='Dashboard.html'">🏠 Dashboard</button>
+            <button class="btn-nav" onclick="logout()">🚪 Salir</button>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- Banner solo lectura (jefa) -->
+        <div id="readonlyBanner" class="readonly-banner" style="display:none">
+            👁️ Vista de lectura — estás viendo todas las novedades de todos los edificios.
+        </div>
+
+        <!-- Acción + Filtros -->
+        <div class="action-bar">
+            <button id="btnNueva" class="btn btn-primary" onclick="abrirModal()" style="display:none">
+                ➕ Nueva Novedad
+            </button>
+            <div class="filtros">
+                <select id="filtroEdificio" onchange="aplicarFiltros()">
+                    <option value="">🏢 Todos los edificios</option>
+                </select>
+                <select id="filtroEstado" onchange="aplicarFiltros()">
+                    <option value="">⚪ Todos los estados</option>
+                    <option value="Pendiente">⏳ Pendiente</option>
+                    <option value="Resuelta">✅ Resuelta</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Resumen por edificio -->
+        <div class="resumen-titulo">Resumen por edificio</div>
+        <div id="resumenGrid" class="resumen-grid">
+            <div style="color:#999;font-size:.9em;grid-column:1/-1">Cargando edificios...</div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Edificio</th>
+                        <th>Fecha</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                        <th>Registrado por</th>
+                        <th id="thAccion">Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyNovedades">
+                    <tr class="empty-row"><td colspan="6">Cargando novedades...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal nueva novedad -->
+<div id="modalOverlay" class="modal-overlay" style="display:none" onclick="cerrarAlClickarFondo(event)">
+    <div class="modal">
+        <h2>➕ Nueva Novedad</h2>
+        <form id="formNovedad" onsubmit="guardarNovedad(event)">
+            <div class="form-group">
+                <label>Edificio *</label>
+                <select id="modalEdificio" required>
+                    <option value="">Seleccionar edificio...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Fecha *</label>
+                <input type="date" id="modalFecha" required>
+            </div>
+            <div class="form-group">
+                <label>Descripción de la novedad *</label>
+                <textarea id="modalDescripcion" placeholder="Describe detalladamente la novedad observada..." required></textarea>
+            </div>
+            <div class="modal-btns">
+                <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                <button type="submit" class="btn btn-primary" id="btnGuardar">💾 Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script type="module">
+    import { initializeApp }            from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getDatabase, ref, push, onValue, update, serverTimestamp }
+                                        from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+    const firebaseConfig = {
+        apiKey:            "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
+        authDomain:        "azeche-ph.firebaseapp.com",
+        databaseURL:       "https://azeche-ph-default-rtdb.firebaseio.com",
+        projectId:         "azeche-ph",
+        storageBucket:     "azeche-ph.firebasestorage.app",
+        messagingSenderId: "905337990521",
+        appId:             "1:905337990521:web:c2ca4932672c59fef6c5c9"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getDatabase(app);
+
+    let esAdmin      = false;   // administrador → CRUD completo
+    let userNombre   = '';
+    let todasNovedades = [];    // cache local para filtrar sin re-fetch
+    let edificiosMap   = {};    // { key: { nombre, icono } }
+
+    // ── Auth ───────────────────────────────────────────────────────────────
+    onAuthStateChanged(auth, (user) => {
+        if (!user) { location.href = 'index.html'; return; }
+
+        const info = JSON.parse(localStorage.getItem('azecheUser') || '{}');
+        const rol  = info.rol || '';
+        userNombre = info.nombre || user.email;
+
+        if (rol !== 'administrador' && rol !== 'creadora') {
+            location.href = 'Dashboard.html';
+            return;
+        }
+
+        esAdmin = (rol === 'administrador');
+
+        if (esAdmin) {
+            document.getElementById('btnNueva').style.display = '';
+            document.getElementById('headerSub').textContent  = `Supervisora: ${userNombre}`;
+        } else {
+            document.getElementById('readonlyBanner').style.display = '';
+            document.getElementById('thAccion').style.display        = 'none';
+            document.getElementById('headerSub').textContent         = `Vista de lectura — ${userNombre}`;
+        }
+
+        cargarEdificios();
+        cargarNovedades();
+    });
+
+    window.logout = () => signOut(auth).then(() => location.href = 'index.html');
+
+    // ── Edificios (dinámico desde Firebase) ────────────────────────────────
+    function cargarEdificios() {
+        onValue(ref(db, 'edificios'), (snap) => {
+            edificiosMap = {};
+            const selFiltro  = document.getElementById('filtroEdificio');
+            const selModal   = document.getElementById('modalEdificio');
+            const prevFiltro = selFiltro.value;
+            const prevModal  = selModal.value;
+
+            selFiltro.innerHTML = '<option value="">🏢 Todos los edificios</option>';
+            selModal.innerHTML  = '<option value="">Seleccionar edificio...</option>';
+
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    const ed = child.val();
+                    const nombre = ed.nombre || child.key;
+                    const icono  = ed.icono  || '🏢';
+                    edificiosMap[child.key] = { nombre, icono };
+
+                    [selFiltro, selModal].forEach(sel => {
+                        const opt = document.createElement('option');
+                        opt.value       = child.key;
+                        opt.textContent = `${icono} ${nombre}`;
+                        sel.appendChild(opt);
+                    });
+                });
+            }
+
+            selFiltro.value = prevFiltro;
+            selModal.value  = prevModal;
+
+            renderResumen();
+        });
+    }
+
+    // ── Novedades (tiempo real) ────────────────────────────────────────────
+    function cargarNovedades() {
+        onValue(ref(db, 'supervisiones'), (snap) => {
+            todasNovedades = [];
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    todasNovedades.push({ id: child.key, ...child.val() });
+                });
+                // Más recientes primero
+                todasNovedades.sort((a, b) => (b.creadoAt || '').localeCompare(a.creadoAt || ''));
+            }
+            renderResumen();
+            renderTabla();
+        });
+    }
+
+    // ── Resumen por edificio ───────────────────────────────────────────────
+    function renderResumen() {
+        const grid = document.getElementById('resumenGrid');
+        if (Object.keys(edificiosMap).length === 0) return;
+
+        const filtroActivo = document.getElementById('filtroEdificio').value;
+
+        // Contar por edificio
+        const conteo = {};
+        Object.keys(edificiosMap).forEach(k => { conteo[k] = { pendiente: 0, resuelta: 0 }; });
+        todasNovedades.forEach(n => {
+            if (!conteo[n.edificioId]) conteo[n.edificioId] = { pendiente: 0, resuelta: 0 };
+            if (n.estado === 'Resuelta') conteo[n.edificioId].resuelta++;
+            else                         conteo[n.edificioId].pendiente++;
+        });
+
+        grid.innerHTML = '';
+        Object.entries(edificiosMap).forEach(([key, ed]) => {
+            const { pendiente, resuelta } = conteo[key] || { pendiente: 0, resuelta: 0 };
+            const activo = filtroActivo === key ? 'activo' : '';
+            const card = document.createElement('div');
+            card.className = `resumen-card ${activo}`;
+            card.innerHTML = `
+                <div class="edificio-nombre">${ed.icono} ${ed.nombre}</div>
+                <div class="badges">
+                    ${pendiente > 0
+                        ? `<span class="mini-badge pendiente">⏳ ${pendiente} pend.</span>`
+                        : `<span class="mini-badge cero">0 pendientes</span>`}
+                    ${resuelta > 0
+                        ? `<span class="mini-badge resuelta">✅ ${resuelta} res.</span>`
+                        : ''}
+                </div>`;
+            card.onclick = () => {
+                document.getElementById('filtroEdificio').value = (filtroActivo === key ? '' : key);
+                aplicarFiltros();
+            };
+            grid.appendChild(card);
+        });
+    }
+
+    // ── Tabla de novedades ─────────────────────────────────────────────────
+    function renderTabla() {
+        const filtroEd     = document.getElementById('filtroEdificio').value;
+        const filtroEstado = document.getElementById('filtroEstado').value;
+
+        const filtradas = todasNovedades.filter(n => {
+            if (filtroEd     && n.edificioId !== filtroEd)   return false;
+            if (filtroEstado && n.estado     !== filtroEstado) return false;
+            return true;
+        });
+
+        const tbody = document.getElementById('tbodyNovedades');
+
+        if (filtradas.length === 0) {
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="6">
+                ${todasNovedades.length === 0
+                    ? 'No hay novedades registradas aún.'
+                    : 'No hay novedades que coincidan con los filtros.'}
+            </td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = filtradas.map(n => {
+            const fechaDisplay = n.fecha
+                ? new Date(n.fecha + 'T12:00:00').toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' })
+                : '—';
+
+            const badgeClass = n.estado === 'Resuelta' ? 'badge-resuelta' : 'badge-pendiente';
+            const badgeIcon  = n.estado === 'Resuelta' ? '✅' : '⏳';
+            const edNombre   = n.edificioNombre || (edificiosMap[n.edificioId]?.nombre) || n.edificioId;
+
+            const accionBtn = esAdmin
+                ? n.estado === 'Pendiente'
+                    ? `<button class="btn-small btn-resolver" onclick="cambiarEstado('${n.id}','Resuelta')">✅ Resolver</button>`
+                    : `<button class="btn-small btn-reabrir"  onclick="cambiarEstado('${n.id}','Pendiente')">↩️ Reabrir</button>`
+                : '';
+
+            return `<tr>
+                <td><strong>${edNombre}</strong></td>
+                <td style="white-space:nowrap">${fechaDisplay}</td>
+                <td class="desc-cell">${escapeHtml(n.descripcion)}</td>
+                <td><span class="badge ${badgeClass}">${badgeIcon} ${n.estado}</span></td>
+                <td style="font-size:.82em;color:#666">${escapeHtml(n.creadoPor || '—')}</td>
+                ${esAdmin ? `<td>${accionBtn}</td>` : ''}
+            </tr>`;
+        }).join('');
+    }
+
+    // ── Filtros ────────────────────────────────────────────────────────────
+    window.aplicarFiltros = () => {
+        renderResumen();
+        renderTabla();
+    };
+
+    // ── Modal ──────────────────────────────────────────────────────────────
+    window.abrirModal = () => {
+        document.getElementById('formNovedad').reset();
+        document.getElementById('modalFecha').value = new Date().toISOString().split('T')[0];
+        document.getElementById('modalOverlay').style.display = 'flex';
+    };
+
+    window.cerrarModal = () => {
+        document.getElementById('modalOverlay').style.display = 'none';
+    };
+
+    window.cerrarAlClickarFondo = (e) => {
+        if (e.target === document.getElementById('modalOverlay')) cerrarModal();
+    };
+
+    // ── Guardar novedad ────────────────────────────────────────────────────
+    window.guardarNovedad = async (e) => {
+        e.preventDefault();
+        const edificioId = document.getElementById('modalEdificio').value;
+        const fecha       = document.getElementById('modalFecha').value;
+        const descripcion = document.getElementById('modalDescripcion').value.trim();
+
+        if (!edificioId || !fecha || !descripcion) return;
+
+        const btn = document.getElementById('btnGuardar');
+        btn.disabled    = true;
+        btn.textContent = 'Guardando...';
+
+        try {
+            const edInfo = edificiosMap[edificioId] || {};
+            await push(ref(db, 'supervisiones'), {
+                edificioId,
+                edificioNombre: edInfo.nombre || edificioId,
+                fecha,
+                descripcion,
+                estado:    'Pendiente',
+                creadoPor: userNombre,
+                creadoAt:  new Date().toISOString()
+            });
+            cerrarModal();
+            mostrarToast('✅ Novedad registrada correctamente');
+        } catch (err) {
+            mostrarToast('❌ Error al guardar: ' + err.message, true);
+        } finally {
+            btn.disabled    = false;
+            btn.textContent = '💾 Guardar';
+        }
+    };
+
+    // ── Cambiar estado ─────────────────────────────────────────────────────
+    window.cambiarEstado = async (id, nuevoEstado) => {
+        if (!esAdmin) return;
+        try {
+            const datos = { estado: nuevoEstado };
+            if (nuevoEstado === 'Resuelta') datos.resueltaAt = new Date().toISOString();
+            else                             datos.resueltaAt = null;
+            await update(ref(db, `supervisiones/${id}`), datos);
+            mostrarToast(nuevoEstado === 'Resuelta' ? '✅ Novedad marcada como resuelta' : '↩️ Novedad reabierta');
+        } catch (err) {
+            mostrarToast('❌ Error: ' + err.message, true);
+        }
+    };
+
+    // ── Utilidades ─────────────────────────────────────────────────────────
+    function mostrarToast(msg, error = false) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className   = 'toast' + (error ? ' error' : '');
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+</script>
+</body>
+</html>
