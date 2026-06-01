@@ -101,9 +101,17 @@
             background: #f4f6f9; padding: 12px 16px; text-align: left;
             font-size: 0.78em; text-transform: uppercase; letter-spacing: 0.8px;
             color: #666; font-weight: 700;
+            position: sticky; top: 0; z-index: 2;
         }
         td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; font-size: 0.93em; color: #333; }
         td:first-child, td:last-child, th:first-child, th:last-child { white-space: nowrap; }
+        .tabla-scroll { overflow-x: auto; overflow-y: auto; max-height: calc(100vh - 310px); min-height: 200px; }
+        .mes-separador td {
+            background: linear-gradient(135deg, #e8f0ff 0%, #f0f8ff 100%);
+            color: #0056B8; font-weight: 700; font-size: 0.82em;
+            padding: 7px 16px; letter-spacing: 1px; text-transform: uppercase;
+            border-bottom: 2px solid #c5d8f7;
+        }
         tr:hover td { background: #f8fbff; }
         tr:last-child td { border-bottom: none; }
         .empty-row td { text-align: center; padding: 50px; color: #aaa; font-style: italic; }
@@ -329,7 +337,7 @@
 
     <div class="tabla-container">
         <div class="tabla-header">📄 Cuentas de Cobro</div>
-        <div style="overflow-x:auto;">
+        <div class="tabla-scroll">
         <table>
             <thead>
                 <tr>
@@ -614,12 +622,23 @@
                 return;
             }
 
-            tbody.innerHTML = filtradas.map(c => {
-                try {
-                    const numDisplay = c.numero || (c.consecutivo
-                        ? String(c.consecutivo).padStart(3,'0') + '-' + String(c.anio || new Date().getFullYear()).slice(-2)
-                        : '—');
-                    return `
+            const MES_NUM = {enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,octubre:10,noviembre:11,diciembre:12};
+            const MESES_ES = {enero:'Enero',febrero:'Febrero',marzo:'Marzo',abril:'Abril',mayo:'Mayo',junio:'Junio',julio:'Julio',agosto:'Agosto',septiembre:'Septiembre',octubre:'Octubre',noviembre:'Noviembre',diciembre:'Diciembre'};
+            const gruposMap = new Map();
+            filtradas.forEach(c => {
+                const gKey = (c.anio||'?') + '-' + String(MES_NUM[c.mes]||0).padStart(2,'0');
+                if (!gruposMap.has(gKey)) gruposMap.set(gKey, { label: (MESES_ES[c.mes]||c.mes||'?') + ' ' + (c.anio||''), cuentas: [] });
+                gruposMap.get(gKey).cuentas.push(c);
+            });
+            let html = '';
+            gruposMap.forEach(grupo => {
+                html += `<tr class="mes-separador"><td colspan="7">📅 ${grupo.label}</td></tr>`;
+                grupo.cuentas.forEach(c => {
+                    try {
+                        const numDisplay = c.numero || (c.consecutivo
+                            ? String(c.consecutivo).padStart(3,'0') + '-' + String(c.anio || new Date().getFullYear()).slice(-2)
+                            : '—');
+                        html += `
                 <tr>
                     <td style="white-space:nowrap"><strong>${numDisplay}</strong></td>
                     <td style="white-space:nowrap">${c.fechaCorta || '—'}</td>
@@ -627,7 +646,7 @@
                     <td>${c.concepto || '—'}</td>
                     <td style="white-space:nowrap"><strong>${formatearPesos(c.valor || 0)}</strong></td>
                     <td style="white-space:nowrap"><span class="badge badge-${c.estado || 'pendiente'}">${c.estado === 'cobrada' ? 'Cobrada' : 'Pendiente'}</span></td>
-                    <td>
+                    <td style="white-space:nowrap">
                         <button type="button" class="btn-tabla btn-ver"
                             onclick="window.verCuenta('${c.key}')">👁️ Ver</button>
                         <button type="button" class="btn-tabla btn-pdf"
@@ -639,10 +658,12 @@
                             onclick="window.eliminarCuenta('${c.key}', '${c.numero || ''}')">🗑️</button>
                     </td>
                 </tr>`;
-                } catch(e) {
-                    return `<tr><td colspan="7" style="color:#999;font-size:.85em;">⚠️ Entrada con datos incompletos — ${c.key}</td></tr>`;
-                }
-            }).join('');
+                    } catch(e) {
+                        html += `<tr><td colspan="7" style="color:#999;font-size:.85em;">⚠️ Entrada con datos incompletos — ${c.key}</td></tr>`;
+                    }
+                });
+            });
+            tbody.innerHTML = html;
         } catch(err) {
             tbody.innerHTML = `<tr class="empty-row"><td colspan="7">❌ Error cargando datos: ${err.message}</td></tr>`;
         }
