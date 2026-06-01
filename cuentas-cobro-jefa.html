@@ -621,12 +621,12 @@
                         : '—');
                     return `
                 <tr>
-                    <td><strong>${numDisplay}</strong></td>
-                    <td>${c.fechaCorta || '—'}</td>
+                    <td style="white-space:nowrap"><strong>${numDisplay}</strong></td>
+                    <td style="white-space:nowrap">${c.fechaCorta || '—'}</td>
                     <td>${c.edificioNombre || '—'}</td>
                     <td>${c.concepto || '—'}</td>
-                    <td><strong>${formatearPesos(c.valor || 0)}</strong></td>
-                    <td><span class="badge badge-${c.estado || 'pendiente'}">${c.estado === 'cobrada' ? 'Cobrada' : 'Pendiente'}</span></td>
+                    <td style="white-space:nowrap"><strong>${formatearPesos(c.valor || 0)}</strong></td>
+                    <td style="white-space:nowrap"><span class="badge badge-${c.estado || 'pendiente'}">${c.estado === 'cobrada' ? 'Cobrada' : 'Pendiente'}</span></td>
                     <td>
                         <button type="button" class="btn-tabla btn-ver"
                             onclick="window.verCuenta('${c.key}')">👁️ Ver</button>
