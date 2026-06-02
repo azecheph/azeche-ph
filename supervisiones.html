@@ -234,17 +234,32 @@
         .toast.show { opacity: 1; transform: translateY(0); }
         .toast.error { background: #dc3545; }
 
-        /* ── Vista solo lectura banner ── */
-        .readonly-banner {
-            background: #e8f4fd;
-            border: 1px solid #bee3f8;
-            border-radius: 10px;
-            padding: 10px 18px;
-            color: #2b6cb0;
-            font-size: 0.88em;
-            font-weight: 600;
-            margin-bottom: 20px;
+        /* ── Fotos ── */
+        .fotos-preview { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+        .fotos-preview img { width:72px; height:72px; object-fit:cover; border-radius:8px; border:2px solid #ddd; }
+        .foto-thumb {
+            width:46px; height:46px; object-fit:cover; border-radius:6px;
+            cursor:pointer; border:2px solid #ddd; transition:all 0.2s; vertical-align:middle; margin:2px;
         }
+        .foto-thumb:hover { border-color:#0056B8; transform:scale(1.12); }
+        .fotos-count { font-size:0.78em; color:#0056B8; font-weight:700; cursor:pointer; white-space:nowrap; }
+        .fotos-count:hover { text-decoration:underline; }
+        .lightbox {
+            position:fixed; inset:0; background:rgba(0,0,0,0.88);
+            display:flex; align-items:center; justify-content:center; z-index:3000; cursor:pointer;
+        }
+        .lightbox img { max-width:92vw; max-height:88vh; border-radius:10px; box-shadow:0 8px 40px rgba(0,0,0,0.5); }
+        .lightbox-close {
+            position:fixed; top:18px; right:24px; color:white; font-size:2em;
+            cursor:pointer; font-weight:700; line-height:1;
+        }
+        .foto-upload-label {
+            display:flex; align-items:center; gap:8px; padding:10px 14px;
+            border:2px dashed #c0d4f0; border-radius:10px; cursor:pointer;
+            color:#0056B8; font-size:0.9em; font-weight:600; transition:border-color 0.3s;
+        }
+        .foto-upload-label:hover { border-color:#0056B8; background:#f0f6ff; }
+        .foto-upload-label input { display:none; }
     </style>
 </head>
 <body>
@@ -261,11 +276,6 @@
     </div>
 
     <div class="content">
-        <!-- Banner solo lectura (jefa) -->
-        <div id="readonlyBanner" class="readonly-banner" style="display:none">
-            👁️ Vista de lectura — estás viendo todas las novedades de todos los edificios.
-        </div>
-
         <!-- Acción + Filtros -->
         <div class="action-bar">
             <button id="btnNueva" class="btn btn-primary" onclick="abrirModal()" style="display:none">
@@ -297,13 +307,14 @@
                         <th>Edificio</th>
                         <th>Fecha</th>
                         <th>Descripción</th>
+                        <th>Fotos</th>
                         <th>Estado</th>
                         <th>Registrado por</th>
-                        <th id="thAccion">Acción</th>
+                        <th>Acción</th>
                     </tr>
                 </thead>
                 <tbody id="tbodyNovedades">
-                    <tr class="empty-row"><td colspan="6">Cargando novedades...</td></tr>
+                    <tr class="empty-row"><td colspan="7">Cargando novedades...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -329,6 +340,14 @@
                 <label>Descripción de la novedad *</label>
                 <textarea id="modalDescripcion" placeholder="Describe detalladamente la novedad observada..." required></textarea>
             </div>
+            <div class="form-group">
+                <label>📷 Fotos (máx. 3, opcional)</label>
+                <label class="foto-upload-label">
+                    <input type="file" id="modalFotos" accept="image/*" multiple onchange="previewFotos(this)">
+                    📁 Seleccionar fotos
+                </label>
+                <div id="fotosPreview" class="fotos-preview"></div>
+            </div>
             <div class="modal-btns">
                 <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
                 <button type="submit" class="btn btn-primary" id="btnGuardar">💾 Guardar</button>
@@ -337,14 +356,22 @@
     </div>
 </div>
 
+<!-- Lightbox fotos -->
+<div id="lightbox" class="lightbox" style="display:none" onclick="cerrarLightbox()">
+    <span class="lightbox-close">✕</span>
+    <img id="lightboxImg" src="" alt="">
+</div>
+
 <!-- Toast -->
 <div id="toast" class="toast"></div>
 
 <script type="module">
     import { initializeApp }            from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getDatabase, ref, push, onValue, update, serverTimestamp }
+    import { getDatabase, ref, push, onValue, update }
                                         from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    import { getStorage, ref as sRef, uploadBytes, getDownloadURL }
+                                        from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
     const firebaseConfig = {
         apiKey:            "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
@@ -356,11 +383,12 @@
         appId:             "1:905337990521:web:c2ca4932672c59fef6c5c9"
     };
 
-    const app  = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db   = getDatabase(app);
+    const app     = initializeApp(firebaseConfig);
+    const auth    = getAuth(app);
+    const db      = getDatabase(app);
+    const storage = getStorage(app);
 
-    let esAdmin      = false;   // creadora (Carla) → CRUD completo | administrador → solo lectura
+    let esAdmin      = true;    // ambos roles (creadora y administrador) tienen CRUD completo
     let userNombre   = '';
     let todasNovedades = [];    // cache local para filtrar sin re-fetch
     let edificiosMap   = {};    // { key: { nombre, icono } }
@@ -378,16 +406,8 @@
             return;
         }
 
-        esAdmin = (rol === 'creadora');
-
-        if (esAdmin) {
-            document.getElementById('btnNueva').style.display = '';
-            document.getElementById('headerSub').textContent  = `Supervisora: ${userNombre}`;
-        } else {
-            document.getElementById('readonlyBanner').style.display = '';
-            document.getElementById('thAccion').style.display        = 'none';
-            document.getElementById('headerSub').textContent         = `Vista de lectura — ${userNombre}`;
-        }
+        document.getElementById('btnNueva').style.display = '';
+        document.getElementById('headerSub').textContent  = userNombre;
 
         cargarEdificios();
         cargarNovedades();
@@ -500,7 +520,7 @@
         const tbody = document.getElementById('tbodyNovedades');
 
         if (filtradas.length === 0) {
-            tbody.innerHTML = `<tr class="empty-row"><td colspan="6">
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="7">
                 ${todasNovedades.length === 0
                     ? 'No hay novedades registradas aún.'
                     : 'No hay novedades que coincidan con los filtros.'}
@@ -517,19 +537,22 @@
             const badgeIcon  = n.estado === 'Resuelta' ? '✅' : '⏳';
             const edNombre   = n.edificioNombre || (edificiosMap[n.edificioId]?.nombre) || n.edificioId;
 
-            const accionBtn = esAdmin
-                ? n.estado === 'Pendiente'
-                    ? `<button class="btn-small btn-resolver" onclick="cambiarEstado('${n.id}','Resuelta')">✅ Resolver</button>`
-                    : `<button class="btn-small btn-reabrir"  onclick="cambiarEstado('${n.id}','Pendiente')">↩️ Reabrir</button>`
-                : '';
+            const fotosHtml = (n.fotos && n.fotos.length > 0)
+                ? n.fotos.map(url => `<img class="foto-thumb" src="${url}" onclick="abrirFoto('${url}')" loading="lazy" title="Ver foto">`).join('')
+                : '<span style="color:#ccc;font-size:.85em;">—</span>';
+
+            const accionBtn = n.estado === 'Pendiente'
+                ? `<button class="btn-small btn-resolver" onclick="cambiarEstado('${n.id}','Resuelta')">✅ Resolver</button>`
+                : `<button class="btn-small btn-reabrir"  onclick="cambiarEstado('${n.id}','Pendiente')">↩️ Reabrir</button>`;
 
             return `<tr>
                 <td><strong>${edNombre}</strong></td>
                 <td style="white-space:nowrap">${fechaDisplay}</td>
                 <td class="desc-cell">${escapeHtml(n.descripcion)}</td>
+                <td style="white-space:nowrap">${fotosHtml}</td>
                 <td><span class="badge ${badgeClass}">${badgeIcon} ${n.estado}</span></td>
                 <td style="font-size:.82em;color:#666">${escapeHtml(n.creadoPor || '—')}</td>
-                ${esAdmin ? `<td>${accionBtn}</td>` : ''}
+                <td style="white-space:nowrap">${accionBtn}</td>
             </tr>`;
         }).join('');
     }
@@ -566,15 +589,29 @@
 
         const btn = document.getElementById('btnGuardar');
         btn.disabled    = true;
-        btn.textContent = 'Guardando...';
+        btn.textContent = '⏳ Guardando...';
 
         try {
+            // Subir fotos si hay
+            const archivos = Array.from(document.getElementById('modalFotos').files).slice(0, 3);
+            let fotos = [];
+            if (archivos.length > 0) {
+                btn.textContent = '📤 Subiendo fotos...';
+                fotos = await Promise.all(archivos.map(async (file) => {
+                    const blob = await comprimirImagen(file);
+                    const path = `supervisiones/${Date.now()}_${file.name.replace(/\s+/g,'_')}`;
+                    const snap = await uploadBytes(sRef(storage, path), blob, { contentType: 'image/jpeg' });
+                    return getDownloadURL(snap.ref);
+                }));
+            }
+
             const edInfo = edificiosMap[edificioId] || {};
             await push(ref(db, 'supervisiones'), {
                 edificioId,
                 edificioNombre: edInfo.nombre || edificioId,
                 fecha,
                 descripcion,
+                fotos,
                 estado:    'Pendiente',
                 creadoPor: userNombre,
                 creadoAt:  new Date().toISOString()
@@ -582,11 +619,52 @@
             cerrarModal();
             mostrarToast('✅ Novedad registrada correctamente');
         } catch (err) {
-            mostrarToast('❌ Error al guardar: ' + err.message, true);
+            const msg = err.code === 'storage/unauthorized'
+                ? '❌ Sin permisos en Storage — actualiza las reglas en Firebase Console'
+                : '❌ Error al guardar: ' + err.message;
+            mostrarToast(msg, true);
         } finally {
             btn.disabled    = false;
             btn.textContent = '💾 Guardar';
         }
+    };
+
+    // Comprime imagen antes de subir (max 1200px ancho, 80% calidad)
+    async function comprimirImagen(file, maxW = 1200) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                let w = img.width, h = img.height;
+                if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                canvas.toBlob(resolve, 'image/jpeg', 0.8);
+            };
+            img.src = URL.createObjectURL(file);
+        });
+    }
+
+    // Preview de fotos en modal
+    window.previewFotos = (input) => {
+        const files   = Array.from(input.files).slice(0, 3);
+        const preview = document.getElementById('fotosPreview');
+        preview.innerHTML = '';
+        files.forEach(f => {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(f);
+            preview.appendChild(img);
+        });
+        if (input.files.length > 3) mostrarToast('⚠️ Solo se subirán las primeras 3 fotos', false);
+    };
+
+    // Lightbox
+    window.abrirFoto = (url) => {
+        document.getElementById('lightboxImg').src = url;
+        document.getElementById('lightbox').style.display = 'flex';
+    };
+    window.cerrarLightbox = () => {
+        document.getElementById('lightbox').style.display = 'none';
     };
 
     // ── Cambiar estado ─────────────────────────────────────────────────────
