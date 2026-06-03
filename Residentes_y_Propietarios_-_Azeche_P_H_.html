@@ -540,6 +540,12 @@
                     <input type="text" id="inputMatriculaDeposito" placeholder="Ej: 50N-20-0001236">
                 </div>
                 <div class="form-group">
+                    <label>🔗 Vincular a apartamento <span style="color:#999;font-weight:400;">(para parqueaderos y garajes)</span></label>
+                    <select id="inputVinculadoApto">
+                        <option value="">— Sin vincular (mostrar como tarjeta independiente) —</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>Observaciones / Tips</label>
                     <textarea id="inputObservaciones" placeholder="Notas, recordatorios, información adicional..."></textarea>
                 </div>
@@ -641,20 +647,36 @@
         }
 
 
+            // ── Mapa de vinculados (garajes/parqueaderos agrupados) ──
+            function buildVinculadosMap(data) {
+                const mapa = {};    // { parentKey: [ {key, ...entry} ] }
+                const hijos = new Set();
+                if (!data) return { mapa, hijos };
+                Object.entries(data).forEach(([key, entry]) => {
+                    if (entry.vinculadoAptoKey) {
+                        hijos.add(key);
+                        if (!mapa[entry.vinculadoAptoKey]) mapa[entry.vinculadoAptoKey] = [];
+                        mapa[entry.vinculadoAptoKey].push({ key, ...entry });
+                    }
+                });
+                return { mapa, hijos };
+            }
+
             // Propietarios
             const propList = document.getElementById('listaPropietarios');
             propList.innerHTML = '';
             let countProp = 0;
+            const { mapa: vMapProp, hijos: vHijosProp } = buildVinculadosMap(dataPropietarios[edificio]);
 
             if (edificio && dataPropietarios[edificio]) {
                 ordenarPorApartamento(Object.entries(dataPropietarios[edificio])).forEach(([key, prop]) => {
+                    if (vHijosProp.has(key)) return; // se muestra dentro del padre
                     const estado = prop.estado || 'activo';
-                    
                     if ((filtroEstado === 'todos' || estado === filtroEstado) &&
-                        (!busqueda || 
-                        prop.nombre?.toLowerCase().includes(busqueda) || 
+                        (!busqueda ||
+                        prop.nombre?.toLowerCase().includes(busqueda) ||
                         prop.apto?.toLowerCase().includes(busqueda))) {
-                        propList.innerHTML += crearCard(prop, key, 'propietario');
+                        propList.innerHTML += crearCard(prop, key, 'propietario', vMapProp[key] || []);
                         countProp++;
                     }
                 });
@@ -673,16 +695,17 @@
             const resList = document.getElementById('listaResidentes');
             resList.innerHTML = '';
             let countRes = 0;
+            const { mapa: vMapRes, hijos: vHijosRes } = buildVinculadosMap(dataResidentes[edificio]);
 
             if (edificio && dataResidentes[edificio]) {
                 ordenarPorApartamento(Object.entries(dataResidentes[edificio])).forEach(([key, res]) => {
+                    if (vHijosRes.has(key)) return;
                     const estado = res.estado || 'activo';
-                    
                     if ((filtroEstado === 'todos' || estado === filtroEstado) &&
-                        (!busqueda || 
-                        res.nombre?.toLowerCase().includes(busqueda) || 
+                        (!busqueda ||
+                        res.nombre?.toLowerCase().includes(busqueda) ||
                         res.apto?.toLowerCase().includes(busqueda))) {
-                        resList.innerHTML += crearCard(res, key, 'residente');
+                        resList.innerHTML += crearCard(res, key, 'residente', vMapRes[key] || []);
                         countRes++;
                     }
                 });
@@ -704,12 +727,14 @@
         window.renderizar = renderizar;
 
         // Crear card
-        function crearCard(persona, key, tipo) {
+        function crearCard(persona, key, tipo, vinculados = []) {
             const estado = persona.estado || 'activo';
             const coefApto   = parseFloat(persona.coeficienteApto) || 0;
             const coefParq   = parseFloat(persona.coeficienteParq) || 0;
             const coefLegado = parseFloat(persona.coeficiente)     || 0;
-            const coefTotal  = (coefApto > 0 || coefParq > 0) ? coefApto + coefParq : coefLegado;
+            const coefBase   = (coefApto > 0 || coefParq > 0) ? coefApto + coefParq : coefLegado;
+            const coefVinc   = vinculados.reduce((s, v) => s + (parseFloat(v.coeficienteApto) || parseFloat(v.coeficiente) || 0), 0);
+            const coefTotal  = coefBase + coefVinc;
             const tieneCoef  = coefTotal > 0;
             const badge = estado === 'activo' ? 
                 '<span class="card-badge badge-activo">✅ Activo</span>' :
@@ -776,6 +801,21 @@
                         </div>
                         ` : ''}
                     </div>
+                    ${vinculados.length > 0 ? `
+                    <div style="background:#e8f4ff;border-radius:8px;padding:10px 12px;margin:6px 0 10px;">
+                        <div style="font-weight:700;color:#0056B8;font-size:.82em;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;">🔗 Parqueaderos / Garajes vinculados</div>
+                        ${vinculados.map(v => {
+                            const cf = parseFloat(v.coeficienteApto) || parseFloat(v.coeficiente) || 0;
+                            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #c5d8f7;font-size:.9em;">
+                                <span style="font-weight:700;">🅿️ ${v.apto}</span>
+                                <span style="color:#555;">${v.nombre || ''}</span>
+                                <span style="display:flex;gap:6px;align-items:center;">
+                                    ${cf > 0 ? `<span style="color:#0056B8;font-weight:700;">${(cf*100).toFixed(4)}%</span>` : ''}
+                                    <button class="btn btn-warning" style="padding:3px 8px;font-size:.78em;" onclick="editarPersona('${v.key}','${tipo}')">✏️</button>
+                                </span>
+                            </div>`;
+                        }).join('')}
+                    </div>` : ''}
                     <div class="card-actions">
                         <button class="btn btn-warning" onclick="editarPersona('${key}', '${tipo}')">✏️ Editar</button>
                         ${btnArchivar}
@@ -800,7 +840,8 @@
             document.getElementById('displayCoefTotal').textContent = '—';
             document.getElementById('groupCoeficiente').style.display =
                 tabActual === 'propietarios' ? 'block' : 'none';
-            
+            poblarSelectVincular(null, null);
+
             document.getElementById('modal').classList.add('active');
         };
 
@@ -833,7 +874,8 @@
             document.getElementById('inputMatriculaGaraje').value = data.matriculaGaraje || '';
             document.getElementById('inputMatriculaDeposito').value = data.matriculaDeposito || '';
             document.getElementById('inputObservaciones').value = data.observaciones || '';
-            
+            poblarSelectVincular(key, data.vinculadoAptoKey || '');
+
             document.getElementById('groupCoeficiente').style.display =
                 tipo === 'propietario' ? 'block' : 'none';
             
@@ -856,6 +898,7 @@
                 matriculaGaraje: document.getElementById('inputMatriculaGaraje').value,
                 matriculaDeposito: document.getElementById('inputMatriculaDeposito').value,
                 observaciones: document.getElementById('inputObservaciones').value,
+                vinculadoAptoKey: document.getElementById('inputVinculadoApto').value || '',
                 estado: 'activo'
             };
             
@@ -931,6 +974,23 @@
                 alert('❌ Error: ' + error.message);
             }
         };
+
+        // Poblar selector de vinculación con los apartamentos del edificio actual
+        function poblarSelectVincular(keyPropio, valorActual) {
+            const sel = document.getElementById('inputVinculadoApto');
+            sel.innerHTML = '<option value="">— Sin vincular (tarjeta independiente) —</option>';
+            const tipo = tabActual === 'propietarios' ? dataPropietarios : dataResidentes;
+            const data = tipo[edificioActual] || {};
+            Object.entries(data).forEach(([k, entry]) => {
+                if (k === keyPropio) return; // no vincular a sí mismo
+                if (entry.vinculadoAptoKey) return; // no mostrar los que ya son hijos
+                const opt = document.createElement('option');
+                opt.value = k;
+                opt.textContent = `${entry.apto || k} — ${entry.nombre || ''}`;
+                if (k === valorActual) opt.selected = true;
+                sel.appendChild(opt);
+            });
+        }
 
         // Calcular coeficiente total en tiempo real
         window.calcularCoefTotal = function() {
