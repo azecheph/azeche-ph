@@ -448,6 +448,7 @@
                 <div class="btn-group">
                     <button class="btn btn-primary" onclick="abrirModalAgregar()">+ Agregar</button>
                     <button class="btn btn-secondary" onclick="exportarExcel()">📊 Exportar Excel</button>
+                    <button class="btn btn-info" onclick="autoVincular()" title="Detecta garajes/parqueaderos y los agrupa con su dueño automáticamente">🔗 Auto-vincular garajes</button>
                 </div>
             </div>
         </div>
@@ -991,6 +992,60 @@
                 sel.appendChild(opt);
             });
         }
+
+        // Auto-vincular garajes/parqueaderos por coincidencia de nombre de propietario
+        window.autoVincular = function() {
+            if (!edificioActual) { alert('⚠️ Primero selecciona un edificio'); return; }
+
+            const tipo  = tabActual === 'propietarios' ? 'propietarios' : 'residentes';
+            const data  = (tipo === 'propietarios' ? dataPropietarios : dataResidentes)[edificioActual];
+            if (!data)  { alert('No hay registros en este edificio'); return; }
+
+            const entries = Object.entries(data);
+
+            // Padres = no son G/P/D y no están ya vinculados
+            const padres = entries.filter(([, v]) =>
+                !v.vinculadoAptoKey && !/^[GgPpDd]\d/i.test(v.apto || ''));
+
+            // Hijos candidatos = empiezan con G, P o D seguido de dígito, sin vínculo aún
+            const hijos = entries.filter(([, v]) =>
+                !v.vinculadoAptoKey && /^[GgPpDd]\d/i.test(v.apto || ''));
+
+            if (hijos.length === 0) {
+                alert('No se encontraron garajes o parqueaderos sin vincular (entradas que empiecen con G, P o D seguido de número).');
+                return;
+            }
+
+            // Emparejar por nombre exacto (case-insensitive, sin espacios extra)
+            const norm = s => (s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+            const propuestas = [];
+            const sinMatch   = [];
+
+            hijos.forEach(([hijoKey, hijo]) => {
+                const match = padres.find(([, p]) => norm(p.nombre) === norm(hijo.nombre) && norm(hijo.nombre));
+                if (match) propuestas.push({ hijoKey, hijoApto: hijo.apto, padreKey: match[0], padreApto: match[1].apto, nombre: match[1].nombre });
+                else        sinMatch.push(`${hijo.apto} (${hijo.nombre || 'sin nombre'})`);
+            });
+
+            if (propuestas.length === 0) {
+                let msg = 'No se encontraron coincidencias por nombre.\n\nSin match:\n' + sinMatch.join('\n');
+                msg += '\n\nVerifica que el nombre del propietario sea idéntico en el garaje y en el apartamento.';
+                alert(msg);
+                return;
+            }
+
+            let confirmMsg = `Se vincularán ${propuestas.length} garaje(s)/parqueadero(s):\n\n`;
+            confirmMsg += propuestas.map(p => `✅  ${p.hijoApto}  →  ${p.padreApto} (${p.nombre})`).join('\n');
+            if (sinMatch.length > 0) confirmMsg += `\n\n⚠️ Sin coincidencia (quedan sueltos):\n` + sinMatch.join('\n');
+            confirmMsg += '\n\n¿Aplicar?';
+
+            if (!confirm(confirmMsg)) return;
+
+            Promise.all(
+                propuestas.map(p => update(ref(db, `${tipo}/${edificioActual}/${p.hijoKey}`), { vinculadoAptoKey: p.padreKey }))
+            ).then(() => alert(`✅ ${propuestas.length} vinculaciones aplicadas correctamente`))
+             .catch(err => alert('❌ Error: ' + err.message));
+        };
 
         // Calcular coeficiente total en tiempo real
         window.calcularCoefTotal = function() {
