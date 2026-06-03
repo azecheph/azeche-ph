@@ -507,8 +507,21 @@
                     <input type="text" id="inputDocumento">
                 </div>
                 <div class="form-group" id="groupCoeficiente">
-                    <label>Coeficiente</label>
-                    <input type="number" step="0.0001" id="inputCoeficiente">
+                    <label>📊 Coeficientes</label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px;">
+                        <div>
+                            <label style="font-size:.85em;color:#555;font-weight:600;margin-bottom:4px;display:block;">🏠 Apartamento</label>
+                            <input type="number" step="0.0001" min="0" max="1" id="inputCoeficienteApto" oninput="calcularCoefTotal()" placeholder="Ej: 0.0224">
+                        </div>
+                        <div>
+                            <label style="font-size:.85em;color:#555;font-weight:600;margin-bottom:4px;display:block;">🅿️ Parqueadero <span style="color:#999;font-weight:400;">(si aplica)</span></label>
+                            <input type="number" step="0.0001" min="0" max="1" id="inputCoeficienteParq" oninput="calcularCoefTotal()" placeholder="Ej: 0.0058">
+                        </div>
+                    </div>
+                    <div style="background:#e8f4ff;border-radius:8px;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;">
+                        <span style="font-weight:700;color:#0056B8;font-size:.9em;">∑ Coeficiente Total:</span>
+                        <span id="displayCoefTotal" style="font-weight:900;color:#0056B8;font-size:1.05em;">—</span>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>🏷️ Matrícula Catastral — Apartamento <span style="color:#999;font-weight:400;">(cuando aplique)</span></label>
@@ -693,6 +706,11 @@
         // Crear card
         function crearCard(persona, key, tipo) {
             const estado = persona.estado || 'activo';
+            const coefApto   = parseFloat(persona.coeficienteApto) || 0;
+            const coefParq   = parseFloat(persona.coeficienteParq) || 0;
+            const coefLegado = parseFloat(persona.coeficiente)     || 0;
+            const coefTotal  = (coefApto > 0 || coefParq > 0) ? coefApto + coefParq : coefLegado;
+            const tieneCoef  = coefTotal > 0;
             const badge = estado === 'activo' ? 
                 '<span class="card-badge badge-activo">✅ Activo</span>' :
                 '<span class="card-badge badge-archivado">📦 Archivado</span>';
@@ -724,10 +742,11 @@
                             <span class="info-value">${persona.email}</span>
                         </div>
                         ` : ''}
-                        ${persona.coeficiente ? `
-                        <div class="info-item">
-                            <span class="info-label">Coeficiente:</span>
-                            <span class="info-value">${(parseFloat(persona.coeficiente) * 100).toFixed(2)}%</span>
+                        ${tieneCoef ? `
+                        <div class="info-item" style="flex-direction:column;align-items:flex-start;gap:3px;background:#f0f6ff;padding:8px 10px;border-radius:8px;margin:2px 0;">
+                            ${coefApto > 0 ? `<span class="info-value">🏠 Coef. Apto: ${(coefApto*100).toFixed(4)}%</span>` : ''}
+                            ${coefParq > 0 ? `<span class="info-value">🅿️ Coef. Parqueadero: ${(coefParq*100).toFixed(4)}%</span>` : ''}
+                            <span class="info-value" style="font-weight:700;color:#0056B8;">∑ Total: ${(coefTotal*100).toFixed(4)}%</span>
                         </div>
                         ` : ''}
                         ${persona.documento ? `
@@ -778,7 +797,8 @@
                 tabActual === 'propietarios' ? 'Agregar Propietario' : 'Agregar Residente';
             
             document.getElementById('formulario').reset();
-            document.getElementById('groupCoeficiente').style.display = 
+            document.getElementById('displayCoefTotal').textContent = '—';
+            document.getElementById('groupCoeficiente').style.display =
                 tabActual === 'propietarios' ? 'block' : 'none';
             
             document.getElementById('modal').classList.add('active');
@@ -805,14 +825,16 @@
             document.getElementById('inputTelefono').value = data.telefono || '';
             document.getElementById('inputEmail').value = data.email || '';
             document.getElementById('inputDocumento').value = data.documento || '';
-            document.getElementById('inputCoeficiente').value = data.coeficiente || '';
+            document.getElementById('inputCoeficienteApto').value = data.coeficienteApto !== undefined ? data.coeficienteApto : (data.coeficiente || '');
+            document.getElementById('inputCoeficienteParq').value = data.coeficienteParq || '';
+            calcularCoefTotal();
             document.getElementById('inputMatriculaApto').value = data.matriculaApto || '';
             document.getElementById('inputParqueadero').value = data.parqueadero || '';
             document.getElementById('inputMatriculaGaraje').value = data.matriculaGaraje || '';
             document.getElementById('inputMatriculaDeposito').value = data.matriculaDeposito || '';
             document.getElementById('inputObservaciones').value = data.observaciones || '';
             
-            document.getElementById('groupCoeficiente').style.display = 
+            document.getElementById('groupCoeficiente').style.display =
                 tipo === 'propietario' ? 'block' : 'none';
             
             document.getElementById('modal').classList.add('active');
@@ -838,7 +860,11 @@
             };
             
             if (tabActual === 'propietarios') {
-                datos.coeficiente = parseFloat(document.getElementById('inputCoeficiente').value) || 0;
+                const coefApto = parseFloat(document.getElementById('inputCoeficienteApto').value) || 0;
+                const coefParq = parseFloat(document.getElementById('inputCoeficienteParq').value) || 0;
+                datos.coeficienteApto = coefApto;
+                datos.coeficienteParq = coefParq;
+                datos.coeficiente     = coefApto + coefParq; // campo total (compatibilidad)
             }
             
             try {
@@ -904,6 +930,14 @@
             } catch (error) {
                 alert('❌ Error: ' + error.message);
             }
+        };
+
+        // Calcular coeficiente total en tiempo real
+        window.calcularCoefTotal = function() {
+            const apto = parseFloat(document.getElementById('inputCoeficienteApto').value) || 0;
+            const parq = parseFloat(document.getElementById('inputCoeficienteParq').value) || 0;
+            const total = apto + parq;
+            document.getElementById('displayCoefTotal').textContent = total > 0 ? (total * 100).toFixed(4) + '%' : '—';
         };
 
         // Exportar Excel
