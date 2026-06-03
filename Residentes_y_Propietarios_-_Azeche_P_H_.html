@@ -770,9 +770,9 @@
                         ` : ''}
                         ${tieneCoef ? `
                         <div class="info-item" style="flex-direction:column;align-items:flex-start;gap:3px;background:#f0f6ff;padding:8px 10px;border-radius:8px;margin:2px 0;">
-                            ${coefApto > 0 ? `<span class="info-value">🏠 Coef. Apto: ${(coefApto*100).toFixed(4)}%</span>` : ''}
-                            ${coefParq > 0 ? `<span class="info-value">🅿️ Coef. Parqueadero: ${(coefParq*100).toFixed(4)}%</span>` : ''}
-                            <span class="info-value" style="font-weight:700;color:#0056B8;">∑ Total: ${(coefTotal*100).toFixed(4)}%</span>
+                            ${coefApto > 0 ? `<span class="info-value">🏠 Coef. Apto: ${(coefApto*100).toFixed(2)}%</span>` : ''}
+                            ${coefParq > 0 ? `<span class="info-value">🅿️ Coef. Parqueadero: ${(coefParq*100).toFixed(2)}%</span>` : ''}
+                            <span class="info-value" style="font-weight:700;color:#0056B8;">∑ Total: ${(coefTotal*100).toFixed(2)}%</span>
                         </div>
                         ` : ''}
                         ${persona.documento ? `
@@ -811,7 +811,7 @@
                                 <span style="font-weight:700;">🅿️ ${v.apto}</span>
                                 <span style="color:#555;">${v.nombre || ''}</span>
                                 <span style="display:flex;gap:6px;align-items:center;">
-                                    ${cf > 0 ? `<span style="color:#0056B8;font-weight:700;">${(cf*100).toFixed(4)}%</span>` : ''}
+                                    ${cf > 0 ? `<span style="color:#0056B8;font-weight:700;">${(cf*100).toFixed(2)}%</span>` : ''}
                                     <button class="btn btn-warning" style="padding:3px 8px;font-size:.78em;" onclick="editarPersona('${v.key}','${tipo}')">✏️</button>
                                 </span>
                             </div>`;
@@ -1052,7 +1052,7 @@
             const apto = parseFloat(document.getElementById('inputCoeficienteApto').value) || 0;
             const parq = parseFloat(document.getElementById('inputCoeficienteParq').value) || 0;
             const total = apto + parq;
-            document.getElementById('displayCoefTotal').textContent = total > 0 ? (total * 100).toFixed(4) + '%' : '—';
+            document.getElementById('displayCoefTotal').textContent = total > 0 ? (total * 100).toFixed(2) + '%' : '—';
         };
 
         // Exportar Excel
