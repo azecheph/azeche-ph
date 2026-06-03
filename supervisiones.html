@@ -341,7 +341,7 @@
                 <textarea id="modalDescripcion" placeholder="Describe detalladamente la novedad observada..." required></textarea>
             </div>
             <div class="form-group">
-                <label>📷 Fotos (máx. 3, opcional)</label>
+                <label>📷 Fotos (máx. 10, opcional)</label>
                 <label class="foto-upload-label">
                     <input type="file" id="modalFotos" accept="image/*" multiple onchange="previewFotos(this)">
                     📁 Seleccionar fotos
@@ -593,7 +593,7 @@
 
         try {
             // Subir fotos si hay
-            const archivos = Array.from(document.getElementById('modalFotos').files).slice(0, 3);
+            const archivos = Array.from(document.getElementById('modalFotos').files).slice(0, 10);
             let fotos = [];
             if (archivos.length > 0) {
                 btn.textContent = '📤 Subiendo fotos...';
@@ -647,7 +647,7 @@
 
     // Preview de fotos en modal
     window.previewFotos = (input) => {
-        const files   = Array.from(input.files).slice(0, 3);
+        const files   = Array.from(input.files).slice(0, 10);
         const preview = document.getElementById('fotosPreview');
         preview.innerHTML = '';
         files.forEach(f => {
@@ -655,7 +655,7 @@
             img.src = URL.createObjectURL(f);
             preview.appendChild(img);
         });
-        if (input.files.length > 3) mostrarToast('⚠️ Solo se subirán las primeras 3 fotos', false);
+        if (input.files.length > 10) mostrarToast('⚠️ Solo se subirán las primeras 10 fotos', false);
     };
 
     // Lightbox
