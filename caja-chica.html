@@ -218,6 +218,44 @@
         .btn-submit:hover { opacity: 0.9; transform: translateY(-2px); }
         .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
+        @media print {
+            body > *:not(#printArea) { display: none !important; }
+            #printArea {
+                display: block !important; position: static !important;
+                font-family: 'Segoe UI', Arial, sans-serif; max-width: 560px; margin: 20px auto;
+            }
+            .print-encabezado { text-align: center; margin-bottom: 18px; }
+            .print-encabezado h2 { font-size: 1.1em; font-weight: 900; color: #000; margin-bottom: 4px; }
+            .print-encabezado p  { font-size: 0.85em; color: #555; }
+            .print-box {
+                border: 2px solid #000; border-radius: 0;
+                page-break-inside: avoid;
+            }
+            .print-box-header {
+                background: #000 !important; color: #fff !important;
+                -webkit-print-color-adjust: exact; print-color-adjust: exact;
+                padding: 10px 16px; font-weight: 700; font-size: 0.9em;
+                letter-spacing: 1px; text-transform: uppercase;
+                display: flex; justify-content: space-between;
+            }
+            .print-fila {
+                display: flex; padding: 8px 14px; border-bottom: 1px solid #ddd;
+                font-size: 0.88em;
+            }
+            .print-fila:last-child { border-bottom: none; }
+            .print-label { min-width: 150px; font-weight: 700; color: #444; text-transform: uppercase; font-size: 0.82em; }
+            .print-valor { color: #111; flex: 1; }
+            .print-valor-grande { font-size: 1.3em; font-weight: 900; color: #000; }
+            .print-firma { margin-top: 28px; display: flex; justify-content: flex-end; }
+            .print-firma-bloque { text-align: center; }
+            .print-firma-linea { border-top: 1px solid #000; width: 220px; margin-bottom: 6px; }
+            .print-firma-texto { font-size: 0.82em; color: #555; }
+            .print-fotos { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 14px; }
+            .print-fotos img { width: 90px; height: 90px; object-fit: cover; border: 1px solid #ccc; }
+            .print-fecha-impresion { text-align: right; font-size: 0.75em; color: #888; margin-top: 12px; }
+        }
+        #printArea { display: none; }
+
         .lightbox {
             position: fixed; inset: 0; background: rgba(0,0,0,0.88);
             display: flex; align-items: center; justify-content: center; z-index: 3000; cursor: pointer;
@@ -478,8 +516,15 @@
                 <div id="verCompFotos" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"></div>
             </div>
         </div>
+        <button type="button" onclick="imprimirComprobante()"
+            style="width:100%;padding:12px;margin-top:10px;background:linear-gradient(135deg,#0056B8,#00B853);
+                   color:white;border:none;border-radius:8px;font-size:1em;font-weight:700;cursor:pointer;">
+            🖨️ Imprimir Comprobante
+        </button>
     </div>
 </div>
+
+<div id="printArea"></div>
 
 <!-- LIGHTBOX -->
 <div id="lightbox" class="lightbox" style="display:none" onclick="cerrarLightbox()">
@@ -747,6 +792,7 @@
     window.verComprobante = function(id) {
         const m = todosMovimientos.find(x => x.id === id);
         if (!m) return;
+        _imprimirId = id;
 
         const esGasto = m.tipo === 'gasto';
         const fecha   = new Date(m.fecha + 'T12:00:00')
@@ -802,6 +848,66 @@
         }
 
         document.getElementById('modalVerComp').classList.add('active');
+    };
+
+    // ── IMPRIMIR COMPROBANTE ──────────────────────────────────────────────
+    let _imprimirId = null;
+
+    window.imprimirComprobante = function() {
+        const m = todosMovimientos.find(x => x.id === _imprimirId);
+        if (!m) return;
+
+        const esGasto = m.tipo === 'gasto';
+        const fecha   = new Date(m.fecha + 'T12:00:00')
+            .toLocaleDateString('es-CO', { day:'2-digit', month:'long', year:'numeric' });
+        const ahora   = new Date().toLocaleString('es-CO');
+        const titulo  = esGasto ? 'COMPROBANTE DE CAJA MENOR' : 'REINTEGRO CAJA MENOR';
+
+        const fila = (label, valor, grande = false) =>
+            `<div class="print-fila">
+                <span class="print-label">${label}</span>
+                <span class="print-valor ${grande ? 'print-valor-grande' : ''}">${valor}</span>
+            </div>`;
+
+        let filas = fila('Fecha', fecha);
+        if (esGasto) {
+            filas += fila('Proveedor',      m.proveedor       || '—');
+            filas += fila('N° Comprobante', m.numComprobante  || '—');
+            filas += fila('Categoría',      m.categoria       || '—');
+            filas += fila('Descripción',    m.concepto        || '—');
+            filas += fila('Valor',          formatPesos(m.valor), true);
+        } else {
+            filas += fila('Concepto',       m.concepto        || '—');
+            filas += fila('Entregado por',  m.entregadoPor    || '—');
+            filas += fila('Monto',          formatPesos(m.valor), true);
+        }
+
+        const fotosHtml = (m.fotos && m.fotos.length > 0)
+            ? `<div class="print-fotos">${m.fotos.map(u => `<img src="${u}">`).join('')}</div>`
+            : '';
+
+        document.getElementById('printArea').innerHTML = `
+            <div class="print-encabezado">
+                <h2>AZECHE P.H. — CAJA MENOR</h2>
+                <p>Edificio Torres de Anim II</p>
+            </div>
+            <div class="print-box">
+                <div class="print-box-header">
+                    <span>${titulo}</span>
+                    <span>${fecha}</span>
+                </div>
+                ${filas}
+                ${fotosHtml}
+            </div>
+            <div class="print-firma">
+                <div class="print-firma-bloque">
+                    <div class="print-firma-linea"></div>
+                    <div class="print-firma-texto">Firma responsable</div>
+                </div>
+            </div>
+            <div class="print-fecha-impresion">Impreso: ${ahora}</div>`;
+
+        window.print();
     };
 
     // ── CERRAR MODALES ────────────────────────────────────────────────────
