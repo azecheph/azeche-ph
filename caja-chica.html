@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caja Chica — Azeche P.H.</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white; padding: 22px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .header-content {
+            max-width: 1300px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 15px;
+        }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .logo-box { background: white; padding: 8px 18px; border-radius: 10px; }
+        .logo-text { font-size: 1.5em; font-weight: 900; letter-spacing: -1px; }
+        .logo-blue { color: #0056B8; } .logo-green { color: #00B853; }
+        .header-title h1 { font-size: 1.4em; font-weight: 700; }
+        .header-title p { opacity: 0.85; font-size: 0.88em; margin-top: 2px; }
+        .header-btns { display: flex; gap: 10px; }
+        .btn-back {
+            background: rgba(255,255,255,0.15); color: white;
+            border: 2px solid rgba(255,255,255,0.6); padding: 9px 20px;
+            border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9em; transition: all 0.3s;
+        }
+        .btn-back:hover { background: white; color: #0056B8; }
+
+        /* CONTAINER */
+        .container { max-width: 1300px; margin: 0 auto; padding: 28px 20px; }
+
+        /* STATS */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px; margin-bottom: 25px;
+        }
+        .stat-card {
+            background: white; padding: 22px 20px; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07); border-left: 5px solid #0056B8;
+        }
+        .stat-card.verde  { border-left-color: #00B853; }
+        .stat-card.rojo   { border-left-color: #e53935; }
+        .stat-card.naranja{ border-left-color: #ff9800; }
+        .stat-icon  { font-size: 1.8em; margin-bottom: 8px; }
+        .stat-label { color: #888; font-size: 0.78em; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 5px; }
+        .stat-value { font-size: 1.7em; font-weight: 900; color: #0056B8; }
+        .stat-card.verde   .stat-value { color: #00B853; }
+        .stat-card.rojo    .stat-value { color: #e53935; }
+        .stat-card.naranja .stat-value { color: #ff9800; }
+
+        /* BARRA ACCIONES */
+        .acciones-bar {
+            background: white; padding: 18px 22px; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07); margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+        }
+        .acciones-bar h2 { color: #0056B8; font-size: 1.1em; }
+        .btns-accion { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-gasto {
+            background: linear-gradient(135deg, #e53935, #c62828);
+            color: white; border: none; padding: 11px 22px; border-radius: 8px;
+            font-size: 0.92em; font-weight: 700; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-gasto:hover { opacity: 0.9; transform: translateY(-2px); }
+        .btn-recarga {
+            background: linear-gradient(135deg, #0056B8, #00B853);
+            color: white; border: none; padding: 11px 22px; border-radius: 8px;
+            font-size: 0.92em; font-weight: 700; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-recarga:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        /* FILTROS */
+        .filtros { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .filtros label { font-size: 0.85em; color: #666; font-weight: 600; }
+        .filtros select {
+            padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px;
+            font-size: 0.9em; cursor: pointer; background: white;
+        }
+        .filtros select:focus { outline: none; border-color: #0056B8; }
+
+        /* TABLA */
+        .tabla-container {
+            background: white; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07); overflow: hidden;
+        }
+        .tabla-header {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white; padding: 16px 22px; font-size: 1em; font-weight: 700;
+        }
+        .tabla-scroll { overflow-x: auto; }
+        table { width: 100%; min-width: 750px; border-collapse: collapse; }
+        th {
+            background: #f4f6f9; padding: 12px 16px; text-align: left;
+            font-size: 0.78em; text-transform: uppercase; letter-spacing: 0.8px;
+            color: #666; font-weight: 700; position: sticky; top: 0; z-index: 2;
+            white-space: nowrap;
+        }
+        td { padding: 13px 16px; border-bottom: 1px solid #f0f0f0; font-size: 0.92em; color: #333; }
+        tr:hover td { background: #f8fbff; }
+        tr:last-child td { border-bottom: none; }
+        .empty-row td { text-align: center; padding: 50px; color: #aaa; font-style: italic; }
+
+        .tipo-gasto   { color: #e53935; font-weight: 700; white-space: nowrap; }
+        .tipo-recarga { color: #00B853; font-weight: 700; white-space: nowrap; }
+        .valor-gasto   { color: #e53935; font-weight: 700; white-space: nowrap; }
+        .valor-recarga { color: #00B853; font-weight: 700; white-space: nowrap; }
+        .saldo-col { color: #0056B8; font-weight: 700; white-space: nowrap; }
+
+        .foto-thumb {
+            width: 42px; height: 42px; object-fit: cover; border-radius: 6px;
+            cursor: pointer; border: 2px solid #ddd; margin: 2px; transition: all 0.2s;
+        }
+        .foto-thumb:hover { border-color: #0056B8; transform: scale(1.1); }
+
+        .btn-eliminar-row {
+            background: #fce4ec; color: #c62828; border: none;
+            padding: 5px 10px; border-radius: 6px; cursor: pointer;
+            font-size: 0.8em; font-weight: 700; transition: all 0.2s;
+        }
+        .btn-eliminar-row:hover { background: #c62828; color: white; }
+
+        /* MODALES */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.6);
+            z-index: 1000; justify-content: center; align-items: flex-start;
+            padding: 20px; overflow-y: auto;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 16px;
+            max-width: 520px; width: 100%; margin: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 22px; padding-bottom: 14px; border-bottom: 3px solid #0056B8;
+        }
+        .modal-header h2 { color: #0056B8; font-size: 1.2em; }
+        .modal-header.rojo { border-bottom-color: #e53935; }
+        .modal-header.rojo h2 { color: #e53935; }
+        .btn-close-modal { background: none; border: none; font-size: 1.8em; cursor: pointer; color: #aaa; }
+        .btn-close-modal:hover { color: #e53935; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: #444; font-size: 0.9em; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 11px 13px; border: 2px solid #e0e0e0;
+            border-radius: 8px; font-size: 0.97em; font-family: inherit; transition: border 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none; border-color: #0056B8;
+        }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+
+        .saldo-disponible {
+            background: #e8f4ff; padding: 10px 14px; border-radius: 8px;
+            border-left: 4px solid #0056B8; margin-bottom: 16px;
+            font-size: 0.88em; color: #333;
+        }
+        .saldo-disponible strong { color: #0056B8; }
+
+        .foto-upload-label {
+            display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+            border: 2px dashed #c0d4f0; border-radius: 10px; cursor: pointer;
+            color: #0056B8; font-size: 0.9em; font-weight: 600; transition: border-color 0.3s;
+        }
+        .foto-upload-label:hover { border-color: #0056B8; background: #f0f6ff; }
+        .foto-upload-label input { display: none; }
+        .fotos-preview { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+        .fotos-preview img { width: 68px; height: 68px; object-fit: cover; border-radius: 8px; border: 2px solid #ddd; }
+
+        .btn-submit {
+            width: 100%; padding: 13px; border: none; border-radius: 8px;
+            font-size: 1em; font-weight: 700; cursor: pointer; transition: all 0.3s; margin-top: 6px;
+        }
+        .btn-submit-gasto   { background: linear-gradient(135deg, #e53935, #c62828); color: white; }
+        .btn-submit-recarga { background: linear-gradient(135deg, #0056B8, #00B853); color: white; }
+        .btn-submit:hover { opacity: 0.9; transform: translateY(-2px); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        /* LIGHTBOX */
+        .lightbox {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+            display: flex; align-items: center; justify-content: center; z-index: 3000; cursor: pointer;
+        }
+        .lightbox img { max-width: 92vw; max-height: 88vh; border-radius: 10px; }
+        .lightbox-close { position: fixed; top: 18px; right: 24px; color: white; font-size: 2em; font-weight: 700; cursor: pointer; }
+
+        /* TOAST */
+        .toast {
+            position: fixed; bottom: 30px; right: 30px; z-index: 9999;
+            background: #333; color: white; padding: 13px 22px; border-radius: 10px;
+            font-size: 0.92em; font-weight: 600; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transform: translateY(100px); opacity: 0; transition: all 0.4s;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.exito { background: #2e7d32; }
+        .toast.error { background: #c62828; }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-content">
+        <div class="logo-section">
+            <div class="logo-box">
+                <div class="logo-text">
+                    <span class="logo-blue">AZECHE</span><span class="logo-green">PH</span>
+                </div>
+            </div>
+            <div class="header-title">
+                <h1>💰 Caja Chica</h1>
+                <p id="headerSub">Torres de Anim II</p>
+            </div>
+        </div>
+        <div class="header-btns">
+            <button type="button" class="btn-back" onclick="window.location.href='Dashboard.html'">🏠 Dashboard</button>
+            <button type="button" class="btn-back" onclick="cerrarSesion()">🚪 Salir</button>
+        </div>
+    </div>
+</div>
+
+<!-- CONTAINER -->
+<div class="container">
+
+    <!-- STATS -->
+    <div class="stats-grid">
+        <div class="stat-card verde">
+            <div class="stat-icon">💰</div>
+            <div class="stat-label">Saldo Actual</div>
+            <div class="stat-value" id="statSaldo">—</div>
+        </div>
+        <div class="stat-card rojo">
+            <div class="stat-icon">📤</div>
+            <div class="stat-label">Gastos <span id="statMesLabel">este mes</span></div>
+            <div class="stat-value" id="statGastos">—</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💵</div>
+            <div class="stat-label">Recargas <span id="statMesLabel2">este mes</span></div>
+            <div class="stat-value" id="statRecargas">—</div>
+        </div>
+        <div class="stat-card naranja">
+            <div class="stat-icon">🧾</div>
+            <div class="stat-label">Movimientos <span id="statMesLabel3">este mes</span></div>
+            <div class="stat-value" id="statMovimientos">—</div>
+        </div>
+    </div>
+
+    <!-- ACCIONES + FILTROS -->
+    <div class="acciones-bar">
+        <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+            <h2>📋 Movimientos — Torres de Anim II</h2>
+            <div class="filtros">
+                <label>Mes:</label>
+                <select id="filtroMes" onchange="aplicarFiltro()">
+                    <option value="todos">Todos</option>
+                    <option value="1">Enero</option><option value="2">Febrero</option>
+                    <option value="3">Marzo</option><option value="4">Abril</option>
+                    <option value="5">Mayo</option><option value="6">Junio</option>
+                    <option value="7">Julio</option><option value="8">Agosto</option>
+                    <option value="9">Septiembre</option><option value="10">Octubre</option>
+                    <option value="11">Noviembre</option><option value="12">Diciembre</option>
+                </select>
+                <select id="filtroAnio" onchange="aplicarFiltro()">
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
+                <select id="filtroTipo" onchange="aplicarFiltro()">
+                    <option value="todos">Todos los tipos</option>
+                    <option value="gasto">Solo gastos</option>
+                    <option value="recarga">Solo recargas</option>
+                </select>
+            </div>
+        </div>
+        <div class="btns-accion">
+            <button type="button" class="btn-gasto" onclick="abrirModalGasto()">🔴 Registrar Gasto</button>
+            <button type="button" class="btn-recarga" onclick="abrirModalRecarga()">💵 Nueva Recarga</button>
+        </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="tabla-container">
+        <div class="tabla-header">💰 Caja Chica — Torres de Anim II</div>
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Concepto</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                        <th>Saldo tras</th>
+                        <th>Fotos</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaCuerpo">
+                    <tr class="empty-row"><td colspan="7">Cargando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODAL GASTO -->
+<div class="modal" id="modalGasto">
+    <div class="modal-content">
+        <div class="modal-header rojo">
+            <h2>🔴 Registrar Gasto</h2>
+            <button type="button" class="btn-close-modal" onclick="cerrarModal('modalGasto')">×</button>
+        </div>
+        <div class="saldo-disponible">
+            💰 Saldo disponible: <strong id="saldoDisponible">—</strong>
+        </div>
+        <div class="form-group">
+            <label>📅 Fecha *</label>
+            <input type="date" id="gastoFecha" required>
+        </div>
+        <div class="form-group">
+            <label>📝 Concepto *</label>
+            <input type="text" id="gastoConcepto" placeholder="Ej: Bombillos zona común, escoba...">
+        </div>
+        <div class="form-group">
+            <label>💰 Valor *</label>
+            <input type="number" id="gastoValor" min="1" placeholder="Ej: 28000">
+        </div>
+        <div class="form-group">
+            <label>📷 Foto del comprobante (máx. 3)</label>
+            <label class="foto-upload-label">
+                <input type="file" id="gastoFotos" accept="image/*" multiple onchange="previewFotos(this,'gastoPreview')">
+                📁 Seleccionar fotos
+            </label>
+            <div id="gastoPreview" class="fotos-preview"></div>
+        </div>
+        <button type="button" class="btn-submit btn-submit-gasto" id="btnGuardarGasto" onclick="guardarGasto()">
+            🔴 Registrar Gasto
+        </button>
+    </div>
+</div>
+
+<!-- MODAL RECARGA -->
+<div class="modal" id="modalRecarga">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>💵 Nueva Recarga</h2>
+            <button type="button" class="btn-close-modal" onclick="cerrarModal('modalRecarga')">×</button>
+        </div>
+        <div class="form-group">
+            <label>📅 Fecha *</label>
+            <input type="date" id="recargaFecha" required>
+        </div>
+        <div class="form-group">
+            <label>💰 Monto *</label>
+            <input type="number" id="recargaMonto" value="300000" min="1">
+        </div>
+        <div class="form-group">
+            <label>📝 Nota (opcional)</label>
+            <textarea id="recargaNota" placeholder="Ej: Recarga mensual junio 2026"></textarea>
+        </div>
+        <button type="button" class="btn-submit btn-submit-recarga" id="btnGuardarRecarga" onclick="guardarRecarga()">
+            💵 Registrar Recarga
+        </button>
+    </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" class="lightbox" style="display:none" onclick="cerrarLightbox()">
+    <span class="lightbox-close">✕</span>
+    <img id="lightboxImg" src="" alt="">
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+    import { initializeApp }   from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getDatabase, ref, push, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
+        authDomain: "azeche-ph.firebaseapp.com",
+        databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+        projectId: "azeche-ph",
+        storageBucket: "azeche-ph.firebasestorage.app",
+        messagingSenderId: "905337990521",
+        appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getDatabase(app);
+
+    const EDIFICIO    = 'torre-amin-2';
+    const MONTO_BASE  = 300000;
+
+    let todosMovimientos = []; // cache local
+    let saldoActual      = 0;
+
+    // ── AUTH ───────────────────────────────────────────────────────────────
+    onAuthStateChanged(auth, (user) => {
+        if (!user) { window.location.href = 'index.html'; return; }
+        const info = JSON.parse(localStorage.getItem('azecheUser') || '{}');
+        if (info.rol !== 'creadora') {
+            window.location.href = 'Dashboard.html';
+            return;
+        }
+        document.getElementById('headerSub').textContent = `Torres de Anim II — ${info.nombre || ''}`;
+        seleccionarMesActual();
+        cargarMovimientos();
+    });
+
+    window.cerrarSesion = () => signOut(auth).then(() => {
+        localStorage.removeItem('azecheUser');
+        window.location.href = 'index.html';
+    });
+
+    // ── INICIALIZAR FILTRO CON MES ACTUAL ──────────────────────────────────
+    function seleccionarMesActual() {
+        const hoy = new Date();
+        document.getElementById('filtroMes').value  = hoy.getMonth() + 1;
+        document.getElementById('filtroAnio').value = hoy.getFullYear();
+    }
+
+    // ── CARGAR MOVIMIENTOS ─────────────────────────────────────────────────
+    function cargarMovimientos() {
+        onValue(ref(db, `caja_chica/${EDIFICIO}/movimientos`), (snap) => {
+            todosMovimientos = [];
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    todosMovimientos.push({ id: child.key, ...child.val() });
+                });
+                todosMovimientos.sort((a, b) => a.fecha.localeCompare(b.fecha) || a.creadoAt.localeCompare(b.creadoAt));
+            }
+            // Saldo global (todos los tiempos)
+            saldoActual = todosMovimientos.reduce((s, m) =>
+                m.tipo === 'recarga' ? s + m.valor : s - m.valor, 0);
+            document.getElementById('statSaldo').textContent = formatPesos(saldoActual);
+            document.getElementById('saldoDisponible').textContent = formatPesos(saldoActual);
+            aplicarFiltro();
+        });
+    }
+
+    // ── FILTRO Y RENDER ────────────────────────────────────────────────────
+    window.aplicarFiltro = function() {
+        const mes   = document.getElementById('filtroMes').value;
+        const anio  = document.getElementById('filtroAnio').value;
+        const tipo  = document.getElementById('filtroTipo').value;
+        const esTodos = mes === 'todos';
+
+        const label = esTodos ? 'en total' : `${['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][parseInt(mes)]} ${anio}`;
+        ['statMesLabel','statMesLabel2','statMesLabel3'].forEach(id => document.getElementById(id).textContent = label);
+
+        // Filtrar para stats (solo mes/año, sin filtro tipo)
+        const parStats = todosMovimientos.filter(m => {
+            if (esTodos) return true;
+            const f = new Date(m.fecha + 'T12:00:00');
+            return f.getMonth() + 1 === parseInt(mes) && f.getFullYear() === parseInt(anio);
+        });
+
+        const totalGastos   = parStats.filter(m => m.tipo === 'gasto').reduce((s, m) => s + m.valor, 0);
+        const totalRecargas = parStats.filter(m => m.tipo === 'recarga').reduce((s, m) => s + m.valor, 0);
+        document.getElementById('statGastos').textContent     = formatPesos(totalGastos);
+        document.getElementById('statRecargas').textContent   = formatPesos(totalRecargas);
+        document.getElementById('statMovimientos').textContent = parStats.length;
+
+        // Filtrar para tabla (mes/año + tipo)
+        const filtrados = parStats.filter(m => tipo === 'todos' || m.tipo === tipo);
+
+        // Calcular saldo acumulado hasta cada movimiento (en todos los movimientos cronológicos)
+        const saldoMap = {};
+        let acum = 0;
+        todosMovimientos.forEach(m => {
+            acum += m.tipo === 'recarga' ? m.valor : -m.valor;
+            saldoMap[m.id] = acum;
+        });
+
+        renderTabla(filtrados, saldoMap);
+    };
+
+    function renderTabla(movimientos, saldoMap) {
+        const tbody = document.getElementById('tablaCuerpo');
+        if (movimientos.length === 0) {
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No hay movimientos para el período seleccionado.</td></tr>`;
+            return;
+        }
+
+        // Mostrar más recientes primero
+        const ordenados = [...movimientos].reverse();
+
+        tbody.innerHTML = ordenados.map(m => {
+            const fecha = new Date(m.fecha + 'T12:00:00').toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' });
+            const esGasto = m.tipo === 'gasto';
+            const tipoHtml = esGasto
+                ? `<span class="tipo-gasto">🔴 Gasto</span>`
+                : `<span class="tipo-recarga">💵 Recarga</span>`;
+            const valorHtml = esGasto
+                ? `<span class="valor-gasto">-${formatPesos(m.valor)}</span>`
+                : `<span class="valor-recarga">+${formatPesos(m.valor)}</span>`;
+            const saldoHtml = saldoMap[m.id] !== undefined
+                ? `<span class="saldo-col">${formatPesos(saldoMap[m.id])}</span>`
+                : '—';
+            const fotosHtml = (m.fotos && m.fotos.length > 0)
+                ? m.fotos.map(url => `<img class="foto-thumb" src="${url}" onclick="abrirFoto('${url}')" loading="lazy">`).join('')
+                : '<span style="color:#ddd">—</span>';
+
+            return `<tr>
+                <td style="white-space:nowrap">${fecha}</td>
+                <td>${m.concepto || '—'}</td>
+                <td>${tipoHtml}</td>
+                <td>${valorHtml}</td>
+                <td>${saldoHtml}</td>
+                <td>${fotosHtml}</td>
+                <td><button type="button" class="btn-eliminar-row" onclick="eliminarMovimiento('${m.id}','${m.concepto?.replace(/'/g,"\\'")||''}')">🗑️</button></td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ── MODAL GASTO ────────────────────────────────────────────────────────
+    window.abrirModalGasto = function() {
+        document.getElementById('gastoFecha').value   = new Date().toISOString().split('T')[0];
+        document.getElementById('gastoConcepto').value = '';
+        document.getElementById('gastoValor').value    = '';
+        document.getElementById('gastoPreview').innerHTML = '';
+        document.getElementById('gastoFotos').value   = '';
+        document.getElementById('saldoDisponible').textContent = formatPesos(saldoActual);
+        document.getElementById('modalGasto').classList.add('active');
+    };
+
+    // ── MODAL RECARGA ──────────────────────────────────────────────────────
+    window.abrirModalRecarga = function() {
+        document.getElementById('recargaFecha').value = new Date().toISOString().split('T')[0];
+        document.getElementById('recargaMonto').value = MONTO_BASE;
+        document.getElementById('recargaNota').value  = '';
+        document.getElementById('modalRecarga').classList.add('active');
+    };
+
+    window.cerrarModal = function(id) {
+        document.getElementById(id).classList.remove('active');
+    };
+
+    window.addEventListener('click', (e) => {
+        ['modalGasto','modalRecarga'].forEach(id => {
+            if (e.target === document.getElementById(id)) window.cerrarModal(id);
+        });
+    });
+
+    // ── GUARDAR GASTO ──────────────────────────────────────────────────────
+    window.guardarGasto = async function() {
+        const fecha     = document.getElementById('gastoFecha').value;
+        const concepto  = document.getElementById('gastoConcepto').value.trim();
+        const valor     = parseFloat(document.getElementById('gastoValor').value);
+
+        if (!fecha || !concepto || !valor || valor <= 0) {
+            mostrarToast('⚠️ Completa todos los campos obligatorios', 'error'); return;
+        }
+        if (valor > saldoActual) {
+            mostrarToast('⚠️ El gasto supera el saldo disponible', 'error'); return;
+        }
+
+        const btn = document.getElementById('btnGuardarGasto');
+        btn.disabled = true;
+
+        const archivos = Array.from(document.getElementById('gastoFotos').files).slice(0, 3);
+        let fotos = [];
+        for (let i = 0; i < archivos.length; i++) {
+            btn.textContent = `📷 Procesando foto ${i+1} de ${archivos.length}...`;
+            try { fotos.push(await comprimirImagen(archivos[i])); } catch(e) {}
+        }
+
+        btn.textContent = '⏳ Guardando...';
+        try {
+            await push(ref(db, `caja_chica/${EDIFICIO}/movimientos`), {
+                tipo: 'gasto', fecha, concepto, valor, fotos,
+                creadoAt: new Date().toISOString()
+            });
+            cerrarModal('modalGasto');
+            mostrarToast('✅ Gasto registrado correctamente', 'exito');
+        } catch(e) {
+            mostrarToast('❌ Error: ' + e.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '🔴 Registrar Gasto';
+        }
+    };
+
+    // ── GUARDAR RECARGA ────────────────────────────────────────────────────
+    window.guardarRecarga = async function() {
+        const fecha = document.getElementById('recargaFecha').value;
+        const monto = parseFloat(document.getElementById('recargaMonto').value);
+        const nota  = document.getElementById('recargaNota').value.trim();
+
+        if (!fecha || !monto || monto <= 0) {
+            mostrarToast('⚠️ Completa fecha y monto', 'error'); return;
+        }
+
+        const btn = document.getElementById('btnGuardarRecarga');
+        btn.disabled = true; btn.textContent = '⏳ Guardando...';
+        try {
+            await push(ref(db, `caja_chica/${EDIFICIO}/movimientos`), {
+                tipo: 'recarga', fecha,
+                concepto: nota || `Recarga mensual — $${monto.toLocaleString('es-CO')}`,
+                valor: monto, fotos: [],
+                creadoAt: new Date().toISOString()
+            });
+            cerrarModal('modalRecarga');
+            mostrarToast('✅ Recarga registrada correctamente', 'exito');
+        } catch(e) {
+            mostrarToast('❌ Error: ' + e.message, 'error');
+        } finally {
+            btn.disabled = false; btn.textContent = '💵 Registrar Recarga';
+        }
+    };
+
+    // ── ELIMINAR ───────────────────────────────────────────────────────────
+    window.eliminarMovimiento = async function(id, concepto) {
+        if (!confirm(`¿Eliminar "${concepto}"? Esta acción no se puede deshacer.`)) return;
+        try {
+            await remove(ref(db, `caja_chica/${EDIFICIO}/movimientos/${id}`));
+            mostrarToast('🗑️ Movimiento eliminado', 'exito');
+        } catch(e) {
+            mostrarToast('❌ Error: ' + e.message, 'error');
+        }
+    };
+
+    // ── FOTOS ──────────────────────────────────────────────────────────────
+    window.previewFotos = function(input, previewId) {
+        const files   = Array.from(input.files).slice(0, 3);
+        const preview = document.getElementById(previewId);
+        preview.innerHTML = '';
+        files.forEach(f => {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(f);
+            preview.appendChild(img);
+        });
+    };
+
+    async function comprimirImagen(file, maxW = 800) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+                try {
+                    let w = img.width, h = img.height;
+                    if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', 0.65));
+                } catch(e) { reject(e); }
+            };
+            img.onerror = () => reject(new Error('No se pudo leer: ' + file.name));
+            img.src = URL.createObjectURL(file);
+        });
+    }
+
+    window.abrirFoto = (url) => {
+        document.getElementById('lightboxImg').src = url;
+        document.getElementById('lightbox').style.display = 'flex';
+    };
+    window.cerrarLightbox = () => { document.getElementById('lightbox').style.display = 'none'; };
+
+    // ── UTILIDADES ─────────────────────────────────────────────────────────
+    function formatPesos(n) {
+        return '$' + Math.round(n).toLocaleString('es-CO');
+    }
+
+    function mostrarToast(msg, tipo = '') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast show ' + tipo;
+        setTimeout(() => { t.className = 'toast'; }, 3500);
+    }
+</script>
+</body>
+</html>
