@@ -542,7 +542,11 @@
         onValue(ref(db, `caja_chica/${EDIFICIO}/movimientos`), (snap) => {
             todosMovimientos = [];
             if (snap.exists()) {
-                snap.forEach(child => todosMovimientos.push({ id: child.key, ...child.val() }));
+                snap.forEach(child => {
+                    const val = child.val();
+                    if (val.tipo === 'recarga') val.tipo = 'reintegro'; // normaliza datos viejos
+                    todosMovimientos.push({ id: child.key, ...val });
+                });
                 todosMovimientos.sort((a, b) =>
                     a.fecha.localeCompare(b.fecha) || (a.creadoAt||'').localeCompare(b.creadoAt||''));
             }
