@@ -119,6 +119,26 @@
             font-size: 0.8em; font-weight: 700; transition: all 0.2s;
         }
         .btn-eliminar-row:hover { background: #c62828; color: white; }
+        .btn-ver-row {
+            background: #e8f0ff; color: #0056B8; border: none;
+            padding: 5px 10px; border-radius: 6px; cursor: pointer;
+            font-size: 0.8em; font-weight: 700; transition: all 0.2s; margin-right: 4px;
+        }
+        .btn-ver-row:hover { background: #0056B8; color: white; }
+
+        /* COMPROBANTE VISTA */
+        .comp-vista-fila {
+            display: flex; padding: 9px 0;
+            border-bottom: 1px solid #e8eef8; font-size: 0.93em; align-items: flex-start;
+        }
+        .comp-vista-fila:last-child { border-bottom: none; }
+        .comp-vista-label {
+            min-width: 140px; font-weight: 700; color: #666; font-size: 0.88em;
+            text-transform: uppercase; letter-spacing: 0.5px; padding-top: 1px;
+        }
+        .comp-vista-valor { color: #222; flex: 1; }
+        .comp-valor-grande { font-size: 1.2em; font-weight: 900; color: #0056B8; }
+        .comp-valor-grande.rojo { color: #e53935; }
 
         /* MODALES */
         .modal {
@@ -441,6 +461,26 @@
 </div>
 
 
+<!-- ═══ MODAL VER COMPROBANTE ═══ -->
+<div class="modal" id="modalVerComp">
+    <div class="modal-content" style="max-width:520px">
+        <div class="modal-header" id="verCompHeader">
+            <h2 id="verCompTitulo">Comprobante</h2>
+            <button type="button" class="btn-close-modal" onclick="cerrarModal('modalVerComp')">×</button>
+        </div>
+        <div class="comprobante-box" id="verCompBox">
+            <div class="comprobante-header" id="verCompBoxHeader">
+                <span id="verCompBoxTitulo"></span>
+                <span id="verCompFechaBadge" style="font-size:.85em;opacity:.85"></span>
+            </div>
+            <div class="comprobante-body" id="verCompBody">
+                <div id="verCompFilas"></div>
+                <div id="verCompFotos" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- LIGHTBOX -->
 <div id="lightbox" class="lightbox" style="display:none" onclick="cerrarLightbox()">
     <span class="lightbox-close">✕</span>
@@ -596,8 +636,11 @@
                 <td>${valorHtml}</td>
                 <td>${saldoHtml}</td>
                 <td>${fotosHtml}</td>
-                <td><button type="button" class="btn-eliminar-row"
-                    onclick="eliminarMovimiento('${m.id}','${(m.proveedor||m.concepto||'').replace(/'/g,"\\'")}')">🗑️</button></td>
+                <td style="white-space:nowrap">
+                    <button type="button" class="btn-ver-row" onclick="verComprobante('${m.id}')">👁️ Ver</button>
+                    <button type="button" class="btn-eliminar-row"
+                        onclick="eliminarMovimiento('${m.id}','${(m.proveedor||m.concepto||'').replace(/'/g,"\\'")}')">🗑️</button>
+                </td>
             </tr>`;
         }).join('');
     }
@@ -696,12 +739,73 @@
         }
     };
 
+    // ── VER COMPROBANTE ───────────────────────────────────────────────────
+    window.verComprobante = function(id) {
+        const m = todosMovimientos.find(x => x.id === id);
+        if (!m) return;
+
+        const esGasto = m.tipo === 'gasto';
+        const fecha   = new Date(m.fecha + 'T12:00:00')
+            .toLocaleDateString('es-CO', { day:'2-digit', month:'long', year:'numeric' });
+
+        // Colores según tipo
+        const header = document.getElementById('verCompHeader');
+        const box    = document.getElementById('verCompBox');
+        const bh     = document.getElementById('verCompBoxHeader');
+        const body   = document.getElementById('verCompBody');
+        header.className = esGasto ? 'modal-header rojo' : 'modal-header';
+        box.className    = esGasto ? 'comprobante-box rojo-border' : 'comprobante-box';
+        bh.className     = esGasto ? 'comprobante-header rojo' : 'comprobante-header';
+        body.className   = esGasto ? 'comprobante-body rojo-bg' : 'comprobante-body';
+
+        document.getElementById('verCompTitulo').textContent =
+            esGasto ? '🧾 Comprobante de Caja Menor' : '💵 Reintegro Caja Menor';
+        document.getElementById('verCompBoxTitulo').textContent =
+            esGasto ? '🧾 COMPROBANTE DE CAJA MENOR · Torres de Anim II'
+                    : '💵 REINTEGRO CAJA MENOR · Torres de Anim II';
+        document.getElementById('verCompFechaBadge').textContent = fecha;
+
+        // Filas según tipo
+        const fila = (label, valor, grande = false) =>
+            `<div class="comp-vista-fila">
+                <span class="comp-vista-label">${label}</span>
+                <span class="comp-vista-valor ${grande ? (esGasto ? 'comp-valor-grande rojo' : 'comp-valor-grande') : ''}">${valor}</span>
+            </div>`;
+
+        let filas = fila('📅 Fecha', fecha);
+        if (esGasto) {
+            filas += fila('🏪 Proveedor',    m.proveedor      || '—');
+            filas += fila('🔢 N° Comprobante', m.numComprobante || '—');
+            filas += fila('📂 Categoría',     m.categoria      || '—');
+            filas += fila('📝 Descripción',   m.concepto       || '—');
+            filas += fila('💰 Valor',         formatPesos(m.valor), true);
+        } else {
+            filas += fila('📝 Concepto',      m.concepto       || '—');
+            filas += fila('✍️ Entregado por', m.entregadoPor   || '—');
+            filas += fila('💵 Monto',         formatPesos(m.valor), true);
+        }
+        document.getElementById('verCompFilas').innerHTML = filas;
+
+        // Fotos
+        const fotosCont = document.getElementById('verCompFotos');
+        if (m.fotos && m.fotos.length > 0) {
+            fotosCont.innerHTML = m.fotos.map(url =>
+                `<img src="${url}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid #ddd;cursor:pointer"
+                      onclick="abrirFoto('${url}')">`
+            ).join('');
+        } else {
+            fotosCont.innerHTML = '';
+        }
+
+        document.getElementById('modalVerComp').classList.add('active');
+    };
+
     // ── CERRAR MODALES ────────────────────────────────────────────────────
     window.cerrarModal = function(id) {
         document.getElementById(id).classList.remove('active');
     };
     window.addEventListener('click', (e) => {
-        ['modalGasto','modalReintegro'].forEach(id => {
+        ['modalGasto','modalReintegro','modalVerComp'].forEach(id => {
             if (e.target === document.getElementById(id)) window.cerrarModal(id);
         });
     });
