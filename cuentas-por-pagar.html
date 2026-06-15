@@ -1716,22 +1716,37 @@
             document.getElementById('fechaRecepcion').valueAsDate = new Date();
         };
         
-        // Convierte un token numérico colombiano a número estándar
+        // Convierte un token numérico (formato CO o EN) a número estándar
         function _numCOP(t) {
             t = t.replace(/[$\s]/g, '');
             if (!t) return '0';
-            const hasComma = t.includes(',');
-            const dotCount = (t.match(/\./g) || []).length;
-            if (hasComma) {
-                const afterLastComma = t.split(',').pop();
-                t = afterLastComma.length <= 2 ? t.replace(/\./g, '').replace(',', '.') : t.replace(/[,.]/g, '');
-            } else if (dotCount > 1) {
-                t = t.replace(/\./g, '');
-            } else if (dotCount === 1) {
-                const afterDot = t.split('.')[1];
-                if (afterDot && afterDot.length === 3) t = t.replace('.', '');
+            const commaIdx = t.lastIndexOf(',');
+            const dotIdx   = t.lastIndexOf('.');
+            if (commaIdx === -1 && dotIdx === -1) return t; // número sin separadores
+            if (commaIdx === -1) {
+                // solo puntos
+                const dotCount = (t.match(/\./g) || []).length;
+                if (dotCount > 1) return t.replace(/\./g, ''); // 1.355.010 → 1355010
+                const afterDot = t.split('.').pop();
+                if (afterDot.length === 3) return t.replace('.', ''); // 205.900 → 205900
+                return t; // 205.90 → decimal
             }
-            return t || '0';
+            if (dotIdx === -1) {
+                // solo comas
+                const commaCount = (t.match(/,/g) || []).length;
+                if (commaCount > 1) return t.replace(/,/g, ''); // 1,355,010 → 1355010
+                const afterComma = t.split(',').pop();
+                if (afterComma.length === 3) return t.replace(',', ''); // 205,900 → 205900
+                return t.replace(',', '.'); // 205,90 → decimal
+            }
+            // tienen ambos: la posición relativa determina el formato
+            if (commaIdx < dotIdx) {
+                // 279,833.00 → coma=miles, punto=decimal (formato inglés)
+                return t.replace(/,/g, '');
+            } else {
+                // 279.833,00 → punto=miles, coma=decimal (formato colombiano)
+                return t.replace(/\./g, '').replace(',', '.');
+            }
         }
 
         // Parseo formato colombiano con soporte de expresiones: 1.295 + 29.013 → 30308
