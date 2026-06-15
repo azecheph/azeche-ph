@@ -1726,7 +1726,16 @@
             if (commaIdx === -1) {
                 // solo puntos
                 const dotCount = (t.match(/\./g) || []).length;
-                if (dotCount > 1) return t.replace(/\./g, ''); // 1.355.010 → 1355010
+                if (dotCount > 1) {
+                    const lastGroup = t.split('.').pop();
+                    if (lastGroup.length < 3) {
+                        // último punto es decimal: 1.887.515.10 → 1887515.10
+                        const parts = t.split('.');
+                        const dec = parts.pop();
+                        return parts.join('') + '.' + dec;
+                    }
+                    return t.replace(/\./g, ''); // 1.355.010 → 1355010
+                }
                 const afterDot = t.split('.').pop();
                 if (afterDot.length === 3) return t.replace('.', ''); // 205.900 → 205900
                 return t; // 205.90 → decimal
@@ -1771,6 +1780,10 @@
         });
 
         function calcularValorNeto() {
+            // No recalcular si hay una expresión incompleta en algún campo
+            for (const id of ['valorBruto','aiu','iva','retencion']) {
+                if (/[+\-*/]\s*$/.test(document.getElementById(id).value)) return;
+            }
             const bruto = parseCOP(document.getElementById('valorBruto').value);
             const aiu   = parseCOP(document.getElementById('aiu').value);
             const iva   = parseCOP(document.getElementById('iva').value);
