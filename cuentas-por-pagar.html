@@ -627,12 +627,6 @@
             <div class="edificio-selector">
                 <select id="edificioSelect" onchange="cambiarEdificio()">
                     <option value="">Selecciona edificio</option>
-                    <option value="nepal-2">Nepal 2</option>
-                    <option value="avalon">Avalon</option>
-                    <option value="convivienda-1">Convivienda 1</option>
-                    <option value="pinos-del-country">Pinos del Country</option>
-                    <option value="torres-de-anim-2">Torres de Amin II</option>
-                    <option value="millenium-3">Millenium 3</option>
                 </select>
                 <a href="#" id="btnDrive" class="btn-drive" target="_blank" style="display: none;">
                     📁 Ver Facturas Drive
@@ -1230,7 +1224,23 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        
+
+        // Cargar edificios dinámicamente
+        onValue(ref(db, 'edificios'), (snap) => {
+            const sel = document.getElementById('edificioSelect');
+            if (!sel) return;
+            const v = sel.value;
+            sel.innerHTML = '<option value="">Selecciona edificio</option>';
+            if (snap.exists()) snap.forEach(child => {
+                const ed = child.val();
+                const opt = document.createElement('option');
+                opt.value = ed.edificioId || child.key;
+                opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
+                sel.appendChild(opt);
+            });
+            if (v) sel.value = v;
+        });
+
         let edificioActual = '';
         let facturasTemp = [];
         let proveedoresDB = {}; // Base de datos de proveedores en memoria

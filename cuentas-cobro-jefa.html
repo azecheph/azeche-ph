@@ -392,12 +392,6 @@
             <label>🏢 Edificio *</label>
             <select id="selectEdificio" onchange="cargarDatosEdificio()">
                 <option value="">— Seleccione edificio —</option>
-                <option value="nepal2">Nepal 2</option>
-                <option value="convivienda">Convivienda I</option>
-                <option value="pinos">Pinos del Country</option>
-                <option value="avalon">Avalon</option>
-                <option value="torres">Torres de Anim II</option>
-                <option value="millenium3">Millenium 3</option>
             </select>
         </div>
 
@@ -555,15 +549,39 @@
     const auth = getAuth(app);
     const db   = getDatabase(app);
 
-    // ── DATOS EDIFICIOS
-    const EDIFICIOS = {
-        nepal2:      { nombre: 'EDIFICIO NEPAL 2',            nit: 'NIT: 830-142.380-4' },
-        convivienda: { nombre: 'EDIFICIO CONVIVIENDA I',      nit: 'NIT: 830-112.728-5' },
-        pinos:       { nombre: 'EDIFICIO PINOS DEL COUNTRY',  nit: 'NIT: 830-059.667-8' },
-        avalon:      { nombre: 'EDIFICIO AVALON',             nit: 'NIT: 800-245.101-1' },
-        torres:      { nombre: 'EDIFICIO TORRES DE ANIM II',  nit: 'NIT: 900-563.807-7' },
-        millenium3:  { nombre: 'EDIFICIO MILLENIUM 3',        nit: 'NIT: 901-918.256-8' }
-    };
+    // ── DATOS EDIFICIOS (cargados dinámicamente desde Firebase)
+    let EDIFICIOS = {};
+
+    function formatNIT(rut) {
+        if (!rut) return '';
+        const parts = rut.split('-');
+        if (parts.length < 2) return rut;
+        const num = parts[0].replace(/\D/g, '');
+        const dig = parts[parts.length - 1];
+        if (num.length === 9) return `NIT: ${num.slice(0,3)}-${num.slice(3,6)}.${num.slice(6,9)}-${dig}`;
+        return `NIT: ${rut}`;
+    }
+
+    onValue(ref(db, 'edificios'), (snap) => {
+        EDIFICIOS = {};
+        const sel = document.getElementById('selectEdificio');
+        if (!sel) return;
+        const v = sel.value;
+        sel.innerHTML = '<option value="">— Seleccione edificio —</option>';
+        if (snap.exists()) snap.forEach(child => {
+            const ed = child.val();
+            const eid = ed.edificioId || child.key;
+            EDIFICIOS[eid] = {
+                nombre: (ed.nombre || child.key).toUpperCase(),
+                nit: formatNIT(ed.rut || ed.nit || '')
+            };
+            const opt = document.createElement('option');
+            opt.value = eid;
+            opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
+            sel.appendChild(opt);
+        });
+        if (v) sel.value = v;
+    });
 
     const MESES_NUM = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO',
                        'JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
@@ -719,8 +737,9 @@
 
     window.cargarDatosEdificio = function() {
         const sel = document.getElementById('selectEdificio').value;
-        document.getElementById('nombreEdificio').value = sel ? EDIFICIOS[sel].nombre : '';
-        document.getElementById('nitEdificio').value    = sel ? EDIFICIOS[sel].nit.replace('NIT: ','') : '';
+        const ed = EDIFICIOS[sel] || {};
+        document.getElementById('nombreEdificio').value = ed.nombre || '';
+        document.getElementById('nitEdificio').value    = (ed.nit || '').replace('NIT: ','');
     };
 
     window.generarDocumento = function() {
@@ -733,6 +752,7 @@
         if (!valor || valor <= 0){ mostrarToast('Ingresa el valor de la cuenta', 'error'); return; }
 
         const ed = EDIFICIOS[edKey];
+        if (!ed) { mostrarToast('Datos del edificio no cargados, espera un momento', 'error'); return; }
         const anioCorto = String(anio).slice(-2);
         const numConsec = consecutivoActual + 1;
         const numero = String(numConsec).padStart(3, '0') + '-' + anioCorto;

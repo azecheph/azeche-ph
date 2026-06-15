@@ -942,12 +942,6 @@
                                 <label style="display: block; margin-bottom: 5px; font-weight: 600;">Edificio *</label>
                                 <select id="edificioTarea" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
                                     <option value="">Seleccionar...</option>
-                                    <option value="nepal-2">Nepal 2</option>
-                                    <option value="avalon">Avalon</option>
-                                    <option value="convivienda-1">Convivienda 1</option>
-                                    <option value="pinos-del-country">Pinos del Country</option>
-                                    <option value="torre-amin-2">Torres de Amin II</option>
-                                    <option value="millenium-3">Millenium 3</option>
                                     <option value="todos">Todos los edificios</option>
                                 </select>
                             </div>
@@ -1020,6 +1014,22 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
+
+        // Cargar edificios dinámicamente en selector de tareas
+        onValue(ref(db, 'edificios'), (snap) => {
+            const sel = document.getElementById('edificioTarea');
+            if (!sel) return;
+            const v = sel.value;
+            sel.innerHTML = '<option value="">Seleccionar...</option><option value="todos">Todos los edificios</option>';
+            if (snap.exists()) snap.forEach(child => {
+                const ed = child.val();
+                const opt = document.createElement('option');
+                opt.value = ed.edificioId || child.key;
+                opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
+                sel.appendChild(opt);
+            });
+            if (v) sel.value = v;
+        });
 
         // Verificar autenticación
         auth.onAuthStateChanged((user) => {
