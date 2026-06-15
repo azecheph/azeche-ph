@@ -1782,6 +1782,33 @@
             document.getElementById('editarRestoAPagar').value = resto.toFixed(2);
         }
 
+        // Auto-resolver expresión al salir del campo o al presionar =
+        function autoResolver(el, recalcFn) {
+            if (!el || el.readOnly) return;
+            function resolver() {
+                if (el.value && /[+\-*/]/.test(el.value)) {
+                    const val = parseCOP(el.value);
+                    el.value = Number.isInteger(val) ? String(val) : val.toFixed(2);
+                    if (recalcFn) recalcFn();
+                }
+            }
+            el.addEventListener('blur', resolver);
+            el.addEventListener('keydown', function(e) {
+                if (e.key === '=' || e.key === 'Enter') { e.preventDefault(); resolver(); }
+            });
+        }
+
+        // Aplicar auto-resolver a campos del formulario principal
+        ['valorBruto','aiu','iva','retencion','saldoPendienteAnterior','anticipo'].forEach(id => {
+            autoResolver(document.getElementById(id), () => { calcularValorNeto(); calcularRestoAPagar(); });
+        });
+        autoResolver(document.getElementById('valorNeto'), calcularRestoAPagar);
+
+        // Aplicar auto-resolver a campos del formulario de edición
+        ['editarValorBruto','editarAiu','editarIva','editarRetencion','editarSaldoPendienteAnterior','editarAnticipo'].forEach(id => {
+            autoResolver(document.getElementById(id), () => { calcularValorNetoEditar(); calcularRestoEditar(); });
+        });
+
         // Recalcular también cuando cambia el valor neto
         function calcularValorNetoEditar() {
             const bruto = parseCOP(document.getElementById('editarValorBruto').value);
