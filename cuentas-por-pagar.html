@@ -1716,27 +1716,39 @@
             document.getElementById('fechaRecepcion').valueAsDate = new Date();
         };
         
-        // Parseo formato colombiano: 205.900 → 205900, 1.355.010,50 → 1355010.50
+        // Convierte un token numérico colombiano a número estándar
+        function _numCOP(t) {
+            t = t.replace(/[$\s]/g, '');
+            if (!t) return '0';
+            const hasComma = t.includes(',');
+            const dotCount = (t.match(/\./g) || []).length;
+            if (hasComma) {
+                const afterLastComma = t.split(',').pop();
+                t = afterLastComma.length <= 2 ? t.replace(/\./g, '').replace(',', '.') : t.replace(/[,.]/g, '');
+            } else if (dotCount > 1) {
+                t = t.replace(/\./g, '');
+            } else if (dotCount === 1) {
+                const afterDot = t.split('.')[1];
+                if (afterDot && afterDot.length === 3) t = t.replace('.', '');
+            }
+            return t || '0';
+        }
+
+        // Parseo formato colombiano con soporte de expresiones: 1.295 + 29.013 → 30308
         function parseCOP(str) {
             if (typeof str === 'number') return isNaN(str) ? 0 : str;
-            let s = String(str || '').trim().replace(/[$\s]/g, '');
-            if (!s) return 0;
-            const hasComma = s.includes(',');
-            const dotCount = (s.match(/\./g) || []).length;
-            if (hasComma) {
-                const afterLastComma = s.split(',').pop();
-                if (afterLastComma.length <= 2) {
-                    s = s.replace(/\./g, '').replace(',', '.');  // coma = decimal
-                } else {
-                    s = s.replace(/[,.]/g, '');  // coma = miles
+            const raw = String(str || '').trim();
+            if (!raw) return 0;
+            // Si contiene operadores matemáticos, evaluar como expresión
+            if (/[+\-*/]/.test(raw)) {
+                const expr = raw.replace(/[\d.,]+/g, token => _numCOP(token));
+                if (/^[\d\s+\-*/().]+$/.test(expr)) {
+                    try { return Function('"use strict"; return (' + expr + ')')() || 0; }
+                    catch(e) { return 0; }
                 }
-            } else if (dotCount > 1) {
-                s = s.replace(/\./g, '');  // múltiples puntos = miles
-            } else if (dotCount === 1) {
-                const afterDot = s.split('.')[1];
-                if (afterDot && afterDot.length === 3) s = s.replace('.', '');  // punto = miles
+                return 0;
             }
-            return parseFloat(s) || 0;
+            return parseFloat(_numCOP(raw)) || 0;
         }
 
         ['valorBruto', 'aiu', 'iva', 'retencion'].forEach(id => {
