@@ -148,13 +148,6 @@
                 <label>Edificio *</label>
                 <select id="edificio" required onchange="autoEd()">
                     <option value="">Seleccionar...</option>
-                    <option>Nepal 2</option>
-                    <option>Pinos del Country</option>
-                    <option>Convivienda I</option>
-                    <option>Avalon</option>
-                    <option>Torres de Amin II</option>
-                    <option>Millenium 3</option>
-                    <option>Gloria M Azcarate</option>
                 </select>
             </div>
             <div class="f"><label>NIT</label><input type="text" id="nit" readonly></div>
@@ -251,7 +244,7 @@
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getDatabase, ref, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getDatabase, ref, push, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
 const app = initializeApp({
     apiKey:"AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
@@ -263,6 +256,25 @@ const app = initializeApp({
     appId:"1:905337990521:web:c2ca4932672c59fef6c5c9"
 });
 const db = getDatabase(app);
+
+// Cargar edificios dinámicamente desde Firebase
+onValue(ref(db, 'edificios'), (snap) => {
+    const sel = document.getElementById('edificio');
+    if (!sel) return;
+    const v = sel.value;
+    sel.innerHTML = '<option value="">Seleccionar...</option>';
+    if (snap.exists()) snap.forEach(child => {
+        const ed = child.val();
+        const nombre = ed.nombre || child.key;
+        // Actualizar mapa EDIF con datos de Firebase
+        window.EDIF[nombre] = { nit: ed.rut || '', dir: ed.direccion || '' };
+        const opt = document.createElement('option');
+        opt.value = nombre;
+        opt.textContent = (ed.icono || '🏢') + ' ' + nombre;
+        sel.appendChild(opt);
+    });
+    if (v) sel.value = v;
+});
 
 window._save = async (data) => {
     await push(ref(db, 'solicitudes_insumos'), data);
@@ -314,7 +326,7 @@ const CATS = {
         {e:'🍬',n:'Azúcar',u:'Kilo'},
     ]
 };
-const EDIF = {
+window.EDIF = {
     'Nepal 2':          {nit:'830142380-4', dir:'Calle 55 #4a-24'},
     'Pinos del Country':{nit:'830059667-8', dir:'CR 12 127 B - 23'},
     'Convivienda I':    {nit:'830112728-5', dir:'CR 10a #138-71'},
