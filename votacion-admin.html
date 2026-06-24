@@ -1,8 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0056B8">
 <title>Panel Admin - Votacion Azeche PH</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1388,7 +1390,15 @@ window.imprimirAsistencia = function() {
 
     <div class="pie">Documento generado por Azeche P.H. | ${new Date().toLocaleString('es-CO')}</div>
     <script>window.onload = () => { window.print(); }<\/script>
-  </body></html>`;
+  
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').catch(function() {});
+      });
+    }
+  </script>
+</body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -1507,12 +1517,28 @@ window.imprimirResultados = function() {
     ${seccionesHtml}
     <div class="pie">Documento generado por Azeche P.H. | ${new Date().toLocaleString('es-CO')}</div>
     <script>window.onload = () => { window.print(); }<\/script>
-  </body></html>`;
+  
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').catch(function() {});
+      });
+    }
+  </script>
+</body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
   w.document.close();
 };
 </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').catch(function() {});
+      });
+    }
+  </script>
 </body>
 </html>

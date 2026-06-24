@@ -1,8 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0056B8">
     <title>Asambleas - Azeche P.H.</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
@@ -1169,5 +1171,13 @@
             window.open('generador-actas-v2.html', '_blank');
         };
     </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').catch(function() {});
+      });
+    }
+  </script>
 </body>
 </html>

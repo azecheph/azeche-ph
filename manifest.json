@@ -1,0 +1,19 @@
+{
+  "name": "Azeche P.H. - Administración",
+  "short_name": "Azeche P.H.",
+  "description": "Sistema de administración de propiedad horizontal",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0056B8",
+  "theme_color": "#0056B8",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "Logo/1.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,8 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!-- saved from url=(0058)file:///C:/Users/C3MADRIZ/Downloads/index-LOGIN-FINAL.html -->
 <html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0056B8">
     <title>Azeche P.H. - Login</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -352,4 +354,12 @@
     </script>
 
 
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').catch(function() {});
+      });
+    }
+  </script>
 </body></html>
