@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpieza Firebase - Azeche P.H.</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4ff; padding: 30px; }
+        h1 { color: #0056B8; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+        .path { font-family: monospace; font-size: 1.1em; color: #333; margin-bottom: 8px; }
+        .count { color: #666; margin-bottom: 12px; }
+        button { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: .95em; font-weight: 600; }
+        .btn-delete { background: #e53935; color: white; }
+        .btn-delete:hover { background: #c62828; }
+        .btn-ok { background: #2e7d32; color: white; margin-top: 10px; }
+        #log { background: #1e1e1e; color: #00ff00; padding: 16px; border-radius: 8px; font-family: monospace; min-height: 100px; margin-top: 20px; white-space: pre-wrap; }
+        .warning { background: #fff3cd; border-left: 4px solid #ff9800; padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🧹 Limpieza de Datos Firebase</h1>
+    <div class="warning">⚠️ Esta página elimina paths viejos de <code>cuentas_por_pagar</code> que ya no corresponden a ningún edificio activo. Úsala una sola vez.</div>
+
+    <div id="contenido"><p>Cargando datos de Firebase...</p></div>
+    <div id="log"></div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getDatabase, ref, get, remove } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
+            authDomain: "azeche-ph.firebaseapp.com",
+            databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
+            projectId: "azeche-ph",
+            storageBucket: "azeche-ph.firebasestorage.app",
+            messagingSenderId: "905337990521",
+            appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const log = document.getElementById('log');
+        function escribir(msg) { log.textContent += msg + '\n'; }
+
+        // Cargar edificios activos
+        const edSnap = await get(ref(db, 'edificios'));
+        const slugsActivos = new Set();
+        if (edSnap.exists()) {
+            edSnap.forEach(child => {
+                const ed = child.val();
+                const id = ed.edificioId || child.key;
+                slugsActivos.add(id);
+            });
+        }
+        escribir('✅ Edificios activos: ' + [...slugsActivos].join(', '));
+
+        // Cargar todos los paths de cuentas_por_pagar
+        const cppSnap = await get(ref(db, 'cuentas_por_pagar'));
+        const contenido = document.getElementById('contenido');
+
+        if (!cppSnap.exists()) {
+            contenido.innerHTML = '<p>No hay datos en cuentas_por_pagar.</p>';
+        } else {
+            const pathsViejos = [];
+            const pathsActivos = [];
+
+            cppSnap.forEach(child => {
+                const pathId = child.key;
+                const count = child.size || Object.keys(child.val() || {}).length;
+                if (slugsActivos.has(pathId)) {
+                    pathsActivos.push({ id: pathId, count });
+                } else {
+                    pathsViejos.push({ id: pathId, count });
+                }
+            });
+
+            let html = '<h2 style="color:#2e7d32">✅ Paths activos (NO tocar)</h2>';
+            pathsActivos.forEach(p => {
+                html += `<div class="card"><div class="path">${p.id}</div><div class="count">${p.count} facturas</div></div>`;
+            });
+
+            html += '<h2 style="color:#e53935;margin-top:24px">🗑️ Paths viejos/basura (eliminar)</h2>';
+            if (pathsViejos.length === 0) {
+                html += '<p style="color:#2e7d32;font-weight:600">✅ No hay paths basura. Todo limpio.</p>';
+            } else {
+                pathsViejos.forEach(p => {
+                    html += `<div class="card">
+                        <div class="path">${p.id}</div>
+                        <div class="count">${p.count} registros</div>
+                        <button class="btn-delete" onclick="eliminar('${p.id}')">🗑️ Eliminar este path</button>
+                    </div>`;
+                });
+                html += `<button class="btn-delete" style="font-size:1.1em;padding:14px 28px;" onclick="eliminarTodos()">🗑️ ELIMINAR TODOS LOS PATHS BASURA</button>`;
+            }
+
+            contenido.innerHTML = html;
+
+            window.pathsViejos = pathsViejos;
+        }
+
+        window.eliminar = async function(pathId) {
+            if (!confirm(`¿Eliminar TODOS los registros de "${pathId}"?`)) return;
+            try {
+                await remove(ref(db, `cuentas_por_pagar/${pathId}`));
+                escribir(`✅ Eliminado: cuentas_por_pagar/${pathId}`);
+                document.querySelector(`button[onclick="eliminar('${pathId}')"]`).closest('.card').style.opacity = '0.4';
+            } catch(e) {
+                escribir(`❌ Error: ${e.message}`);
+            }
+        };
+
+        window.eliminarTodos = async function() {
+            if (!confirm('¿Eliminar TODOS los paths basura?')) return;
+            for (const p of window.pathsViejos) {
+                try {
+                    await remove(ref(db, `cuentas_por_pagar/${p.id}`));
+                    escribir(`✅ Eliminado: ${p.id}`);
+                } catch(e) {
+                    escribir(`❌ Error en ${p.id}: ${e.message}`);
+                }
+            }
+            escribir('🎉 Limpieza completa. Recarga el Dashboard.');
+        };
+    </script>
+</body>
+</html>
