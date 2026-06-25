@@ -2253,7 +2253,7 @@
                     snap.forEach((c) => {
                         const ct = c.val();
                         total++;
-                        if (ct.estado === 'Pagada' || ct.estado === 'pagada') {
+                        if ((ct.estado || '').toLowerCase() === 'pagada') {
                             pag++;
                         } else {
                             pend++;
