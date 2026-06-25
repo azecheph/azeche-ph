@@ -512,6 +512,12 @@
             box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
         }
 
+        .tarjetas-edificios-wrap { display:flex; gap:14px; overflow-x:auto; padding-bottom:8px; }
+        .tarjeta-ed { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; padding:18px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.15); transition:transform .2s; min-width:220px; flex-shrink:0; }
+        .tarjeta-ed:hover { transform:translateY(-4px); }
+        .tarjeta-ed h3 { margin-bottom:12px; font-size:1.05em; }
+        .tarjeta-ed-fila { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.2); font-size:.92em; }
+        .tarjeta-ed-val { font-weight:700; }
     </style>
 </head>
 <body>
@@ -629,7 +635,7 @@
             <!-- FACTURAS PENDIENTES POR EDIFICIO -->
             <div id="facturas-por-edificio" style="margin-top:28px;">
                 <h3 style="font-size:1.3em;font-weight:700;color:#333;margin-bottom:14px;">💰 Cuentas por Pagar por Edificio</h3>
-                <div id="edificios-facturas-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
+                <div id="edificios-facturas-lista" class="tarjetas-edificios-wrap">
                     <p style="color:#888;font-style:italic;">Cargando...</p>
                 </div>
             </div>
@@ -1150,67 +1156,56 @@
                 }
             });
             
-            // Contar facturas pendientes y calcular saldo por pagar
-            const cuentasRef = ref(db, 'cuentas_por_pagar');
-            onValue(cuentasRef, (snapshot) => {
-                let facturasPendientes = 0;
-                let saldoTotal = 0;
-
-                if (snapshot.exists()) {
-                    // Nivel 1: edificios
-                    snapshot.forEach((edificioSnap) => {
-                        // Nivel 2: facturas individuales
-                        edificioSnap.forEach((facturaSnap) => {
-                            const cuenta = facturaSnap.val();
-                            if (cuenta.estado !== 'pagada' && cuenta.estado !== 'Pagada') {
-                                facturasPendientes++;
-                                saldoTotal += parseFloat(cuenta.valorNeto || cuenta.restoAPagar || 0);
-                            }
-                        });
-                    });
-                }
-
-                document.getElementById('facturasPendientes').textContent = facturasPendientes;
-                document.getElementById('saldoPorPagar').textContent =
-                    '$' + saldoTotal.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0});
-
-                // Desglose por edificio
-                const resumenEdificios = {};
-                if (snapshot.exists()) {
-                    snapshot.forEach((edificioSnap) => {
-                        const eId = edificioSnap.key;
-                        let pendientes = 0, saldo = 0, vencidas = 0;
-                        const hoy = new Date(); hoy.setHours(0,0,0,0);
-                        edificioSnap.forEach((facturaSnap) => {
-                            const c = facturaSnap.val();
-                            if (c.estado !== 'pagada' && c.estado !== 'Pagada') {
-                                pendientes++;
-                                saldo += parseFloat(c.valorNeto || c.restoAPagar || 0);
-                                if (c.fechaVencimiento && new Date(c.fechaVencimiento + 'T00:00:00') < hoy) vencidas++;
-                            }
-                        });
-                        if (pendientes > 0) resumenEdificios[eId] = { pendientes, saldo, vencidas };
-                    });
-                }
+            // Cargar tarjetas de cuentas por pagar dinámicamente desde Firebase
+            async function cargarTarjetasCuentas() {
                 const lista = document.getElementById('edificios-facturas-lista');
-                if (Object.keys(resumenEdificios).length === 0) {
-                    lista.innerHTML = '<p style="color:#2e7d32;font-weight:600;">✅ Sin facturas pendientes</p>';
-                } else {
-                    lista.innerHTML = Object.entries(resumenEdificios).map(([eId, r]) => {
-                        const tieneVencidas = r.vencidas > 0;
-                        const bg = tieneVencidas ? '#fff5f5' : '#f8fbff';
-                        const border = tieneVencidas ? '#e53935' : '#1976d2';
-                        const icono = tieneVencidas ? '🔴' : '🟡';
-                        return `<div style="background:${bg};border:2px solid ${border};border-radius:12px;padding:16px;">
-                            <div style="font-weight:700;font-size:1.05em;margin-bottom:8px;">${icono} ${NOMBRES_EDIFICIOS[eId] || eId}</div>
-                            <div style="color:#555;font-size:0.95em;">📄 ${r.pendientes} factura${r.pendientes>1?'s':''} pendiente${r.pendientes>1?'s':''}</div>
-                            ${r.vencidas > 0 ? `<div style="color:#e53935;font-size:0.9em;font-weight:600;">⚠️ ${r.vencidas} vencida${r.vencidas>1?'s':''}</div>` : ''}
-                            <div style="font-size:1.15em;font-weight:700;color:${border};margin-top:8px;">$${r.saldo.toLocaleString('es-CO',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
-                            <a href="cuentas-por-pagar.html" style="display:inline-block;margin-top:8px;font-size:0.85em;color:${border};text-decoration:none;">Ver facturas →</a>
-                        </div>`;
-                    }).join('');
+                lista.innerHTML = '<p style="color:#888;font-style:italic;">Cargando...</p>';
+
+                const edSnap = await get(ref(db, 'edificios'));
+                const edificios = [];
+                if (edSnap.exists()) {
+                    edSnap.forEach(child => {
+                        const ed = child.val();
+                        edificios.push({ id: ed.edificioId || child.key, nombre: ed.nombre || child.key, icono: ed.icono || '🏢' });
+                    });
                 }
-            });
+
+                let totalPendientesGlobal = 0, totalSaldoGlobal = 0;
+                let html = '';
+
+                for (const ed of edificios) {
+                    const snap = await get(ref(db, `cuentas_por_pagar/${ed.id}`));
+                    let total = 0, pend = 0, pag = 0, deuda = 0;
+                    if (snap.exists()) {
+                        snap.forEach(c => {
+                            const ct = c.val();
+                            total++;
+                            if ((ct.estado || '').toLowerCase() === 'pagada') {
+                                pag++;
+                            } else {
+                                pend++;
+                                const abonos = ct.abonos ? Object.values(ct.abonos).reduce((s,a) => s + (parseFloat(a.monto)||0), 0) : 0;
+                                const ants = ct.anticipos ? Object.values(ct.anticipos).reduce((s,a) => s + (parseFloat(a.monto)||0), 0) : (parseFloat(ct.anticipo)||0);
+                                deuda += (parseFloat(ct.valorNeto)||0) + (parseFloat(ct.saldoPendienteAnterior)||0) - ants - abonos;
+                            }
+                        });
+                    }
+                    totalPendientesGlobal += pend;
+                    totalSaldoGlobal += deuda;
+                    html += `<div class="tarjeta-ed">
+                        <h3>${ed.icono} ${ed.nombre}</h3>
+                        <div class="tarjeta-ed-fila"><span>Total:</span><span class="tarjeta-ed-val">${total}</span></div>
+                        <div class="tarjeta-ed-fila"><span>⚠️ Pendientes:</span><span class="tarjeta-ed-val" style="font-size:1.3em">${pend}</span></div>
+                        <div class="tarjeta-ed-fila"><span>✅ Pagadas:</span><span class="tarjeta-ed-val">${pag}</span></div>
+                        <div class="tarjeta-ed-fila" style="border-bottom:none;margin-top:4px"><span>Deuda:</span><span class="tarjeta-ed-val">$${deuda.toLocaleString('es-CO')}</span></div>
+                    </div>`;
+                }
+
+                lista.innerHTML = html || '<p style="color:#2e7d32;font-weight:600;">✅ Sin facturas pendientes</p>';
+                document.getElementById('facturasPendientes').textContent = totalPendientesGlobal;
+                document.getElementById('saldoPorPagar').textContent = '$' + totalSaldoGlobal.toLocaleString('es-CO', {minimumFractionDigits:0, maximumFractionDigits:0});
+            }
+            cargarTarjetasCuentas();
         }
         // ALERTAS DE VENCIMIENTO DE PÓLIZA Y REPRESENTACIÓN
         function cargarAlertasVencimientos() {
