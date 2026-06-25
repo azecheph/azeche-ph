@@ -1934,8 +1934,9 @@
                 estado: 'Pagada',
                 fechaPago: new Date().toISOString().split('T')[0]
             });
-            
+
             alert('✅ Cuenta marcada como pagada');
+            cargarResumen();
         };
         
         window.eliminarCuenta = async function(id) {
@@ -2066,6 +2067,7 @@
                 
                 alert('✅ Cuenta actualizada exitosamente');
                 cerrarModal('modalEditar');
+                cargarResumen();
                 
             } catch (error) {
                 alert('❌ Error al guardar: ' + error.message);
@@ -2238,7 +2240,9 @@
                 { id: 'convivienda-1', nombre: 'Convivienda I', icono: '🏘️' },
                 { id: 'pinos-del-country', nombre: 'Pinos del Country', icono: '🌲' },
                 { id: 'torres-de-anim-2', nombre: 'Torres de Amin II', icono: '🏗️' },
-                { id: 'millenium-3', nombre: 'Millenium 3', icono: '🏢' }
+                { id: 'millenium-3', nombre: 'Millenium 3', icono: '🏢' },
+                { id: 'angelo', nombre: 'Angelo', icono: '🏢' },
+                { id: 'marija-1', nombre: 'Marija I', icono: '🏢' }
             ];
 
             let html = '';
@@ -2288,7 +2292,9 @@
                 { id: 'convivienda-1', nombre: 'Convivienda I', icono: '🏘️' },
                 { id: 'pinos-del-country', nombre: 'Pinos del Country', icono: '🌲' },
                 { id: 'torres-de-anim-2', nombre: 'Torres de Amin II', icono: '🏗️' },
-                { id: 'millenium-3', nombre: 'Millenium 3', icono: '🏢' }
+                { id: 'millenium-3', nombre: 'Millenium 3', icono: '🏢' },
+                { id: 'angelo', nombre: 'Angelo', icono: '🏢' },
+                { id: 'marija-1', nombre: 'Marija I', icono: '🏢' }
             ];
 
             // Si hay edificio seleccionado, solo mostrar ese; si no, mostrar todos
