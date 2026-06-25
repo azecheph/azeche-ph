@@ -1,4 +1,4 @@
-const CACHE_NAME = 'azeche-ph-v4';
+const CACHE_NAME = 'azeche-ph-v5';
 
 const ASSETS = [
   './index.html',
