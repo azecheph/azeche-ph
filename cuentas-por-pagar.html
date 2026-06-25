@@ -2233,17 +2233,19 @@
         async function cargarResumen() {
             const container = document.getElementById('tarjetasEdificios');
             if (!container) return;
-            
-            const edificios = [
-                { id: 'nepal-2', nombre: 'Nepal 2', icono: '🏢' },
-                { id: 'avalon', nombre: 'Avalon', icono: '🏰' },
-                { id: 'convivienda-1', nombre: 'Convivienda I', icono: '🏘️' },
-                { id: 'pinos-del-country', nombre: 'Pinos del Country', icono: '🌲' },
-                { id: 'torres-de-anim-2', nombre: 'Torres de Amin II', icono: '🏗️' },
-                { id: 'milenio-3', nombre: 'Milenio 3', icono: '🏢' },
-                { id: 'angelo', nombre: 'Angelo', icono: '🏢' },
-                { id: 'marija-1', nombre: 'Marija I', icono: '🏢' }
-            ];
+
+            const edSnap = await get(ref(db, 'edificios'));
+            const edificios = [];
+            if (edSnap.exists()) {
+                edSnap.forEach(child => {
+                    const ed = child.val();
+                    edificios.push({
+                        id: ed.edificioId || child.key,
+                        nombre: ed.nombre || child.key,
+                        icono: ed.icono || '🏢'
+                    });
+                });
+            }
 
             let html = '';
             for (const ed of edificios) {
@@ -2286,16 +2288,18 @@
             contenedor.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><h3>Cargando cuentas pendientes...</h3></div>';
             document.getElementById('modalPendientes').classList.add('active');
 
-            const todosEdificios = [
-                { id: 'nepal-2', nombre: 'Nepal 2', icono: '🏢' },
-                { id: 'avalon', nombre: 'Avalon', icono: '🏰' },
-                { id: 'convivienda-1', nombre: 'Convivienda I', icono: '🏘️' },
-                { id: 'pinos-del-country', nombre: 'Pinos del Country', icono: '🌲' },
-                { id: 'torres-de-anim-2', nombre: 'Torres de Amin II', icono: '🏗️' },
-                { id: 'milenio-3', nombre: 'Milenio 3', icono: '🏢' },
-                { id: 'angelo', nombre: 'Angelo', icono: '🏢' },
-                { id: 'marija-1', nombre: 'Marija I', icono: '🏢' }
-            ];
+            const edSnap2 = await get(ref(db, 'edificios'));
+            const todosEdificios = [];
+            if (edSnap2.exists()) {
+                edSnap2.forEach(child => {
+                    const ed = child.val();
+                    todosEdificios.push({
+                        id: ed.edificioId || child.key,
+                        nombre: ed.nombre || child.key,
+                        icono: ed.icono || '🏢'
+                    });
+                });
+            }
 
             // Si hay edificio seleccionado, solo mostrar ese; si no, mostrar todos
             const edificios = edificioActual
