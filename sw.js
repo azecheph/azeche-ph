@@ -1,36 +1,13 @@
-const CACHE_NAME = 'azeche-ph-v6';
+const CACHE_NAME = 'azeche-ph-v7';
 
-const ASSETS = [
-  './index.html',
-  './Dashboard.html',
-  './edificios.html',
-  './proveedores.html',
-  './contratos.html',
-  './cuentas-cobro-jefa.html',
-  './cuentas-por-cobrar.html',
-  './cuentas-por-pagar.html',
-  './facturas-automaticas.html',
-  './asambleas.html',
-  './asamblea-propietario.html',
-  './registro-asamblea.html',
-  './resultados-vivo.html',
-  './votacion-admin.html',
-  './votacion-pantalla.html',
-  './votacion-propietario.html',
-  './solicitud-insumos.html',
-  './gestion-insumos.html',
-  './consejos-administracion.html',
-  './checklist-recepcion.html',
-  './generador-actas-v2.html',
-  './supervisiones.html',
-  './caja-chica.html',
-  './Residentes_y_Propietarios_-_Azeche_P_H_.html',
+// Solo cachear assets estáticos, NUNCA los HTML
+const STATIC_ASSETS = [
   './Logo/1.png'
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS))
   );
   self.skipWaiting();
 });
@@ -57,6 +34,15 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // HTML siempre desde la red (nunca desde caché)
+  if (event.request.destination === 'document' || url.endsWith('.html')) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Imágenes y otros assets: caché primero
   event.respondWith(
     caches.match(event.request).then(cached => cached || fetch(event.request))
   );
