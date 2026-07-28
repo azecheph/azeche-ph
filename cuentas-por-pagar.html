@@ -590,6 +590,55 @@
         .tarjeta-dato { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2); }
         .tarjeta-valor { font-weight: 700; font-size: 1.1em; }
 
+        /* GUÍA DE FACTURAS MENSUALES */
+        .guia-facturas-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .guia-facturas-card h2 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .guia-facturas-sub {
+            color: #999;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+        .guia-tabla {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .guia-tabla th {
+            background: #f0f4ff;
+            color: #667eea;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 700;
+            border-bottom: 2px solid #667eea;
+            white-space: nowrap;
+        }
+        .guia-tabla td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+        .guia-tabla tbody tr:hover { background: #f8f9ff; }
+        .guia-dia-badge {
+            display: inline-block;
+            background: #ede7f6;
+            color: #6a1b9a;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 11px;
+            margin: 2px 3px 2px 0;
+            white-space: nowrap;
+        }
+
         /* ── ABONOS ── */
         .abono-badge {
             display: inline-flex; align-items: center; gap: 4px;
@@ -662,6 +711,24 @@
         <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px;">
             <h2 style="color: #667eea; margin-bottom: 20px;">📊 Resumen de Facturas por Edificio</h2>
             <div id="tarjetasEdificios" style="display: flex; gap: 15px; flex-wrap: nowrap; overflow-x: auto;"></div>
+        </div>
+
+        <!-- GUÍA DE FACTURAS MENSUALES DEL EDIFICIO SELECCIONADO -->
+        <div class="guia-facturas-card" id="guiaFacturasCard" style="display:none;">
+            <h2>📋 Guía de Facturas Mensuales — <span id="guiaFacturasEdificioNombre"></span></h2>
+            <p class="guia-facturas-sub">Proveedores que facturan habitualmente cada mes en este edificio. Los días mostrados son de referencia (registrados en Mayo/Junio) para recordar qué facturas siempre hay que agregar.</p>
+            <p class="guia-facturas-sub" id="guiaFacturasNota" style="display:none; color:#e65100; font-weight: 600;"></p>
+            <div style="overflow-x: auto;">
+                <table class="guia-tabla">
+                    <thead>
+                        <tr>
+                            <th>Proveedor</th>
+                            <th>Días de Referencia (Mayo / Junio)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="guiaFacturasCuerpo"></tbody>
+                </table>
+            </div>
         </div>
 
         <!-- FILTROS DE BÚSQUEDA -->
@@ -1243,6 +1310,153 @@
             if (v) sel.value = v;
         });
 
+        // ═══════════════════════════════════════════════════════════════
+        // GUÍA DE FACTURAS MENSUALES POR EDIFICIO (referencia Mayo/Junio)
+        // ═══════════════════════════════════════════════════════════════
+        const GUIA_FACTURAS = {
+            'nepal-2': {
+                nombre: 'Nepal 2',
+                proveedores: [
+                    { nombre: 'WOM', fechas: '05-15' },
+                    { nombre: 'ETB', fechas: '05-11' },
+                    { nombre: 'Compliance Pro', fechas: '05-11, 06-15' },
+                    { nombre: 'Serdan SAS', fechas: '05-08, 06-15' },
+                    { nombre: 'Security Control', fechas: '05-04, 06-15' },
+                    { nombre: 'Pintalba Tecnología', fechas: '05-11, 06-15' },
+                    { nombre: 'Multigrast', fechas: '05-08, 06-15' },
+                    { nombre: 'Gloria Azcárate', fechas: '05-12, 06-15' },
+                    { nombre: 'Elevator Sistem Technology', fechas: '05-19' },
+                    { nombre: 'Yesenia Gómez', fechas: '05-19, 06-24' },
+                    { nombre: 'Nepal II (fondo)', fechas: '05-19 (x3)' },
+                    { nombre: 'DESYSTEC', fechas: '05-04' },
+                    { nombre: 'Allianz Seguros', fechas: '05-04' },
+                    { nombre: 'Jesús Antonio Rojas', fechas: '05-15' },
+                    { nombre: 'Inprovex', fechas: '06-23' },
+                    { nombre: 'DIAN', fechas: '05/06 (varios)' },
+                ]
+            },
+            'convivienda-1': {
+                nombre: 'Convivienda I',
+                proveedores: [
+                    { nombre: 'Aservib SAS', fechas: '05-11' },
+                    { nombre: 'Maria C Gonzalez M', fechas: '05-04' },
+                    { nombre: 'Pintalba Tecnología', fechas: '05-11, 06-15 (x2)' },
+                    { nombre: 'Security Control', fechas: '05-04, 06-15' },
+                    { nombre: 'Multigrast', fechas: '05-08, 06-15' },
+                    { nombre: 'WOM', fechas: '05-12, 06-15' },
+                    { nombre: 'Gloria Azcárate', fechas: '05-02, 06-15' },
+                    { nombre: 'Compliance Pro', fechas: '05-11, 06-15' },
+                    { nombre: 'Atanacio Sosa Villamil', fechas: '05-12, 06-07' },
+                    { nombre: 'Gustavo Barriga', fechas: '05-29' },
+                    { nombre: 'Superintendencia Notariado y Registro', fechas: '06-15' },
+                    { nombre: 'Yesenia Gómez', fechas: '06-26, 06-10' },
+                    { nombre: 'DIAN', fechas: '06-15' },
+                ]
+            },
+            'avalon': {
+                nombre: 'Avalon',
+                proveedores: [
+                    { nombre: 'Ascensores Prisma', fechas: '05-14, 06-15' },
+                    { nombre: 'Multigrast', fechas: '05-08, 06-15' },
+                    { nombre: 'Gloria Azcárate', fechas: '05-11, 06-15' },
+                    { nombre: 'Jesús Antonio Rojas', fechas: '05-15' },
+                    { nombre: 'DIAN', fechas: '05-11, 06-15' },
+                    { nombre: 'Mónica Hernández', fechas: '06-15' },
+                    { nombre: 'Adasco Ltda', fechas: '05-13, 06-16' },
+                    { nombre: 'Aquafacil Ingeniería SAS', fechas: '06-18' },
+                    { nombre: 'Compliance Pro', fechas: '06-27' },
+                    { nombre: 'Abacontrol Bug Off', fechas: '06-09' },
+                    { nombre: 'Servicios El Tesoro', fechas: '05-22' },
+                    { nombre: 'Gustavo Barriga', fechas: '05-12, 05-29' },
+                ]
+            },
+            'torre-amin-2': {
+                nombre: 'Torres de Amín II',
+                proveedores: [
+                    { nombre: 'Seguridad G2 Ltda', fechas: '05-01, 06-19' },
+                    { nombre: 'La Previsora Seguros', fechas: '05-01, 06-15' },
+                    { nombre: 'ETB', fechas: '05-01, 06-15' },
+                    { nombre: 'Wired & Wireless Smart Business', fechas: '05-15' },
+                    { nombre: 'Proarrendadores SAS', fechas: '05-01' },
+                    { nombre: 'Multigrast', fechas: '05-01, 06-15' },
+                    { nombre: 'Ingenieros Técnicos Mecánicos', fechas: '05-01 (x2), 06-15' },
+                    { nombre: 'Gloria Azcárate', fechas: '05-01, 06-15' },
+                    { nombre: 'ENEL', fechas: '05-01' },
+                    { nombre: 'Yesenia Gómez', fechas: '05-30' },
+                    { nombre: 'Jonathan Peñuela', fechas: '05-15, 06-16' },
+                ]
+            },
+            'pinos-del-country': {
+                nombre: 'Pinos del Country',
+                proveedores: [
+                    { nombre: 'Gloria Azcárate', fechas: '05-07, 06-15' },
+                    { nombre: 'Yelver Alexander Parra Gómez', fechas: '05-07, 06-15' },
+                    { nombre: 'Sodimac Colombia', fechas: '05-12' },
+                    { nombre: 'Multigrast', fechas: '05-08, 06-15' },
+                    { nombre: 'Serdan SAS', fechas: '05-08, 06-15' },
+                    { nombre: 'WOM', fechas: '06-15' },
+                    { nombre: 'Jesús Antonio Rojas', fechas: '06-15' },
+                    { nombre: 'DIAN', fechas: '06-16' },
+                    { nombre: 'Carlos A Sierra', fechas: '06-17' },
+                ]
+            },
+            'marija-1': {
+                nombre: 'Marija I',
+                proveedores: [
+                    { nombre: 'Administraciones Inmobiliarias Satélite', fechas: '05-01, 06-01' },
+                    { nombre: 'DIAN', fechas: '05-02' },
+                    { nombre: 'Elias Contreras', fechas: '05-15, 05-11, 05-16, 05-08 (varias facturas)' },
+                    { nombre: 'Distrimat', fechas: '05-08' },
+                    { nombre: 'Ricardo Malaver', fechas: '05-16' },
+                    { nombre: 'Transporte y Agregados Daza', fechas: '05-09' },
+                    { nombre: 'ENEL', fechas: '05-11, 06-02' },
+                    { nombre: 'Ferretería la 119', fechas: '05-08' },
+                    { nombre: 'Guiovanny de Jesús Gutiérrez', fechas: '05-24' },
+                    { nombre: 'Multipuertas B&G', fechas: '06-09' },
+                ]
+            },
+            'angelo': {
+                nombre: 'Angelo',
+                nota: 'Edificio incorporado en Junio — aún no hay historial de Mayo.',
+                proveedores: [
+                    { nombre: 'Security Control', fechas: '06-16' },
+                    { nombre: 'DIAN', fechas: '06-16' },
+                    { nombre: 'Andrés Colmenares Colmenadres', fechas: '06-16' },
+                    { nombre: 'Gloria Azcárate', fechas: '06-16, 06-15' },
+                    { nombre: 'Misión Servir SAS', fechas: '06-24' },
+                    { nombre: 'Compliance Pro', fechas: '06-26' },
+                    { nombre: 'Multigrast', fechas: '06-18' },
+                ]
+            },
+        };
+
+        function renderGuiaFacturas() {
+            const card = document.getElementById('guiaFacturasCard');
+            const cuerpo = document.getElementById('guiaFacturasCuerpo');
+            const nombreEl = document.getElementById('guiaFacturasEdificioNombre');
+            const notaEl = document.getElementById('guiaFacturasNota');
+            if (!card || !cuerpo || !nombreEl || !notaEl) return;
+
+            const guia = GUIA_FACTURAS[edificioActual];
+            if (!edificioActual || !guia) {
+                card.style.display = 'none';
+                return;
+            }
+
+            nombreEl.textContent = guia.nombre;
+            if (guia.nota) {
+                notaEl.textContent = '⚠️ ' + guia.nota;
+                notaEl.style.display = 'block';
+            } else {
+                notaEl.style.display = 'none';
+            }
+            cuerpo.innerHTML = guia.proveedores.map(p => {
+                const badges = p.fechas.split(',').map(f => `<span class="guia-dia-badge">${f.trim()}</span>`).join('');
+                return `<tr><td>${p.nombre}</td><td>${badges}</td></tr>`;
+            }).join('');
+            card.style.display = 'block';
+        }
+
         let edificioActual = '';
         let facturasTemp = [];
         let proveedoresDB = {}; // Base de datos de proveedores en memoria
@@ -1383,7 +1597,8 @@
             } else {
                 btnDrive.style.display = 'none';
             }
-            
+
+            renderGuiaFacturas();
             cargarCuentas();
         };
         
