@@ -591,17 +591,6 @@
         .tarjeta-valor { font-weight: 700; font-size: 1.1em; }
 
         /* GUÍA DE FACTURAS MENSUALES */
-        .guia-facturas-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-        .guia-facturas-card h2 {
-            color: #667eea;
-            margin-bottom: 5px;
-        }
         .guia-facturas-sub {
             color: #999;
             font-size: 13px;
@@ -705,30 +694,15 @@
             <button class="btn" style="background: #e53935; color: white;" onclick="verPendientesPorEdificio()">
                 🔴 Ver Pendientes por Edificio
             </button>
+            <button class="btn" style="background: #667eea; color: white;" onclick="abrirGuiaFacturas()">
+                📋 Guía de Facturas Mensuales
+            </button>
         </div>
 
         <!-- RESUMEN DE FACTURAS POR EDIFICIO -->
         <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px;">
             <h2 style="color: #667eea; margin-bottom: 20px;">📊 Resumen de Facturas por Edificio</h2>
             <div id="tarjetasEdificios" style="display: flex; gap: 15px; flex-wrap: nowrap; overflow-x: auto;"></div>
-        </div>
-
-        <!-- GUÍA DE FACTURAS MENSUALES DEL EDIFICIO SELECCIONADO -->
-        <div class="guia-facturas-card" id="guiaFacturasCard" style="display:none;">
-            <h2>📋 Guía de Facturas Mensuales — <span id="guiaFacturasEdificioNombre"></span></h2>
-            <p class="guia-facturas-sub">Proveedores que facturan habitualmente cada mes en este edificio. Los días mostrados son de referencia (registrados en Mayo/Junio) para recordar qué facturas siempre hay que agregar.</p>
-            <p class="guia-facturas-sub" id="guiaFacturasNota" style="display:none; color:#e65100; font-weight: 600;"></p>
-            <div style="overflow-x: auto;">
-                <table class="guia-tabla">
-                    <thead>
-                        <tr>
-                            <th>Proveedor</th>
-                            <th>Días de Referencia (Mayo / Junio)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="guiaFacturasCuerpo"></tbody>
-                </table>
-            </div>
         </div>
 
         <!-- FILTROS DE BÚSQUEDA -->
@@ -1167,6 +1141,29 @@
         </div>
     </div>
 
+    <!-- MODAL GUÍA DE FACTURAS MENSUALES -->
+    <div class="modal" id="modalGuiaFacturas">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2>📋 Guía de Facturas Mensuales — <span id="guiaFacturasEdificioNombre"></span></h2>
+                <button class="btn-close" onclick="cerrarModal('modalGuiaFacturas')">&times;</button>
+            </div>
+            <p class="guia-facturas-sub">Proveedores que facturan habitualmente cada mes en este edificio. Los días mostrados son de referencia (registrados en Mayo/Junio) para recordar qué facturas siempre hay que agregar.</p>
+            <p class="guia-facturas-sub" id="guiaFacturasNota" style="display:none; color:#e65100; font-weight: 600;"></p>
+            <div style="overflow-x: auto;">
+                <table class="guia-tabla">
+                    <thead>
+                        <tr>
+                            <th>Proveedor</th>
+                            <th>Días de Referencia (Mayo / Junio)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="guiaFacturasCuerpo"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL PENDIENTES POR EDIFICIO -->
     <div class="modal" id="modalPendientes">
         <div class="modal-content" style="max-width: 1200px;">
@@ -1430,16 +1427,22 @@
             },
         };
 
-        function renderGuiaFacturas() {
-            const card = document.getElementById('guiaFacturasCard');
+        window.abrirGuiaFacturas = function() {
+            if (!edificioActual) {
+                alert('Selecciona un edificio primero');
+                return;
+            }
+
             const cuerpo = document.getElementById('guiaFacturasCuerpo');
             const nombreEl = document.getElementById('guiaFacturasEdificioNombre');
             const notaEl = document.getElementById('guiaFacturasNota');
-            if (!card || !cuerpo || !nombreEl || !notaEl) return;
 
             const guia = GUIA_FACTURAS[edificioActual];
-            if (!edificioActual || !guia) {
-                card.style.display = 'none';
+            if (!guia) {
+                nombreEl.textContent = '';
+                notaEl.style.display = 'none';
+                cuerpo.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#999; padding:20px;">Aún no hay guía de facturas registrada para este edificio</td></tr>';
+                document.getElementById('modalGuiaFacturas').classList.add('active');
                 return;
             }
 
@@ -1454,8 +1457,8 @@
                 const badges = p.fechas.split(',').map(f => `<span class="guia-dia-badge">${f.trim()}</span>`).join('');
                 return `<tr><td>${p.nombre}</td><td>${badges}</td></tr>`;
             }).join('');
-            card.style.display = 'block';
-        }
+            document.getElementById('modalGuiaFacturas').classList.add('active');
+        };
 
         let edificioActual = '';
         let facturasTemp = [];
@@ -1598,7 +1601,6 @@
                 btnDrive.style.display = 'none';
             }
 
-            renderGuiaFacturas();
             cargarCuentas();
         };
         
