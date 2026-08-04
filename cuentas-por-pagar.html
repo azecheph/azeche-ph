@@ -84,7 +84,29 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
         }
-        
+
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            font-size: inherit;
+        }
+
+        .btn-whatsapp:hover {
+            background: #1ebe57;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+        }
+
         .btn-logout {
             background: #667eea;
             color: white;
@@ -671,6 +693,9 @@
                 <a href="#" id="btnDrive" class="btn-drive" target="_blank" style="display: none;">
                     📁 Ver Facturas Drive
                 </a>
+                <button class="btn-whatsapp" onclick="compartirDatosWhatsApp()">
+                    📤 Compartir Datos por WhatsApp
+                </button>
 
             </div>
             <button class="btn-logout" onclick="location.href='Dashboard.html'">
@@ -1292,6 +1317,7 @@
         const db = getDatabase(app);
 
         // Cargar edificios dinámicamente
+        const edificiosData = {};
         onValue(ref(db, 'edificios'), (snap) => {
             const sel = document.getElementById('edificioSelect');
             if (!sel) return;
@@ -1299,13 +1325,41 @@
             sel.innerHTML = '<option value="">Selecciona edificio</option>';
             if (snap.exists()) snap.forEach(child => {
                 const ed = child.val();
+                const id = ed.edificioId || child.key;
+                edificiosData[id] = {
+                    nombre: ed.nombre || child.key,
+                    rut: ed.rut || '',
+                    direccion: ed.direccion || ''
+                };
                 const opt = document.createElement('option');
-                opt.value = ed.edificioId || child.key;
+                opt.value = id;
                 opt.textContent = (ed.icono || '🏢') + ' ' + (ed.nombre || child.key);
                 sel.appendChild(opt);
             });
             if (v) sel.value = v;
         });
+
+        // ═══════════════════════════════════════════════════════════════
+        // COMPARTIR DATOS DEL EDIFICIO POR WHATSAPP (para cuentas de cobro)
+        // ═══════════════════════════════════════════════════════════════
+        window.compartirDatosWhatsApp = function() {
+            if (!edificioActual) {
+                alert('Selecciona un edificio primero');
+                return;
+            }
+            const ed = edificiosData[edificioActual];
+            if (!ed) {
+                alert('No se encontraron los datos de este edificio');
+                return;
+            }
+            const mensaje =
+                `📋 *Datos para Cuenta de Cobro*\n\n` +
+                `🏢 Edificio: ${ed.nombre}\n` +
+                `🆔 NIT/RUT: ${ed.rut || 'No registrado'}\n` +
+                `📍 Dirección: ${ed.direccion || 'No registrada'}\n\n` +
+                `Por favor incluir estos datos en la cuenta de cobro.`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
+        };
 
         // ═══════════════════════════════════════════════════════════════
         // GUÍA DE FACTURAS MENSUALES POR EDIFICIO (referencia Mayo/Junio)
