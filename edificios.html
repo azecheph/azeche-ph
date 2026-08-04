@@ -600,6 +600,7 @@
                 <div class="card-actions">
                     <button class="btn-card btn-edit" onclick="abrirEditar('${key}')">✏️ Editar</button>
                     <button class="btn-card" style="background:#7c3aed;color:white;" onclick="abrirDocumentos('${key}')">📄 Docs</button>
+                    <button class="btn-card" style="background:#25D366;color:white;" onclick="compartirEdificioWhatsApp('${(d.nombre||'').replace(/'/g,"\\'")}','${(d.rut||'').replace(/'/g,"\\'")}','${(d.direccion||'').replace(/'/g,"\\'")}')">📤 WhatsApp</button>
                     <button class="btn-card btn-del" onclick="eliminarEdificio('${key}','${(d.nombre||'').replace(/'/g,"\\'")}')">🗑️</button>
                 </div>
             </div>
@@ -743,6 +744,16 @@
 
     window.cerrarModal = function() {
         document.getElementById('modalEdificio').classList.remove('active');
+    };
+
+    window.compartirEdificioWhatsApp = function(nombre, rut, direccion) {
+        const mensaje =
+            `📋 *Datos para Cuenta de Cobro*\n\n` +
+            `🏢 Edificio: ${nombre}\n` +
+            `🆔 NIT/RUT: ${rut || 'No registrado'}\n` +
+            `📍 Dirección: ${direccion || 'No registrada'}\n\n` +
+            `Por favor incluir estos datos en la cuenta de cobro.`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
     };
 
     function limpiarForm() {
