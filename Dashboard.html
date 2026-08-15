@@ -96,45 +96,83 @@
             padding: 0 20px;
         }
 
-        /* MENÚ DE NAVEGACIÓN */
-        .nav-menu {
+        /* LAYOUT: SIDEBAR + CONTENIDO */
+        .app-layout {
+            display: flex;
+            gap: 22px;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* MENÚ DE NAVEGACIÓN (SIDEBAR AGRUPADO) */
+        .sidebar-nav {
             background: white;
             border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 30px;
+            padding: 18px 12px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
+            width: 248px;
+            flex-shrink: 0;
         }
-        
+
+        .nav-group { margin-bottom: 14px; }
+        .nav-group:last-child { margin-bottom: 0; }
+
+        .nav-group-label {
+            display: block;
+            font-size: 0.72em;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #94a3b8;
+            padding: 4px 10px 8px;
+        }
+
         .nav-btn {
-            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
-            color: white;
-            padding: 15px 30px;
+            width: 100%;
+            background: transparent;
+            color: #334155;
             border: none;
-            border-radius: 10px;
-            font-size: 1em;
+            padding: 8px 10px;
+            border-radius: 9px;
+            font-size: 0.92em;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: background 0.2s;
             display: flex;
             align-items: center;
             gap: 10px;
+            text-align: left;
         }
-        
+
         .nav-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 86, 184, 0.3);
+            background: #f1f5f9;
         }
-        
+
         .nav-btn.active {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            background: #fff6e0;
+            color: #b8790a;
         }
-        
-        .nav-btn .icon {
-            font-size: 1.3em;
+
+        .nav-btn .icon-chip {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+        }
+
+        @media (max-width: 860px) {
+            .app-layout { flex-direction: column; }
+            .sidebar-nav { width: 100%; }
         }
 
         /* STATS CARDS */
@@ -541,68 +579,81 @@
     </div>
 
     <div class="container">
+      <div class="app-layout">
         <!-- MENÚ DE NAVEGACIÓN -->
-        <div class="nav-menu">
-            <button class="nav-btn active" onclick="mostrarSeccion('dashboard')">
-                <span class="icon">📊</span>
-                <span>Dashboard</span>
-            </button>
-            <button class="nav-btn" onclick="window.location.href='edificios.html'">
-                <span class="icon">🏢</span>
-                <span>Edificios</span>
-            </button>
-            <button class="nav-btn" onclick="window.location.href='cuentas-por-pagar.html'">
-                <span class="icon">💰</span>
-                <span>Cuentas por Pagar</span>
-            </button>
-            <button class="nav-btn" onclick="window.location.href='cuentas-por-cobrar.html'" style="background: linear-gradient(135deg, #e53935 0%, #c62828 100%);">
-                <span class="icon">📊</span>
-                <span>Cartera Morosos</span>
-            </button>
-            <button class="nav-btn" onclick="window.location.href='proveedores.html'">
-                <span class="icon">🤝</span>
-                <span>Proveedores</span>
-            </button>
-            <button class="nav-btn" onclick="window.location.href='contratos.html'">
-                <span class="icon">📄</span>
-                <span>Contratos</span>
-            </button>
-            <button class="nav-btn" onclick="window.location.href='Residentes_y_Propietarios_-_Azeche_P_H_.html'">
-                <span class="icon">👥</span>
-                <span>Residentes y Propietarios</span>
-            </button>
-            <button class="nav-btn" onclick="window.location.href='asambleas.html'">
-                <span class="icon">🎯</span>
-                <span>Asambleas</span>
-            </button>
-            <button class="nav-btn" onclick="window.location.href='consejos-administracion.html'" style="background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);">
-                <span class="icon">🏛️</span>
-                <span>Consejos de Administración</span>
-            </button>
-            <button class="nav-btn" onclick="window.open('checklist-recepcion.html', '_blank')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <span class="icon">📋</span>
-                <span>Checklist Recepción</span>
-            </button>
-            <button class="nav-btn" onclick="window.location.href='gestion-insumos.html'" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-                <span class="icon">📦</span>
-                <span>Órdenes de Compra</span>
-            </button>
-            <button class="nav-btn" onclick="window.location.href='supervisiones.html'" style="background: linear-gradient(135deg, #0f766e 0%, #059669 100%);">
-                <span class="icon">🔍</span>
-                <span>Supervisiones</span>
-            </button>
-            <button class="nav-btn" onclick="window.location.href='caja-chica.html'" style="background: linear-gradient(135deg, #b45309 0%, #d97706 100%);">
-                <span class="icon">💰</span>
-                <span>Caja Menor</span>
-            </button>
-            <button class="nav-btn" id="btnCuentasJefa" onclick="window.location.href='cuentas-cobro-jefa.html'" style="display:none; background: linear-gradient(135deg, #6a0dad 0%, #9c27b0 100%);">
-                <span class="icon">👑</span>
-                <span>Cuentas de Cobro</span>
-            </button>
-        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-group">
+                <span class="nav-group-label">Principal</span>
+                <button class="nav-btn active" onclick="mostrarSeccion('dashboard')">
+                    <span class="icon-chip" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);">📊</span>
+                    <span>Dashboard</span>
+                </button>
+            </div>
+            <div class="nav-group">
+                <span class="nav-group-label">Edificios y Comunidad</span>
+                <button class="nav-btn" onclick="window.location.href='edificios.html'">
+                    <span class="icon-chip">🏢</span>
+                    <span>Edificios</span>
+                </button>
+                <button class="nav-btn" onclick="window.location.href='Residentes_y_Propietarios_-_Azeche_P_H_.html'">
+                    <span class="icon-chip">👥</span>
+                    <span>Residentes y Propietarios</span>
+                </button>
+                <button class="nav-btn" onclick="window.location.href='asambleas.html'">
+                    <span class="icon-chip">🎯</span>
+                    <span>Asambleas</span>
+                </button>
+                <button class="nav-btn" onclick="window.location.href='consejos-administracion.html'">
+                    <span class="icon-chip" style="background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);">🏛️</span>
+                    <span>Consejos de Administración</span>
+                </button>
+            </div>
+            <div class="nav-group">
+                <span class="nav-group-label">Finanzas</span>
+                <button class="nav-btn" onclick="window.location.href='cuentas-por-pagar.html'">
+                    <span class="icon-chip">💰</span>
+                    <span>Cuentas por Pagar</span>
+                </button>
+                <button class="nav-btn" onclick="window.location.href='cuentas-por-cobrar.html'">
+                    <span class="icon-chip" style="background: linear-gradient(135deg, #e53935 0%, #c62828 100%);">📊</span>
+                    <span>Cartera Morosos</span>
+                </button>
+                <button class="nav-btn" onclick="window.location.href='caja-chica.html'">
+                    <span class="icon-chip" style="background: linear-gradient(135deg, #b45309 0%, #d97706 100%);">💰</span>
+                    <span>Caja Menor</span>
+                </button>
+                <button class="nav-btn" id="btnCuentasJefa" onclick="window.location.href='cuentas-cobro-jefa.html'" style="display:none;">
+                    <span class="icon-chip" style="background: linear-gradient(135deg, #6a0dad 0%, #9c27b0 100%);">👑</span>
+                    <span>Cuentas de Cobro</span>
+                </button>
+                <button class="nav-btn" onclick="window.location.href='gestion-insumos.html'">
+                    <span class="icon-chip" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">📦</span>
+                    <span>Órdenes de Compra</span>
+                </button>
+            </div>
+            <div class="nav-group">
+                <span class="nav-group-label">Operaciones</span>
+                <button class="nav-btn" onclick="window.location.href='proveedores.html'">
+                    <span class="icon-chip">🤝</span>
+                    <span>Proveedores</span>
+                </button>
+                <button class="nav-btn" onclick="window.location.href='contratos.html'">
+                    <span class="icon-chip">📄</span>
+                    <span>Contratos</span>
+                </button>
+                <button class="nav-btn" onclick="window.open('checklist-recepcion.html', '_blank')">
+                    <span class="icon-chip" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">📋</span>
+                    <span>Checklist Recepción</span>
+                </button>
+                <button class="nav-btn" onclick="window.location.href='supervisiones.html'">
+                    <span class="icon-chip" style="background: linear-gradient(135deg, #0f766e 0%, #059669 100%);">🔍</span>
+                    <span>Supervisiones</span>
+                </button>
+            </div>
+        </nav>
 
         <!-- DASHBOARD PRINCIPAL -->
-        </div>
+        <div class="main-content">
         <div id="dashboard-section" class="dashboard-section">
             <div class="stats-grid">
                 <div class="stat-card">
@@ -1001,6 +1052,8 @@
                 </div>
             </div>
         </div>
+        </div>
+      </div>
     </div>
 
     <div class="footer">
