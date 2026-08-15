@@ -6,6 +6,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0056B8">
     <title>Mantenimiento - Azeche P.H.</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -254,6 +255,46 @@
         }
         .toast.show { opacity: 1; transform: translateY(0); }
         .toast.error { background: #dc3545; }
+
+        /* ── Barra de informe para el consejo ── */
+        .informe-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            background: #f0f4fb;
+            border: 1px solid #d7e3f5;
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 26px;
+        }
+        .informe-bar strong { color: #0056B8; font-size: 0.95em; white-space: nowrap; }
+        .btn-informe {
+            background: linear-gradient(135deg, #475569 0%, #64748b 100%);
+            color: white;
+        }
+        .btn-informe:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(71,85,105,0.4); }
+
+        /* ── Servicios recurrentes ── */
+        .section-titulo-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0 0 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .section-titulo-row h2 { font-size: 1.05em; color: #333; }
+        .frecuencia-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.78em;
+            font-weight: 700;
+            background: #e0e7ff;
+            color: #3730a3;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -270,7 +311,44 @@
     </div>
 
     <div class="content">
+        <!-- Informe para el consejo -->
+        <div class="informe-bar">
+            <strong>📄 Informe para el Consejo</strong>
+            <select id="informeEdificio">
+                <option value="">Seleccionar edificio...</option>
+            </select>
+            <button class="btn btn-informe" onclick="generarInformeConsejo()">📄 Generar Informe PDF</button>
+        </div>
+
+        <!-- Servicios recurrentes -->
+        <div class="section-titulo-row">
+            <h2>🌱 Servicios Recurrentes por Edificio</h2>
+            <button id="btnNuevoRecurrente" class="btn btn-primary" onclick="abrirModalRecurrente()" style="display:none">
+                ➕ Nuevo Servicio Recurrente
+            </button>
+        </div>
+        <div class="table-container" style="margin-bottom:28px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Edificio</th>
+                        <th>Servicio</th>
+                        <th>Proveedor / Contratista</th>
+                        <th>Frecuencia</th>
+                        <th>Notas</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyRecurrentes">
+                    <tr class="empty-row"><td colspan="6">Cargando servicios recurrentes...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
         <!-- Acción + Filtros -->
+        <div class="section-titulo-row">
+            <h2>🗓️ Historial de Mantenimientos y Reparaciones</h2>
+        </div>
         <div class="action-bar">
             <button id="btnNueva" class="btn btn-primary" onclick="abrirModal()" style="display:none">
                 ➕ Nuevo Mantenimiento
@@ -368,6 +446,62 @@
     </div>
 </div>
 
+<!-- Modal nuevo/editar servicio recurrente -->
+<div id="modalRecurrenteOverlay" class="modal-overlay" style="display:none" onclick="cerrarAlClickarFondoRecurrente(event)">
+    <div class="modal">
+        <h2 id="modalRecurrenteTitulo">➕ Nuevo Servicio Recurrente</h2>
+        <form id="formRecurrente" onsubmit="guardarRecurrente(event)">
+            <div class="form-group">
+                <label>Edificio *</label>
+                <select id="modalRecEdificio" required>
+                    <option value="">Seleccionar edificio...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Servicio *</label>
+                <select id="modalRecServicio" required onchange="toggleServicioOtro()">
+                    <option value="Jardinería">🌱 Jardinería</option>
+                    <option value="Aseo Áreas Comunes">🧹 Aseo Áreas Comunes</option>
+                    <option value="Fumigación / Control de Plagas">🐜 Fumigación / Control de Plagas</option>
+                    <option value="Mantenimiento de Ascensores">🛗 Mantenimiento de Ascensores</option>
+                    <option value="Piscina">🏊 Piscina</option>
+                    <option value="Otro">✏️ Otro</option>
+                </select>
+            </div>
+            <div class="form-group" id="grupoServicioOtro" style="display:none">
+                <label>Especifique el servicio *</label>
+                <input type="text" id="modalRecServicioOtro" placeholder="Ej: Mantenimiento de bombas de agua">
+            </div>
+            <div class="form-group">
+                <label>Proveedor / Contratista *</label>
+                <input type="text" id="modalRecProveedor" list="listaProveedores" placeholder="Nombre del proveedor o contratista" required>
+            </div>
+            <div class="form-group">
+                <label>Frecuencia *</label>
+                <select id="modalRecFrecuencia" required>
+                    <option value="Semanal">Semanal</option>
+                    <option value="Quincenal">Quincenal</option>
+                    <option value="Mensual" selected>Mensual</option>
+                    <option value="Bimestral">Bimestral</option>
+                    <option value="Trimestral">Trimestral</option>
+                    <option value="Anual">Anual</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Notas</label>
+                <textarea id="modalRecNotas" placeholder="Detalles adicionales (opcional)..."></textarea>
+            </div>
+            <div class="modal-btns">
+                <button type="button" class="btn btn-secondary" onclick="cerrarModalRecurrente()">Cancelar</button>
+                <button type="submit" class="btn btn-primary" id="btnGuardarRecurrente">💾 Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Logo oculto (para incrustar en el PDF del informe) -->
+<img id="logoPDF" src="logo-azeche.png" style="display:none" crossorigin="anonymous" onload="precargarLogo()">
+
 <!-- Toast -->
 <div id="toast" class="toast"></div>
 
@@ -393,8 +527,11 @@
 
     let userNombre        = '';
     let todosMantenimientos = [];
+    let todosRecurrentes  = [];
     let edificiosMap      = {};
     let editandoId        = null;   // null = nuevo registro, string = editando
+    let editandoRecurrenteId = null;
+    let logoB64           = null;
 
     // ── Auth ───────────────────────────────────────────────────────────────
     onAuthStateChanged(auth, (user) => {
@@ -410,12 +547,26 @@
         }
 
         document.getElementById('btnNueva').style.display = '';
+        document.getElementById('btnNuevoRecurrente').style.display = '';
         document.getElementById('headerSub').textContent  = userNombre;
 
         cargarEdificios();
         cargarProveedores();
         cargarMantenimientos();
+        cargarServiciosRecurrentes();
     });
+
+    // ── Logo (para el PDF del informe) ──────────────────────────────────────
+    window.precargarLogo = function() {
+        try {
+            const img = document.getElementById('logoPDF');
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            canvas.getContext('2d').drawImage(img, 0, 0);
+            logoB64 = canvas.toDataURL('image/png');
+        } catch (e) { logoB64 = null; }
+    };
 
     window.logout = () => signOut(auth).then(() => location.href = 'index.html');
 
@@ -423,13 +574,19 @@
     function cargarEdificios() {
         onValue(ref(db, 'edificios'), (snap) => {
             edificiosMap = {};
-            const selFiltro  = document.getElementById('filtroEdificio');
-            const selModal   = document.getElementById('modalEdificio');
-            const prevFiltro = selFiltro.value;
-            const prevModal  = selModal.value;
+            const selFiltro   = document.getElementById('filtroEdificio');
+            const selModal    = document.getElementById('modalEdificio');
+            const selRec      = document.getElementById('modalRecEdificio');
+            const selInforme  = document.getElementById('informeEdificio');
+            const prevFiltro  = selFiltro.value;
+            const prevModal   = selModal.value;
+            const prevRec     = selRec.value;
+            const prevInforme = selInforme.value;
 
-            selFiltro.innerHTML = '<option value="">🏢 Todos los edificios</option>';
-            selModal.innerHTML  = '<option value="">Seleccionar edificio...</option>';
+            selFiltro.innerHTML  = '<option value="">🏢 Todos los edificios</option>';
+            selModal.innerHTML   = '<option value="">Seleccionar edificio...</option>';
+            selRec.innerHTML     = '<option value="">Seleccionar edificio...</option>';
+            selInforme.innerHTML = '<option value="">Seleccionar edificio...</option>';
 
             if (snap.exists()) {
                 snap.forEach(child => {
@@ -438,7 +595,7 @@
                     const icono  = ed.icono  || '🏢';
                     edificiosMap[child.key] = { nombre, icono };
 
-                    [selFiltro, selModal].forEach(sel => {
+                    [selFiltro, selModal, selRec, selInforme].forEach(sel => {
                         const opt = document.createElement('option');
                         opt.value       = child.key;
                         opt.textContent = `${icono} ${nombre}`;
@@ -447,10 +604,13 @@
                 });
             }
 
-            selFiltro.value = prevFiltro;
-            selModal.value  = prevModal;
+            selFiltro.value  = prevFiltro;
+            selModal.value   = prevModal;
+            selRec.value     = prevRec;
+            selInforme.value = prevInforme;
 
             renderResumen();
+            renderTablaRecurrentes();
         });
     }
 
@@ -470,6 +630,157 @@
             }
         });
     }
+
+    // ── Servicios recurrentes (jardinería, aseo, etc.) ─────────────────────
+    function cargarServiciosRecurrentes() {
+        onValue(ref(db, 'servicios_recurrentes'), (snap) => {
+            todosRecurrentes = [];
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    todosRecurrentes.push({ id: child.key, ...child.val() });
+                });
+                todosRecurrentes.sort((a, b) => (a.edificioNombre || '').localeCompare(b.edificioNombre || ''));
+            }
+            renderTablaRecurrentes();
+        });
+    }
+
+    function renderTablaRecurrentes() {
+        const tbody = document.getElementById('tbodyRecurrentes');
+        if (!tbody) return;
+
+        if (todosRecurrentes.length === 0) {
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No hay servicios recurrentes registrados aún.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = todosRecurrentes.map(r => {
+            const edNombre = r.edificioNombre || (edificiosMap[r.edificioId]?.nombre) || r.edificioId;
+            return `<tr>
+                <td><strong>${edNombre}</strong></td>
+                <td>${escapeHtml(r.servicio)}</td>
+                <td>${escapeHtml(r.proveedor || '—')}</td>
+                <td><span class="frecuencia-tag">${escapeHtml(r.frecuencia || '—')}</span></td>
+                <td class="desc-cell">${escapeHtml(r.notas || '—')}</td>
+                <td style="white-space:nowrap">
+                    <button class="btn-small btn-editar" onclick="editarRecurrente('${r.id}')">✏️</button>
+                    <button class="btn-small btn-eliminar" onclick="eliminarRecurrente('${r.id}')">🗑️</button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    window.toggleServicioOtro = () => {
+        const esOtro = document.getElementById('modalRecServicio').value === 'Otro';
+        document.getElementById('grupoServicioOtro').style.display = esOtro ? '' : 'none';
+        document.getElementById('modalRecServicioOtro').required = esOtro;
+    };
+
+    window.abrirModalRecurrente = (registro = null) => {
+        document.getElementById('formRecurrente').reset();
+        document.getElementById('grupoServicioOtro').style.display = 'none';
+        editandoRecurrenteId = null;
+
+        if (registro) {
+            editandoRecurrenteId = registro.id;
+            document.getElementById('modalRecurrenteTitulo').textContent = '✏️ Editar Servicio Recurrente';
+            document.getElementById('modalRecEdificio').value    = registro.edificioId  || '';
+            document.getElementById('modalRecProveedor').value   = registro.proveedor   || '';
+            document.getElementById('modalRecFrecuencia').value  = registro.frecuencia  || 'Mensual';
+            document.getElementById('modalRecNotas').value       = registro.notas       || '';
+
+            const serviciosPredefinidos = ['Jardinería','Aseo Áreas Comunes','Fumigación / Control de Plagas','Mantenimiento de Ascensores','Piscina'];
+            if (serviciosPredefinidos.includes(registro.servicio)) {
+                document.getElementById('modalRecServicio').value = registro.servicio;
+            } else {
+                document.getElementById('modalRecServicio').value = 'Otro';
+                document.getElementById('grupoServicioOtro').style.display = '';
+                document.getElementById('modalRecServicioOtro').value = registro.servicio || '';
+            }
+        } else {
+            document.getElementById('modalRecurrenteTitulo').textContent = '➕ Nuevo Servicio Recurrente';
+        }
+
+        document.getElementById('modalRecurrenteOverlay').style.display = 'flex';
+    };
+
+    window.cerrarModalRecurrente = () => {
+        document.getElementById('modalRecurrenteOverlay').style.display = 'none';
+        editandoRecurrenteId = null;
+    };
+
+    window.cerrarAlClickarFondoRecurrente = (e) => {
+        if (e.target === document.getElementById('modalRecurrenteOverlay')) cerrarModalRecurrente();
+    };
+
+    window.guardarRecurrente = async (e) => {
+        e.preventDefault();
+        const edificioId = document.getElementById('modalRecEdificio').value;
+        const servicioSel = document.getElementById('modalRecServicio').value;
+        const servicio = servicioSel === 'Otro'
+            ? document.getElementById('modalRecServicioOtro').value.trim()
+            : servicioSel;
+        const proveedor  = document.getElementById('modalRecProveedor').value.trim();
+        const frecuencia = document.getElementById('modalRecFrecuencia').value;
+        const notas      = document.getElementById('modalRecNotas').value.trim();
+
+        if (!edificioId || !servicio || !proveedor) return;
+
+        const btn = document.getElementById('btnGuardarRecurrente');
+        btn.disabled    = true;
+        btn.textContent = '⏳ Guardando...';
+
+        try {
+            const edInfo = edificiosMap[edificioId] || {};
+
+            if (editandoRecurrenteId) {
+                await update(ref(db, `servicios_recurrentes/${editandoRecurrenteId}`), {
+                    edificioId,
+                    edificioNombre: edInfo.nombre || edificioId,
+                    servicio,
+                    proveedor,
+                    frecuencia,
+                    notas,
+                    editadoAt: new Date().toISOString()
+                });
+                cerrarModalRecurrente();
+                mostrarToast('✅ Servicio recurrente actualizado');
+            } else {
+                await push(ref(db, 'servicios_recurrentes'), {
+                    edificioId,
+                    edificioNombre: edInfo.nombre || edificioId,
+                    servicio,
+                    proveedor,
+                    frecuencia,
+                    notas,
+                    creadoPor: userNombre,
+                    creadoAt:  new Date().toISOString()
+                });
+                cerrarModalRecurrente();
+                mostrarToast('✅ Servicio recurrente registrado');
+            }
+        } catch (err) {
+            mostrarToast('❌ Error al guardar: ' + err.message, true);
+        } finally {
+            btn.disabled    = false;
+            btn.textContent = '💾 Guardar';
+        }
+    };
+
+    window.editarRecurrente = (id) => {
+        const registro = todosRecurrentes.find(r => r.id === id);
+        if (registro) abrirModalRecurrente(registro);
+    };
+
+    window.eliminarRecurrente = async (id) => {
+        if (!confirm('¿Eliminar este servicio recurrente? Esta acción no se puede deshacer.')) return;
+        try {
+            await remove(ref(db, `servicios_recurrentes/${id}`));
+            mostrarToast('🗑️ Servicio recurrente eliminado');
+        } catch (err) {
+            mostrarToast('❌ Error al eliminar: ' + err.message, true);
+        }
+    };
 
     // ── Mantenimientos (tiempo real) ────────────────────────────────────────
     function cargarMantenimientos() {
@@ -704,6 +1015,162 @@
         } catch (err) {
             mostrarToast('❌ Error al eliminar: ' + err.message, true);
         }
+    };
+
+    // ── Informe para el Consejo (PDF) ───────────────────────────────────────
+    window.generarInformeConsejo = () => {
+        const edificioId = document.getElementById('informeEdificio').value;
+        if (!edificioId) {
+            mostrarToast('⚠️ Selecciona un edificio para generar el informe', true);
+            return;
+        }
+        const edInfo = edificiosMap[edificioId] || {};
+        const edNombre = edInfo.nombre || edificioId;
+
+        const recurrentes = todosRecurrentes.filter(r => r.edificioId === edificioId);
+        const registros    = todosMantenimientos.filter(m => m.edificioId === edificioId);
+        const realizados    = registros.filter(m => m.estado === 'Realizado')
+                                        .sort((a, b) => (b.fechaRealizado || '').localeCompare(a.fechaRealizado || ''));
+        const pendientes     = registros.filter(m => m.estado !== 'Realizado')
+                                        .sort((a, b) => (a.fechaProgramada || '').localeCompare(b.fechaProgramada || ''));
+        const imprevistosCount = registros.filter(m => m.tipo === 'Imprevisto').length;
+
+        const fmt = (f) => f
+            ? new Date(f + 'T12:00:00').toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' })
+            : 'Sin definir';
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const pageWidth  = doc.internal.pageSize.width;
+        const marginLeft = 20;
+        const maxWidth   = pageWidth - marginLeft * 2;
+        let yPos = 20;
+
+        function checkNewPage(requiredSpace = 20) {
+            if (yPos + requiredSpace > 280) { doc.addPage(); yPos = 20; return true; }
+            return false;
+        }
+
+        function sinEmoji(str) {
+            return String(str || '').replace(/[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]|[\u{FE00}-\u{FEFF}]/gu, '').replace(/\s+/g,' ').trim();
+        }
+
+        function tituloSeccion(texto) {
+            checkNewPage(20);
+            doc.setFillColor(237, 242, 247);
+            doc.rect(marginLeft - 5, yPos - 5, maxWidth + 10, 10, 'F');
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(0, 0, 0);
+            doc.text(texto, marginLeft, yPos);
+            yPos += 13;
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(9.5);
+        }
+
+        // ── Encabezado ──
+        doc.setFillColor(0, 86, 184);
+        doc.rect(0, 0, pageWidth, 44, 'F');
+        doc.setFillColor(255, 255, 255);
+        doc.rect(10, 5, 38, 34, 'F');
+        if (logoB64) {
+            doc.addImage(logoB64, 'PNG', 11, 6, 36, 32);
+        } else {
+            doc.setFontSize(13); doc.setFont(undefined, 'bold');
+            doc.setTextColor(0, 86, 184); doc.text('Azeche', 12, 19);
+            doc.setTextColor(0, 184, 83); doc.text('P.H.', 12, 29);
+        }
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(16); doc.setFont(undefined, 'bold');
+        doc.text('INFORME DE MANTENIMIENTO', pageWidth / 2 + 15, 16, { align: 'center' });
+        doc.setFontSize(10); doc.setFont(undefined, 'normal');
+        doc.text(`Edificio: ${sinEmoji(edNombre)} — Para el Consejo de Administración`, pageWidth / 2 + 15, 25, { align: 'center' });
+        doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-CO')}`, pageWidth / 2 + 15, 34, { align: 'center' });
+
+        yPos = 56;
+
+        // ── Resumen ejecutivo ──
+        tituloSeccion('RESUMEN EJECUTIVO');
+        const resumenItems = [
+            `Mantenimientos y reparaciones realizados: ${realizados.length}`,
+            `De los cuales fueron arreglos imprevistos: ${imprevistosCount}`,
+            `Pendientes o programados: ${pendientes.length}`,
+            `Servicios recurrentes activos: ${recurrentes.length}`
+        ];
+        resumenItems.forEach(t => { checkNewPage(); doc.text('• ' + t, marginLeft, yPos); yPos += 7; });
+        yPos += 6;
+
+        // ── Servicios recurrentes ──
+        tituloSeccion('SERVICIOS RECURRENTES ACTIVOS');
+        if (recurrentes.length === 0) {
+            doc.text('No hay servicios recurrentes registrados para este edificio.', marginLeft, yPos);
+            yPos += 10;
+        } else {
+            recurrentes.forEach(r => {
+                checkNewPage(16);
+                doc.setFont(undefined, 'bold');
+                doc.text(sinEmoji(r.servicio), marginLeft, yPos);
+                doc.setFont(undefined, 'normal');
+                doc.text(`${sinEmoji(r.proveedor)} — ${sinEmoji(r.frecuencia)}`, marginLeft, yPos + 5);
+                if (r.notas) {
+                    const notaLines = doc.splitTextToSize(sinEmoji(r.notas), maxWidth - 10);
+                    doc.setFontSize(8.5); doc.setTextColor(90,90,90);
+                    notaLines.forEach(l => { checkNewPage(); doc.text(l, marginLeft + 5, yPos + 10); yPos += 4.5; });
+                    doc.setFontSize(9.5); doc.setTextColor(0,0,0);
+                }
+                yPos += 13;
+            });
+        }
+        yPos += 3;
+
+        // ── Realizados ──
+        tituloSeccion('MANTENIMIENTOS Y REPARACIONES REALIZADOS');
+        if (realizados.length === 0) {
+            doc.text('No hay registros realizados en este período.', marginLeft, yPos);
+            yPos += 10;
+        } else {
+            realizados.forEach(m => {
+                checkNewPage(18);
+                const tipoTxt = m.tipo === 'Imprevisto' ? 'Arreglo imprevisto' : 'Mantenimiento';
+                doc.setFont(undefined, 'bold');
+                doc.text(`${fmt(m.fechaRealizado)} — ${tipoTxt} — ${sinEmoji(m.proveedor)}`, marginLeft, yPos);
+                doc.setFont(undefined, 'normal');
+                const descLines = doc.splitTextToSize(sinEmoji(m.descripcion), maxWidth - 5);
+                descLines.forEach(l => { checkNewPage(); yPos += 5; doc.text(l, marginLeft + 3, yPos); });
+                yPos += 9;
+            });
+        }
+        yPos += 3;
+
+        // ── Pendientes ──
+        tituloSeccion('PENDIENTES / PRÓXIMOS PROGRAMADOS');
+        if (pendientes.length === 0) {
+            doc.text('No hay mantenimientos pendientes o programados.', marginLeft, yPos);
+            yPos += 10;
+        } else {
+            pendientes.forEach(m => {
+                checkNewPage(18);
+                const tipoTxt = m.tipo === 'Imprevisto' ? 'Arreglo imprevisto' : 'Mantenimiento';
+                doc.setFont(undefined, 'bold');
+                doc.text(`Programado: ${fmt(m.fechaProgramada)} — ${tipoTxt} — ${sinEmoji(m.proveedor)}`, marginLeft, yPos);
+                doc.setFont(undefined, 'normal');
+                const descLines = doc.splitTextToSize(sinEmoji(m.descripcion), maxWidth - 5);
+                descLines.forEach(l => { checkNewPage(); yPos += 5; doc.text(l, marginLeft + 3, yPos); });
+                yPos += 9;
+            });
+        }
+
+        // ── Pie de página ──
+        const totalPaginas = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPaginas; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text(`Azeche P.H. — Informe generado por ${sinEmoji(userNombre)} — Página ${i} de ${totalPaginas}`, marginLeft, 292);
+        }
+
+        doc.save(`Informe_Mantenimiento_${sinEmoji(edNombre).replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+        mostrarToast('✅ Informe generado');
     };
 
     // ── Utilidades ─────────────────────────────────────────────────────────
