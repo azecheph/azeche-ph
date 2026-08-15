@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0056B8">
+    <title>Mantenimiento - Azeche P.H.</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #475569 0%, #64748b 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { font-size: 1.8em; display: flex; align-items: center; gap: 12px; }
+        .header-sub { font-size: 0.85em; opacity: 0.85; margin-top: 4px; }
+
+        .btn-nav {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 9px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            margin-left: 8px;
+        }
+        .btn-nav:hover { background: white; color: #0056B8; transform: translateY(-2px); }
+
+        /* ── Content ── */
+        .content { padding: 30px; }
+
+        /* ── Barra de acciones ── */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 11px 26px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0056B8 0%, #00B853 100%);
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,86,184,0.4); }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { transform: translateY(-2px); }
+
+        /* ── Filtros ── */
+        .filtros {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filtros select, .filtros input {
+            padding: 9px 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9em;
+            transition: border-color 0.3s;
+            cursor: pointer;
+        }
+        .filtros select:focus, .filtros input:focus {
+            outline: none;
+            border-color: #0056B8;
+        }
+
+        /* ── Resumen por edificio ── */
+        .resumen-titulo {
+            font-size: 1em;
+            font-weight: 700;
+            color: #333;
+            margin: 24px 0 12px;
+        }
+        .resumen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+        .resumen-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-align: center;
+        }
+        .resumen-card:hover { border-color: #0056B8; transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,86,184,0.15); }
+        .resumen-card.activo { border-color: #0056B8; background: #e8f0fb; }
+        .resumen-card .edificio-nombre { font-size: 0.85em; font-weight: 700; color: #333; margin-bottom: 8px; }
+        .resumen-card .badges { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+        .mini-badge {
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+        }
+        .mini-badge.pendiente { background: #fff3cd; color: #856404; }
+        .mini-badge.realizado { background: #d1e7dd; color: #0a5830; }
+        .mini-badge.cero      { background: #e9ecef; color: #6c757d; }
+
+        /* ── Tabla ── */
+        .table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: linear-gradient(135deg, #0056B8 0%, #00B853 100%); color: white; }
+        th { padding: 14px 15px; text-align: left; font-weight: 600; font-size: 0.9em; white-space: nowrap; }
+        tbody tr { border-bottom: 1px solid #eee; transition: background 0.2s; }
+        tbody tr:hover { background: #f8f9fa; }
+        td { padding: 13px 15px; font-size: 0.9em; vertical-align: middle; }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82em;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .badge-pendiente { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+        .badge-realizado { background: #d1e7dd; color: #0a5830; border: 1px solid #198754; }
+
+        .tipo-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.78em;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .tipo-preventivo { background: #dbeafe; color: #1e40af; }
+        .tipo-imprevisto { background: #fde2e1; color: #b3261e; }
+
+        .btn-small {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.82em;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .btn-resolver  { background: #198754; color: white; }
+        .btn-resolver:hover  { background: #146c43; transform: translateY(-1px); }
+        .btn-reabrir   { background: #ffc107; color: #000; }
+        .btn-reabrir:hover   { background: #e0a800; transform: translateY(-1px); }
+        .btn-editar    { background: #0d6efd; color: white; }
+        .btn-editar:hover    { background: #0b5ed7; transform: translateY(-1px); }
+        .btn-eliminar  { background: #dc3545; color: white; }
+        .btn-eliminar:hover  { background: #b02a37; transform: translateY(-1px); }
+
+        .desc-cell { max-width: 300px; word-break: break-word; }
+        .empty-row td { text-align: center; padding: 50px; color: #999; font-size: 0.95em; }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            width: 100%;
+            max-width: 560px;
+            max-height: 88vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .modal h2 { color: #0056B8; margin-bottom: 24px; font-size: 1.3em; }
+        .form-group { display: flex; flex-direction: column; margin-bottom: 18px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group label { font-weight: 600; margin-bottom: 7px; color: #333; font-size: 0.9em; }
+        .form-group select,
+        .form-group input,
+        .form-group textarea {
+            padding: 11px 13px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        .form-group select:focus,
+        .form-group input:focus,
+        .form-group textarea:focus { outline: none; border-color: #0056B8; }
+        .form-group textarea { resize: vertical; min-height: 90px; }
+        .form-hint { font-size: 0.78em; color: #888; margin-top: 4px; }
+        .modal-btns { display: flex; gap: 12px; margin-top: 8px; justify-content: flex-end; }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: #198754;
+            color: white;
+            padding: 13px 22px;
+            border-radius: 10px;
+            font-weight: 600;
+            z-index: 2000;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { background: #dc3545; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>🔧 Mantenimiento</h1>
+            <div class="header-sub" id="headerSub">Mantenimientos y reparaciones por edificio</div>
+        </div>
+        <div>
+            <button class="btn-nav" onclick="location.href='Dashboard.html'">🏠 Dashboard</button>
+            <button class="btn-nav" onclick="logout()">🚪 Salir</button>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- Acción + Filtros -->
+        <div class="action-bar">
+            <button id="btnNueva" class="btn btn-primary" onclick="abrirModal()" style="display:none">
+                ➕ Nuevo Mantenimiento
+            </button>
+            <div class="filtros">
+                <select id="filtroEdificio" onchange="aplicarFiltros()">
+                    <option value="">🏢 Todos los edificios</option>
+                </select>
+                <select id="filtroTipo" onchange="aplicarFiltros()">
+                    <option value="">🔧 Todos los tipos</option>
+                    <option value="Preventivo">🛠️ Mantenimiento</option>
+                    <option value="Imprevisto">⚠️ Arreglo imprevisto</option>
+                </select>
+                <select id="filtroEstado" onchange="aplicarFiltros()">
+                    <option value="">⚪ Todos los estados</option>
+                    <option value="Pendiente">⏳ Pendiente</option>
+                    <option value="Realizado">✅ Realizado</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Resumen por edificio -->
+        <div class="resumen-titulo">Resumen por edificio</div>
+        <div id="resumenGrid" class="resumen-grid">
+            <div style="color:#999;font-size:.9em;grid-column:1/-1">Cargando edificios...</div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Edificio</th>
+                        <th>Tipo</th>
+                        <th>Proveedor / Contratista</th>
+                        <th>Fecha realizado</th>
+                        <th>Próximo mantenimiento</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyMantenimientos">
+                    <tr class="empty-row"><td colspan="8">Cargando registros...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal nuevo/editar mantenimiento -->
+<div id="modalOverlay" class="modal-overlay" style="display:none" onclick="cerrarAlClickarFondo(event)">
+    <div class="modal">
+        <h2 id="modalTitulo">➕ Nuevo Mantenimiento</h2>
+        <form id="formMantenimiento" onsubmit="guardarMantenimiento(event)">
+            <div class="form-group">
+                <label>Edificio *</label>
+                <select id="modalEdificio" required>
+                    <option value="">Seleccionar edificio...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tipo *</label>
+                <select id="modalTipo" required>
+                    <option value="Preventivo">🛠️ Mantenimiento</option>
+                    <option value="Imprevisto">⚠️ Arreglo imprevisto</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Proveedor / Contratista *</label>
+                <input type="text" id="modalProveedor" list="listaProveedores" placeholder="Nombre del proveedor o contratista" required>
+                <datalist id="listaProveedores"></datalist>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Fecha en que se realizó</label>
+                    <input type="date" id="modalFechaRealizado">
+                    <div class="form-hint">Déjalo vacío si aún no se ha hecho.</div>
+                </div>
+                <div class="form-group">
+                    <label>Próximo mantenimiento</label>
+                    <input type="date" id="modalFechaProgramada">
+                    <div class="form-hint">Cuándo se debe realizar.</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Descripción *</label>
+                <textarea id="modalDescripcion" placeholder="Describe lo que se hizo o lo que se debe hacer..." required></textarea>
+            </div>
+            <div class="modal-btns">
+                <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                <button type="submit" class="btn btn-primary" id="btnGuardar">💾 Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script type="module">
+    import { initializeApp }            from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getDatabase, ref, push, onValue, update, remove }
+                                        from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+    const firebaseConfig = {
+        apiKey:            "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
+        authDomain:        "azeche-ph.firebaseapp.com",
+        databaseURL:       "https://azeche-ph-default-rtdb.firebaseio.com",
+        projectId:         "azeche-ph",
+        storageBucket:     "azeche-ph.firebasestorage.app",
+        messagingSenderId: "905337990521",
+        appId:             "1:905337990521:web:c2ca4932672c59fef6c5c9"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getDatabase(app);
+
+    let userNombre        = '';
+    let todosMantenimientos = [];
+    let edificiosMap      = {};
+    let editandoId        = null;   // null = nuevo registro, string = editando
+
+    // ── Auth ───────────────────────────────────────────────────────────────
+    onAuthStateChanged(auth, (user) => {
+        if (!user) { location.href = 'index.html'; return; }
+
+        const info = JSON.parse(localStorage.getItem('azecheUser') || '{}');
+        const rol  = info.rol || '';
+        userNombre = info.nombre || user.email;
+
+        if (rol !== 'administrador' && rol !== 'creadora') {
+            location.href = 'Dashboard.html';
+            return;
+        }
+
+        document.getElementById('btnNueva').style.display = '';
+        document.getElementById('headerSub').textContent  = userNombre;
+
+        cargarEdificios();
+        cargarProveedores();
+        cargarMantenimientos();
+    });
+
+    window.logout = () => signOut(auth).then(() => location.href = 'index.html');
+
+    // ── Edificios (dinámico desde Firebase) ────────────────────────────────
+    function cargarEdificios() {
+        onValue(ref(db, 'edificios'), (snap) => {
+            edificiosMap = {};
+            const selFiltro  = document.getElementById('filtroEdificio');
+            const selModal   = document.getElementById('modalEdificio');
+            const prevFiltro = selFiltro.value;
+            const prevModal  = selModal.value;
+
+            selFiltro.innerHTML = '<option value="">🏢 Todos los edificios</option>';
+            selModal.innerHTML  = '<option value="">Seleccionar edificio...</option>';
+
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    const ed = child.val();
+                    const nombre = ed.nombre || child.key;
+                    const icono  = ed.icono  || '🏢';
+                    edificiosMap[child.key] = { nombre, icono };
+
+                    [selFiltro, selModal].forEach(sel => {
+                        const opt = document.createElement('option');
+                        opt.value       = child.key;
+                        opt.textContent = `${icono} ${nombre}`;
+                        sel.appendChild(opt);
+                    });
+                });
+            }
+
+            selFiltro.value = prevFiltro;
+            selModal.value  = prevModal;
+
+            renderResumen();
+        });
+    }
+
+    // ── Proveedores registrados (para sugerir en el campo de texto) ────────
+    function cargarProveedores() {
+        onValue(ref(db, 'proveedores'), (snap) => {
+            const lista = document.getElementById('listaProveedores');
+            lista.innerHTML = '';
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    const p = child.val();
+                    if (!p.nombre) return;
+                    const opt = document.createElement('option');
+                    opt.value = p.nombre;
+                    lista.appendChild(opt);
+                });
+            }
+        });
+    }
+
+    // ── Mantenimientos (tiempo real) ────────────────────────────────────────
+    function cargarMantenimientos() {
+        onValue(ref(db, 'mantenimiento'), (snap) => {
+            todosMantenimientos = [];
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    todosMantenimientos.push({ id: child.key, ...child.val() });
+                });
+                // Más recientes primero
+                todosMantenimientos.sort((a, b) => (b.creadoAt || '').localeCompare(a.creadoAt || ''));
+            }
+            renderResumen();
+            renderTabla();
+        });
+    }
+
+    // ── Resumen por edificio ───────────────────────────────────────────────
+    function renderResumen() {
+        const grid = document.getElementById('resumenGrid');
+        if (Object.keys(edificiosMap).length === 0) return;
+
+        const filtroActivo = document.getElementById('filtroEdificio').value;
+
+        const conteo = {};
+        Object.keys(edificiosMap).forEach(k => { conteo[k] = { pendiente: 0, realizado: 0 }; });
+        todosMantenimientos.forEach(m => {
+            if (!conteo[m.edificioId]) conteo[m.edificioId] = { pendiente: 0, realizado: 0 };
+            if (m.estado === 'Realizado') conteo[m.edificioId].realizado++;
+            else                          conteo[m.edificioId].pendiente++;
+        });
+
+        grid.innerHTML = '';
+        Object.entries(edificiosMap).forEach(([key, ed]) => {
+            const { pendiente, realizado } = conteo[key] || { pendiente: 0, realizado: 0 };
+            const activo = filtroActivo === key ? 'activo' : '';
+            const card = document.createElement('div');
+            card.className = `resumen-card ${activo}`;
+            card.innerHTML = `
+                <div class="edificio-nombre">${ed.icono} ${ed.nombre}</div>
+                <div class="badges">
+                    ${pendiente > 0
+                        ? `<span class="mini-badge pendiente">⏳ ${pendiente} pend.</span>`
+                        : `<span class="mini-badge cero">0 pendientes</span>`}
+                    ${realizado > 0
+                        ? `<span class="mini-badge realizado">✅ ${realizado} real.</span>`
+                        : ''}
+                </div>`;
+            card.onclick = () => {
+                document.getElementById('filtroEdificio').value = (filtroActivo === key ? '' : key);
+                aplicarFiltros();
+            };
+            grid.appendChild(card);
+        });
+    }
+
+    // ── Tabla de mantenimientos ─────────────────────────────────────────────
+    function renderTabla() {
+        const filtroEd     = document.getElementById('filtroEdificio').value;
+        const filtroTipo   = document.getElementById('filtroTipo').value;
+        const filtroEstado = document.getElementById('filtroEstado').value;
+
+        const filtradas = todosMantenimientos.filter(m => {
+            if (filtroEd     && m.edificioId !== filtroEd)     return false;
+            if (filtroTipo   && m.tipo       !== filtroTipo)   return false;
+            if (filtroEstado && m.estado     !== filtroEstado) return false;
+            return true;
+        });
+
+        const tbody = document.getElementById('tbodyMantenimientos');
+
+        if (filtradas.length === 0) {
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="8">
+                ${todosMantenimientos.length === 0
+                    ? 'No hay mantenimientos registrados aún.'
+                    : 'No hay registros que coincidan con los filtros.'}
+            </td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = filtradas.map(m => {
+            const fmt = (f) => f
+                ? new Date(f + 'T12:00:00').toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' })
+                : '—';
+
+            const badgeClass = m.estado === 'Realizado' ? 'badge-realizado' : 'badge-pendiente';
+            const badgeIcon  = m.estado === 'Realizado' ? '✅' : '⏳';
+            const edNombre   = m.edificioNombre || (edificiosMap[m.edificioId]?.nombre) || m.edificioId;
+            const tipoClass  = m.tipo === 'Imprevisto' ? 'tipo-imprevisto' : 'tipo-preventivo';
+            const tipoLabel  = m.tipo === 'Imprevisto' ? '⚠️ Imprevisto' : '🛠️ Mantenimiento';
+
+            const accionBtn = (m.estado === 'Pendiente'
+                ? `<button class="btn-small btn-resolver" onclick="cambiarEstado('${m.id}','Realizado')">✅ Realizado</button> `
+                : `<button class="btn-small btn-reabrir"  onclick="cambiarEstado('${m.id}','Pendiente')">↩️ Reabrir</button> `)
+                + `<button class="btn-small btn-editar"   onclick="abrirEditar('${m.id}')">✏️</button> `
+                + `<button class="btn-small btn-eliminar" onclick="eliminarMantenimiento('${m.id}')">🗑️</button>`;
+
+            return `<tr>
+                <td><strong>${edNombre}</strong></td>
+                <td><span class="tipo-tag ${tipoClass}">${tipoLabel}</span></td>
+                <td>${escapeHtml(m.proveedor || '—')}</td>
+                <td style="white-space:nowrap">${fmt(m.fechaRealizado)}</td>
+                <td style="white-space:nowrap">${fmt(m.fechaProgramada)}</td>
+                <td class="desc-cell">${escapeHtml(m.descripcion)}</td>
+                <td><span class="badge ${badgeClass}">${badgeIcon} ${m.estado}</span></td>
+                <td style="white-space:nowrap">${accionBtn}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ── Filtros ────────────────────────────────────────────────────────────
+    window.aplicarFiltros = () => {
+        renderResumen();
+        renderTabla();
+    };
+
+    // ── Modal ──────────────────────────────────────────────────────────────
+    window.abrirModal = (registro = null) => {
+        document.getElementById('formMantenimiento').reset();
+        editandoId = null;
+
+        if (registro) {
+            editandoId = registro.id;
+            document.getElementById('modalTitulo').textContent        = '✏️ Editar Mantenimiento';
+            document.getElementById('modalEdificio').value            = registro.edificioId       || '';
+            document.getElementById('modalTipo').value                = registro.tipo             || 'Preventivo';
+            document.getElementById('modalProveedor').value           = registro.proveedor         || '';
+            document.getElementById('modalFechaRealizado').value      = registro.fechaRealizado    || '';
+            document.getElementById('modalFechaProgramada').value     = registro.fechaProgramada   || '';
+            document.getElementById('modalDescripcion').value         = registro.descripcion       || '';
+        } else {
+            document.getElementById('modalTitulo').textContent = '➕ Nuevo Mantenimiento';
+        }
+
+        document.getElementById('modalOverlay').style.display = 'flex';
+    };
+
+    window.cerrarModal = () => {
+        document.getElementById('modalOverlay').style.display = 'none';
+        editandoId = null;
+    };
+
+    window.cerrarAlClickarFondo = (e) => {
+        if (e.target === document.getElementById('modalOverlay')) cerrarModal();
+    };
+
+    // ── Guardar mantenimiento ───────────────────────────────────────────────
+    window.guardarMantenimiento = async (e) => {
+        e.preventDefault();
+        const edificioId       = document.getElementById('modalEdificio').value;
+        const tipo              = document.getElementById('modalTipo').value;
+        const proveedor          = document.getElementById('modalProveedor').value.trim();
+        const fechaRealizado    = document.getElementById('modalFechaRealizado').value;
+        const fechaProgramada   = document.getElementById('modalFechaProgramada').value;
+        const descripcion        = document.getElementById('modalDescripcion').value.trim();
+
+        if (!edificioId || !proveedor || !descripcion) return;
+
+        const btn = document.getElementById('btnGuardar');
+        btn.disabled    = true;
+        btn.textContent = '⏳ Guardando...';
+
+        try {
+            const edInfo = edificiosMap[edificioId] || {};
+
+            if (editandoId) {
+                await update(ref(db, `mantenimiento/${editandoId}`), {
+                    edificioId,
+                    edificioNombre: edInfo.nombre || edificioId,
+                    tipo,
+                    proveedor,
+                    fechaRealizado,
+                    fechaProgramada,
+                    descripcion,
+                    editadoAt: new Date().toISOString()
+                });
+                cerrarModal();
+                mostrarToast('✅ Registro actualizado correctamente');
+            } else {
+                await push(ref(db, 'mantenimiento'), {
+                    edificioId,
+                    edificioNombre: edInfo.nombre || edificioId,
+                    tipo,
+                    proveedor,
+                    fechaRealizado,
+                    fechaProgramada,
+                    descripcion,
+                    estado:    fechaRealizado ? 'Realizado' : 'Pendiente',
+                    creadoPor: userNombre,
+                    creadoAt:  new Date().toISOString()
+                });
+                cerrarModal();
+                mostrarToast('✅ Mantenimiento registrado');
+            }
+        } catch (err) {
+            mostrarToast('❌ Error al guardar: ' + err.message, true);
+        } finally {
+            btn.disabled    = false;
+            btn.textContent = '💾 Guardar';
+        }
+    };
+
+    // ── Cambiar estado ─────────────────────────────────────────────────────
+    window.cambiarEstado = async (id, nuevoEstado) => {
+        try {
+            const datos = { estado: nuevoEstado };
+            if (nuevoEstado === 'Realizado') {
+                const reg = todosMantenimientos.find(m => m.id === id);
+                if (reg && !reg.fechaRealizado) {
+                    datos.fechaRealizado = new Date().toISOString().split('T')[0];
+                }
+            }
+            await update(ref(db, `mantenimiento/${id}`), datos);
+            mostrarToast(nuevoEstado === 'Realizado' ? '✅ Marcado como realizado' : '↩️ Reabierto como pendiente');
+        } catch (err) {
+            mostrarToast('❌ Error: ' + err.message, true);
+        }
+    };
+
+    // ── Editar mantenimiento ────────────────────────────────────────────────
+    window.abrirEditar = (id) => {
+        const registro = todosMantenimientos.find(m => m.id === id);
+        if (registro) abrirModal(registro);
+    };
+
+    // ── Eliminar mantenimiento ──────────────────────────────────────────────
+    window.eliminarMantenimiento = async (id) => {
+        if (!confirm('¿Eliminar este registro de mantenimiento? Esta acción no se puede deshacer.')) return;
+        try {
+            await remove(ref(db, `mantenimiento/${id}`));
+            mostrarToast('🗑️ Registro eliminado');
+        } catch (err) {
+            mostrarToast('❌ Error al eliminar: ' + err.message, true);
+        }
+    };
+
+    // ── Utilidades ─────────────────────────────────────────────────────────
+    function mostrarToast(msg, error = false) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className   = 'toast' + (error ? ' error' : '');
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+</script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').catch(function() {});
+      });
+    }
+  </script>
+</body>
+</html>
