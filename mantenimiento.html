@@ -170,8 +170,9 @@
             font-weight: 700;
             white-space: nowrap;
         }
-        .tipo-preventivo { background: #dbeafe; color: #1e40af; }
-        .tipo-imprevisto { background: #fde2e1; color: #b3261e; }
+        .tipo-preventivo  { background: #dbeafe; color: #1e40af; }
+        .tipo-supervision { background: #ccfbf1; color: #0f5e56; }
+        .tipo-imprevisto  { background: #fde2e1; color: #b3261e; }
 
         .btn-small {
             padding: 6px 14px;
@@ -360,6 +361,7 @@
                 <select id="filtroTipo" onchange="aplicarFiltros()">
                     <option value="">🔧 Todos los tipos</option>
                     <option value="Preventivo">🛠️ Mantenimiento</option>
+                    <option value="Supervision">🔍 Supervisión</option>
                     <option value="Imprevisto">⚠️ Arreglo imprevisto</option>
                 </select>
                 <select id="filtroEstado" onchange="aplicarFiltros()">
@@ -414,6 +416,7 @@
                 <label>Tipo *</label>
                 <select id="modalTipo" required>
                     <option value="Preventivo">🛠️ Mantenimiento</option>
+                    <option value="Supervision">🔍 Supervisión</option>
                     <option value="Imprevisto">⚠️ Arreglo imprevisto</option>
                 </select>
             </div>
@@ -532,6 +535,7 @@
     let editandoId        = null;   // null = nuevo registro, string = editando
     let editandoRecurrenteId = null;
     let logoB64           = null;
+    let logoAspect         = 3;   // ancho/alto del logo ya recortado (fallback razonable)
 
     // ── Auth ───────────────────────────────────────────────────────────────
     onAuthStateChanged(auth, (user) => {
@@ -557,14 +561,54 @@
     });
 
     // ── Logo (para el PDF del informe) ──────────────────────────────────────
+    // El PNG original trae mucho espacio en blanco alrededor de la marca; se
+    // recorta automáticamente al área con contenido para que no se vea diminuto
+    // ni deformado dentro del recuadro del PDF.
     window.precargarLogo = function() {
         try {
             const img = document.getElementById('logoPDF');
             const canvas = document.createElement('canvas');
-            canvas.width = img.naturalWidth;
+            canvas.width  = img.naturalWidth;
             canvas.height = img.naturalHeight;
-            canvas.getContext('2d').drawImage(img, 0, 0);
-            logoB64 = canvas.toDataURL('image/png');
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const umbral = 245; // pixel se considera "contenido" si no es casi blanco
+            let minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    const i = (y * canvas.width + x) * 4;
+                    if (data[i] < umbral || data[i + 1] < umbral || data[i + 2] < umbral) {
+                        if (x < minX) minX = x;
+                        if (x > maxX) maxX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+                    }
+                }
+            }
+
+            if (maxX <= minX || maxY <= minY) {
+                logoB64    = canvas.toDataURL('image/png');
+                logoAspect = canvas.width / canvas.height;
+                return;
+            }
+
+            const pad = Math.round(Math.max(canvas.width, canvas.height) * 0.02);
+            minX = Math.max(0, minX - pad);
+            minY = Math.max(0, minY - pad);
+            maxX = Math.min(canvas.width - 1, maxX + pad);
+            maxY = Math.min(canvas.height - 1, maxY + pad);
+
+            const w = maxX - minX + 1;
+            const h = maxY - minY + 1;
+            const cropCanvas = document.createElement('canvas');
+            cropCanvas.width  = w;
+            cropCanvas.height = h;
+            cropCanvas.getContext('2d').drawImage(canvas, minX, minY, w, h, 0, 0, w, h);
+
+            logoB64    = cropCanvas.toDataURL('image/png');
+            logoAspect = w / h;
         } catch (e) { logoB64 = null; }
     };
 
@@ -869,8 +913,7 @@
             const badgeClass = m.estado === 'Realizado' ? 'badge-realizado' : 'badge-pendiente';
             const badgeIcon  = m.estado === 'Realizado' ? '✅' : '⏳';
             const edNombre   = m.edificioNombre || (edificiosMap[m.edificioId]?.nombre) || m.edificioId;
-            const tipoClass  = m.tipo === 'Imprevisto' ? 'tipo-imprevisto' : 'tipo-preventivo';
-            const tipoLabel  = m.tipo === 'Imprevisto' ? '⚠️ Imprevisto' : '🛠️ Mantenimiento';
+            const ti = tipoInfo(m.tipo);
 
             const accionBtn = (m.estado === 'Pendiente'
                 ? `<button class="btn-small btn-resolver" onclick="cambiarEstado('${m.id}','Realizado')">✅ Realizado</button> `
@@ -880,7 +923,7 @@
 
             return `<tr>
                 <td><strong>${edNombre}</strong></td>
-                <td><span class="tipo-tag ${tipoClass}">${tipoLabel}</span></td>
+                <td><span class="tipo-tag ${ti.clase}">${ti.tagLabel}</span></td>
                 <td>${escapeHtml(m.proveedor || '—')}</td>
                 <td style="white-space:nowrap">${fmt(m.fechaRealizado)}</td>
                 <td style="white-space:nowrap">${fmt(m.fechaProgramada)}</td>
@@ -1033,7 +1076,8 @@
                                         .sort((a, b) => (b.fechaRealizado || '').localeCompare(a.fechaRealizado || ''));
         const pendientes     = registros.filter(m => m.estado !== 'Realizado')
                                         .sort((a, b) => (a.fechaProgramada || '').localeCompare(b.fechaProgramada || ''));
-        const imprevistosCount = registros.filter(m => m.tipo === 'Imprevisto').length;
+        const imprevistosCount   = registros.filter(m => m.tipo === 'Imprevisto').length;
+        const supervisionCount  = registros.filter(m => m.tipo === 'Supervision').length;
 
         const fmt = (f) => f
             ? new Date(f + 'T12:00:00').toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' })
@@ -1071,21 +1115,32 @@
         // ── Encabezado ──
         doc.setFillColor(0, 86, 184);
         doc.rect(0, 0, pageWidth, 44, 'F');
+
+        // Caja blanca del logo (ancha, porque el logotipo real es apaisado)
+        const logoBoxX = 10, logoBoxY = 7, logoBoxW = 78, logoBoxH = 30;
         doc.setFillColor(255, 255, 255);
-        doc.rect(10, 5, 38, 34, 'F');
+        doc.rect(logoBoxX, logoBoxY, logoBoxW, logoBoxH, 'F');
         if (logoB64) {
-            doc.addImage(logoB64, 'PNG', 11, 6, 36, 32);
+            const ar = logoAspect || 3;
+            const padBox = 5;
+            let lw = logoBoxW - padBox * 2;
+            let lh = lw / ar;
+            if (lh > logoBoxH - padBox * 2) { lh = logoBoxH - padBox * 2; lw = lh * ar; }
+            doc.addImage(logoB64, 'PNG', logoBoxX + (logoBoxW - lw) / 2, logoBoxY + (logoBoxH - lh) / 2, lw, lh);
         } else {
             doc.setFontSize(13); doc.setFont(undefined, 'bold');
-            doc.setTextColor(0, 86, 184); doc.text('Azeche', 12, 19);
-            doc.setTextColor(0, 184, 83); doc.text('P.H.', 12, 29);
+            doc.setTextColor(0, 86, 184); doc.text('Azeche', logoBoxX + 8, logoBoxY + 14);
+            doc.setTextColor(0, 184, 83); doc.text('P.H.', logoBoxX + 8, logoBoxY + 24);
         }
+
+        const textX = logoBoxX + logoBoxW + 8;
         doc.setTextColor(255, 255, 255);
-        doc.setFontSize(16); doc.setFont(undefined, 'bold');
-        doc.text('INFORME DE MANTENIMIENTO', pageWidth / 2 + 15, 16, { align: 'center' });
-        doc.setFontSize(10); doc.setFont(undefined, 'normal');
-        doc.text(`Edificio: ${sinEmoji(edNombre)} — Para el Consejo de Administración`, pageWidth / 2 + 15, 25, { align: 'center' });
-        doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-CO')}`, pageWidth / 2 + 15, 34, { align: 'center' });
+        doc.setFontSize(15); doc.setFont(undefined, 'bold');
+        doc.text('INFORME DE MANTENIMIENTO', textX, 18);
+        doc.setFontSize(9.5); doc.setFont(undefined, 'normal');
+        doc.text(`Edificio: ${sinEmoji(edNombre)}`, textX, 26);
+        doc.text('Para el Consejo de Administración', textX, 32);
+        doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-CO')}`, textX, 38);
 
         yPos = 56;
 
@@ -1094,6 +1149,7 @@
         const resumenItems = [
             `Mantenimientos y reparaciones realizados: ${realizados.length}`,
             `De los cuales fueron arreglos imprevistos: ${imprevistosCount}`,
+            `De los cuales fueron visitas de supervisión: ${supervisionCount}`,
             `Pendientes o programados: ${pendientes.length}`,
             `Servicios recurrentes activos: ${recurrentes.length}`
         ];
@@ -1131,7 +1187,7 @@
         } else {
             realizados.forEach(m => {
                 checkNewPage(18);
-                const tipoTxt = m.tipo === 'Imprevisto' ? 'Arreglo imprevisto' : 'Mantenimiento';
+                const tipoTxt = tipoInfo(m.tipo).pdfLabel;
                 doc.setFont(undefined, 'bold');
                 doc.text(`${fmt(m.fechaRealizado)} — ${tipoTxt} — ${sinEmoji(m.proveedor)}`, marginLeft, yPos);
                 doc.setFont(undefined, 'normal');
@@ -1150,7 +1206,7 @@
         } else {
             pendientes.forEach(m => {
                 checkNewPage(18);
-                const tipoTxt = m.tipo === 'Imprevisto' ? 'Arreglo imprevisto' : 'Mantenimiento';
+                const tipoTxt = tipoInfo(m.tipo).pdfLabel;
                 doc.setFont(undefined, 'bold');
                 doc.text(`Programado: ${fmt(m.fechaProgramada)} — ${tipoTxt} — ${sinEmoji(m.proveedor)}`, marginLeft, yPos);
                 doc.setFont(undefined, 'normal');
@@ -1185,6 +1241,13 @@
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // Info visual/texto para cada tipo de registro (tabla y PDF)
+    function tipoInfo(tipo) {
+        if (tipo === 'Imprevisto')  return { clase: 'tipo-imprevisto',  tagLabel: '⚠️ Imprevisto',  pdfLabel: 'Arreglo imprevisto' };
+        if (tipo === 'Supervision') return { clase: 'tipo-supervision', tagLabel: '🔍 Supervisión', pdfLabel: 'Supervisión' };
+        return { clase: 'tipo-preventivo', tagLabel: '🛠️ Mantenimiento', pdfLabel: 'Mantenimiento' };
     }
 </script>
 
