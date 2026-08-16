@@ -217,8 +217,23 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
         .modal h2 { color: #0056B8; margin-bottom: 24px; font-size: 1.3em; }
+        .modal-wide { max-width: 680px; }
+        .modal-section-title {
+            font-size: 0.82em;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: #0056B8;
+            background: #eef4fc;
+            border-left: 4px solid #0056B8;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 22px 0 16px;
+        }
+        .modal-section-title:first-of-type { margin-top: 0; }
         .form-group { display: flex; flex-direction: column; margin-bottom: 18px; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .form-group label { font-weight: 600; margin-bottom: 7px; color: #333; font-size: 0.9em; }
         .form-group select,
         .form-group input,
@@ -233,9 +248,59 @@
         .form-group select:focus,
         .form-group input:focus,
         .form-group textarea:focus { outline: none; border-color: #0056B8; }
-        .form-group textarea { resize: vertical; min-height: 90px; }
+        .form-group textarea { resize: vertical; min-height: 70px; }
         .form-hint { font-size: 0.78em; color: #888; margin-top: 4px; }
         .modal-btns { display: flex; gap: 12px; margin-top: 8px; justify-content: flex-end; }
+
+        /* ── Fotos (antes/después) ── */
+        .fotos-preview { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+        .fotos-preview img { width:64px; height:64px; object-fit:cover; border-radius:8px; border:2px solid #ddd; }
+        .foto-thumb {
+            width:46px; height:46px; object-fit:cover; border-radius:6px;
+            cursor:pointer; border:2px solid #ddd; transition:all 0.2s; vertical-align:middle; margin:2px;
+        }
+        .foto-thumb:hover { border-color:#0056B8; transform:scale(1.12); }
+        .foto-upload-label {
+            display:flex; align-items:center; gap:8px; padding:9px 13px;
+            border:2px dashed #c0d4f0; border-radius:8px; cursor:pointer;
+            color:#0056B8; font-size:0.88em; font-weight:600; transition:border-color 0.3s;
+            width: fit-content;
+        }
+        .foto-upload-label:hover { border-color:#0056B8; background:#f0f6ff; }
+        .foto-upload-label input { display:none; }
+        .lightbox {
+            position:fixed; inset:0; background:rgba(0,0,0,0.88);
+            display:flex; align-items:center; justify-content:center; z-index:3000; cursor:pointer;
+        }
+        .lightbox img { max-width:92vw; max-height:88vh; border-radius:10px; box-shadow:0 8px 40px rgba(0,0,0,0.5); }
+        .lightbox-close {
+            position:fixed; top:18px; right:24px; color:white; font-size:2em;
+            cursor:pointer; font-weight:700; line-height:1;
+        }
+
+        /* ── Firma digital ── */
+        .firma-pad {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            background: #fff;
+            width: 100%;
+            max-width: 100%;
+            height: 110px;
+            touch-action: none;
+            cursor: crosshair;
+        }
+        .btn-mini {
+            padding: 5px 12px;
+            border: none;
+            border-radius: 6px;
+            background: #6c757d;
+            color: white;
+            font-size: 0.78em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+        .btn-mini:hover { background: #5a6268; }
 
         /* ── Toast ── */
         .toast {
@@ -403,9 +468,11 @@
 
 <!-- Modal nuevo/editar mantenimiento -->
 <div id="modalOverlay" class="modal-overlay" style="display:none" onclick="cerrarAlClickarFondo(event)">
-    <div class="modal">
-        <h2 id="modalTitulo">➕ Nuevo Mantenimiento</h2>
+    <div class="modal modal-wide">
+        <h2 id="modalTitulo">➕ Nuevo Registro de Servicio</h2>
         <form id="formMantenimiento" onsubmit="guardarMantenimiento(event)">
+
+            <div class="modal-section-title">1. Datos del Servicio y del Contratista</div>
             <div class="form-group">
                 <label>Edificio *</label>
                 <select id="modalEdificio" required>
@@ -413,40 +480,154 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Tipo *</label>
+                <label>Tipo de visita *</label>
                 <select id="modalTipo" required>
-                    <option value="Preventivo">🛠️ Mantenimiento</option>
-                    <option value="Supervision">🔍 Supervisión</option>
-                    <option value="Imprevisto">⚠️ Arreglo imprevisto</option>
+                    <option value="Preventivo">Rutinaria (mensual / preventiva)</option>
+                    <option value="Imprevisto">Imprevisto (falla / correctivo)</option>
+                    <option value="Supervision">Inspección técnica</option>
                 </select>
-            </div>
-            <div class="form-group">
-                <label>Proveedor / Contratista *</label>
-                <input type="text" id="modalProveedor" list="listaProveedores" placeholder="Nombre del proveedor o contratista" required>
-                <datalist id="listaProveedores"></datalist>
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Fecha en que se realizó</label>
+                    <label>Empresa contratista *</label>
+                    <input type="text" id="modalProveedor" list="listaProveedores" placeholder="Nombre de la empresa" required>
+                    <datalist id="listaProveedores"></datalist>
+                </div>
+                <div class="form-group">
+                    <label>Técnico que asiste</label>
+                    <input type="text" id="modalTecnico" placeholder="Nombre del técnico">
+                </div>
+            </div>
+            <div class="form-row-3">
+                <div class="form-group">
+                    <label>Fecha</label>
                     <input type="date" id="modalFechaRealizado">
-                    <div class="form-hint">Déjalo vacío si aún no se ha hecho.</div>
+                    <div class="form-hint">Déjalo vacío si aún no se ha realizado la visita.</div>
+                </div>
+                <div class="form-group">
+                    <label>Hora de entrada</label>
+                    <input type="time" id="modalHoraEntrada">
+                </div>
+                <div class="form-group">
+                    <label>Hora de salida</label>
+                    <input type="time" id="modalHoraSalida">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Equipo / sistema atendido</label>
+                <input type="text" id="modalEquipo" placeholder="Ej: Ascensor Torre A, Tanque de agua subterráneo">
+            </div>
+
+            <div class="modal-section-title">2. Estado Inicial y Diagnóstico</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Situación al llegar</label>
+                    <select id="modalEstadoInicial">
+                        <option value="">Sin especificar</option>
+                        <option value="Funcionando">Funcionando</option>
+                        <option value="Apagado">Apagado</option>
+                        <option value="Bloqueado">Bloqueado</option>
+                        <option value="Inundado">Inundado</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Lecturas de control</label>
+                    <input type="text" id="modalLecturas" placeholder="Kilometraje, horas de uso, presión, voltaje...">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Problema detectado (si fue imprevisto)</label>
+                <textarea id="modalProblema" placeholder="Causa exacta de la falla..."></textarea>
+            </div>
+
+            <div class="modal-section-title">3. Actividades Realizadas</div>
+            <div class="form-group">
+                <label>Tareas de mantenimiento realizadas *</label>
+                <textarea id="modalDescripcion" placeholder="Limpieza, lubricación, ajuste de piezas, calibración..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Cambio de refacciones / repuestos</label>
+                <textarea id="modalRepuestos" placeholder="Piezas o insumos que se reemplazaron..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Pruebas de funcionamiento</label>
+                <textarea id="modalPruebas" placeholder="Ensayos realizados para confirmar que el sistema quedó seguro..."></textarea>
+            </div>
+
+            <div class="modal-section-title">4. Estado Final y Recomendaciones</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Condición de entrega</label>
+                    <select id="modalEstadoFinal">
+                        <option value="">Sin especificar</option>
+                        <option value="Operativo">Operativo</option>
+                        <option value="Fuera de servicio">Fuera de servicio</option>
+                        <option value="En observación">En observación</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Próximo mantenimiento</label>
                     <input type="date" id="modalFechaProgramada">
-                    <div class="form-hint">Cuándo se debe realizar.</div>
                 </div>
             </div>
             <div class="form-group">
-                <label>Descripción *</label>
-                <textarea id="modalDescripcion" placeholder="Describe lo que se hizo o lo que se debe hacer..." required></textarea>
+                <label>Tareas pendientes / presupuesto extra</label>
+                <textarea id="modalTareasPendientes" placeholder="Reparaciones que requieren presupuesto extra o piezas no disponibles..."></textarea>
             </div>
+            <div class="form-group">
+                <label>Sugerencias del técnico</label>
+                <textarea id="modalRecomendaciones" placeholder="Recomendaciones de uso para residentes o cuidados para la administración..."></textarea>
+            </div>
+
+            <div class="modal-section-title">5. Registro y Firmas</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>📷 Fotos — Antes (máx. 6)</label>
+                    <label class="foto-upload-label">
+                        <input type="file" id="modalFotosAntes" accept="image/*" multiple onchange="previewFotos(this,'previewAntes')">
+                        📁 Seleccionar
+                    </label>
+                    <div id="previewAntesExistentes" style="display:none;margin-top:6px"></div>
+                    <div id="previewAntes" class="fotos-preview"></div>
+                </div>
+                <div class="form-group">
+                    <label>📷 Fotos — Después (máx. 6)</label>
+                    <label class="foto-upload-label">
+                        <input type="file" id="modalFotosDespues" accept="image/*" multiple onchange="previewFotos(this,'previewDespues')">
+                        📁 Seleccionar
+                    </label>
+                    <div id="previewDespuesExistentes" style="display:none;margin-top:6px"></div>
+                    <div id="previewDespues" class="fotos-preview"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Firma del técnico</label>
+                    <canvas id="firmaTecnicoCanvas" class="firma-pad" width="360" height="110"></canvas>
+                    <button type="button" class="btn-mini" onclick="limpiarFirma('firmaTecnicoCanvas')">🧹 Limpiar firma</button>
+                    <input type="text" id="modalFirmaTecnicoNombre" placeholder="Nombre de quien firma" style="margin-top:8px">
+                </div>
+                <div class="form-group">
+                    <label>Firma de recibido (administración / conserje)</label>
+                    <canvas id="firmaRecibidoCanvas" class="firma-pad" width="360" height="110"></canvas>
+                    <button type="button" class="btn-mini" onclick="limpiarFirma('firmaRecibidoCanvas')">🧹 Limpiar firma</button>
+                    <input type="text" id="modalFirmaRecibidoNombre" placeholder="Nombre de quien recibe" style="margin-top:8px">
+                </div>
+            </div>
+
             <div class="modal-btns">
                 <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
                 <button type="submit" class="btn btn-primary" id="btnGuardar">💾 Guardar</button>
             </div>
         </form>
     </div>
+</div>
+
+<!-- Lightbox fotos -->
+<div id="lightbox" class="lightbox" style="display:none" onclick="cerrarLightbox()">
+    <span class="lightbox-close">✕</span>
+    <img id="lightboxImg" src="" alt="">
 </div>
 
 <!-- Modal nuevo/editar servicio recurrente -->
@@ -561,58 +742,142 @@
     });
 
     // ── Logo (para el PDF del informe) ──────────────────────────────────────
-    // El PNG original trae mucho espacio en blanco alrededor de la marca; se
-    // recorta automáticamente al área con contenido para que no se vea diminuto
-    // ni deformado dentro del recuadro del PDF.
+    // logo-azeche.png es un lienzo de 500x500 con mucho espacio en blanco
+    // alrededor de la marca real. Se usa un recorte FIJO ya medido de antemano
+    // (en vez de detectar bordes leyendo píxeles, que puede fallar en el
+    // navegador por seguridad de canvas) para que el logo salga nítido y bien
+    // proporcionado en el PDF.
+    const LOGO_CROP = { sx: 6, sy: 149, sw: 479, sh: 161 };
     window.precargarLogo = function() {
         try {
             const img = document.getElementById('logoPDF');
             const canvas = document.createElement('canvas');
-            canvas.width  = img.naturalWidth;
-            canvas.height = img.naturalHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-
-            const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const umbral = 245; // pixel se considera "contenido" si no es casi blanco
-            let minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
-            for (let y = 0; y < canvas.height; y++) {
-                for (let x = 0; x < canvas.width; x++) {
-                    const i = (y * canvas.width + x) * 4;
-                    if (data[i] < umbral || data[i + 1] < umbral || data[i + 2] < umbral) {
-                        if (x < minX) minX = x;
-                        if (x > maxX) maxX = x;
-                        if (y < minY) minY = y;
-                        if (y > maxY) maxY = y;
-                    }
-                }
-            }
-
-            if (maxX <= minX || maxY <= minY) {
-                logoB64    = canvas.toDataURL('image/png');
-                logoAspect = canvas.width / canvas.height;
-                return;
-            }
-
-            const pad = Math.round(Math.max(canvas.width, canvas.height) * 0.02);
-            minX = Math.max(0, minX - pad);
-            minY = Math.max(0, minY - pad);
-            maxX = Math.min(canvas.width - 1, maxX + pad);
-            maxY = Math.min(canvas.height - 1, maxY + pad);
-
-            const w = maxX - minX + 1;
-            const h = maxY - minY + 1;
-            const cropCanvas = document.createElement('canvas');
-            cropCanvas.width  = w;
-            cropCanvas.height = h;
-            cropCanvas.getContext('2d').drawImage(canvas, minX, minY, w, h, 0, 0, w, h);
-
-            logoB64    = cropCanvas.toDataURL('image/png');
-            logoAspect = w / h;
+            canvas.width  = LOGO_CROP.sw;
+            canvas.height = LOGO_CROP.sh;
+            canvas.getContext('2d').drawImage(
+                img,
+                LOGO_CROP.sx, LOGO_CROP.sy, LOGO_CROP.sw, LOGO_CROP.sh,
+                0, 0, LOGO_CROP.sw, LOGO_CROP.sh
+            );
+            logoB64    = canvas.toDataURL('image/png');
+            logoAspect = LOGO_CROP.sw / LOGO_CROP.sh;
         } catch (e) { logoB64 = null; }
     };
 
     window.logout = () => signOut(auth).then(() => location.href = 'index.html');
+
+    // ── Firma digital (canvas) ──────────────────────────────────────────────
+    function inicializarFirma(canvasId) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.lineWidth = 2.2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#1a1a2e';
+        let dibujando = false;
+
+        function posicion(e) {
+            const r = canvas.getBoundingClientRect();
+            return {
+                x: (e.clientX - r.left) * (canvas.width / r.width),
+                y: (e.clientY - r.top) * (canvas.height / r.height)
+            };
+        }
+        canvas.addEventListener('pointerdown', (e) => {
+            dibujando = true;
+            const p = posicion(e);
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            canvas.setPointerCapture(e.pointerId);
+        });
+        canvas.addEventListener('pointermove', (e) => {
+            if (!dibujando) return;
+            const p = posicion(e);
+            ctx.lineTo(p.x, p.y);
+            ctx.stroke();
+        });
+        canvas.addEventListener('pointerup', () => { dibujando = false; });
+        canvas.addEventListener('pointerleave', () => { dibujando = false; });
+    }
+
+    window.limpiarFirma = (canvasId) => {
+        const canvas = document.getElementById(canvasId);
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+    };
+
+    function firmaEstaVacia(canvasId) {
+        const canvas = document.getElementById(canvasId);
+        const blanco = document.createElement('canvas');
+        blanco.width = canvas.width;
+        blanco.height = canvas.height;
+        return canvas.toDataURL() === blanco.toDataURL();
+    }
+
+    function cargarFirmaGuardada(canvasId, dataUrl) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (!dataUrl) return;
+        const img = new Image();
+        img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        img.src = dataUrl;
+    }
+
+    inicializarFirma('firmaTecnicoCanvas');
+    inicializarFirma('firmaRecibidoCanvas');
+
+    // ── Fotos antes/después ──────────────────────────────────────────────────
+    let fotosAntesNuevas = [], fotosDespuesNuevas = [];
+    let fotosAntesExistentes = [], fotosDespuesExistentes = [];
+
+    async function comprimirImagen(file, maxW = 800) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+                try {
+                    let w = img.width, h = img.height;
+                    if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', 0.65));
+                } catch (e) { reject(e); }
+            };
+            img.onerror = () => reject(new Error('No se pudo leer: ' + file.name));
+            img.src = URL.createObjectURL(file);
+        });
+    }
+
+    window.previewFotos = (input, previewId) => {
+        const files   = Array.from(input.files).slice(0, 6);
+        const preview = document.getElementById(previewId);
+        preview.innerHTML = '';
+        files.forEach(f => {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(f);
+            preview.appendChild(img);
+        });
+        if (input.files.length > 6) mostrarToast('⚠️ Solo se subirán las primeras 6 fotos', false);
+    };
+
+    window.abrirFoto = (url) => {
+        document.getElementById('lightboxImg').src = url;
+        document.getElementById('lightbox').style.display = 'flex';
+    };
+    window.cerrarLightbox = () => {
+        document.getElementById('lightbox').style.display = 'none';
+    };
+
+    function renderFotosExistentes(contenedorId, fotos) {
+        const cont = document.getElementById(contenedorId);
+        if (!fotos || fotos.length === 0) { cont.style.display = 'none'; cont.innerHTML = ''; return; }
+        cont.style.display = '';
+        cont.innerHTML = `<div style="font-size:.78em;color:#555;margin-bottom:5px">
+            Fotos actuales — seleccionar nuevas las <strong>reemplaza</strong>:</div>
+            <div class="fotos-preview">${fotos.map(url =>
+                `<img src="${url}" class="foto-thumb" onclick="abrirFoto('${url}')" title="Ver foto">`
+            ).join('')}</div>`;
+    }
 
     // ── Edificios (dinámico desde Firebase) ────────────────────────────────
     function cargarEdificios() {
@@ -918,6 +1183,7 @@
             const accionBtn = (m.estado === 'Pendiente'
                 ? `<button class="btn-small btn-resolver" onclick="cambiarEstado('${m.id}','Realizado')">✅ Realizado</button> `
                 : `<button class="btn-small btn-reabrir"  onclick="cambiarEstado('${m.id}','Pendiente')">↩️ Reabrir</button> `)
+                + `<button class="btn-small btn-informe"  onclick="generarActaServicio('${m.id}')">📄 Acta</button> `
                 + `<button class="btn-small btn-editar"   onclick="abrirEditar('${m.id}')">✏️</button> `
                 + `<button class="btn-small btn-eliminar" onclick="eliminarMantenimiento('${m.id}')">🗑️</button>`;
 
@@ -943,19 +1209,48 @@
     // ── Modal ──────────────────────────────────────────────────────────────
     window.abrirModal = (registro = null) => {
         document.getElementById('formMantenimiento').reset();
+        document.getElementById('previewAntes').innerHTML   = '';
+        document.getElementById('previewDespues').innerHTML = '';
+        limpiarFirma('firmaTecnicoCanvas');
+        limpiarFirma('firmaRecibidoCanvas');
+        fotosAntesExistentes = [];
+        fotosDespuesExistentes = [];
         editandoId = null;
 
         if (registro) {
             editandoId = registro.id;
-            document.getElementById('modalTitulo').textContent        = '✏️ Editar Mantenimiento';
+            document.getElementById('modalTitulo').textContent        = '✏️ Editar Registro de Servicio';
             document.getElementById('modalEdificio').value            = registro.edificioId       || '';
             document.getElementById('modalTipo').value                = registro.tipo             || 'Preventivo';
             document.getElementById('modalProveedor').value           = registro.proveedor         || '';
+            document.getElementById('modalTecnico').value             = registro.tecnico           || '';
             document.getElementById('modalFechaRealizado').value      = registro.fechaRealizado    || '';
-            document.getElementById('modalFechaProgramada').value     = registro.fechaProgramada   || '';
+            document.getElementById('modalHoraEntrada').value         = registro.horaEntrada       || '';
+            document.getElementById('modalHoraSalida').value          = registro.horaSalida        || '';
+            document.getElementById('modalEquipo').value              = registro.equipo            || '';
+            document.getElementById('modalEstadoInicial').value       = registro.estadoInicial     || '';
+            document.getElementById('modalLecturas').value            = registro.lecturasControl   || '';
+            document.getElementById('modalProblema').value            = registro.problemaDetectado || '';
             document.getElementById('modalDescripcion').value         = registro.descripcion       || '';
+            document.getElementById('modalRepuestos').value           = registro.repuestos         || '';
+            document.getElementById('modalPruebas').value             = registro.pruebas           || '';
+            document.getElementById('modalEstadoFinal').value         = registro.estadoFinal       || '';
+            document.getElementById('modalFechaProgramada').value     = registro.fechaProgramada   || '';
+            document.getElementById('modalTareasPendientes').value    = registro.tareasPendientes  || '';
+            document.getElementById('modalRecomendaciones').value     = registro.recomendaciones   || '';
+            document.getElementById('modalFirmaTecnicoNombre').value  = registro.firmaTecnicoNombre  || '';
+            document.getElementById('modalFirmaRecibidoNombre').value = registro.firmaRecibidoNombre || '';
+
+            fotosAntesExistentes    = registro.fotosAntes    || [];
+            fotosDespuesExistentes  = registro.fotosDespues  || [];
+            renderFotosExistentes('previewAntesExistentes', fotosAntesExistentes);
+            renderFotosExistentes('previewDespuesExistentes', fotosDespuesExistentes);
+            cargarFirmaGuardada('firmaTecnicoCanvas', registro.firmaTecnico);
+            cargarFirmaGuardada('firmaRecibidoCanvas', registro.firmaRecibido);
         } else {
-            document.getElementById('modalTitulo').textContent = '➕ Nuevo Mantenimiento';
+            document.getElementById('modalTitulo').textContent = '➕ Nuevo Registro de Servicio';
+            document.getElementById('previewAntesExistentes').style.display   = 'none';
+            document.getElementById('previewDespuesExistentes').style.display = 'none';
         }
 
         document.getElementById('modalOverlay').style.display = 'flex';
@@ -973,12 +1268,26 @@
     // ── Guardar mantenimiento ───────────────────────────────────────────────
     window.guardarMantenimiento = async (e) => {
         e.preventDefault();
-        const edificioId       = document.getElementById('modalEdificio').value;
-        const tipo              = document.getElementById('modalTipo').value;
-        const proveedor          = document.getElementById('modalProveedor').value.trim();
-        const fechaRealizado    = document.getElementById('modalFechaRealizado').value;
-        const fechaProgramada   = document.getElementById('modalFechaProgramada').value;
-        const descripcion        = document.getElementById('modalDescripcion').value.trim();
+        const edificioId          = document.getElementById('modalEdificio').value;
+        const tipo                 = document.getElementById('modalTipo').value;
+        const proveedor             = document.getElementById('modalProveedor').value.trim();
+        const tecnico               = document.getElementById('modalTecnico').value.trim();
+        const fechaRealizado       = document.getElementById('modalFechaRealizado').value;
+        const horaEntrada           = document.getElementById('modalHoraEntrada').value;
+        const horaSalida            = document.getElementById('modalHoraSalida').value;
+        const equipo                = document.getElementById('modalEquipo').value.trim();
+        const estadoInicial         = document.getElementById('modalEstadoInicial').value;
+        const lecturasControl       = document.getElementById('modalLecturas').value.trim();
+        const problemaDetectado    = document.getElementById('modalProblema').value.trim();
+        const descripcion           = document.getElementById('modalDescripcion').value.trim();
+        const repuestos              = document.getElementById('modalRepuestos').value.trim();
+        const pruebas                = document.getElementById('modalPruebas').value.trim();
+        const estadoFinal            = document.getElementById('modalEstadoFinal').value;
+        const fechaProgramada       = document.getElementById('modalFechaProgramada').value;
+        const tareasPendientes      = document.getElementById('modalTareasPendientes').value.trim();
+        const recomendaciones        = document.getElementById('modalRecomendaciones').value.trim();
+        const firmaTecnicoNombre    = document.getElementById('modalFirmaTecnicoNombre').value.trim();
+        const firmaRecibidoNombre   = document.getElementById('modalFirmaRecibidoNombre').value.trim();
 
         if (!edificioId || !proveedor || !descripcion) return;
 
@@ -987,36 +1296,62 @@
         btn.textContent = '⏳ Guardando...';
 
         try {
+            // ── Fotos: comprimir las nuevas si se seleccionaron ──
+            const archivosAntes   = Array.from(document.getElementById('modalFotosAntes').files).slice(0, 6);
+            const archivosDespues = Array.from(document.getElementById('modalFotosDespues').files).slice(0, 6);
+            let fotosAntes = [], fotosDespues = [];
+
+            if (archivosAntes.length > 0) {
+                btn.textContent = '📷 Procesando fotos de antes...';
+                for (const f of archivosAntes) {
+                    try { fotosAntes.push(await comprimirImagen(f)); } catch (e) {}
+                }
+            }
+            if (archivosDespues.length > 0) {
+                btn.textContent = '📷 Procesando fotos de después...';
+                for (const f of archivosDespues) {
+                    try { fotosDespues.push(await comprimirImagen(f)); } catch (e) {}
+                }
+            }
+            const fotosAntesGuardar   = fotosAntes.length   > 0 ? fotosAntes   : fotosAntesExistentes;
+            const fotosDespuesGuardar = fotosDespues.length > 0 ? fotosDespues : fotosDespuesExistentes;
+
+            // ── Firmas ──
+            const firmaTecnico  = firmaEstaVacia('firmaTecnicoCanvas')  ? null : document.getElementById('firmaTecnicoCanvas').toDataURL('image/png');
+            const firmaRecibido = firmaEstaVacia('firmaRecibidoCanvas') ? null : document.getElementById('firmaRecibidoCanvas').toDataURL('image/png');
+
+            btn.textContent = '⏳ Guardando...';
+
             const edInfo = edificiosMap[edificioId] || {};
+            const datos = {
+                edificioId,
+                edificioNombre: edInfo.nombre || edificioId,
+                tipo, proveedor, tecnico,
+                fechaRealizado, horaEntrada, horaSalida, equipo,
+                estadoInicial, lecturasControl, problemaDetectado,
+                descripcion, repuestos, pruebas,
+                estadoFinal, fechaProgramada, tareasPendientes, recomendaciones,
+                fotosAntes: fotosAntesGuardar, fotosDespues: fotosDespuesGuardar,
+                firmaTecnico, firmaTecnicoNombre,
+                firmaRecibido, firmaRecibidoNombre
+            };
 
             if (editandoId) {
                 await update(ref(db, `mantenimiento/${editandoId}`), {
-                    edificioId,
-                    edificioNombre: edInfo.nombre || edificioId,
-                    tipo,
-                    proveedor,
-                    fechaRealizado,
-                    fechaProgramada,
-                    descripcion,
+                    ...datos,
                     editadoAt: new Date().toISOString()
                 });
                 cerrarModal();
                 mostrarToast('✅ Registro actualizado correctamente');
             } else {
                 await push(ref(db, 'mantenimiento'), {
-                    edificioId,
-                    edificioNombre: edInfo.nombre || edificioId,
-                    tipo,
-                    proveedor,
-                    fechaRealizado,
-                    fechaProgramada,
-                    descripcion,
+                    ...datos,
                     estado:    fechaRealizado ? 'Realizado' : 'Pendiente',
                     creadoPor: userNombre,
                     creadoAt:  new Date().toISOString()
                 });
                 cerrarModal();
-                mostrarToast('✅ Mantenimiento registrado');
+                mostrarToast('✅ Registro de servicio guardado');
             }
         } catch (err) {
             mostrarToast('❌ Error al guardar: ' + err.message, true);
@@ -1227,6 +1562,182 @@
 
         doc.save(`Informe_Mantenimiento_${sinEmoji(edNombre).replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);
         mostrarToast('✅ Informe generado');
+    };
+
+    // ── Acta de Servicio (PDF detallado de una sola visita) ─────────────────
+    window.generarActaServicio = (id) => {
+        const m = todosMantenimientos.find(r => r.id === id);
+        if (!m) return;
+
+        const edNombre = m.edificioNombre || (edificiosMap[m.edificioId]?.nombre) || m.edificioId;
+        const tipoTextoActa = {
+            Preventivo:  'Rutinaria (mensual / preventiva)',
+            Imprevisto:  'Imprevisto (falla / correctivo)',
+            Supervision: 'Inspección técnica'
+        }[m.tipo] || 'Sin especificar';
+
+        const fmt = (f) => f
+            ? new Date(f + 'T12:00:00').toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' })
+            : 'Sin especificar';
+        const ne = (v) => (v && String(v).trim()) ? v : 'No especificado';
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const pageWidth  = doc.internal.pageSize.width;
+        const marginLeft = 20;
+        const maxWidth   = pageWidth - marginLeft * 2;
+        let yPos = 20;
+
+        function checkNewPage(requiredSpace = 20) {
+            if (yPos + requiredSpace > 280) { doc.addPage(); yPos = 20; return true; }
+            return false;
+        }
+        function sinEmoji(str) {
+            return String(str || '').replace(/[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]|[\u{FE00}-\u{FEFF}]/gu, '').replace(/\s+/g,' ').trim();
+        }
+        function tituloSeccion(texto) {
+            checkNewPage(20);
+            doc.setFillColor(237, 242, 247);
+            doc.rect(marginLeft - 5, yPos - 5, maxWidth + 10, 10, 'F');
+            doc.setFontSize(11.5); doc.setFont(undefined, 'bold'); doc.setTextColor(0, 0, 0);
+            doc.text(texto, marginLeft, yPos);
+            yPos += 12;
+            doc.setFont(undefined, 'normal'); doc.setFontSize(9.5);
+        }
+        function campo(label, valor) {
+            checkNewPage(8);
+            doc.setFont(undefined, 'bold');
+            doc.text(label, marginLeft, yPos);
+            doc.setFont(undefined, 'normal');
+            const lines = doc.splitTextToSize(sinEmoji(valor), maxWidth - 60);
+            doc.text(lines, marginLeft + 60, yPos);
+            yPos += Math.max(6, lines.length * 5);
+        }
+        function parrafo(label, valor) {
+            checkNewPage(12);
+            doc.setFont(undefined, 'bold');
+            doc.text(label, marginLeft, yPos);
+            yPos += 5.5;
+            doc.setFont(undefined, 'normal');
+            const lines = doc.splitTextToSize(sinEmoji(valor), maxWidth - 5);
+            lines.forEach(l => { checkNewPage(); doc.text(l, marginLeft + 3, yPos); yPos += 5; });
+            yPos += 3;
+        }
+
+        // ── Encabezado ──
+        doc.setFillColor(0, 86, 184);
+        doc.rect(0, 0, pageWidth, 44, 'F');
+        const logoBoxX = 10, logoBoxY = 7, logoBoxW = 78, logoBoxH = 30;
+        doc.setFillColor(255, 255, 255);
+        doc.rect(logoBoxX, logoBoxY, logoBoxW, logoBoxH, 'F');
+        if (logoB64) {
+            const ar = logoAspect || 3;
+            const padBox = 5;
+            let lw = logoBoxW - padBox * 2;
+            let lh = lw / ar;
+            if (lh > logoBoxH - padBox * 2) { lh = logoBoxH - padBox * 2; lw = lh * ar; }
+            doc.addImage(logoB64, 'PNG', logoBoxX + (logoBoxW - lw) / 2, logoBoxY + (logoBoxH - lh) / 2, lw, lh);
+        } else {
+            doc.setFontSize(13); doc.setFont(undefined, 'bold');
+            doc.setTextColor(0, 86, 184); doc.text('Azeche', logoBoxX + 8, logoBoxY + 14);
+            doc.setTextColor(0, 184, 83); doc.text('P.H.', logoBoxX + 8, logoBoxY + 24);
+        }
+        const textX = logoBoxX + logoBoxW + 8;
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(14); doc.setFont(undefined, 'bold');
+        doc.text('ACTA DE SERVICIO DE MANTENIMIENTO', textX, 17);
+        doc.setFontSize(9.5); doc.setFont(undefined, 'normal');
+        doc.text(`Edificio: ${sinEmoji(edNombre)}`, textX, 25);
+        doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-CO')}`, textX, 32);
+        doc.text('Azeche P.H. — Soluciones Administrativas', textX, 38);
+
+        yPos = 56;
+
+        // ── 1. Datos del Servicio y del Contratista ──
+        tituloSeccion('1. DATOS DEL SERVICIO Y DEL CONTRATISTA');
+        campo('Edificio:', edNombre);
+        campo('Tipo de visita:', tipoTextoActa);
+        campo('Empresa contratista:', ne(m.proveedor));
+        campo('Técnico que asiste:', ne(m.tecnico));
+        campo('Fecha:', fmt(m.fechaRealizado));
+        campo('Hora de entrada:', ne(m.horaEntrada));
+        campo('Hora de salida:', ne(m.horaSalida));
+        campo('Equipo / sistema atendido:', ne(m.equipo));
+        yPos += 4;
+
+        // ── 2. Estado Inicial y Diagnóstico ──
+        tituloSeccion('2. ESTADO INICIAL Y DIAGNÓSTICO');
+        campo('Situación al llegar:', ne(m.estadoInicial));
+        campo('Lecturas de control:', ne(m.lecturasControl));
+        parrafo('Problema detectado:', ne(m.problemaDetectado));
+
+        // ── 3. Actividades Realizadas ──
+        tituloSeccion('3. ACTIVIDADES REALIZADAS');
+        parrafo('Tareas de mantenimiento realizadas:', ne(m.descripcion));
+        parrafo('Cambio de refacciones / repuestos:', ne(m.repuestos));
+        parrafo('Pruebas de funcionamiento:', ne(m.pruebas));
+
+        // ── 4. Estado Final y Recomendaciones ──
+        tituloSeccion('4. ESTADO FINAL Y RECOMENDACIONES');
+        campo('Condición de entrega:', ne(m.estadoFinal));
+        campo('Próximo mantenimiento programado:', fmt(m.fechaProgramada));
+        parrafo('Tareas pendientes / presupuesto extra:', ne(m.tareasPendientes));
+        parrafo('Sugerencias del técnico:', ne(m.recomendaciones));
+
+        // ── 5. Registro y Firmas ──
+        tituloSeccion('5. REGISTRO Y FIRMAS');
+
+        function bloqueFotos(titulo, fotos) {
+            checkNewPage(14);
+            doc.setFont(undefined, 'bold');
+            doc.text(titulo, marginLeft, yPos);
+            yPos += 6;
+            doc.setFont(undefined, 'normal');
+            if (!fotos || fotos.length === 0) {
+                doc.text('Sin fotos adjuntas.', marginLeft + 3, yPos);
+                yPos += 8;
+                return;
+            }
+            const tam = 38, gap = 5;
+            let x = marginLeft;
+            checkNewPage(tam + 6);
+            fotos.forEach((foto) => {
+                if (x + tam > marginLeft + maxWidth) { x = marginLeft; yPos += tam + gap; checkNewPage(tam + 6); }
+                try { doc.addImage(foto, 'JPEG', x, yPos, tam, tam); } catch (e) {}
+                x += tam + gap;
+            });
+            yPos += tam + 10;
+        }
+
+        bloqueFotos('Evidencia fotográfica — Antes:', m.fotosAntes);
+        bloqueFotos('Evidencia fotográfica — Después:', m.fotosDespues);
+
+        // Firmas
+        checkNewPage(55);
+        const firmaW = (maxWidth - 10) / 2;
+        const firmaBoxY = yPos;
+        doc.setDrawColor(200, 200, 200);
+        doc.rect(marginLeft, firmaBoxY, firmaW, 30);
+        doc.rect(marginLeft + firmaW + 10, firmaBoxY, firmaW, 30);
+        if (m.firmaTecnico)  { try { doc.addImage(m.firmaTecnico,  'PNG', marginLeft + 2, firmaBoxY + 2, firmaW - 4, 26); } catch (e) {} }
+        if (m.firmaRecibido) { try { doc.addImage(m.firmaRecibido, 'PNG', marginLeft + firmaW + 12, firmaBoxY + 2, firmaW - 4, 26); } catch (e) {} }
+        yPos = firmaBoxY + 34;
+        doc.setFontSize(8.5); doc.setFont(undefined, 'normal');
+        doc.text(`Técnico: ${sinEmoji(ne(m.firmaTecnicoNombre))}`, marginLeft, yPos);
+        doc.text(`Recibido por: ${sinEmoji(ne(m.firmaRecibidoNombre))}`, marginLeft + firmaW + 10, yPos);
+        doc.setFontSize(9.5);
+
+        // ── Pie de página ──
+        const totalPaginas = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPaginas; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text(`Azeche P.H. — Acta generada por ${sinEmoji(userNombre)} — Página ${i} de ${totalPaginas}`, marginLeft, 292);
+        }
+
+        doc.save(`Acta_Servicio_${sinEmoji(edNombre).replace(/\s+/g,'_')}_${(m.fechaRealizado || 'sin_fecha')}.pdf`);
+        mostrarToast('✅ Acta de servicio generada');
     };
 
     // ── Utilidades ─────────────────────────────────────────────────────────
