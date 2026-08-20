@@ -417,18 +417,54 @@
                     <label>⏳ Plazo de pago (días hábiles) *</label>
                     <input type="number" id="cobroPrePlazo" value="5" min="1">
                 </div>
-                <div class="form-group full-width">
-                    <label>💳 Datos de pago / consignación (opcional)</label>
-                    <input type="text" id="cobroPreDatosPago" placeholder="Ej: Cuenta de ahorros No. XXX del Banco XXX a nombre de la copropiedad">
+
+                <div class="form-group full-width" style="border-top:1px solid #eee;padding-top:12px;font-weight:700;color:#1a237e;">💳 Forma de pago</div>
+                <div class="form-group">
+                    <label>Tipo de cuenta</label>
+                    <input type="text" id="cobroPreTipoCuenta" placeholder="Ej: de ahorros">
                 </div>
                 <div class="form-group">
-                    <label>✍️ Firma / nombre de quien envía</label>
-                    <input type="text" id="cobroPreFirmaNombre" placeholder="Ej: Administración">
+                    <label>Número de cuenta</label>
+                    <input type="text" id="cobroPreNumCuenta" placeholder="Ej: 123-456789-00">
+                </div>
+                <div class="form-group full-width">
+                    <label>Banco</label>
+                    <input type="text" id="cobroPreBanco" placeholder="Ej: Bancolombia">
+                </div>
+                <div class="form-group full-width">
+                    <label>Teléfono / correo de la administración</label>
+                    <input type="text" id="cobroPreContacto" placeholder="Ej: 601 234 5678 / admin@azecheph.com">
+                </div>
+
+                <div class="form-group full-width" style="border-top:1px solid #eee;padding-top:12px;font-weight:700;color:#1a237e;">✍️ Firma</div>
+                <div class="form-group">
+                    <label>Nombre completo del administrador</label>
+                    <input type="text" id="cobroPreFirmaNombre" placeholder="Ej: Carla Castellano">
                 </div>
                 <div class="form-group">
                     <label>Cargo</label>
-                    <input type="text" id="cobroPreFirmaCargo" placeholder="Ej: Administradora">
+                    <input type="text" id="cobroPreFirmaCargo" value="Administrador(a)">
                 </div>
+                <div class="form-group full-width">
+                    <label>C.C. del administrador</label>
+                    <input type="text" id="cobroPreCedula" placeholder="Ej: 1.020.304.050">
+                </div>
+
+                <div class="form-group full-width" style="border-top:1px solid #eee;padding-top:12px;font-weight:700;color:#1a237e;">📬 Constancia de envío</div>
+                <div class="form-group">
+                    <label>Fecha de envío</label>
+                    <input type="date" id="cobroPreFechaEnvio">
+                </div>
+                <div class="form-group">
+                    <label>Medio de envío</label>
+                    <select id="cobroPreMedioEnvio">
+                        <option value="">-- Sin especificar --</option>
+                        <option value="correo certificado">Correo certificado</option>
+                        <option value="correo electrónico">Correo electrónico</option>
+                        <option value="entrega física con firma de recibido">Entrega física con firma de recibido</option>
+                    </select>
+                </div>
+
                 <input type="hidden" id="cobroPreKey">
                 <div class="full-width">
                     <button type="button" class="btn btn-danger" onclick="generarCobroPrejuridico()" style="width:100%;">⚖️ Generar PDF de Cobro Prejurídico</button>
@@ -1363,6 +1399,8 @@
             document.getElementById('cobroPreKey').value = key;
             document.getElementById('cobroPreFecha').valueAsDate = new Date();
             if (!document.getElementById('cobroPrePlazo').value) document.getElementById('cobroPrePlazo').value = 5;
+            if (!document.getElementById('cobroPreFechaEnvio').value) document.getElementById('cobroPreFechaEnvio').valueAsDate = new Date();
+            if (!document.getElementById('cobroPreFirmaCargo').value) document.getElementById('cobroPreFirmaCargo').value = 'Administrador(a)';
 
             document.getElementById('cobroPreInfoApto').innerHTML = `
                 <div style="font-weight:700;font-size:1.1em;color:#1a237e;margin-bottom:10px;">${d.inmueble} — ${d.propietario}</div>
@@ -1386,12 +1424,19 @@
 
             const fechaStr = document.getElementById('cobroPreFecha').value;
             const plazoDias = parseInt(document.getElementById('cobroPrePlazo').value) || 5;
-            const datosPago = document.getElementById('cobroPreDatosPago').value.trim();
-            const firmaNombre = document.getElementById('cobroPreFirmaNombre').value.trim() || 'La Administración';
-            const firmaCargo = document.getElementById('cobroPreFirmaCargo').value.trim();
+            const tipoCuenta = document.getElementById('cobroPreTipoCuenta').value.trim();
+            const numCuenta = document.getElementById('cobroPreNumCuenta').value.trim();
+            const banco = document.getElementById('cobroPreBanco').value.trim();
+            const contacto = document.getElementById('cobroPreContacto').value.trim();
+            const firmaNombre = document.getElementById('cobroPreFirmaNombre').value.trim();
+            const firmaCargo = document.getElementById('cobroPreFirmaCargo').value.trim() || 'Administrador(a)';
+            const cedula = document.getElementById('cobroPreCedula').value.trim();
+            const fechaEnvioStr = document.getElementById('cobroPreFechaEnvio').value;
+            const medioEnvio = document.getElementById('cobroPreMedioEnvio').value;
 
             if (!fechaStr) { alert('❌ Ingresa la fecha del documento'); return; }
 
+            const val = (v, ph) => v ? v : ph;
             const ed = edificiosCache[edificioActual] || { nombre: edificioActual, nit: '', direccion: '' };
             const { totalPagosEfectivo, saldoFinalEfectivo } = calcularSaldoEfectivo(d);
             const fecha = new Date(fechaStr + 'T12:00:00').toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -1473,7 +1518,7 @@
                 ['Saldo inicial', fmt(d.saldoInicial)],
                 ['Cuotas de administración', fmt(d.totalAdmon)],
                 ['Cuotas extraordinarias', fmt(d.totalExtras)],
-                ['Intereses de mora', fmt(d.totalIntereses)],
+                ['Intereses de mora (ver liquidación anexa)', fmt(d.totalIntereses)],
                 ['Pagos / abonos recibidos', '-' + fmt(totalPagosEfectivo)]
             ];
             doc.setFontSize(9.5);
@@ -1495,20 +1540,49 @@
 
             doc.setFont(undefined, 'normal');
             doc.setFontSize(10);
-            const parrafo2 = `Sobre el saldo en mora se causan intereses moratorios equivalentes a una y media (1.5) veces el interés bancario corriente certificado por la Superintendencia Financiera de Colombia, conforme al artículo 30 de la Ley 675 de 2001.\n\nPor lo anterior, se le requiere para que dentro de los ${plazoDias} días hábiles siguientes al recibo de esta comunicación cancele la totalidad de la suma adeudada, o se acerque a la administración para acordar un plan de pago.` + (datosPago ? `\n\nPara realizar el pago: ${datosPago}` : '') + `\n\nDe no recibirse el pago o una respuesta dentro del plazo indicado, la copropiedad iniciará el cobro por la vía judicial. De acuerdo con el artículo 48 de la Ley 675 de 2001, el certificado de deuda expedido por el administrador presta mérito ejecutivo sin necesidad de requisito o trámite adicional, lo que dará lugar a un proceso ejecutivo con los intereses, costas procesales y honorarios de abogado que se causen a cargo del deudor.`;
-            doc.splitTextToSize(parrafo2, maxWidth).forEach(line => { checkNewPage(8); doc.text(line, marginLeft, yPos); yPos += 5.5; });
+            const cuentaTxt = `Cuenta ${val(tipoCuenta, '[tipo de cuenta]')} N.° ${val(numCuenta, '[número de cuenta]')} — Banco ${val(banco, '[nombre del banco]')} — a nombre de ${ed.nombre}${ed.nit ? ', NIT ' + ed.nit : ''}.`;
+            const contactoTxt = `También puede acercarse directamente a la administración en ${ed.direccion || 'la dirección de administración'}, en horario de atención, o comunicarse al ${val(contacto, '[teléfono/correo de la administración]')}.`;
+            const parrafo2 = `Sobre el saldo en mora se causan intereses moratorios equivalentes a una y media (1.5) veces el interés bancario corriente de la Superintendencia Financiera de Colombia, conforme al artículo 30 de la Ley 675 de 2001. La liquidación detallada de estos intereses (tasa aplicada, periodo de mora y fórmula de cálculo) se encuentra a disposición del propietario en la administración.\n\nPor lo anterior, se le requiere para que dentro de los ${plazoDias} días hábiles siguientes al recibo de esta comunicación cancele la totalidad de la suma adeudada, o se acerque a la administración para acordar un plan de pago.\n\nForma de pago:\n${cuentaTxt}\n${contactoTxt}\n\nDe no recibirse el pago o una respuesta dentro del plazo indicado, la copropiedad iniciará el cobro por la vía judicial. De acuerdo con el artículo 48 de la Ley 675 de 2001, el certificado de deuda expedido por el administrador presta mérito ejecutivo sin necesidad de requisito o trámite adicional, lo que dará lugar a un proceso ejecutivo con los intereses, costas procesales y honorarios de abogado que se causen a cargo del deudor.`;
+
+            parrafo2.split('\n').forEach(parrafo => {
+                if (parrafo === 'Forma de pago:') {
+                    checkNewPage(8);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(parrafo, marginLeft, yPos);
+                    doc.setFont(undefined, 'normal');
+                    yPos += 5.5;
+                    return;
+                }
+                if (parrafo === '') { yPos += 2.5; return; }
+                doc.splitTextToSize(parrafo, maxWidth).forEach(line => { checkNewPage(8); doc.text(line, marginLeft, yPos); yPos += 5.5; });
+            });
 
             yPos += 15;
-            checkNewPage(35);
+            checkNewPage(45);
             doc.text('Atentamente,', marginLeft, yPos);
             yPos += 20;
             doc.line(marginLeft, yPos, marginLeft + 70, yPos);
             yPos += 6;
             doc.setFont(undefined, 'bold');
-            doc.text(firmaNombre, marginLeft, yPos);
-            if (firmaCargo) { yPos += 5.5; doc.setFont(undefined, 'normal'); doc.text(firmaCargo, marginLeft, yPos); }
+            doc.text(val(firmaNombre, '[Nombre completo del administrador]'), marginLeft, yPos);
             yPos += 5.5;
-            doc.text(ed.nombre + (ed.nit ? ' — NIT ' + ed.nit : ''), marginLeft, yPos);
+            doc.setFont(undefined, 'normal');
+            doc.text(`${firmaCargo} — ${ed.nombre}${ed.nit ? ', NIT ' + ed.nit : ''}`, marginLeft, yPos);
+            yPos += 5.5;
+            doc.text(`C.C. ${val(cedula, '[número de cédula]')}`, marginLeft, yPos);
+
+            yPos += 16;
+            checkNewPage(20);
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(9.5);
+            doc.text('Constancia de envío:', marginLeft, yPos);
+            yPos += 5.5;
+            doc.setFont(undefined, 'italic');
+            const fechaEnvioTxt = fechaEnvioStr ? new Date(fechaEnvioStr + 'T12:00:00').toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }) : '[fecha]';
+            const medioTxt = medioEnvio || '[medio: correo certificado / correo electrónico / entrega física con firma de recibido]';
+            const constanciaTxt = `Enviado el ${fechaEnvioTxt} por ${medioTxt}. Copia archivada en el expediente del inmueble.`;
+            doc.splitTextToSize(constanciaTxt, maxWidth).forEach(line => { checkNewPage(); doc.text(line, marginLeft, yPos); yPos += 5; });
+            doc.setFont(undefined, 'normal');
 
             const nombreArchivo = `Cobro-Prejuridico-${(d.inmueble||'apto').replace(/[^a-zA-Z0-9]/g,'')}-${fechaStr}.pdf`;
             doc.save(nombreArchivo);
