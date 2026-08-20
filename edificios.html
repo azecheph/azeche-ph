@@ -60,13 +60,13 @@
         }
         .edificio-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.18); border-color: #0056B8; }
 
-        .edificio-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #0056B8; }
+        .edificio-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #0056B8; flex-wrap: wrap; }
         .edificio-icon { font-size: 2.8em; }
-        .edificio-title { flex: 1; }
+        .edificio-title { flex: 1; min-width: 110px; }
         .edificio-title h2 { color: #0056B8; font-size: 1.4em; margin-bottom: 4px; }
         .edificio-title p { color: #888; font-size: 0.85em; }
 
-        .card-actions { display: flex; gap: 6px; }
+        .card-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
         .btn-card { border: none; padding: 7px 12px; border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 700; transition: all 0.2s; }
         .btn-edit { background: #e8f0ff; color: #0056B8; }
         .btn-edit:hover { background: #0056B8; color: white; }
