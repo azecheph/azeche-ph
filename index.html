@@ -219,12 +219,12 @@
             
             <div class="form-group">
                 <label>📧 Email</label>
-                <input type="email" id="email" placeholder="usuario@ejemplo.com" required="">
+                <input type="email" id="email" placeholder="usuario@ejemplo.com" autocomplete="username" required="">
             </div>
-            
+
             <div class="form-group">
                 <label>🔒 Contraseña</label>
-                <input type="password" id="password" placeholder="••••••••" required="">
+                <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required="">
             </div>
             
             <button type="submit" class="btn-login">Iniciar Sesión</button>
@@ -255,57 +255,45 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // USUARIOS FINALES
+        // USUARIOS FINALES (la contraseña real la valida Firebase Auth, no vive aquí)
         const usuarios = {
             admin: {
                 email: 'azeche.adm@azecheph.com',
-                password: 'AzecheAdm2025!',
                 nombre: 'Azeche Adm.',
                 rol: 'administrador',
                 permisos: ['ver', 'editar', 'crear', 'eliminar', 'configurar']
             },
             c3madriz: {
                 email: 'c3madriz@azecheph.com',
-                password: 'C3madriz2025!',
                 nombre: 'Carla Castellano (Creadora)',
                 rol: 'creadora',
                 permisos: ['todo', 'administrar', 'configurar', 'eliminar', 'usuarios', 'reportes', 'backup', 'superadmin']
             },
             contadora: {
                 email: 'contadora@azecheph.com',
-                password: 'Conta2026!',
                 nombre: 'Contadora',
                 rol: 'contadora',
                 permisos: ['ver', 'editar', 'crear', 'descargar', 'reportes']
             }
         };
 
-        // LOGIN RÁPIDO CON CONTRASEÑA
+        // ACCESO RÁPIDO: solo precarga el email y deja que el navegador
+        // autocomplete/guarde la contraseña en el campo real del formulario
         window.loginRapido = function(tipo) {
             const usuario = usuarios[tipo];
-            
-            // Pedir contraseña usando prompt
-            const passwordIngresada = prompt(`🔐 Ingresa la contraseña para ${usuario.nombre}:`);
-            
-            if (!passwordIngresada) {
-                return; // Usuario canceló
-            }
-            
-            if (passwordIngresada !== usuario.password) {
-                mostrarError('❌ Contraseña incorrecta');
-                return;
-            }
-            
-            // Contraseña correcta, proceder con login
-            login(usuario.email, usuario.password, usuario.nombre, usuario.rol);
+            document.getElementById('email').value = usuario.email;
+            const passwordInput = document.getElementById('password');
+            passwordInput.value = '';
+            passwordInput.focus();
         };
 
-        // LOGIN MANUAL
+        // LOGIN MANUAL (y también el de Acceso Rápido, que solo precarga el email)
         document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            login(email, password);
+            const conocido = Object.values(usuarios).find(u => u.email === email);
+            login(email, password, conocido ? conocido.nombre : null, conocido ? conocido.rol : null);
         });
 
         // FUNCIÓN DE LOGIN
