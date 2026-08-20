@@ -643,18 +643,19 @@
             </div>
             <div class="form-group">
                 <label>Servicio *</label>
-                <select id="modalRecServicio" required onchange="toggleServicioOtro()">
+                <select id="modalRecServicio" required>
                     <option value="Jardinería">🌱 Jardinería</option>
                     <option value="Aseo Áreas Comunes">🧹 Aseo Áreas Comunes</option>
                     <option value="Fumigación / Control de Plagas">🐜 Fumigación / Control de Plagas</option>
                     <option value="Mantenimiento de Ascensores">🛗 Mantenimiento de Ascensores</option>
-                    <option value="Piscina">🏊 Piscina</option>
-                    <option value="Otro">✏️ Otro</option>
+                    <option value="Extintores">🧯 Extintores</option>
+                    <option value="Certificación de Puertas">🚪 Certificación de Puertas</option>
+                    <option value="Certificación de Ascensores">📋 Certificación de Ascensores</option>
+                    <option value="Elevadores de Autos">🚗 Elevadores de Autos</option>
+                    <option value="Mantenimiento Eléctrico">⚡ Mantenimiento Eléctrico</option>
+                    <option value="Tanques de Agua y Bombas">🚰 Tanques de Agua y Bombas</option>
+                    <option value="Automatizaciones">🤖 Automatizaciones</option>
                 </select>
-            </div>
-            <div class="form-group" id="grupoServicioOtro" style="display:none">
-                <label>Especifique el servicio *</label>
-                <input type="text" id="modalRecServicioOtro" placeholder="Ej: Mantenimiento de bombas de agua">
             </div>
             <div class="form-group">
                 <label>Proveedor / Contratista *</label>
@@ -979,15 +980,8 @@
         }).join('');
     }
 
-    window.toggleServicioOtro = () => {
-        const esOtro = document.getElementById('modalRecServicio').value === 'Otro';
-        document.getElementById('grupoServicioOtro').style.display = esOtro ? '' : 'none';
-        document.getElementById('modalRecServicioOtro').required = esOtro;
-    };
-
     window.abrirModalRecurrente = (registro = null) => {
         document.getElementById('formRecurrente').reset();
-        document.getElementById('grupoServicioOtro').style.display = 'none';
         editandoRecurrenteId = null;
 
         if (registro) {
@@ -998,14 +992,16 @@
             document.getElementById('modalRecFrecuencia').value  = registro.frecuencia  || 'Mensual';
             document.getElementById('modalRecNotas').value       = registro.notas       || '';
 
-            const serviciosPredefinidos = ['Jardinería','Aseo Áreas Comunes','Fumigación / Control de Plagas','Mantenimiento de Ascensores','Piscina'];
-            if (serviciosPredefinidos.includes(registro.servicio)) {
-                document.getElementById('modalRecServicio').value = registro.servicio;
-            } else {
-                document.getElementById('modalRecServicio').value = 'Otro';
-                document.getElementById('grupoServicioOtro').style.display = '';
-                document.getElementById('modalRecServicioOtro').value = registro.servicio || '';
+            const selServicio = document.getElementById('modalRecServicio');
+            const yaExiste = Array.from(selServicio.options).some(o => o.value === registro.servicio);
+            if (!yaExiste && registro.servicio) {
+                // Servicio antiguo que ya no está en la lista fija: se agrega temporalmente para no perder el dato
+                const opt = document.createElement('option');
+                opt.value = registro.servicio;
+                opt.textContent = registro.servicio;
+                selServicio.appendChild(opt);
             }
+            selServicio.value = registro.servicio || '';
         } else {
             document.getElementById('modalRecurrenteTitulo').textContent = '➕ Nuevo Servicio Recurrente';
         }
@@ -1025,10 +1021,7 @@
     window.guardarRecurrente = async (e) => {
         e.preventDefault();
         const edificioId = document.getElementById('modalRecEdificio').value;
-        const servicioSel = document.getElementById('modalRecServicio').value;
-        const servicio = servicioSel === 'Otro'
-            ? document.getElementById('modalRecServicioOtro').value.trim()
-            : servicioSel;
+        const servicio   = document.getElementById('modalRecServicio').value;
         const proveedor  = document.getElementById('modalRecProveedor').value.trim();
         const frecuencia = document.getElementById('modalRecFrecuencia').value;
         const notas      = document.getElementById('modalRecNotas').value.trim();
