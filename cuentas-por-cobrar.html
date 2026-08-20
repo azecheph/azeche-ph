@@ -495,7 +495,8 @@
                 edificiosCache[eid] = {
                     nombre: ed.nombre || child.key,
                     nit: ed.rut || ed.nit || '',
-                    direccion: ed.direccion || ''
+                    direccion: ed.direccion || '',
+                    logo: ed.logo || ''
                 };
             });
             if (v) sel.value = v;
@@ -1414,8 +1415,17 @@
             doc.rect(0, 0, pageWidth, 44, 'F');
             doc.setFillColor(255, 255, 255);
             doc.rect(10, 5, 38, 34, 'F');
-            if (logoB64) {
-                doc.addImage(logoB64, 'PNG', 11, 6, 36, 32);
+            const logoAUsar = ed.logo || logoB64;
+            if (logoAUsar) {
+                try {
+                    const propsLogo = doc.getImageProperties(logoAUsar);
+                    const wMax = 36, hMax = 32;
+                    const ratio = Math.min(wMax / propsLogo.width, hMax / propsLogo.height);
+                    const w = propsLogo.width * ratio, h = propsLogo.height * ratio;
+                    doc.addImage(logoAUsar, propsLogo.fileType || 'PNG', 11 + (wMax - w) / 2, 6 + (hMax - h) / 2, w, h);
+                } catch (e) {
+                    doc.addImage(logoAUsar, 'PNG', 11, 6, 36, 32);
+                }
             } else {
                 doc.setFontSize(13);
                 doc.setFont(undefined, 'bold');
