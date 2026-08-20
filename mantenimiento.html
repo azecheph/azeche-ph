@@ -389,9 +389,14 @@
         <!-- Servicios recurrentes -->
         <div class="section-titulo-row">
             <h2>🌱 Servicios Recurrentes por Edificio</h2>
-            <button id="btnNuevoRecurrente" class="btn btn-primary" onclick="abrirModalRecurrente()" style="display:none">
-                ➕ Nuevo Servicio Recurrente
-            </button>
+            <div class="filtros">
+                <select id="filtroRecurrenteEdificio" onchange="renderTablaRecurrentes()">
+                    <option value="">🏢 Todos los edificios</option>
+                </select>
+                <button id="btnNuevoRecurrente" class="btn btn-primary" onclick="abrirModalRecurrente()" style="display:none">
+                    ➕ Nuevo Servicio Recurrente
+                </button>
+            </div>
         </div>
         <div class="table-container" style="margin-bottom:28px;">
             <table>
@@ -884,19 +889,22 @@
     function cargarEdificios() {
         onValue(ref(db, 'edificios'), (snap) => {
             edificiosMap = {};
-            const selFiltro   = document.getElementById('filtroEdificio');
-            const selModal    = document.getElementById('modalEdificio');
-            const selRec      = document.getElementById('modalRecEdificio');
-            const selInforme  = document.getElementById('informeEdificio');
-            const prevFiltro  = selFiltro.value;
-            const prevModal   = selModal.value;
-            const prevRec     = selRec.value;
-            const prevInforme = selInforme.value;
+            const selFiltro    = document.getElementById('filtroEdificio');
+            const selModal     = document.getElementById('modalEdificio');
+            const selRec       = document.getElementById('modalRecEdificio');
+            const selInforme   = document.getElementById('informeEdificio');
+            const selFiltroRec = document.getElementById('filtroRecurrenteEdificio');
+            const prevFiltro    = selFiltro.value;
+            const prevModal     = selModal.value;
+            const prevRec       = selRec.value;
+            const prevInforme   = selInforme.value;
+            const prevFiltroRec = selFiltroRec.value;
 
-            selFiltro.innerHTML  = '<option value="">🏢 Todos los edificios</option>';
-            selModal.innerHTML   = '<option value="">Seleccionar edificio...</option>';
-            selRec.innerHTML     = '<option value="">Seleccionar edificio...</option>';
-            selInforme.innerHTML = '<option value="">Seleccionar edificio...</option>';
+            selFiltro.innerHTML    = '<option value="">🏢 Todos los edificios</option>';
+            selModal.innerHTML     = '<option value="">Seleccionar edificio...</option>';
+            selRec.innerHTML       = '<option value="">Seleccionar edificio...</option>';
+            selInforme.innerHTML   = '<option value="">Seleccionar edificio...</option>';
+            selFiltroRec.innerHTML = '<option value="">🏢 Todos los edificios</option>';
 
             if (snap.exists()) {
                 snap.forEach(child => {
@@ -905,7 +913,7 @@
                     const icono  = ed.icono  || '🏢';
                     edificiosMap[child.key] = { nombre, icono };
 
-                    [selFiltro, selModal, selRec, selInforme].forEach(sel => {
+                    [selFiltro, selModal, selRec, selInforme, selFiltroRec].forEach(sel => {
                         const opt = document.createElement('option');
                         opt.value       = child.key;
                         opt.textContent = `${icono} ${nombre}`;
@@ -914,10 +922,11 @@
                 });
             }
 
-            selFiltro.value  = prevFiltro;
-            selModal.value   = prevModal;
-            selRec.value     = prevRec;
-            selInforme.value = prevInforme;
+            selFiltro.value    = prevFiltro;
+            selModal.value     = prevModal;
+            selRec.value       = prevRec;
+            selInforme.value   = prevInforme;
+            selFiltroRec.value = prevFiltroRec;
 
             renderResumen();
             renderTablaRecurrentes();
@@ -959,12 +968,19 @@
         const tbody = document.getElementById('tbodyRecurrentes');
         if (!tbody) return;
 
+        const filtroEd = document.getElementById('filtroRecurrenteEdificio')?.value || '';
+        const filas = filtroEd ? todosRecurrentes.filter(r => r.edificioId === filtroEd) : todosRecurrentes;
+
         if (todosRecurrentes.length === 0) {
             tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No hay servicios recurrentes registrados aún.</td></tr>`;
             return;
         }
+        if (filas.length === 0) {
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Este edificio no tiene servicios recurrentes registrados.</td></tr>`;
+            return;
+        }
 
-        tbody.innerHTML = todosRecurrentes.map(r => {
+        tbody.innerHTML = filas.map(r => {
             const edNombre = r.edificioNombre || (edificiosMap[r.edificioId]?.nombre) || r.edificioId;
             return `<tr>
                 <td><strong>${edNombre}</strong></td>
