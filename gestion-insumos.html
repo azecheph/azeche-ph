@@ -477,7 +477,7 @@ window.verDetalle = (key) => {
             <div class="prod-list-m">
                 ${cons.map(p=>`<div class="prod-row-m">
                     <div class="dot azul"></div>
-                    <div class="pname-m">${p.emoji||'📦'} ${p.nombre}<small>${p.cat||'Conserjería'}</small></div>
+                    <div class="pname-m">${p.emoji||'📦'} ${p.nombre}<small>${p.cat||'Conserjería'}</small>${p.nota?`<small style="color:#b8860b;">📝 ${p.nota}</small>`:''}</div>
                     <span class="qty-badge">${p.cantidad} ${p.unidad}</span>
                 </div>`).join('')}
             </div>
@@ -488,7 +488,7 @@ window.verDetalle = (key) => {
             <div class="prod-list-m">
                 ${cafe.map(p=>`<div class="prod-row-m">
                     <div class="dot verde"></div>
-                    <div class="pname-m">${p.emoji||'📦'} ${p.nombre}<small>${p.cat||'Cafetería'}</small></div>
+                    <div class="pname-m">${p.emoji||'📦'} ${p.nombre}<small>${p.cat||'Cafetería'}</small>${p.nota?`<small style="color:#b8860b;">📝 ${p.nota}</small>`:''}</div>
                     <span class="qty-badge v">${p.cantidad} ${p.unidad}</span>
                 </div>`).join('')}
             </div>
@@ -583,14 +583,19 @@ function _buildPDF(s){
         doc.text('UNIDAD',   A-M-14,  y+5);
         y += 9;
         prods.forEach((p,i) => {
-            if(y > 265){ doc.addPage(); y=18; }
-            if(i%2===0){ doc.setFillColor(250,252,255); doc.rect(M,y,A-M*2,7,'F'); }
+            const filaAlto = p.nota ? 11 : 7;
+            if(y > 265-filaAlto){ doc.addPage(); y=18; }
+            if(i%2===0){ doc.setFillColor(250,252,255); doc.rect(M,y,A-M*2,filaAlto,'F'); }
             doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(0,0,0);
             doc.text(String(i+1),               M+3,    y+5);
             doc.text(p.nombre.substring(0,55),  M+10,   y+5);
             doc.text(String(p.cantidad),         A-M-26, y+5);
             doc.text(p.unidad||'-',              A-M-14, y+5);
-            y += 7;
+            if(p.nota){
+                doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(120,120,120);
+                doc.text('Nota: '+p.nota.substring(0,80), M+10, y+9.5);
+            }
+            y += filaAlto;
         });
         y += 5;
     };
@@ -653,11 +658,11 @@ window.enviarWA = (key) => {
     msg += `\nSolicitante: ${s.solicitante||'-'}`;
     if(cons.length){
         msg += `\n\n*🧹 CONSERJERÍA:*`;
-        cons.forEach(p=>{ msg += `\n• ${p.nombre}: ${p.cantidad} ${p.unidad}`; });
+        cons.forEach(p=>{ msg += `\n• ${p.nombre}: ${p.cantidad} ${p.unidad}`; if(p.nota) msg += ` _(${p.nota})_`; });
     }
     if(cafe.length){
         msg += `\n\n*☕ CAFETERÍA:*`;
-        cafe.forEach(p=>{ msg += `\n• ${p.nombre}: ${p.cantidad} ${p.unidad}`; });
+        cafe.forEach(p=>{ msg += `\n• ${p.nombre}: ${p.cantidad} ${p.unidad}`; if(p.nota) msg += ` _(${p.nota})_`; });
     }
     if(s.observaciones) msg += `\n\n📝 ${s.observaciones}`;
     msg += `\n\n_Favor confirmar recepción y disponibilidad._`;
@@ -688,21 +693,32 @@ const CATS_ED = {
         {e:'🧴',n:'Galón Creolina',u:'Galón'},
         {e:'🗑️',n:'Bolsas de Basura 80 cm x 60 cm',u:'Paquete'},
         {e:'🗑️',n:'Bolsas de Basura Extra Jumbo 100 cm x 70 cm',u:'Paquete'},
+        {e:'🗑️',n:'Bolsas Extra Jumbo 110 cm x 100 cm Blancas',u:'Paquete'},
+        {e:'🗑️',n:'Bolsas Extra Jumbo 110 cm x 100 cm Negras',u:'Paquete'},
+        {e:'🗑️',n:'Bolsas Negras Medianas',u:'Paquete'},
+        {e:'🗑️',n:'Bolsas Blancas Medianas',u:'Paquete'},
+        {e:'🗑️',n:'Bolsas Pequeñas',u:'Paquete'},
         {e:'🧼',n:'Jabón de Manos',u:'Unidad'},
         {e:'🧻',n:'Toallas de Manos',u:'Rollo'},
         {e:'🪣',n:'Traperos',u:'Unidad'},
-        {e:'🧹',n:'Escobas',u:'Unidad'},
+        {e:'🧹',n:'Escobas Blandas',u:'Unidad'},
+        {e:'🧹',n:'Escobas Duras',u:'Unidad'},
         {e:'🧻',n:'Papel Higiénico',u:'Paquete'},
         {e:'🪟',n:'Limpia Vidrios en Spray',u:'Unidad'},
         {e:'💨',n:'Spray Ambientador',u:'Unidad'},
         {e:'✨',n:'Lustramuebles',u:'Unidad'},
         {e:'🧽',n:'Esponjillas',u:'Paquete'},
+        {e:'🧽',n:'Zabras',u:'Paquete'},
         {e:'🧼',n:'Jabón Rey',u:'Unidad'},
         {e:'🧼',n:'Jabón en Polvo',u:'Unidad'},
+        {e:'🧂',n:'Bicarbonato',u:'Kilo'},
+        {e:'🛗',n:'Silicona para Ascensor',u:'Unidad'},
+        {e:'🕯️',n:'Cera Líquida',u:'Galón'},
         {e:'🧤',n:'Guantes',u:'Par'},
     ],
     cafeteria:[
         {e:'☕',n:'Café',u:'500g'},
+        {e:'☕',n:'Café Instantáneo',u:'Unidad'},
         {e:'🍬',n:'Panela',u:'Kilo'},
         {e:'🍬',n:'Azúcar',u:'Kilo'},
     ]
@@ -754,6 +770,7 @@ function _renderEditProds() {
         <div class="prod-edit-row">
             <div class="prod-edit-name">${p.emoji||'📦'} ${p.nombre}
                 <small style="display:block;color:#888;font-weight:400;font-size:.8em;">${tipo==='cons'?'🧹 Conserjería':'☕ Cafetería'}</small>
+                <input type="text" placeholder="✏️ Acotación (opcional)" value="${(p.nota||'').replace(/"/g,'&quot;')}" oninput="_enota('${tipo}',${i},this.value)" style="width:100%;box-sizing:border-box;margin-top:5px;padding:5px 8px;border:1px solid #e0e6f5;border-radius:6px;font-size:.8em;color:#555;background:#fafcff;">
             </div>
             <div style="display:flex;align-items:center;gap:5px;">
                 <button onclick="_eqty('${tipo}',${i},-1)" style="width:26px;height:26px;border:2px solid #0056B8;border-radius:6px;background:white;color:#0056B8;font-weight:700;cursor:pointer;line-height:1;">−</button>
@@ -789,11 +806,16 @@ window._edel = (tipo, idx) => {
     _renderEditProds();
 };
 
+window._enota = (tipo, idx, val) => {
+    const arr = tipo==='cons' ? _editCons : _editCafe;
+    arr[idx].nota = val;
+};
+
 window._abrirSelEdit = (c) => {
     _editCat = c;
     _editTmp = {};
     const arr = c==='conserjeria' ? _editCons : _editCafe;
-    arr.forEach(p=>{ _editTmp[p.nombre]={cantidad:p.cantidad,unidad:p.unidad}; });
+    arr.forEach(p=>{ _editTmp[p.nombre]={cantidad:p.cantidad,unidad:p.unidad,nota:p.nota||''}; });
     document.getElementById('eSelTitle').textContent = c==='conserjeria'?'🧹 Conserjería':'☕ Cafetería';
     document.getElementById('eBuscar').value='';
     _renderSelEdit();
@@ -823,7 +845,7 @@ window._renderSelEdit = () => {
 };
 
 window._esCq = (n,u,d) => {
-    if(!_editTmp[n]) _editTmp[n]={cantidad:0,unidad:u};
+    if(!_editTmp[n]) _editTmp[n]={cantidad:0,unidad:u,nota:''};
     _editTmp[n].cantidad=Math.max(0,(_editTmp[n].cantidad||0)+d);
     if(_editTmp[n].cantidad===0) delete _editTmp[n];
     _renderSelEdit();
@@ -834,7 +856,7 @@ window._esCustom = () => {
     const c=parseInt(document.getElementById('eCCant').value)||1;
     const u=document.getElementById('eCUnidad').value;
     if(!n){alert('Escribe el nombre del producto');return;}
-    _editTmp[n]={cantidad:c,unidad:u};
+    _editTmp[n]={cantidad:c,unidad:u,nota:''};
     document.getElementById('eCNombre').value='';
     document.getElementById('eCCant').value='1';
     _renderSelEdit();
@@ -845,7 +867,7 @@ window._esConfirmar = () => {
     const em={}; CATS_ED[_editCat].forEach(p=>em[p.n]=p.e);
     const nuevos=Object.entries(_editTmp)
         .filter(([,t])=>t.cantidad>0)
-        .map(([n,t])=>({cat:_editCat,nombre:n,emoji:em[n]||'📦',cantidad:t.cantidad,unidad:t.unidad}));
+        .map(([n,t])=>({cat:_editCat,nombre:n,emoji:em[n]||'📦',cantidad:t.cantidad,unidad:t.unidad,nota:t.nota||''}));
     if(_editCat==='conserjeria') _editCons=nuevos;
     else _editCafe=nuevos;
     document.getElementById('modalEditSel').classList.remove('active');
