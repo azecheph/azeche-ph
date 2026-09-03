@@ -554,6 +554,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, onValue, push, set, remove, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
@@ -1082,8 +1083,95 @@
         };
 
         // Exportar Excel
+        function _ordenarAptoExport(entries) {
+            return entries.sort((a, b) => {
+                const na = parseInt(String(a[1].apto || '').replace(/\D/g, '')) || 999999;
+                const nb = parseInt(String(b[1].apto || '').replace(/\D/g, '')) || 999999;
+                return na - nb;
+            });
+        }
+
+        function _filaExport(p, dataSet, tipo) {
+            const coefApto = coefNorm(p.coeficienteApto);
+            const coefParq = coefNorm(p.coeficienteParq);
+            const coefLegado = coefNorm(p.coeficiente);
+            const hasNew = parseFloat(p.coeficienteApto) > 0 || parseFloat(p.coeficienteParq) > 0;
+            const coefTotal = hasNew ? (coefApto + coefParq) : coefLegado;
+            const vinc = (p.vinculadoAptoKey && dataSet && dataSet[p.vinculadoAptoKey])
+                ? (dataSet[p.vinculadoAptoKey].apto || dataSet[p.vinculadoAptoKey].nombre || '')
+                : '';
+            const fila = {
+                'Apartamento / Casa': p.apto || '',
+                'Nombre completo': p.nombre || '',
+                'Teléfono': p.telefono || '',
+                'Email': p.email || '',
+                'Documento': p.documento || ''
+            };
+            if (tipo === 'propietario') {
+                fila['Coeficiente Apto (%)'] = coefApto || '';
+                fila['Coeficiente Parqueadero (%)'] = coefParq || '';
+                fila['Coeficiente Total (%)'] = coefTotal || '';
+            }
+            fila['Vinculado a'] = vinc;
+            fila['N° Parqueadero'] = p.parqueadero || '';
+            fila['Matrícula catastral - Apto/Casa'] = p.matriculaApto || '';
+            fila['Matrícula catastral - Garaje'] = p.matriculaGaraje || '';
+            fila['Matrícula catastral - Depósito'] = p.matriculaDeposito || '';
+            fila['Observaciones'] = p.observaciones || '';
+            fila['Estado'] = (p.estado || 'activo') === 'activo' ? 'Activo' : 'Archivado';
+            return fila;
+        }
+
         window.exportarExcel = function() {
-            alert('Función de exportar Excel - Por implementar');
+            if (!edificioActual || (!dataPropietarios[edificioActual] && !dataResidentes[edificioActual])) {
+                alert('⚠️ No hay datos para exportar. Selecciona un edificio con registros.');
+                return;
+            }
+
+            const setProp = dataPropietarios[edificioActual] || {};
+            const setRes = dataResidentes[edificioActual] || {};
+            const propietarios = _ordenarAptoExport(Object.entries(setProp)).map(([, p]) => _filaExport(p, setProp, 'propietario'));
+            const residentes = _ordenarAptoExport(Object.entries(setRes)).map(([, p]) => _filaExport(p, setRes, 'residente'));
+
+            if (!propietarios.length && !residentes.length) {
+                alert('⚠️ No hay registros para exportar en este edificio.');
+                return;
+            }
+
+            const nombreEdif = (document.querySelector('#edificioSelect option:checked')?.textContent || 'Edificio')
+                .replace(/[^\p{L}\p{N}\s-]/gu, '').trim().replace(/\s+/g, '_') || 'Edificio';
+            const fecha = new Date().toISOString().slice(0, 10);
+            const archivo = `Residentes_y_Propietarios_${nombreEdif}_${fecha}`;
+
+            if (typeof XLSX !== 'undefined') {
+                const wb = XLSX.utils.book_new();
+                const wsP = XLSX.utils.json_to_sheet(propietarios.length ? propietarios : [{ 'Apartamento / Casa': '(sin registros)' }]);
+                const wsR = XLSX.utils.json_to_sheet(residentes.length ? residentes : [{ 'Apartamento / Casa': '(sin registros)' }]);
+                wsP['!cols'] = Object.keys(propietarios[0] || { a: 1 }).map(() => ({ wch: 24 }));
+                wsR['!cols'] = Object.keys(residentes[0] || { a: 1 }).map(() => ({ wch: 24 }));
+                XLSX.utils.book_append_sheet(wb, wsP, 'Propietarios');
+                XLSX.utils.book_append_sheet(wb, wsR, 'Residentes');
+                XLSX.writeFile(wb, archivo + '.xlsx');
+                return;
+            }
+
+            // Fallback: CSV (separador ; para Excel en español) si la librería no cargó
+            const aCSV = (filas) => {
+                if (!filas.length) return '';
+                const cols = Object.keys(filas[0]);
+                const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+                return [cols.join(';'), ...filas.map(f => cols.map(c => esc(f[c])).join(';'))].join('\r\n');
+            };
+            const contenido = 'PROPIETARIOS\r\n' + aCSV(propietarios) + '\r\n\r\nRESIDENTES\r\n' + aCSV(residentes);
+            const blob = new Blob(['﻿' + contenido], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = archivo + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
         };
     </script>
 
