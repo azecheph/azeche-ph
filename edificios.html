@@ -417,6 +417,14 @@
         'Tores de Anim II':'torre-amin-2',  'tores de anim ii':'torre-amin-2'
     };
 
+    // Páginas públicas de SST (Seguridad y Salud en el Trabajo) por edificio
+    const SST_URLS = {
+        'nepal-2':       'https://nepal2edificio.github.io/sst-nepal2/',
+        'convivienda-1': 'https://edificioconvivienda.github.io/sst-convivienda1/',
+        'avalon':        'https://edificioavalon.github.io/SST-avalon/',
+        'angelo':        'https://edificioangeloph.github.io/SST-angelo/'
+    };
+
     // Generar slug automático para edificios nuevos
     function generarSlug(nombre) {
         return nombre
@@ -486,6 +494,9 @@
     // ══════════════════════════════════════════════════
     function crearTarjeta(key, d) {
         const pwd_id = 'pwd-' + key;
+
+        // URL de la página pública de SST del edificio (por slug o por nombre conocido)
+        const sstUrl = SST_URLS[d.edificioId] || SST_URLS[SLUGS_CONOCIDOS[(d.nombre || '').trim()]] || '';
 
         // Sección sensible según rol
         let sensibleHtml = '';
@@ -607,6 +618,7 @@
                 <div class="card-actions">
                     <button class="btn-card btn-edit" onclick="abrirEditar('${key}')">✏️ Editar</button>
                     <button class="btn-card" style="background:#7c3aed;color:white;" onclick="abrirDocumentos('${key}')">📄 Docs</button>
+                    ${sstUrl ? `<button class="btn-card" style="background:#0056B8;color:white;" onclick="window.open('${sstUrl}','_blank','noopener')">🦺 SST</button>` : ''}
                     <button class="btn-card" style="background:#25D366;color:white;" onclick="compartirEdificioWhatsApp('${(d.nombre||'').replace(/'/g,"\\'")}','${(d.rut||'').replace(/'/g,"\\'")}','${(d.direccion||'').replace(/'/g,"\\'")}')">📤 WhatsApp</button>
                     <button class="btn-card btn-del" onclick="eliminarEdificio('${key}','${(d.nombre||'').replace(/'/g,"\\'")}')">🗑️</button>
                 </div>
@@ -626,6 +638,7 @@
             ${d.direccion ? `<div class="info-group"><div class="info-label">📍 Dirección</div><div class="info-value">${d.direccion}</div></div>` : ''}
             ${d.rut ? `<div class="info-group"><div class="info-label">🏛️ RUT / NIT</div><div class="info-value">${d.rut}</div></div>` : ''}
             ${d.telefono ? `<div class="info-group"><div class="info-label">📞 Teléfono</div><div class="info-value"><a href="tel:${d.telefono}">${d.telefono}</a></div></div>` : ''}
+            ${sstUrl ? `<div class="info-group"><div class="info-label">🦺 Sistema SST</div><div class="info-value"><a href="${sstUrl}" target="_blank" rel="noopener">Ver página SST ↗</a></div></div>` : ''}
             ${catastralInfo}
             ${polizaInfo}
             ${reprInfo}
