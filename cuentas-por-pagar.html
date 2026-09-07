@@ -1582,6 +1582,9 @@
                             tipoCuenta: cuentasPago[0]?.tipoCuenta || prov.tipoCuenta || '',
                             numeroCuenta: cuentasPago[0]?.numeroCuenta || prov.numeroCuenta || prov.cuentaBancaria || '',
                             metodoPago: prov.metodoPago || '',
+                            correo: prov.correo || prov.email || '',
+                            telefono: prov.telefono || prov.celular || '',
+                            whatsapp: prov.whatsapp || '',
                             cuentasPago: cuentasPago
                         };
                         
@@ -1850,10 +1853,13 @@
                         N.º ${cta.numeroCuenta || '—'}
                     </div>`).join('');
 
+            const telefono = extra.telefono || extra.whatsapp || '';
             pop.innerHTML = `
                 <h4>🏢 ${c.proveedor || 'Proveedor'}</h4>
                 ${fila('Tipo de ID', c.tipoId)}
                 ${fila('Identificación', c.numeroId)}
+                ${fila('Correo', extra.correo)}
+                ${fila('Teléfono', telefono)}
                 ${fila('Método de pago', c.metodoPago || extra.metodoPago)}
                 ${cuentasHtml || '<div class="pp-row"><span class="pp-val" style="color:#999;">Sin datos bancarios registrados</span></div>'}
             `;
