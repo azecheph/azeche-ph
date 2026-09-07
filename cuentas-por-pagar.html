@@ -679,6 +679,37 @@
         #tablaCuentas td:nth-child(16) { color: #e53935; }
         #tablaCuentas th:nth-child(17) { color: #8e44ad; }
         .saldo-pend-ant { color: #e53935; font-weight: 700; font-family: 'Courier New', monospace; }
+
+        /* ── Recuadro flotante con los datos del proveedor (al pasar el mouse por la fila) ── */
+        .prov-popover {
+            position: fixed;
+            z-index: 99999;
+            max-width: 340px;
+            background: #ffffff;
+            border: 1px solid #d9def0;
+            border-left: 5px solid #0056B8;
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.22);
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #2c3e50;
+            pointer-events: none;
+        }
+        .prov-popover h4 {
+            margin: 0 0 8px;
+            font-size: 14px;
+            color: #0056B8;
+            border-bottom: 1px solid #eef1f8;
+            padding-bottom: 6px;
+        }
+        .prov-popover .pp-row { display: flex; gap: 8px; margin: 4px 0; }
+        .prov-popover .pp-label { flex: 0 0 108px; color: #7a869a; font-weight: 600; }
+        .prov-popover .pp-val { flex: 1; font-weight: 600; word-break: break-word; }
+        .prov-popover .pp-cuenta {
+            background: #f5f7fd; border-radius: 8px; padding: 6px 8px; margin-top: 6px; line-height: 1.5;
+        }
+        .prov-popover .pp-cuenta strong { color: #0056B8; }
+        #tablaCuerpo tr[data-id]:hover { cursor: help; }
     </style>
 </head>
 <body>
@@ -1517,6 +1548,7 @@
         let edificioActual = '';
         let facturasTemp = [];
         let proveedoresDB = {}; // Base de datos de proveedores en memoria
+        let popoverData = {};   // Datos por fila para el recuadro flotante del proveedor
         
         // Cargar proveedores desde Firebase al iniciar
         const proveedoresRef = ref(db, 'proveedores');
@@ -1693,18 +1725,23 @@
                 }
                 
                 let contador = 0;
+                popoverData = {};
                 snapshot.forEach((childSnapshot) => {
                     const cuenta = childSnapshot.val();
                     const id = childSnapshot.key;
                     console.log('✅ Cargando cuenta:', cuenta.proveedor);
+                    popoverData[id] = cuenta;
                     tbody.innerHTML += crearFilaCuenta(cuenta, id);
                     contador++;
                 });
-                
+
                 console.log(`✅ Total cuentas cargadas: ${contador}`);
-                
+
                 // Actualizar contador
                 document.getElementById('contadorFacturas').textContent = contador;
+
+                // Enlazar el recuadro flotante de datos del proveedor a las filas recién creadas
+                wireProveedorPopover();
                 
                 // MIGRACIÓN AUTOMÁTICA: Actualizar datos bancarios vacíos
                 migrarDatosBancarios(snapshot);
@@ -1778,6 +1815,71 @@
             }
         }
         
+        // ═══════════════════════════════════════════════════════════════
+        // RECUADRO FLOTANTE CON LOS DATOS DEL PROVEEDOR (al pasar el mouse)
+        // ═══════════════════════════════════════════════════════════════
+        function wireProveedorPopover() {
+            if (!document.getElementById('provPopover')) return;
+            document.querySelectorAll('#tablaCuerpo tr[data-id]').forEach(tr => {
+                tr.addEventListener('mouseenter', mostrarPopoverProveedor);
+                tr.addEventListener('mousemove', moverPopoverProveedor);
+                tr.addEventListener('mouseleave', ocultarPopoverProveedor);
+            });
+        }
+
+        function mostrarPopoverProveedor(e) {
+            const pop = document.getElementById('provPopover');
+            const c = popoverData[e.currentTarget.dataset.id];
+            if (!pop || !c) return;
+
+            const extra = proveedoresDB[(c.proveedor || '').toLowerCase()] || {};
+            const cuentas = (extra.cuentasPago && extra.cuentasPago.length)
+                ? extra.cuentasPago
+                : [{ banco: c.banco, tipoCuenta: c.tipoCuenta, numeroCuenta: c.numeroCuenta }];
+
+            const fila = (label, val) => val
+                ? `<div class="pp-row"><span class="pp-label">${label}</span><span class="pp-val">${val}</span></div>`
+                : '';
+
+            const cuentasHtml = cuentas
+                .filter(cta => cta && (cta.banco || cta.numeroCuenta))
+                .map((cta, i) => `
+                    <div class="pp-cuenta">
+                        <strong>Cuenta${cuentas.length > 1 ? ' ' + (i + 1) : ''}</strong><br>
+                        ${cta.banco || 'Sin banco'} — ${cta.tipoCuenta || 's/tipo'}<br>
+                        N.º ${cta.numeroCuenta || '—'}
+                    </div>`).join('');
+
+            pop.innerHTML = `
+                <h4>🏢 ${c.proveedor || 'Proveedor'}</h4>
+                ${fila('Tipo de ID', c.tipoId)}
+                ${fila('Identificación', c.numeroId)}
+                ${fila('Método de pago', c.metodoPago || extra.metodoPago)}
+                ${cuentasHtml || '<div class="pp-row"><span class="pp-val" style="color:#999;">Sin datos bancarios registrados</span></div>'}
+            `;
+            pop.hidden = false;
+            moverPopoverProveedor(e);
+        }
+
+        function moverPopoverProveedor(e) {
+            const pop = document.getElementById('provPopover');
+            if (!pop || pop.hidden) return;
+            const margen = 16;
+            const w = pop.offsetWidth, h = pop.offsetHeight;
+            let x = e.clientX + margen;
+            let y = e.clientY + margen;
+            if (x + w > window.innerWidth - 8)  x = e.clientX - w - margen;
+            if (y + h > window.innerHeight - 8) y = window.innerHeight - h - 8;
+            if (y < 8) y = 8;
+            pop.style.left = x + 'px';
+            pop.style.top  = y + 'px';
+        }
+
+        function ocultarPopoverProveedor() {
+            const pop = document.getElementById('provPopover');
+            if (pop) pop.hidden = true;
+        }
+
         function crearFilaCuenta(cuenta, id) {
             const estadoClass = cuenta.estado === 'Pagada' ? 'estado-pagada' :
                                (new Date(cuenta.fechaVencimiento) < new Date() ? 'estado-vencida' : 'estado-pendiente');
@@ -1808,7 +1910,7 @@
             const saldoColor = saldoActual <= 0 ? '#00B853' : '#e53935';
 
             return `
-                <tr data-proveedor="${(cuenta.proveedor || '').toLowerCase()}" data-fecha="${cuenta.fechaRecepcion || ''}">
+                <tr data-id="${id}" data-proveedor="${(cuenta.proveedor || '').toLowerCase()}" data-fecha="${cuenta.fechaRecepcion || ''}">
                     <td>${cuenta.proveedor || ''}</td>
                     <td>${cuenta.tipoId || ''}</td>
                     <td>${cuenta.numeroId || ''}</td>
@@ -3068,6 +3170,9 @@
             }
         };
     </script>
+
+  <!-- Recuadro flotante con los datos del proveedor -->
+  <div id="provPopover" class="prov-popover" hidden></div>
 
   <script>
     if ('serviceWorker' in navigator) {
