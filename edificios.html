@@ -362,6 +362,45 @@
                 <textarea id="fCuentasBancarias" rows="4" placeholder="Ej:&#10;Bancolombia - Ahorros - 123-456789-00 - Nepal 2 PH&#10;Davivienda - Corriente - 987-654321-00 - Nepal 2 PH"></textarea>
             </div>
 
+            <div class="section-divider divider-blue form-full">💡 Servicios Públicos (ETB, agua, luz)</div>
+
+            <div class="form-group form-full">
+                <label>📞 ETB (teléfono / internet)</label>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px;">
+                    <input type="text" id="fEtbCuenta" placeholder="N.º de cuenta / contrato">
+                    <select id="fEtbDom">
+                        <option value="">¿Domiciliada?</option>
+                        <option value="si">Sí, domiciliada</option>
+                        <option value="no">No, pago manual</option>
+                    </select>
+                    <input type="number" id="fEtbDia" min="1" max="31" placeholder="Día de vencimiento (1-31)">
+                </div>
+            </div>
+            <div class="form-group form-full">
+                <label>💧 Agua (acueducto)</label>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px;">
+                    <input type="text" id="fAguaCuenta" placeholder="N.º de cuenta / contrato">
+                    <select id="fAguaDom">
+                        <option value="">¿Domiciliada?</option>
+                        <option value="si">Sí, domiciliada</option>
+                        <option value="no">No, pago manual</option>
+                    </select>
+                    <input type="number" id="fAguaDia" min="1" max="31" placeholder="Día de vencimiento (1-31)">
+                </div>
+            </div>
+            <div class="form-group form-full">
+                <label>💡 Luz (energía)</label>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px;">
+                    <input type="text" id="fLuzCuenta" placeholder="N.º de cuenta / contrato">
+                    <select id="fLuzDom">
+                        <option value="">¿Domiciliada?</option>
+                        <option value="si">Sí, domiciliada</option>
+                        <option value="no">No, pago manual</option>
+                    </select>
+                    <input type="number" id="fLuzDia" min="1" max="31" placeholder="Día de vencimiento (1-31)">
+                </div>
+            </div>
+
             <div class="section-divider divider-purple form-full">🔐 Datos Sensibles (acceso restringido)</div>
 
             <div class="form-group form-full">
@@ -608,6 +647,44 @@
             </div>`;
         }
 
+        // Servicios públicos (ETB, agua, luz)
+        let serviciosInfo = '';
+        {
+            const sp = d.serviciosPublicos || {};
+            const defs = [['etb','📞 ETB (teléfono/internet)'], ['agua','💧 Agua (acueducto)'], ['luz','💡 Luz (energía)']];
+            const hoyDia = new Date().getDate();
+            const filas = defs.map(([k, titulo]) => {
+                const s = sp[k] || {};
+                if (!s.cuenta && !s.diaVence && !s.domiciliada) return '';
+                const dom = s.domiciliada === 'si'
+                    ? '<span style="color:#2e7d32;font-weight:700;">✅ Domiciliada</span>'
+                    : s.domiciliada === 'no'
+                        ? '<span style="color:#e65100;font-weight:700;">💳 Pago manual</span>'
+                        : '<span style="color:#888;">Domiciliación sin registrar</span>';
+                let venceHtml = '';
+                if (s.diaVence) {
+                    const dia = parseInt(s.diaVence, 10);
+                    const faltan = dia - hoyDia;
+                    const col = faltan < 0 ? '#2e7d32' : faltan === 0 ? '#c62828' : faltan <= 3 ? '#e65100' : '#555';
+                    const aviso = faltan === 0 ? ' — ⚠️ vence hoy'
+                        : (faltan > 0 && faltan <= 3) ? ` — ⏰ faltan ${faltan} día${faltan !== 1 ? 's' : ''}`
+                        : '';
+                    venceHtml = `<br><span style="color:${col};">📅 Vence el día <strong>${dia}</strong> de cada mes${aviso}</span>`;
+                }
+                return `<div style="margin:6px 0;padding-bottom:6px;border-bottom:1px dashed #e0e0e0;">
+                    <strong>${titulo}</strong><br>
+                    ${s.cuenta ? `N.º cuenta: <strong>${s.cuenta}</strong><br>` : ''}
+                    ${dom}${venceHtml}
+                </div>`;
+            }).join('');
+            if (filas.trim()) {
+                serviciosInfo = `<div class="info-group">
+                    <div class="info-label">💡 Servicios Públicos</div>
+                    <div class="info-value" style="font-size:0.92em;">${filas}</div>
+                </div>`;
+            }
+        }
+
         return `
         <div class="edificio-card">
             <div class="edificio-header">
@@ -644,6 +721,7 @@
             ${polizaInfo}
             ${reprInfo}
             ${cuentasInfo}
+            ${serviciosInfo}
             ${sensibleHtml}
         </div>`;
     }
@@ -726,6 +804,15 @@
         togglePolizaPago();
         document.getElementById('fRepresentacionVence').value = d.representacionVence || '';
         document.getElementById('fCuentasBancarias').value    = d.cuentasBancarias || '';
+
+        const sp = d.serviciosPublicos || {};
+        [['Etb','etb'],['Agua','agua'],['Luz','luz']].forEach(([suf, k]) => {
+            const s = sp[k] || {};
+            document.getElementById('f' + suf + 'Cuenta').value = s.cuenta || '';
+            document.getElementById('f' + suf + 'Dom').value    = s.domiciliada || '';
+            document.getElementById('f' + suf + 'Dia').value    = s.diaVence || '';
+        });
+
         document.getElementById('fClavesCamaras').value  = d.clavesCamaras || '';
         document.getElementById('fNotas').value          = d.notas || '';
 
@@ -768,6 +855,11 @@
             polizaCuotasPagadas:document.getElementById('fPolizaCuotasPagadas').value || '',
             representacionVence:  document.getElementById('fRepresentacionVence').value,
             cuentasBancarias:document.getElementById('fCuentasBancarias').value.trim(),
+            serviciosPublicos: {
+                etb:  { cuenta: document.getElementById('fEtbCuenta').value.trim(),  domiciliada: document.getElementById('fEtbDom').value,  diaVence: document.getElementById('fEtbDia').value || '' },
+                agua: { cuenta: document.getElementById('fAguaCuenta').value.trim(), domiciliada: document.getElementById('fAguaDom').value, diaVence: document.getElementById('fAguaDia').value || '' },
+                luz:  { cuenta: document.getElementById('fLuzCuenta').value.trim(),  domiciliada: document.getElementById('fLuzDom').value,  diaVence: document.getElementById('fLuzDia').value || '' }
+            },
             clavesCamaras:   document.getElementById('fClavesCamaras').value.trim(),
             notas:           document.getElementById('fNotas').value.trim(),
             actualizadoEn:   new Date().toISOString()
@@ -821,7 +913,9 @@
          'fMatricula','fChip','fCatastral','fPolizaNo','fAseguradora',
          'fPolizaInicio','fPolizaVence','fPolizaValor',
          'fPolizaCuotas','fPolizaCuotaValor','fPolizaCuotasPagadas',
-         'fRepresentacionVence','fCuentasBancarias','fClavesCamaras','fNotas'].forEach(id => {
+         'fRepresentacionVence','fCuentasBancarias','fClavesCamaras','fNotas',
+         'fEtbCuenta','fEtbDom','fEtbDia','fAguaCuenta','fAguaDom','fAguaDia',
+         'fLuzCuenta','fLuzDom','fLuzDia'].forEach(id => {
             document.getElementById(id).value = '';
         });
         document.getElementById('fTipo').value          = 'EDIFICIO';
