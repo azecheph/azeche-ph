@@ -143,7 +143,7 @@
             border-radius: 15px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.08);
         }
-        table { width: 100%; border-collapse: collapse; }
+        table { width: 100%; min-width: 1080px; border-collapse: collapse; }
         thead { background: linear-gradient(135deg, #0056B8 0%, #00B853 100%); color: white; }
         th { padding: 14px 15px; text-align: left; font-weight: 600; font-size: 0.9em; white-space: nowrap; }
         tbody tr { border-bottom: 1px solid #eee; transition: background 0.2s; }
@@ -179,7 +179,13 @@
         .btn-eliminar  { background: #dc3545; color: white; }
         .btn-eliminar:hover  { background: #b02a37; transform: translateY(-1px); }
 
-        .desc-cell { max-width: 320px; word-break: break-word; }
+        .desc-cell {
+            min-width: 340px;
+            max-width: 460px;
+            white-space: normal;
+            overflow-wrap: break-word;
+            line-height: 1.5;
+        }
         .empty-row td { text-align: center; padding: 50px; color: #999; font-size: 0.95em; }
 
         /* ── Modal ── */
