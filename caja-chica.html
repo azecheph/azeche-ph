@@ -611,7 +611,17 @@
     onAuthStateChanged(auth, (user) => {
         if (!user) { window.location.href = 'index.html'; return; }
         const info = JSON.parse(localStorage.getItem('azecheUser') || '{}');
-        if (info.rol !== 'administrador' && info.rol !== 'creadora') { window.location.href = 'Dashboard.html'; return; }
+        // El rol sale del correo con el que inició sesión (si el navegador perdió azecheUser, igual funciona)
+        const ROL_POR_CORREO = { 'azeche.adm@azecheph.com': 'administrador', 'c3madriz@azecheph.com': 'creadora' };
+        const rol = ROL_POR_CORREO[(user.email || '').toLowerCase()] || info.rol;
+        if (rol !== 'administrador' && rol !== 'creadora') {
+            document.body.innerHTML = `<div style="max-width:420px;margin:80px auto;padding:24px;font-family:sans-serif;text-align:center;background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
+                <h2 style="margin-bottom:10px">Sin acceso a Caja Menor</h2>
+                <p style="color:#555;margin-bottom:18px">El usuario <b>${user.email || 'desconocido'}</b> (rol: ${rol || 'sin rol'}) no tiene permiso para este módulo.</p>
+                <button onclick="location.href='Dashboard.html'" style="padding:10px 18px;border:none;border-radius:8px;background:#1e3a5f;color:#fff;cursor:pointer">Volver al Dashboard</button></div>`;
+            return;
+        }
+        if (!info.rol) localStorage.setItem('azecheUser', JSON.stringify({ ...info, uid: user.uid, email: user.email, rol, nombre: info.nombre || user.email }));
         document.getElementById('headerSub').textContent = `Torres de Anim II — ${info.nombre || ''}`;
         seleccionarMesActual();
         cargarMovimientos();
