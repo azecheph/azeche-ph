@@ -275,6 +275,17 @@
         <div id="listaFacturas" class="facturas-lista"></div>
     </div>
 
+    <!-- GUARDIA DE SESIÓN: solo la jefa, la contadora y Carla (igual que el resto del sistema) -->
+    <style id="guardiaSesion">body{visibility:hidden}</style>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        const auth = getAuth(initializeApp({ apiKey: "AIzaSyBZ-rv2u8O4e5qB2bXsjHEikg5e3r4CPhI", authDomain: "azeche-ph.firebaseapp.com", databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com", projectId: "azeche-ph", storageBucket: "azeche-ph.firebasestorage.app", messagingSenderId: "990780503849", appId: "1:990780503849:web:5d7b41c14ae60c6c36ae63" }));
+        onAuthStateChanged(auth, user => {
+            if (user) document.getElementById('guardiaSesion')?.remove();
+            else window.location.href = 'index.html';
+        });
+    </script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, onValue, update, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';

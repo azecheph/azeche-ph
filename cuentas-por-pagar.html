@@ -1329,6 +1329,17 @@
         </div>
     </div>
 
+    <!-- GUARDIA DE SESIÓN: solo la jefa, la contadora y Carla (igual que el resto del sistema) -->
+    <style id="guardiaSesion">body{visibility:hidden}</style>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        const auth = getAuth(initializeApp({ apiKey: "AIzaSyAS9c6-ың_xF-p7r2eL36yaKpuwTbCg-AE", authDomain: "azeche-ph.firebaseapp.com", databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com", projectId: "azeche-ph", storageBucket: "azeche-ph.firebasestorage.app", messagingSenderId: "357588904299", appId: "1:357588904299:web:7f5e83f259569477d82b1f" }));
+        onAuthStateChanged(auth, user => {
+            if (user) document.getElementById('guardiaSesion')?.remove();
+            else window.location.href = 'index.html';
+        });
+    </script>
     <script type="module">
         // Firebase
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
