@@ -518,7 +518,7 @@
             } else if (factura.estado === 'aprobado') {
                 acciones = `
                     <div class="factura-acciones">
-                        <button class="btn btn-ver" onclick="location.href='cuentas-por-pagar.html'">
+                        <button class="btn btn-ver" onclick="location.href='cuentas-por-pagar.html?v=' + Date.now()">
                             🔍 Ver en Cuentas por Pagar
                         </button>
                     </div>
