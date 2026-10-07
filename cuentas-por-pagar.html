@@ -1334,7 +1334,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        const auth = getAuth(initializeApp({ apiKey: "AIzaSyAS9c6-ың_xF-p7r2eL36yaKpuwTbCg-AE", authDomain: "azeche-ph.firebaseapp.com", databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com", projectId: "azeche-ph", storageBucket: "azeche-ph.firebasestorage.app", messagingSenderId: "357588904299", appId: "1:357588904299:web:7f5e83f259569477d82b1f" }));
+        const auth = getAuth(initializeApp({ apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo", authDomain: "azeche-ph.firebaseapp.com", databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com", projectId: "azeche-ph", storageBucket: "azeche-ph.firebasestorage.app", messagingSenderId: "905337990521", appId: "1:905337990521:web:c2ca4932672c59fef6c5c9" }));
         onAuthStateChanged(auth, user => {
             if (user) document.getElementById('guardiaSesion')?.remove();
             else window.location.href = 'index.html';
@@ -1346,13 +1346,13 @@
         import { getDatabase, ref, push, set, onValue, update, remove, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
-            apiKey: "AIzaSyAS9c6-ың_xF-p7r2eL36yaKpuwTbCg-AE",
+            apiKey: "AIzaSyB-RIKKCnOcOctlNDKwM6Enx1Ls-wOMZSo",
             authDomain: "azeche-ph.firebaseapp.com",
             databaseURL: "https://azeche-ph-default-rtdb.firebaseio.com",
             projectId: "azeche-ph",
             storageBucket: "azeche-ph.firebasestorage.app",
-            messagingSenderId: "357588904299",
-            appId: "1:357588904299:web:7f5e83f259569477d82b1f"
+            messagingSenderId: "905337990521",
+            appId: "1:905337990521:web:c2ca4932672c59fef6c5c9"
         };
 
         const app = initializeApp(firebaseConfig);
