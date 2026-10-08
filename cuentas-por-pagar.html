@@ -995,7 +995,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Categoría del Gasto</label>
+                    <label style="display:flex;justify-content:space-between;align-items:center;">Categoría del Gasto<button type="button" onclick="nuevaCategoriaGasto('categoriaGasto')" title="Agregar una categoría nueva" style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:600;cursor:pointer;">➕ Nueva categoría</button></label>
                     <select id="categoriaGasto">
                         <option value="">Seleccionar...</option>
                         <option value="Servicios Públicos">Servicios Públicos</option>
@@ -1170,7 +1170,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Categoría del Gasto</label>
+                    <label style="display:flex;justify-content:space-between;align-items:center;">Categoría del Gasto<button type="button" onclick="nuevaCategoriaGasto('editarCategoriaGasto')" title="Agregar una categoría nueva" style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:600;cursor:pointer;">➕ Nueva categoría</button></label>
                     <select id="editarCategoriaGasto">
                         <option value="">Seleccionar...</option>
                         <option value="Servicios Públicos">Servicios Públicos</option>
@@ -1561,6 +1561,74 @@
         let proveedoresDB = {}; // Base de datos de proveedores en memoria
         let popoverData = {};   // Datos por fila para el recuadro flotante del proveedor
         
+        // Categorías del gasto: las de siempre + las que se agregan desde la app (nodo categorias_gasto)
+        const CATEGORIAS_BASE = ['Servicios Públicos', 'Mantenimiento', 'Conserjería y Monitoreo', 'Aseo', 'Prestación de Servicios', 'Impuestos', 'Seguros', 'Compras', 'Contratos', 'Otros'];
+        let categoriasExtra = [];
+
+        function listaCategorias() {
+            const base = CATEGORIAS_BASE.filter(c => c !== 'Otros');
+            const extra = categoriasExtra.filter(c => !CATEGORIAS_BASE.some(b => b.toLowerCase() === c.toLowerCase()));
+            return [...base, ...extra.sort((a, b) => a.localeCompare(b, 'es')), 'Otros'];
+        }
+
+        function pintarCategorias() {
+            ['categoriaGasto', 'editarCategoriaGasto'].forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                const actual = sel.value;
+                sel.innerHTML = '<option value="">Seleccionar...</option>';
+                listaCategorias().forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c;
+                    opt.textContent = c;
+                    sel.appendChild(opt);
+                });
+                asegurarOpcionCategoria(id, actual);
+                sel.value = actual;
+            });
+        }
+
+        // Si una cuenta tiene una categoría que ya no está en la lista, se agrega para no perderla al editar
+        window.asegurarOpcionCategoria = function(id, valor) {
+            const sel = document.getElementById(id);
+            if (!sel || !valor) return;
+            if (![...sel.options].some(o => o.value === valor)) {
+                const opt = document.createElement('option');
+                opt.value = valor;
+                opt.textContent = valor;
+                sel.appendChild(opt);
+            }
+        };
+
+        onValue(ref(db, 'categorias_gasto'), (snapshot) => {
+            categoriasExtra = [];
+            snapshot.forEach(child => {
+                const nombre = (child.val() && child.val().nombre) || '';
+                if (nombre) categoriasExtra.push(nombre);
+            });
+            pintarCategorias();
+        });
+
+        window.nuevaCategoriaGasto = async function(selectId) {
+            const nombre = (prompt('Nombre de la nueva categoría del gasto:') || '').trim().replace(/\s+/g, ' ');
+            if (!nombre) return;
+            const existente = listaCategorias().find(c => c.toLowerCase() === nombre.toLowerCase());
+            if (existente) {
+                document.getElementById(selectId).value = existente;
+                alert('La categoría "' + existente + '" ya existe. Quedó seleccionada.');
+                return;
+            }
+            try {
+                await push(ref(db, 'categorias_gasto'), { nombre: nombre, creadaEl: new Date().toISOString() });
+                categoriasExtra.push(nombre);
+                pintarCategorias();
+                document.getElementById(selectId).value = nombre;
+            } catch (e) {
+                console.error(e);
+                alert('No se pudo guardar la categoría: ' + e.message);
+            }
+        };
+
         // Cargar proveedores desde Firebase al iniciar
         const proveedoresRef = ref(db, 'proveedores');
         onValue(proveedoresRef, (snapshot) => {
@@ -2375,6 +2443,7 @@
                 document.getElementById('editarFechaVencimiento').value = cuenta.fechaVencimiento || '';
                 document.getElementById('editarMetodoPago').value = cuenta.metodoPago || '';
                 document.getElementById('editarPrioridad').value = cuenta.prioridad || 'Media';
+                asegurarOpcionCategoria('editarCategoriaGasto', cuenta.categoriaGasto);
                 document.getElementById('editarCategoriaGasto').value = cuenta.categoriaGasto || '';
                 document.getElementById('editarObservaciones').value = cuenta.observaciones || '';
                 document.getElementById('editarSaldoPendienteAnterior').value = cuenta.saldoPendienteAnterior || 0;
