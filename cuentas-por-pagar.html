@@ -955,6 +955,26 @@
                         <input type="date" id="fechaAnticipo">
                     </div>
                 </div>
+
+                <!-- NOTA CRÉDITO -->
+                <div style="background: #f3e5f5; padding: 12px; border-radius: 8px; border: 2px solid #ce93d8; margin-bottom: 15px;">
+                    <label style="color: #8e24aa; font-weight: 700; display: block; margin-bottom: 8px;">🧾 Nota Crédito</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>No. Nota Crédito</label>
+                            <input type="text" id="notaCreditoNumero" placeholder="Ej: 29">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha Nota Crédito</label>
+                            <input type="date" id="notaCreditoFecha">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Monto Total Nota Crédito (con IVA)</label>
+                        <input type="text" inputmode="decimal" id="notaCreditoMonto" value="0" oninput="calcularRestoAPagar()">
+                    </div>
+                    <small style="color: #999; display: block;">Valor que el proveedor descuenta de esta factura. Se resta del saldo final.</small>
+                </div>
                 <div class="form-group">
                     <label style="color: #00B853; font-weight: 700;">✅ Resto a Pagar</label>
                     <input type="text" id="restoAPagar" readonly style="background: #e8f5e9; font-size: 1.1em; font-weight: 700; color: #00B853;">
@@ -1130,6 +1150,26 @@
                         <label>📅 Fecha Anticipo</label>
                         <input type="date" id="editarFechaAnticipo">
                     </div>
+                </div>
+
+                <!-- NOTA CRÉDITO EN EDICIÓN -->
+                <div style="background: #f3e5f5; padding: 12px; border-radius: 8px; border: 2px solid #ce93d8; margin-bottom: 15px;">
+                    <label style="color: #8e24aa; font-weight: 700; display: block; margin-bottom: 8px;">🧾 Nota Crédito</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>No. Nota Crédito</label>
+                            <input type="text" id="editarNotaCreditoNumero" placeholder="Ej: 29">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha Nota Crédito</label>
+                            <input type="date" id="editarNotaCreditoFecha">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Monto Total Nota Crédito (con IVA)</label>
+                        <input type="text" inputmode="decimal" id="editarNotaCreditoMonto" value="0" oninput="calcularRestoEditar()">
+                    </div>
+                    <small style="color: #999; display: block;">Valor que el proveedor descuenta de esta factura. Se resta del saldo final.</small>
                 </div>
                 <div class="form-group">
                     <label style="color: #00B853; font-weight: 700;">✅ Resto a Pagar</label>
@@ -1986,11 +2026,14 @@
             // Saldo pendiente anterior (deuda preexistente)
             const saldoPendAnterior = parseFloat(cuenta.saldoPendienteAnterior) || 0;
 
-            // Saldo actual = valorNeto + saldoPendAnterior - totalAnticipos - totalAbonos
+            const notaCredito = parseFloat(cuenta.notaCreditoMonto) || 0;
+
+            // Saldo actual = valorNeto + saldoPendAnterior - totalAnticipos - totalAbonos - notaCredito
             const saldoActual = (parseFloat(cuenta.valorNeto) || 0)
                 + saldoPendAnterior
                 - totalAnticipos
-                - totalAbonos;
+                - totalAbonos
+                - notaCredito;
 
             const saldoColor = saldoActual <= 0 ? '#00B853' : '#e53935';
 
@@ -2003,7 +2046,7 @@
                     <td>${cuenta.tipoCuenta || '-'}</td>
                     <td>${cuenta.numeroCuenta || '-'}</td>
                     <td>${cuenta.concepto || ''}</td>
-                    <td>${cuenta.facturaNo || ''}</td>
+                    <td>${cuenta.facturaNo || ''}${notaCredito > 0 ? `<br><small style="color:#8e24aa; font-weight:600;" title="Nota crédito${cuenta.notaCreditoFecha ? ' del ' + cuenta.notaCreditoFecha : ''}">🧾 NC ${cuenta.notaCreditoNumero || ''}: -$${notaCredito.toLocaleString('es-CO')}</small>` : ''}</td>
                     <td>$${Number(cuenta.valorBruto || 0).toLocaleString('es-CO')}</td>
                     <td>$${Number(cuenta.aiu || 0).toLocaleString('es-CO')}</td>
                     <td>$${Number(cuenta.iva || 0).toLocaleString('es-CO')}</td>
@@ -2256,7 +2299,8 @@
             const valorNeto        = parseCOP(document.getElementById('valorNeto').value);
             const anticipo         = parseCOP(document.getElementById('anticipo').value);
             const saldoPendAnterior = parseCOP(document.getElementById('saldoPendienteAnterior').value);
-            const resto = valorNeto + saldoPendAnterior - anticipo;
+            const notaCredito       = parseCOP(document.getElementById('notaCreditoMonto').value);
+            const resto = valorNeto + saldoPendAnterior - anticipo - notaCredito;
             document.getElementById('restoAPagar').value = resto.toFixed(2);
         }
 
@@ -2265,9 +2309,14 @@
             const valorNeto         = parseCOP(document.getElementById('editarValorNeto').value);
             const anticipo          = parseCOP(document.getElementById('editarAnticipo').value);
             const saldoPendAnterior = parseCOP(document.getElementById('editarSaldoPendienteAnterior').value);
-            const resto = valorNeto + saldoPendAnterior - anticipo;
+            const notaCredito       = parseCOP(document.getElementById('editarNotaCreditoMonto').value);
+            const resto = valorNeto + saldoPendAnterior - anticipo - notaCredito;
             document.getElementById('editarRestoAPagar').value = resto.toFixed(2);
         }
+
+        // Exponer para los oninput del HTML (el script es type="module")
+        window.calcularRestoAPagar = calcularRestoAPagar;
+        window.calcularRestoEditar = calcularRestoEditar;
 
         // Auto-resolver expresión al salir del campo o al presionar =
         function autoResolver(el, recalcFn) {
@@ -2286,13 +2335,13 @@
         }
 
         // Aplicar auto-resolver a campos del formulario principal
-        ['valorBruto','aiu','iva','retencion','saldoPendienteAnterior','anticipo'].forEach(id => {
+        ['valorBruto','aiu','iva','retencion','saldoPendienteAnterior','anticipo','notaCreditoMonto'].forEach(id => {
             autoResolver(document.getElementById(id), () => { calcularValorNeto(); calcularRestoAPagar(); });
         });
         autoResolver(document.getElementById('valorNeto'), calcularRestoAPagar);
 
         // Aplicar auto-resolver a campos del formulario de edición
-        ['editarValorBruto','editarAiu','editarIva','editarRetencion','editarSaldoPendienteAnterior','editarAnticipo'].forEach(id => {
+        ['editarValorBruto','editarAiu','editarIva','editarRetencion','editarSaldoPendienteAnterior','editarAnticipo','editarNotaCreditoMonto'].forEach(id => {
             autoResolver(document.getElementById(id), () => { calcularValorNetoEditar(); calcularRestoEditar(); });
         });
 
@@ -2336,6 +2385,9 @@
                 saldoPendienteAnterior: parseCOP(document.getElementById('saldoPendienteAnterior').value),
                 anticipo: parseCOP(document.getElementById('anticipo').value),
                 fechaAnticipo: document.getElementById('fechaAnticipo').value || null,
+                notaCreditoNumero: document.getElementById('notaCreditoNumero').value.trim() || null,
+                notaCreditoFecha: document.getElementById('notaCreditoFecha').value || null,
+                notaCreditoMonto: parseCOP(document.getElementById('notaCreditoMonto').value),
                 restoAPagar: parseCOP(document.getElementById('restoAPagar').value) || parseCOP(document.getElementById('valorNeto').value) || parseCOP(valorBruto),
                 fechaRecepcion: document.getElementById('fechaRecepcion').value || null,
                 fechaVencimiento: document.getElementById('fechaVencimiento').value || null,
@@ -2449,7 +2501,11 @@
                 document.getElementById('editarSaldoPendienteAnterior').value = cuenta.saldoPendienteAnterior || 0;
                 document.getElementById('editarAnticipo').value = cuenta.anticipo || 0;
                 document.getElementById('editarFechaAnticipo').value = cuenta.fechaAnticipo || '';
+                document.getElementById('editarNotaCreditoNumero').value = cuenta.notaCreditoNumero || '';
+                document.getElementById('editarNotaCreditoFecha').value = cuenta.notaCreditoFecha || '';
+                document.getElementById('editarNotaCreditoMonto').value = cuenta.notaCreditoMonto || 0;
                 document.getElementById('editarRestoAPagar').value = cuenta.restoAPagar || cuenta.valorNeto || 0;
+                calcularRestoEditar();
                 
                 // Abrir modal
                 document.getElementById('modalEditar').classList.add('active');
@@ -2507,6 +2563,9 @@
                     saldoPendienteAnterior: parseCOP(document.getElementById('editarSaldoPendienteAnterior').value),
                     anticipo: parseCOP(document.getElementById('editarAnticipo').value),
                     fechaAnticipo: document.getElementById('editarFechaAnticipo').value || null,
+                    notaCreditoNumero: document.getElementById('editarNotaCreditoNumero').value.trim() || null,
+                    notaCreditoFecha: document.getElementById('editarNotaCreditoFecha').value || null,
+                    notaCreditoMonto: parseCOP(document.getElementById('editarNotaCreditoMonto').value),
                     restoAPagar: parseCOP(document.getElementById('editarRestoAPagar').value) || parseCOP(document.getElementById('editarValorNeto').value),
                     fechaRecepcion: document.getElementById('editarFechaRecepcion').value || null,
                     fechaVencimiento: document.getElementById('editarFechaVencimiento').value || null,
@@ -2726,7 +2785,8 @@
                             const saldoEdif = (parseFloat(ct.valorNeto) || 0)
                                 + (parseFloat(ct.saldoPendienteAnterior) || 0)
                                 - totAnt
-                                - totalAbonos;
+                                - totalAbonos
+                                - (parseFloat(ct.notaCreditoMonto) || 0);
                             deuda += saldoEdif;
                         }
                     });
@@ -2790,7 +2850,8 @@
                                 const saldo = (parseFloat(ct.valorNeto) || 0)
                                     + saldoPendAnterior
                                     - totalAnticipos
-                                    - totalAbonos;
+                                    - totalAbonos
+                                    - (parseFloat(ct.notaCreditoMonto) || 0);
                                 const fVenc = ct.fechaVencimiento ? new Date(ct.fechaVencimiento + 'T00:00:00') : null;
                                 const vencida = fVenc && fVenc < hoy;
                                 if (vencida) totalGeneralVencidas++;
@@ -2929,7 +2990,8 @@
                 const saldoActual = (parseFloat(cuenta.valorNeto) || 0)
                     + saldoPendAnterior
                     - totalAnticiposAb
-                    - totalAbonos;
+                    - totalAbonos
+                    - (parseFloat(cuenta.notaCreditoMonto) || 0);
 
                 document.getElementById('abonoIdCuenta').value = id;
                 document.getElementById('abonoFecha').valueAsDate = new Date();
@@ -3005,7 +3067,8 @@
                 const saldoActual = (parseFloat(cuenta.valorNeto) || 0)
                     + saldoPendAnterior
                     - totalAnticiposHist
-                    - totalAbonos;
+                    - totalAbonos
+                    - (parseFloat(cuenta.notaCreditoMonto) || 0);
 
                 let html = `
                     <div style="background:#f0f4ff; padding:15px; border-radius:10px; margin-bottom:15px;">
@@ -3103,7 +3166,7 @@
                     ? Object.values(cuenta.abonos).reduce((s, a) => s + (parseFloat(a.monto) || 0), 0)
                     : 0;
                 const saldoPendAnterior = parseFloat(cuenta.saldoPendienteAnterior) || 0;
-                const saldoActual = (parseFloat(cuenta.valorNeto) || 0) + saldoPendAnterior - totalAnticipos - totalAbonos;
+                const saldoActual = (parseFloat(cuenta.valorNeto) || 0) + saldoPendAnterior - totalAnticipos - totalAbonos - (parseFloat(cuenta.notaCreditoMonto) || 0);
 
                 document.getElementById('anticipoIdCuenta').value = id;
                 document.getElementById('anticipoFecha').valueAsDate = new Date();
@@ -3184,7 +3247,7 @@
                     ? Object.values(cuenta.abonos).reduce((s, a) => s + (parseFloat(a.monto) || 0), 0)
                     : 0;
                 const saldoPendAnterior = parseFloat(cuenta.saldoPendienteAnterior) || 0;
-                const saldoActual = (parseFloat(cuenta.valorNeto) || 0) + saldoPendAnterior - totalAnticipos - totalAbonos;
+                const saldoActual = (parseFloat(cuenta.valorNeto) || 0) + saldoPendAnterior - totalAnticipos - totalAbonos - (parseFloat(cuenta.notaCreditoMonto) || 0);
 
                 let html = `
                     <div style="background:#fff3e0; padding:15px; border-radius:10px; margin-bottom:15px;">
