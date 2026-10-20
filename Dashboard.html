@@ -1242,7 +1242,7 @@
                                 pend++;
                                 const abonos = ct.abonos ? Object.values(ct.abonos).reduce((s,a) => s + (parseFloat(a.monto)||0), 0) : 0;
                                 const ants = ct.anticipos ? Object.values(ct.anticipos).reduce((s,a) => s + (parseFloat(a.monto)||0), 0) : (parseFloat(ct.anticipo)||0);
-                                deuda += (parseFloat(ct.valorNeto)||0) + (parseFloat(ct.saldoPendienteAnterior)||0) - ants - abonos;
+                                deuda += (parseFloat(ct.valorNeto)||0) + (parseFloat(ct.saldoPendienteAnterior)||0) - ants - abonos - (parseFloat(ct.notaCreditoMonto)||0);
                             }
                         });
                     }
