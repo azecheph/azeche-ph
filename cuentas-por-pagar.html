@@ -2634,33 +2634,52 @@
                 }
 
                 // Crear datos para Excel
-                const datosExcel = cuentas.map(c => ({
-                    'Proveedor': c.proveedor || '',
-                    'Tipo de ID': c.tipoId || 'NIT',
-                    'No. Identificación': c.numeroId || '',
-                    'Banco': c.banco || '',
-                    'Tipo de Cuenta': c.tipoCuenta || '',
-                    'Número de Cuenta': c.numeroCuenta || '',
-                    'Concepto': c.concepto || '',
-                    'Nro Factura': c.facturaNo || '',
-                    'Valor Bruto': c.valorBruto || 0,
-                    'AIU': c.aiu || 0,
-                    'IVA': c.iva || 0,
-                    'Retención': c.retencion || 0,
-                    'Valor Neto a Pagar': c.valorNeto || 0,
-                    'Fecha de Recepción': c.fechaRecepcion || '',
-                    'Fecha de Vencimiento': c.fechaVencimiento || '',
-                    'Fecha de Pago': c.fechaPago || '',
-                    'Estado': c.estado || 'Pendiente',
-                    'Método de Pago': c.metodoPago || '',
-                    'Categoría del Gasto': c.categoriaGasto || '',
-                    'Prioridad': c.prioridad || 'Media',
-                    'Observaciones': c.observaciones || ''
-                }));
-                
+                const encabezados = ['Proveedor', 'Tipo de ID', 'No. Identificación', 'Banco', 'Tipo de Cuenta',
+                    'Número de Cuenta', 'Concepto', 'Nro Factura', 'Valor Bruto', 'AIU', 'IVA', 'Retención',
+                    'Anticipo', 'Nota Credito', 'Valor Neto a Pagar', 'Fecha de Recepción', 'Fecha de Vencimiento',
+                    'Fecha de Pago', 'Estado', 'Método de Pago', 'Categoría del Gasto', 'Prioridad', 'Observaciones'];
+
+                const filas = cuentas.map(c => {
+                    // Total de anticipos (lista nueva o campo escalar anterior)
+                    const anticipo = c.anticipos
+                        ? Object.values(c.anticipos).reduce((s, a) => s + (parseFloat(a.monto) || 0), 0)
+                        : (parseFloat(c.anticipo) || 0);
+                    const notaCredito = parseFloat(c.notaCreditoMonto) || 0;
+                    return [
+                        c.proveedor || '', c.tipoId || 'NIT', c.numeroId || '', c.banco || '',
+                        c.tipoCuenta || '', c.numeroCuenta || '', c.concepto || '', c.facturaNo || '',
+                        parseFloat(c.valorBruto) || 0, parseFloat(c.aiu) || 0, parseFloat(c.iva) || 0, parseFloat(c.retencion) || 0,
+                        anticipo || '', notaCredito || '',
+                        null, // Valor Neto a Pagar: fórmula, se llena abajo
+                        c.fechaRecepcion || '', c.fechaVencimiento || '', c.fechaPago || '',
+                        c.estado || 'Pendiente', c.metodoPago || '', c.categoriaGasto || '',
+                        c.prioridad || 'Media', c.observaciones || ''
+                    ];
+                });
+
                 // Crear workbook
                 const wb = XLSX.utils.book_new();
-                const ws = XLSX.utils.json_to_sheet(datosExcel);
+                const ws = XLSX.utils.aoa_to_sheet([encabezados, ...filas]);
+
+                // Valor Neto a Pagar = Bruto + AIU + IVA - Retención - Anticipo - Nota Crédito
+                filas.forEach((f, i) => {
+                    const r = i + 2;
+                    const neto = f[8] + f[9] + f[10] - f[11] - (f[12] || 0) - (f[13] || 0);
+                    ws[`O${r}`] = { t: 'n', v: neto, f: `SUM(I${r}+J${r}+K${r}-L${r}-M${r}-N${r})` };
+                });
+
+                // Fila de totales (dos filas en blanco después de la última cuenta)
+                const ultima = filas.length + 1;
+                const filaTot = ultima + 3;
+                ws[`A${filaTot}`] = { t: 's', v: 'TOTALES' };
+                ['I', 'J', 'K', 'L', 'M', 'N', 'O'].forEach((col, k) => {
+                    const total = filas.reduce((s, f) => {
+                        const v = k === 6 ? (f[8] + f[9] + f[10] - f[11] - (f[12] || 0) - (f[13] || 0)) : f[8 + k];
+                        return s + (parseFloat(v) || 0);
+                    }, 0);
+                    ws[`${col}${filaTot}`] = { t: 'n', v: total, f: `SUM(${col}2:${col}${filaTot - 1})` };
+                });
+                ws['!ref'] = `A1:W${filaTot}`;
                 
                 // Ajustar anchos de columnas
                 ws['!cols'] = [
@@ -2676,6 +2695,8 @@
                     { wch: 12 }, // AIU
                     { wch: 12 }, // IVA
                     { wch: 16 }, // Retención
+                    { wch: 14 }, // Anticipo
+                    { wch: 14 }, // Nota Credito
                     { wch: 18 }, // Valor Neto a Pagar
                     { wch: 18 }, // Fecha Recepción
                     { wch: 20 }, // Fecha Vencimiento

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'azeche-ph-v10';
+const CACHE_NAME = 'azeche-ph-v11';
 
 // Solo cachear assets estáticos, NUNCA los HTML
 const STATIC_ASSETS = [
