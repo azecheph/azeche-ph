@@ -261,8 +261,22 @@ const app = initializeApp({
 });
 const db = getDatabase(app);
 
-// Cargar edificios dinámicamente desde Firebase
-onValue(ref(db, 'edificios'), (snap) => {
+// Cargar edificios dinámicamente desde Firebase.
+// Esta página es pública (sin login): lee edificios_publico (solo nombre, icono,
+// NIT y dirección). Si esa copia aún no existe, usa edificios como respaldo.
+let fuenteEdificios = null;
+onValue(ref(db, 'edificios_publico'), (snap) => {
+    if (snap.exists()) {
+        fuenteEdificios = 'publico';
+        pintarEdificios(snap);
+    } else if (!fuenteEdificios) {
+        fuenteEdificios = 'respaldo';
+        onValue(ref(db, 'edificios'), (s) => { if (fuenteEdificios === 'respaldo') pintarEdificios(s); },
+            (err) => console.error('Sin acceso a edificios:', err));
+    }
+}, (err) => console.error('Sin acceso a edificios_publico:', err));
+
+function pintarEdificios(snap) {
     const sel = document.getElementById('edificio');
     if (!sel) return;
     const v = sel.value;
@@ -278,7 +292,7 @@ onValue(ref(db, 'edificios'), (snap) => {
         sel.appendChild(opt);
     });
     if (v) sel.value = v;
-});
+}
 
 window._save = async (data) => {
     await push(ref(db, 'solicitudes_insumos'), data);

@@ -526,7 +526,40 @@
                 html += crearTarjeta(child.key, child.val());
             });
             grid.innerHTML = html;
+            sincronizarPublico(snap);
         });
+    }
+
+    // ══════════════════════════════════════════════════
+    // COPIA PÚBLICA: edificios_publico/{key} = { nombre, icono, rut, direccion, edificioId }
+    // edificios/ exige sesión (contraseñas, claves, cuentas). Las páginas sin login
+    // (solicitud-insumos) leen solo esta copia sin datos sensibles.
+    // ══════════════════════════════════════════════════
+    let ultimoPublico = '';
+    async function sincronizarPublico(snap) {
+        if (!auth.currentUser) return;
+        const publico = {};
+        snap.forEach(child => {
+            const d = child.val() || {};
+            publico[child.key] = {
+                nombre:     d.nombre || '',
+                icono:      d.icono || '🏢',
+                rut:        d.rut || '',
+                direccion:  d.direccion || '',
+                edificioId: d.edificioId || ''
+            };
+        });
+        const json = JSON.stringify(publico);
+        if (json === ultimoPublico) return;
+        try {
+            const actual = await get(ref(db, 'edificios_publico'));
+            if (JSON.stringify(actual.val() || {}) !== json) {
+                await set(ref(db, 'edificios_publico'), publico);
+            }
+            ultimoPublico = json;
+        } catch (err) {
+            console.error('No se pudo actualizar edificios_publico:', err);
+        }
     }
 
     // ══════════════════════════════════════════════════
@@ -1166,7 +1199,14 @@
     window.logout = () => signOut(auth).then(() => { window.location.href = 'index.html'; });
 
     // Iniciar
-    onAuthStateChanged(auth, () => inicializar());
+    // edificios/ exige sesión: sin usuario, volver al login
+    let iniciado = false;
+    onAuthStateChanged(auth, (user) => {
+        if (!user) { window.location.href = 'index.html'; return; }
+        if (iniciado) return;
+        iniciado = true;
+        inicializar();
+    });
 </script>
 
 <script>
