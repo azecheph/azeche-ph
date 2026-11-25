@@ -2649,7 +2649,9 @@
                         c.proveedor || '', c.tipoId || 'NIT', c.numeroId || '', c.banco || '',
                         c.tipoCuenta || '', c.numeroCuenta || '', c.concepto || '', c.facturaNo || '',
                         parseFloat(c.valorBruto) || 0, parseFloat(c.aiu) || 0, parseFloat(c.iva) || 0, parseFloat(c.retencion) || 0,
-                        anticipo || '', notaCredito || '',
+                        // Siempre número (0 si no hay): una celda de texto vacío
+                        // hace que Excel muestre #¡VALOR! en la fórmula del Valor Neto
+                        anticipo || 0, notaCredito || 0,
                         null, // Valor Neto a Pagar: fórmula, se llena abajo
                         c.fechaRecepcion || '', c.fechaVencimiento || '', c.fechaPago || '',
                         c.estado || 'Pendiente', c.metodoPago || '', c.categoriaGasto || '',
