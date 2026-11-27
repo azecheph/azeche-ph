@@ -442,7 +442,6 @@
         { nombre:'Pinos del Country', edificioId:'pinos-del-country',  tipo:'EDIFICIO', icono:'🌲',  email:'pinosdelcountryedificio@gmail.com',  password:'pinos%2024*',       direccion:'CR 12 127 B - 23', rut:'830059667-8', telefono:'', matricula:'', chip:'', catastral:'', polizaNo:'', aseguradora:'', polizaVence:'', polizaValor:'', cuentasBancarias:'', clavesCamaras:'', notas:'' },
         { nombre:'Convivienda I',     edificioId:'convivienda-1',      tipo:'EDIFICIO', icono:'🏘️', email:'edificioconvivienda@gmail.com',       password:'Convivi#2024',      direccion:'CR 10a #138-71',   rut:'830112728-5', telefono:'', matricula:'', chip:'', catastral:'', polizaNo:'', aseguradora:'', polizaVence:'', polizaValor:'', cuentasBancarias:'', clavesCamaras:'', notas:'' },
         { nombre:'Avalon',            edificioId:'avalon',             tipo:'EDIFICIO', icono:'🏰',  email:'edificioavalonadm@gmail.com',        password:'admin.avalon&2025', direccion:'Calle 65 #9-07',   rut:'800245101-1', telefono:'', matricula:'', chip:'', catastral:'', polizaNo:'', aseguradora:'', polizaVence:'', polizaValor:'', cuentasBancarias:'', clavesCamaras:'', notas:'' },
-        { nombre:'Torres de Amin II', edificioId:'torre-amin-2',       tipo:'EDIFICIO', icono:'🏢',  email:'',                                  password:'',                  direccion:'',                 rut:'',            telefono:'', matricula:'', chip:'', catastral:'', polizaNo:'', aseguradora:'', polizaVence:'', polizaValor:'', cuentasBancarias:'', clavesCamaras:'', notas:'' }
     ];
 
     // Mapa de nombres conocidos a sus slugs (para migración de registros existentes)
@@ -452,8 +451,6 @@
         'Convivienda I':'convivienda-1', 'convivienda i':'convivienda-1',
         'Convivienda 1':'convivienda-1', 'convivienda 1':'convivienda-1',
         'Avalon':'avalon', 'avalon':'avalon',
-        'Torres de Amin II':'torre-amin-2', 'torres de amin ii':'torre-amin-2',
-        'Tores de Anim II':'torre-amin-2',  'tores de anim ii':'torre-amin-2'
     };
 
     // Páginas públicas de SST (Seguridad y Salud en el Trabajo) por edificio
@@ -462,7 +459,6 @@
         'convivienda-1': 'https://edificioconvivienda.github.io/sst-convivienda1/',
         'avalon':        'https://edificioavalon.github.io/SST-avalon/',
         'angelo':        'https://edificioangeloph.github.io/SST-angelo/',
-        'torre-amin-2':  'https://torresdeanim2.github.io/SST-Torresdeanim2/'
     };
 
     // Generar slug automático para edificios nuevos
@@ -490,7 +486,7 @@
             }
         } else {
             // Migración: agregar edificioId a registros que no lo tienen, y corregir slugs incorrectos
-            const SLUGS_INCORRECTOS = { 'tores-de-anim-2': 'torre-amin-2', 'torres-de-amin-2': 'torre-amin-2' };
+            const SLUGS_INCORRECTOS = {};
             const migraciones = [];
             snap.forEach(child => {
                 const ed = child.val();

@@ -519,7 +519,7 @@
         let carteraData = {};
 
         // Helper slug (fallback si edificioId no está aún en Firebase)
-        const _SLUGS_CONOCIDOS = {'Nepal 2':'nepal-2','Pinos del Country':'pinos-del-country','Convivienda I':'convivienda-1','Convivienda 1':'convivienda-1','Avalon':'avalon','Torres de Amin II':'torre-amin-2','Tores de Anim II':'torre-amin-2'};
+        const _SLUGS_CONOCIDOS = {'Nepal 2':'nepal-2','Pinos del Country':'pinos-del-country','Convivienda I':'convivienda-1','Convivienda 1':'convivienda-1','Avalon':'avalon',};
         function slugEdificio(n){if(!n)return'';if(_SLUGS_CONOCIDOS[n])return _SLUGS_CONOCIDOS[n];return n.replace(/\bIV\b/g,'4').replace(/\bIII\b/g,'3').replace(/\bII\b/g,'2').replace(/\bI\b/g,'1').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');}
 
         // ─── EDIFICIOS DINÁMICOS ────────────────────────────────────────
@@ -533,7 +533,7 @@
             if (snap.exists()) snap.forEach(child => {
                 const ed = child.val();
                 const opt = document.createElement('option');
-                const _idFix = {'tores-de-anim-2':'torre-amin-2','torres-de-amin-2':'torre-amin-2'};
+                const _idFix = {};
                 let _eid = ed.edificioId || slugEdificio(ed.nombre) || child.key;
                 const eid = _idFix[_eid] || _eid;
                 opt.value = eid;
