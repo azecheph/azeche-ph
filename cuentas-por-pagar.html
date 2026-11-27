@@ -788,6 +788,10 @@
                         <option value="12">Diciembre</option>
                     </select>
                 </div>
+                <div style="min-width: 110px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #667eea;">📆 Año:</label>
+                    <select id="filtroAnio" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;" onchange="aplicarFiltros()"></select>
+                </div>
                 <button class="btn btn-secondary" onclick="limpiarFiltros()" style="align-self: flex-end;">
                     🔄 Limpiar Filtros
                 </button>
@@ -2038,8 +2042,8 @@
             const saldoColor = saldoActual <= 0 ? '#00B853' : '#e53935';
 
             return `
-                <tr data-id="${id}" data-proveedor="${(cuenta.proveedor || '').toLowerCase()}" data-fecha="${cuenta.fechaRecepcion || ''}">
-                    <td>${cuenta.proveedor || ''}</td>
+                <tr data-id="${id}" data-proveedor="${(cuenta.proveedor || '').toLowerCase()}" data-fecha="${cuenta.fechaRecepcion || ''}" data-estado="${cuenta.estado || 'Pendiente'}" data-saldo="${saldoActual}">
+                    <td>${cuenta.proveedor || ''}<br><span class="tag-arrastre" style="display:none; background:#fff3e0; color:#e65100; border:1px solid #ffb74d; border-radius:6px; padding:1px 6px; font-size:11px; font-weight:700; white-space:nowrap;"></span></td>
                     <td>${cuenta.tipoId || ''}</td>
                     <td>${cuenta.numeroId || ''}</td>
                     <td>${cuenta.banco || '-'}</td>
@@ -2616,46 +2620,54 @@
                     return;
                 }
 
-                // Convertir a array filtrando por mes seleccionado
+                // Cuentas del mes + las de meses anteriores que siguen pendientes
+                // (no "Pagada" y con saldo > 0). Esas pasan al mes siguiente hasta pagarse.
+                const filtroAnio = (document.getElementById('filtroAnio') || {}).value || String(new Date().getFullYear());
+                const periodo = `${filtroAnio}-${filtroMes}`;
+                const sumaLista = (obj) => obj ? Object.values(obj).reduce((s, a) => s + (parseFloat(a.monto) || 0), 0) : 0;
                 const cuentas = [];
                 snapshot.forEach((childSnapshot) => {
                     const c = { id: childSnapshot.key, ...childSnapshot.val() };
-                    const mesCuenta = c.fechaRecepcion ? c.fechaRecepcion.substring(5, 7) : '';
-                    if (mesCuenta === filtroMes) {
-                        cuentas.push(c);
-                    }
+                    c._anticipo = c.anticipos ? sumaLista(c.anticipos) : (parseFloat(c.anticipo) || 0);
+                    c._abonos = sumaLista(c.abonos);
+                    c._saldoAnt = parseFloat(c.saldoPendienteAnterior) || 0;
+                    c._nc = parseFloat(c.notaCreditoMonto) || 0;
+                    const saldo = (parseFloat(c.valorNeto) || 0) + c._saldoAnt - c._anticipo - c._abonos - c._nc;
+                    c._tipo = tipoEnPeriodo(c.fechaRecepcion, c.estado, saldo, periodo);
+                    if (c._tipo) cuentas.push(c);
                 });
 
                 if (cuentas.length === 0) {
-                    const nombresMes = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio',
-                                        'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-                    alert(`❌ No hay cuentas para ${nombresMes[parseInt(filtroMes)]}`);
+                    alert(`❌ No hay cuentas para ${NOMBRES_MES[parseInt(filtroMes)]} ${filtroAnio}`);
                     return;
                 }
+
+                // Primero las que vienen de meses anteriores (más viejas primero), luego las del mes
+                cuentas.sort((a, b) => (a._tipo === b._tipo ? 0 : a._tipo === 'arrastre' ? -1 : 1)
+                    || (a.fechaRecepcion || '').localeCompare(b.fechaRecepcion || ''));
 
                 // Crear datos para Excel
                 const encabezados = ['Proveedor', 'Tipo de ID', 'No. Identificación', 'Banco', 'Tipo de Cuenta',
                     'Número de Cuenta', 'Concepto', 'Nro Factura', 'Valor Bruto', 'AIU', 'IVA', 'Retención',
-                    'Anticipo', 'Nota Credito', 'Valor Neto a Pagar', 'Fecha de Recepción', 'Fecha de Vencimiento',
+                    'Anticipo', 'Nota Credito', 'Saldo Anterior', 'Abonos', 'Valor Neto a Pagar',
+                    'Fecha de Recepción', 'Fecha de Vencimiento',
                     'Fecha de Pago', 'Estado', 'Método de Pago', 'Categoría del Gasto', 'Prioridad', 'Observaciones'];
 
                 const filas = cuentas.map(c => {
-                    // Total de anticipos (lista nueva o campo escalar anterior)
-                    const anticipo = c.anticipos
-                        ? Object.values(c.anticipos).reduce((s, a) => s + (parseFloat(a.monto) || 0), 0)
-                        : (parseFloat(c.anticipo) || 0);
-                    const notaCredito = parseFloat(c.notaCreditoMonto) || 0;
+                    const obs = c._tipo === 'arrastre'
+                        ? `Pendiente de ${textoMesDe(c.fechaRecepcion)}` + (c.observaciones ? ` — ${c.observaciones}` : '')
+                        : (c.observaciones || '');
                     return [
                         c.proveedor || '', c.tipoId || 'NIT', c.numeroId || '', c.banco || '',
                         c.tipoCuenta || '', c.numeroCuenta || '', c.concepto || '', c.facturaNo || '',
                         parseFloat(c.valorBruto) || 0, parseFloat(c.aiu) || 0, parseFloat(c.iva) || 0, parseFloat(c.retencion) || 0,
                         // Siempre número (0 si no hay): una celda de texto vacío
                         // hace que Excel muestre #¡VALOR! en la fórmula del Valor Neto
-                        anticipo || 0, notaCredito || 0,
+                        c._anticipo || 0, c._nc || 0, c._saldoAnt || 0, c._abonos || 0,
                         null, // Valor Neto a Pagar: fórmula, se llena abajo
                         c.fechaRecepcion || '', c.fechaVencimiento || '', c.fechaPago || '',
                         c.estado || 'Pendiente', c.metodoPago || '', c.categoriaGasto || '',
-                        c.prioridad || 'Media', c.observaciones || ''
+                        c.prioridad || 'Media', obs
                     ];
                 });
 
@@ -2663,25 +2675,22 @@
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.aoa_to_sheet([encabezados, ...filas]);
 
-                // Valor Neto a Pagar = Bruto + AIU + IVA - Retención - Anticipo - Nota Crédito
+                // Valor Neto a Pagar = Bruto + AIU + IVA - Retención - Anticipo - Nota Crédito + Saldo Anterior - Abonos
+                const netoDe = (f) => f[8] + f[9] + f[10] - f[11] - f[12] - f[13] + f[14] - f[15];
                 filas.forEach((f, i) => {
                     const r = i + 2;
-                    const neto = f[8] + f[9] + f[10] - f[11] - (f[12] || 0) - (f[13] || 0);
-                    ws[`O${r}`] = { t: 'n', v: neto, f: `SUM(I${r}+J${r}+K${r}-L${r}-M${r}-N${r})` };
+                    ws[`Q${r}`] = { t: 'n', v: netoDe(f), f: `SUM(I${r}+J${r}+K${r}-L${r}-M${r}-N${r}+O${r}-P${r})` };
                 });
 
                 // Fila de totales (dos filas en blanco después de la última cuenta)
                 const ultima = filas.length + 1;
                 const filaTot = ultima + 3;
                 ws[`A${filaTot}`] = { t: 's', v: 'TOTALES' };
-                ['I', 'J', 'K', 'L', 'M', 'N', 'O'].forEach((col, k) => {
-                    const total = filas.reduce((s, f) => {
-                        const v = k === 6 ? (f[8] + f[9] + f[10] - f[11] - (f[12] || 0) - (f[13] || 0)) : f[8 + k];
-                        return s + (parseFloat(v) || 0);
-                    }, 0);
+                ['I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'].forEach((col, k) => {
+                    const total = filas.reduce((s, f) => s + (k === 8 ? netoDe(f) : (parseFloat(f[8 + k]) || 0)), 0);
                     ws[`${col}${filaTot}`] = { t: 'n', v: total, f: `SUM(${col}2:${col}${filaTot - 1})` };
                 });
-                ws['!ref'] = `A1:W${filaTot}`;
+                ws['!ref'] = `A1:Y${filaTot}`;
                 
                 // Ajustar anchos de columnas
                 ws['!cols'] = [
@@ -2699,6 +2708,8 @@
                     { wch: 16 }, // Retención
                     { wch: 14 }, // Anticipo
                     { wch: 14 }, // Nota Credito
+                    { wch: 14 }, // Saldo Anterior
+                    { wch: 14 }, // Abonos
                     { wch: 18 }, // Valor Neto a Pagar
                     { wch: 18 }, // Fecha Recepción
                     { wch: 20 }, // Fecha Vencimiento
@@ -2713,13 +2724,13 @@
                 XLSX.utils.book_append_sheet(wb, ws, 'Cuentas por Pagar');
                 
                 // Descargar
-                const nombresMes = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio',
-                                    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-                const año = new Date().getFullYear();
-                const nombreArchivo = `Cuentas_Por_Pagar_${edificioActual}_${nombresMes[parseInt(filtroMes)]}_${año}.xlsx`;
+                const nombreArchivo = `Cuentas_Por_Pagar_${edificioActual}_${NOMBRES_MES[parseInt(filtroMes)]}_${filtroAnio}.xlsx`;
                 XLSX.writeFile(wb, nombreArchivo);
 
-                alert(`✅ Excel descargado exitosamente!\n\n📊 ${cuentas.length} cuentas exportadas\n📁 Archivo: ${nombreArchivo}`);
+                const nArrastre = cuentas.filter(c => c._tipo === 'arrastre').length;
+                alert(`✅ Excel descargado exitosamente!\n\n📊 ${cuentas.length} cuentas exportadas` +
+                      (nArrastre ? `\n↪️ ${nArrastre} pendiente${nArrastre !== 1 ? 's' : ''} de meses anteriores` : '') +
+                      `\n📁 Archivo: ${nombreArchivo}`);
                 
             } catch (error) {
                 console.error('Error descargando Excel:', error);
@@ -2734,23 +2745,71 @@
         // ═══════════════════════════════════════════════════════════════
         // FUNCIONES DE FILTROS
         // ═══════════════════════════════════════════════════════════════
+        // ─── PERIODO Y CUENTAS QUE PASAN AL MES SIGUIENTE ─────────────────
+        // Una cuenta de un mes anterior que no esté "Pagada" y tenga saldo > 0
+        // aparece también en los meses siguientes, hasta que se pague.
+        const NOMBRES_MES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                             'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+        (function llenarFiltroAnio() {
+            const sel = document.getElementById('filtroAnio');
+            if (!sel) return;
+            const actual = new Date().getFullYear();
+            for (let a = actual + 1; a >= 2025; a--) {
+                const o = document.createElement('option');
+                o.value = String(a); o.textContent = String(a);
+                if (a === actual) o.selected = true;
+                sel.appendChild(o);
+            }
+        })();
+
+        // Devuelve '' si la cuenta no entra en el periodo, 'mes' si es del mes,
+        // o 'arrastre' si viene pendiente de un mes anterior.
+        function tipoEnPeriodo(fechaRecepcion, estado, saldo, periodo) {
+            const fp = (fechaRecepcion || '').substring(0, 7);
+            if (!fp) return '';
+            if (fp === periodo) return 'mes';
+            if (fp < periodo && estado !== 'Pagada' && saldo > 0) return 'arrastre';
+            return '';
+        }
+
+        function textoMesDe(fechaRecepcion) {
+            const f = fechaRecepcion || '';
+            return `${NOMBRES_MES[parseInt(f.substring(5, 7))] || ''} ${f.substring(0, 4)}`.trim();
+        }
+
         window.aplicarFiltros = function() {
             const filtroProveedor = document.getElementById('filtroProveedor').value.toLowerCase();
             const filtroMes = document.getElementById('filtroMes').value;
-            
+            const filtroAnio = (document.getElementById('filtroAnio') || {}).value || String(new Date().getFullYear());
+            const periodo = filtroMes ? `${filtroAnio}-${filtroMes}` : '';
+
             const filas = document.querySelectorAll('#tablaCuerpo tr');
             let contador = 0;
-            
+
             filas.forEach(fila => {
                 // Obtener datos de la fila
                 const proveedor = fila.getAttribute('data-proveedor') || '';
                 const fecha = fila.getAttribute('data-fecha') || '';
-                const mesFecha = fecha ? fecha.substring(5, 7) : ''; // Extrae mes de YYYY-MM-DD
-                
+                const estado = fila.getAttribute('data-estado') || '';
+                const saldo = parseFloat(fila.getAttribute('data-saldo')) || 0;
+                const tipo = periodo ? tipoEnPeriodo(fecha, estado, saldo, periodo) : 'mes';
+
+                // Etiqueta "Pendiente de <mes>" solo en las que pasan de un mes anterior
+                const tag = fila.querySelector('.tag-arrastre');
+                if (tag) {
+                    if (tipo === 'arrastre') {
+                        tag.textContent = `↪️ Pendiente de ${textoMesDe(fecha)}`;
+                        tag.style.display = 'inline-block';
+                    } else {
+                        tag.style.display = 'none';
+                    }
+                }
+
                 // Aplicar filtros
                 const coincideProveedor = !filtroProveedor || proveedor.includes(filtroProveedor);
-                const coincideMes = !filtroMes || mesFecha === filtroMes;
-                
+                const coincideMes = !periodo || tipo !== '';
+
                 if (coincideProveedor && coincideMes) {
                     fila.style.display = '';
                     contador++;
@@ -2766,6 +2825,8 @@
         window.limpiarFiltros = function() {
             document.getElementById('filtroProveedor').value = '';
             document.getElementById('filtroMes').value = '';
+            const selAnio = document.getElementById('filtroAnio');
+            if (selAnio) selAnio.value = String(new Date().getFullYear());
             aplicarFiltros();
         };
 
